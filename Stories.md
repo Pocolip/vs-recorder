@@ -14,13 +14,11 @@
 - Create Express server with necessary middleware
 - Configure CORS policy for frontend-backend communication
 - Set up error handling middleware and logging
-- Implement User model for authentication
-- Create Team model with relationships to User
+- Create Team model
 - Develop Replay model connected to Teams
 - Design database indexes for query optimization
 
 ## API Development
-- Build user profile endpoints (GET/PUT /api/users/me)
 - Create team management endpoints (CRUD operations)
 - Implement replay management API with filtering options
 - Develop bulk import functionality for replays
@@ -34,11 +32,9 @@
 - Set up React Router for navigation
 - Configure state management solution
 - Create API service for backend communication
-- Build authentication UI components (login, register, reset)
 - Implement form validation for all inputs
-- Create protected route system for authenticated content
 - Design responsive navigation sidebar
-- Build header component with user profile menu
+- Build header component with menu
 
 ## IndexedDB Implementation
 - Set up IndexedDB schema for offline data storage
