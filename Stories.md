@@ -19,15 +19,6 @@
 - Develop Replay model connected to Teams
 - Design database indexes for query optimization
 
-## Authentication System
-- Implement user registration with email verification
-- Create secure password hashing implementation
-- Build user login endpoints with JWT token generation
-- Develop password reset functionality
-- Create JWT middleware for route protection
-- Implement token refresh logic
-- Add rate limiting for login attempts
-
 ## API Development
 - Build user profile endpoints (GET/PUT /api/users/me)
 - Create team management endpoints (CRUD operations)
