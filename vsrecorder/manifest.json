@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "VS Recorder Extension",
+  "version": "1.0",
+  "description": "A Pokemon Showdown replay analysis Chrome extension",
+  "permissions": [
+    "activeTab"
+  ],
+  "action": {
+    "default_title": "Open VS Recorder"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["hello.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
