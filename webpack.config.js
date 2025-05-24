@@ -4,9 +4,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  devtool: 'cheap-module-source-map',
   entry: {
-    index: './src/index.jsx',
+    popup: './src/index.jsx',
     background: './src/background.js',
     content: './src/content.js'
   },
@@ -15,31 +14,18 @@ module.exports = {
     filename: '[name].js',
     clean: true
   },
-  resolve: {
-    extensions: ['.js', '.jsx']
-  },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react']
-          }
+          loader: 'babel-loader'
         }
       },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader', 'postcss-loader']
-      },
-      {
-        test: /\.(png|jpg|jpeg|gif|svg)$/,
-        type: 'asset/resource',
-        generator: {
-          filename: 'assets/images/[name][ext]'
-        }
       }
     ]
   },
@@ -47,7 +33,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html',
-      chunks: ['index']
+      chunks: ['popup']
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -56,12 +42,12 @@ module.exports = {
       ]
     })
   ],
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-    },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
   },
-  performance: {
-    hints: false
-  }
+  devtool: 'cheap-module-source-map',
+  watch: process.env.NODE_ENV === 'development'
 };
