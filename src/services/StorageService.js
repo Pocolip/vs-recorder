@@ -1,302 +1,462 @@
-// src/services/StorageService.js
+const updateReplay = async (replayId, updates) => {
+    return await updateReplayStatus(replayId, updates);
+};// src/services/StorageService.js - Fixed with explicit method references
 
-class StorageService {
-    // Storage keys
-    static KEYS = {
-        TEAMS: 'teams',
-        REPLAYS: 'replays',
-        SETTINGS: 'settings',
-        STATS: 'stats'
-    };
+console.log('📦 StorageService module loading...');
 
-    // Initialize default data if none exists
-    static async initialize() {
-        try {
-            const existingTeams = await this.getTeams();
-            if (!existingTeams || existingTeams.length === 0) {
-                await this.initializeDefaultData();
-            }
-        } catch (error) {
-            console.error('Error initializing storage:', error);
+const STORAGE_KEYS = {
+    TEAMS: 'vs_recorder_teams',
+    REPLAYS: 'vs_recorder_replays',
+    SETTINGS: 'vs_recorder_settings',
+    STATS: 'vs_recorder_stats'
+};
+
+// Helper function to ensure Chrome Storage is available
+const ensureChromeStorage = () => {
+    if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
+        throw new Error('Chrome Storage API not available');
+    }
+};
+
+// Individual functions instead of class methods to avoid binding issues
+const getTeams = async () => {
+    try {
+        ensureChromeStorage();
+        const result = await chrome.storage.local.get(STORAGE_KEYS.TEAMS);
+        return result[STORAGE_KEYS.TEAMS] || {};
+    } catch (error) {
+        console.error('Failed to get teams:', error);
+        return {};
+    }
+};
+
+const getTeam = async (teamId) => {
+    const teams = await getTeams();
+    return teams[teamId] || null;
+};
+
+const saveTeam = async (teamData) => {
+    try {
+        ensureChromeStorage();
+        const teams = await getTeams();
+        teams[teamData.id] = teamData;
+        await chrome.storage.local.set({ [STORAGE_KEYS.TEAMS]: teams });
+        await updateStats();
+        return teamData;
+    } catch (error) {
+        console.error('Failed to save team:', error);
+        throw error;
+    }
+};
+
+const addTeam = async (teamData) => {
+    return await saveTeam(teamData);
+};
+
+const deleteTeam = async (teamId) => {
+    try {
+        ensureChromeStorage();
+        const teams = await getTeams();
+        delete teams[teamId];
+        await chrome.storage.local.set({ [STORAGE_KEYS.TEAMS]: teams });
+
+        // Also delete all replays for this team
+        await deleteReplaysForTeam(teamId);
+
+        await updateStats();
+    } catch (error) {
+        console.error('Failed to delete team:', error);
+        throw error;
+    }
+};
+
+// Replay functions
+const getReplays = async () => {
+    try {
+        ensureChromeStorage();
+        const result = await chrome.storage.local.get(STORAGE_KEYS.REPLAYS);
+        return result[STORAGE_KEYS.REPLAYS] || {};
+    } catch (error) {
+        console.error('Failed to get replays:', error);
+        return {};
+    }
+};
+
+const getReplaysForTeam = async (teamId) => {
+    const allReplays = await getReplays();
+    const teamReplays = {};
+
+    for (const [replayId, replay] of Object.entries(allReplays)) {
+        if (replay.teamId === teamId) {
+            teamReplays[replayId] = replay;
         }
     }
 
-    // Set up default sample data
-    static async initializeDefaultData() {
-        const defaultTeams = [
-            {
-                id: '1',
-                name: 'Main VGC Team',
-                format: 'VGC 2025',
-                winRate: 68,
-                gamesPlayed: 43,
-                wins: 29,
-                losses: 14,
-                pokemon: '🐉🔥💧🌿⚡🧊',
-                pokepaste: 'https://pokepast.es/ae3a60c6c5f40484',
-                showdownUsers: ['YourUsername'],
-                dateCreated: new Date().toISOString(),
-                lastUsed: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-                isArchived: false,
-                customTags: ['main', 'tournament']
-            },
-            {
-                id: '2',
-                name: 'Experimental Build',
-                format: 'VGC 2025',
-                winRate: 52,
-                gamesPlayed: 23,
-                wins: 12,
-                losses: 11,
-                pokemon: '🦅🌟🗿💎🌙👻',
-                pokepaste: 'https://pokepast.es/example2',
-                showdownUsers: ['YourUsername'],
-                dateCreated: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-                lastUsed: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-                isArchived: false,
-                customTags: ['experimental']
-            },
-            {
-                id: '3',
-                name: 'Tournament Team',
-                format: 'VGC 2025',
-                winRate: 74,
-                gamesPlayed: 31,
-                wins: 23,
-                losses: 8,
-                pokemon: '⚡🔥🌊🌿🌟💫',
-                pokepaste: 'https://pokepast.es/example3',
-                showdownUsers: ['YourUsername'],
-                dateCreated: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days ago
-                lastUsed: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-                isArchived: false,
-                customTags: ['tournament', 'competitive']
+    return teamReplays;
+};
+
+const getReplay = async (replayId) => {
+    const replays = await getReplays();
+    return replays[replayId] || null;
+};
+
+const addReplay = async (replayData) => {
+    try {
+        ensureChromeStorage();
+        const replays = await getReplays();
+        replays[replayData.id] = replayData;
+        await chrome.storage.local.set({ [STORAGE_KEYS.REPLAYS]: replays });
+        await updateStats();
+        return replayData;
+    } catch (error) {
+        console.error('Failed to add replay:', error);
+        throw error;
+    }
+};
+
+const updateReplayStatus = async (replayId, updates) => {
+    try {
+        ensureChromeStorage();
+        const replays = await getReplays();
+        if (replays[replayId]) {
+            replays[replayId] = { ...replays[replayId], ...updates };
+            await chrome.storage.local.set({ [STORAGE_KEYS.REPLAYS]: replays });
+
+            // Only update stats if replay is completed
+            if (updates.status === 'completed') {
+                await updateStats();
             }
-        ];
 
-        await this.setTeams(defaultTeams);
-
-        // Initialize empty replays array
-        await this.setReplays([]);
-
-        // Initialize default settings
-        const defaultSettings = {
-            theme: 'dark',
-            autoImport: false,
-            notifications: true,
-            defaultFormat: 'VGC 2025'
-        };
-        await this.setSettings(defaultSettings);
-    }
-
-    // Teams operations
-    static async getTeams() {
-        return new Promise((resolve) => {
-            chrome.storage.local.get([this.KEYS.TEAMS], (result) => {
-                resolve(result[this.KEYS.TEAMS] || []);
-            });
-        });
-    }
-
-    static async setTeams(teams) {
-        return new Promise((resolve) => {
-            chrome.storage.local.set({ [this.KEYS.TEAMS]: teams }, () => {
-                resolve();
-            });
-        });
-    }
-
-    static async getTeam(teamId) {
-        const teams = await this.getTeams();
-        return teams.find(team => team.id === teamId);
-    }
-
-    static async addTeam(team) {
-        const teams = await this.getTeams();
-        const newTeam = {
-            ...team,
-            id: Date.now().toString(), // Simple ID generation
-            dateCreated: new Date().toISOString(),
-            lastUsed: new Date().toISOString(),
-            gamesPlayed: 0,
-            wins: 0,
-            losses: 0,
-            winRate: 0,
-            isArchived: false
-        };
-        teams.push(newTeam);
-        await this.setTeams(teams);
-        return newTeam;
-    }
-
-    static async updateTeam(teamId, updates) {
-        const teams = await this.getTeams();
-        const teamIndex = teams.findIndex(team => team.id === teamId);
-        if (teamIndex !== -1) {
-            teams[teamIndex] = { ...teams[teamIndex], ...updates };
-            // Recalculate win rate if wins/losses updated
-            if (updates.wins !== undefined || updates.losses !== undefined) {
-                const team = teams[teamIndex];
-                team.gamesPlayed = team.wins + team.losses;
-                team.winRate = team.gamesPlayed > 0 ? Math.round((team.wins / team.gamesPlayed) * 100) : 0;
-            }
-            await this.setTeams(teams);
-            return teams[teamIndex];
+            return replays[replayId];
         }
         return null;
+    } catch (error) {
+        console.error('Failed to update replay status:', error);
+        throw error;
     }
+};
 
-    static async deleteTeam(teamId) {
-        const teams = await this.getTeams();
-        const filteredTeams = teams.filter(team => team.id !== teamId);
-        await this.setTeams(filteredTeams);
-
-        // Also delete associated replays
-        const replays = await this.getReplays();
-        const filteredReplays = replays.filter(replay => replay.teamId !== teamId);
-        await this.setReplays(filteredReplays);
+const deleteReplay = async (replayId) => {
+    try {
+        ensureChromeStorage();
+        const replays = await getReplays();
+        delete replays[replayId];
+        await chrome.storage.local.set({ [STORAGE_KEYS.REPLAYS]: replays });
+        await updateStats();
+    } catch (error) {
+        console.error('Failed to delete replay:', error);
+        throw error;
     }
+};
 
-    // Replays operations
-    static async getReplays(teamId = null) {
-        return new Promise((resolve) => {
-            chrome.storage.local.get([this.KEYS.REPLAYS], (result) => {
-                const allReplays = result[this.KEYS.REPLAYS] || [];
-                if (teamId) {
-                    resolve(allReplays.filter(replay => replay.teamId === teamId));
-                } else {
-                    resolve(allReplays);
+const deleteReplaysForTeam = async (teamId) => {
+    try {
+        ensureChromeStorage();
+        const replays = await getReplays();
+        const filteredReplays = {};
+
+        for (const [replayId, replay] of Object.entries(replays)) {
+            if (replay.teamId !== teamId) {
+                filteredReplays[replayId] = replay;
+            }
+        }
+
+        await chrome.storage.local.set({ [STORAGE_KEYS.REPLAYS]: filteredReplays });
+    } catch (error) {
+        console.error('Failed to delete replays for team:', error);
+        throw error;
+    }
+};
+
+// Stats functions
+const getStats = async () => {
+    try {
+        ensureChromeStorage();
+        const result = await chrome.storage.local.get(STORAGE_KEYS.STATS);
+        return result[STORAGE_KEYS.STATS] || { totalTeams: 0, totalReplays: 0, overallWinRate: 0 };
+    } catch (error) {
+        console.error('Failed to get stats:', error);
+        return { totalTeams: 0, totalReplays: 0, overallWinRate: 0 };
+    }
+};
+
+const updateStats = async () => {
+    try {
+        ensureChromeStorage();
+        const teams = await getTeams();
+        const replays = await getReplays();
+
+        const totalTeams = Object.keys(teams).length;
+        const totalReplays = Object.keys(replays).length;
+
+        // Calculate overall win rate from replays
+        let totalWins = 0;
+        let totalGames = 0;
+
+        for (const replay of Object.values(replays)) {
+            if (replay.parsedData && replay.parsedData.winner) {
+                totalGames++;
+
+                // Check if the current user won by comparing winner with player names
+                const players = replay.parsedData.players || [];
+                const winner = replay.parsedData.winner;
+
+                // For now, assume user is always player 1 (p1) - we'll improve this later
+                if (players.length >= 2 && winner === players[0].name) {
+                    totalWins++;
                 }
-            });
-        });
-    }
+            }
+        }
 
-    static async setReplays(replays) {
-        return new Promise((resolve) => {
-            chrome.storage.local.set({ [this.KEYS.REPLAYS]: replays }, () => {
-                resolve();
-            });
-        });
-    }
-
-    static async addReplay(replay) {
-        const replays = await this.getReplays();
-        const newReplay = {
-            ...replay,
-            id: Date.now().toString(),
-            dateAdded: new Date().toISOString()
-        };
-        replays.push(newReplay);
-        await this.setReplays(replays);
-        return newReplay;
-    }
-
-    // Settings operations
-    static async getSettings() {
-        return new Promise((resolve) => {
-            chrome.storage.local.get([this.KEYS.SETTINGS], (result) => {
-                resolve(result[this.KEYS.SETTINGS] || {});
-            });
-        });
-    }
-
-    static async setSettings(settings) {
-        return new Promise((resolve) => {
-            chrome.storage.local.set({ [this.KEYS.SETTINGS]: settings }, () => {
-                resolve();
-            });
-        });
-    }
-
-    static async updateSettings(updates) {
-        const currentSettings = await this.getSettings();
-        const newSettings = { ...currentSettings, ...updates };
-        await this.setSettings(newSettings);
-        return newSettings;
-    }
-
-    // Stats operations
-    static async getStats() {
-        return new Promise((resolve) => {
-            chrome.storage.local.get([this.KEYS.STATS], (result) => {
-                resolve(result[this.KEYS.STATS] || {});
-            });
-        });
-    }
-
-    static async updateStats(stats) {
-        return new Promise((resolve) => {
-            chrome.storage.local.set({ [this.KEYS.STATS]: stats }, () => {
-                resolve();
-            });
-        });
-    }
-
-    // Utility functions
-    static formatTimeAgo(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-
-        if (diffInSeconds < 60) return 'Just now';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-        return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
-    }
-
-    // Calculate overall stats from teams
-    static async calculateOverallStats() {
-        const teams = await this.getTeams();
-        const activeTeams = teams.filter(team => !team.isArchived);
-
-        const totalGames = activeTeams.reduce((sum, team) => sum + team.gamesPlayed, 0);
-        const totalWins = activeTeams.reduce((sum, team) => sum + team.wins, 0);
         const overallWinRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
 
-        return {
+        const stats = {
+            totalTeams,
+            totalReplays,
             overallWinRate,
-            totalGames,
-            activeTeams: activeTeams.length,
-            totalTeams: teams.length
+            lastUpdated: new Date().toISOString()
         };
+
+        await chrome.storage.local.set({ [STORAGE_KEYS.STATS]: stats });
+        return stats;
+    } catch (error) {
+        console.error('Failed to update stats:', error);
     }
+};
 
-    // Export/Import functionality
-    static async exportData() {
-        const teams = await this.getTeams();
-        const replays = await this.getReplays();
-        const settings = await this.getSettings();
+const getTeamStats = async (teamId) => {
+    const teamReplays = await getReplaysForTeam(teamId);
+    const replayArray = Object.values(teamReplays);
 
-        return {
-            teams,
-            replays,
-            settings,
-            exportDate: new Date().toISOString(),
-            version: '1.0'
-        };
-    }
+    let wins = 0;
+    let totalGames = replayArray.length;
 
-    static async importData(data) {
-        try {
-            if (data.teams) await this.setTeams(data.teams);
-            if (data.replays) await this.setReplays(data.replays);
-            if (data.settings) await this.setSettings(data.settings);
-            return true;
-        } catch (error) {
-            console.error('Error importing data:', error);
-            return false;
+    for (const replay of replayArray) {
+        if (replay.parsedData && replay.parsedData.winner) {
+            const players = replay.parsedData.players || [];
+            const winner = replay.parsedData.winner;
+
+            // Simple win detection - improve this later
+            if (players.length >= 2 && winner === players[0].name) {
+                wins++;
+            }
         }
     }
 
-    // Clear all data
-    static async clearAllData() {
-        return new Promise((resolve) => {
-            chrome.storage.local.clear(() => {
-                resolve();
-            });
-        });
-    }
-}
+    return {
+        totalGames,
+        wins,
+        losses: totalGames - wins,
+        winRate: totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0,
+        lastBattle: replayArray.length > 0
+            ? Math.max(...replayArray.map(r => new Date(r.dateAdded).getTime()))
+            : null
+    };
+};
 
+// Settings functions
+const getSettings = async () => {
+    try {
+        ensureChromeStorage();
+        const result = await chrome.storage.local.get(STORAGE_KEYS.SETTINGS);
+        return result[STORAGE_KEYS.SETTINGS] || {
+            autoImport: false,
+            notifications: true,
+            theme: 'dark'
+        };
+    } catch (error) {
+        console.error('Failed to get settings:', error);
+        return { autoImport: false, notifications: true, theme: 'dark' };
+    }
+};
+
+const updateSettings = async (settings) => {
+    try {
+        ensureChromeStorage();
+        await chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: settings });
+    } catch (error) {
+        console.error('Failed to update settings:', error);
+        throw error;
+    }
+};
+
+// Utility functions
+const clearAllData = async () => {
+    try {
+        ensureChromeStorage();
+        await chrome.storage.local.clear();
+        await initializeSampleData();
+    } catch (error) {
+        console.error('Failed to clear data:', error);
+        throw new Error('Failed to clear data');
+    }
+};
+
+const getStorageUsage = async () => {
+    try {
+        ensureChromeStorage();
+        const result = await chrome.storage.local.getBytesInUse();
+        return {
+            used: result,
+            percentage: Math.round((result / chrome.storage.local.QUOTA_BYTES) * 100)
+        };
+    } catch (error) {
+        console.error('Failed to get storage usage:', error);
+        return { used: 0, percentage: 0 };
+    }
+};
+
+// Sample data initialization
+const initializeSampleData = async () => {
+    try {
+        ensureChromeStorage();
+
+        const sampleTeams = {
+            'team_1': {
+                id: 'team_1',
+                name: 'Reg I Restricteds',
+                description: 'My main team for VGC 2025 Regulation I',
+                pokepaste: 'https://pokepast.es/ae3a60c6c5f40484',
+                showdownUsernames: ['YourUsername'],
+                format: 'VGC 2025 Reg I',
+                tags: ['Restricteds', 'Main'],
+                dateCreated: new Date().toISOString(),
+                lastModified: new Date().toISOString(),
+                isArchived: false
+            }
+        };
+
+        const sampleStats = {
+            totalTeams: 1,
+            totalReplays: 0,
+            overallWinRate: 0,
+            lastUpdated: new Date().toISOString()
+        };
+
+        const sampleSettings = {
+            autoImport: false,
+            notifications: true,
+            theme: 'dark'
+        };
+
+        await Promise.all([
+            chrome.storage.local.set({ [STORAGE_KEYS.TEAMS]: sampleTeams }),
+            chrome.storage.local.set({ [STORAGE_KEYS.REPLAYS]: {} }),
+            chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: sampleSettings }),
+            chrome.storage.local.set({ [STORAGE_KEYS.STATS]: sampleStats })
+        ]);
+    } catch (error) {
+        console.error('Failed to initialize sample data:', error);
+        throw error;
+    }
+};
+
+// Initialize function
+const initialize = async () => {
+    try {
+        const teams = await getTeams();
+        if (Object.keys(teams).length === 0) {
+            await initializeSampleData();
+        }
+    } catch (error) {
+        console.error('Failed to initialize storage:', error);
+    }
+};
+
+// Export/import functions
+const exportData = async () => {
+    try {
+        const [teams, replays, settings, stats] = await Promise.all([
+            getTeams(),
+            getReplays(),
+            getSettings(),
+            getStats()
+        ]);
+
+        return {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            data: {
+                teams,
+                replays,
+                settings,
+                stats
+            }
+        };
+    } catch (error) {
+        console.error('Failed to export data:', error);
+        throw new Error('Failed to export data');
+    }
+};
+
+const importData = async (importData) => {
+    try {
+        ensureChromeStorage();
+
+        if (!importData.data) {
+            throw new Error('Invalid import data format');
+        }
+
+        const { teams, replays, settings, stats } = importData.data;
+
+        await Promise.all([
+            chrome.storage.local.set({ [STORAGE_KEYS.TEAMS]: teams || {} }),
+            chrome.storage.local.set({ [STORAGE_KEYS.REPLAYS]: replays || {} }),
+            chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: settings || {} }),
+            chrome.storage.local.set({ [STORAGE_KEYS.STATS]: stats || {} })
+        ]);
+
+        // Recalculate stats after import
+        await updateStats();
+
+        return true;
+    } catch (error) {
+        console.error('Failed to import data:', error);
+        throw new Error('Failed to import data');
+    }
+};
+
+// Create the service object
+const StorageService = {
+    // Constants
+    STORAGE_KEYS,
+
+    // Team methods
+    getTeams,
+    getTeam,
+    saveTeam,
+    addTeam,
+    deleteTeam,
+
+    // Replay methods
+    getReplays,
+    getReplaysForTeam,
+    getReplay,
+    addReplay,
+    updateReplay,
+    updateReplayStatus,
+    deleteReplay,
+    deleteReplaysForTeam,
+
+    // Stats methods
+    getStats,
+    updateStats,
+    getTeamStats,
+
+    // Settings methods
+    getSettings,
+    updateSettings,
+
+    // Utility methods
+    initialize,
+    clearAllData,
+    getStorageUsage,
+    exportData,
+    importData
+};
+
+console.log('✅ StorageService created with methods:', Object.keys(StorageService));
+
+// Export the service with both named and default exports
+export { StorageService };
 export default StorageService;
