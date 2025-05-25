@@ -1,6 +1,6 @@
 // src/components/EditTeamModal.jsx
 import React, { useState, useEffect } from 'react';
-import { StorageService } from '../services/StorageService';
+import StorageService from '../services/StorageService';
 
 const EditTeamModal = ({ isOpen, onClose, teamData, onTeamUpdated }) => {
     const [formData, setFormData] = useState({
