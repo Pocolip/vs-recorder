@@ -1,183 +1,80 @@
 // src/components/AddReplayModal.jsx
 import React, { useState } from 'react';
-import { ReplayService } from '../services/ReplayService';
-import { StorageService } from '../services/StorageService';
+import { X, Link as LinkIcon, FileText, Plus, AlertCircle } from 'lucide-react';
 
-const AddReplayModal = ({ isOpen, onClose, teamId, teamName, onReplayAdded, team }) => {
+const AddReplayModal = ({ onClose, onAddReplay }) => {
     const [replayUrl, setReplayUrl] = useState('');
     const [notes, setNotes] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [bulkMode, setBulkMode] = useState(false);
+    const [bulkUrls, setBulkUrls] = useState('');
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [importMode, setImportMode] = useState('single'); // 'single' or 'bulk'
-    const [bulkText, setBulkText] = useState('');
-    const [processingStatus, setProcessingStatus] = useState(null); // For bulk import progress
 
-    const handleClose = () => {
-        if (!isLoading) {
-            setReplayUrl('');
-            setNotes('');
-            setBulkText('');
-            setError('');
-            setImportMode('single');
-            setProcessingStatus(null);
-            onClose();
-        }
+    const validateReplayUrl = (url) => {
+        const replayPattern = /^https?:\/\/replay\.pokemonshowdown\.com\/.*$/;
+        return replayPattern.test(url.trim());
     };
 
-    const validateUrl = (url) => {
-        const parsed = ReplayService.parseReplayUrl(url);
-        return parsed !== null;
-    };
+    const handleSingleSubmit = async (e) => {
+        e.preventDefault();
 
-    const handleSingleImport = async () => {
-        if (!replayUrl.trim()) {
+        const trimmedUrl = replayUrl.trim();
+        if (!trimmedUrl) {
             setError('Please enter a replay URL');
             return;
         }
 
-        if (!validateUrl(replayUrl.trim())) {
-            setError('Invalid Showdown replay URL format');
+        if (!validateReplayUrl(trimmedUrl)) {
+            setError('Please enter a valid Pokémon Showdown replay URL');
             return;
         }
 
-        setIsLoading(true);
-        setError('');
-
         try {
-            // Import ReplayProcessor dynamically to avoid bundling issues
-            const { default: ReplayProcessor } = await import('../services/ReplayProcessor');
-
-            // Use async processing for single imports too
-            const replayEntries = await ReplayProcessor.processReplays(
-                [replayUrl.trim()],
-                teamId,
-                notes.trim(),
-                (replayId, status, data) => {
-                    if (onReplayAdded && (status === 'created' || status === 'completed')) {
-                        onReplayAdded(data);
-                    }
-                }
-            );
-
-            if (replayEntries.length > 0) {
-                // Success - close modal
-                handleClose();
-            } else {
-                setError('Failed to create replay entry');
-            }
-
+            setLoading(true);
+            setError('');
+            await onAddReplay(trimmedUrl, notes.trim());
+            // Modal will be closed by parent component on success
         } catch (err) {
-            console.error('Single import error:', err);
-            setError(err.message || 'Failed to import replay');
+            setError(err.message || 'Failed to add replay. Please try again.');
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
-    const handleBulkImport = async () => {
-        if (!bulkText.trim()) {
-            setError('Please enter replay URLs or text containing URLs');
-            return;
-        }
+    const handleBulkSubmit = async (e) => {
+        e.preventDefault();
 
-        const urls = ReplayService.extractUrlsFromText(bulkText);
+        const urls = bulkUrls
+            .split('\n')
+            .map(url => url.trim())
+            .filter(url => url);
 
         if (urls.length === 0) {
-            setError('No valid replay URLs found in the text');
+            setError('Please enter at least one replay URL');
             return;
         }
 
-        const validation = ReplayService.validateMultipleUrls(urls);
-
-        if (validation.invalid.length > 0) {
-            setError(`Found ${validation.invalid.length} invalid URLs. Please check your input.`);
+        const invalidUrls = urls.filter(url => !validateReplayUrl(url));
+        if (invalidUrls.length > 0) {
+            setError(`Invalid URLs found: ${invalidUrls.slice(0, 3).join(', ')}${invalidUrls.length > 3 ? '...' : ''}`);
             return;
         }
-
-        setIsLoading(true);
-        setError('');
 
         try {
-            // Import ReplayProcessor dynamically
-            const { default: ReplayProcessor } = await import('../services/ReplayProcessor');
+            setLoading(true);
+            setError('');
 
-            // Initialize processing status
-            const initialStatus = {
-                total: validation.valid.length,
-                created: 0,
-                loading: 0,
-                completed: 0,
-                error: 0,
-                urls: validation.valid.map(v => v.url)
-            };
-            setProcessingStatus(initialStatus);
-
-            // Start async processing
-            const replayEntries = await ReplayProcessor.processReplays(
-                validation.valid.map(v => v.url),
-                teamId,
-                notes.trim(),
-                (replayId, status, data) => {
-                    // Update processing status
-                    setProcessingStatus(prev => {
-                        if (!prev) return prev;
-
-                        const newStatus = { ...prev };
-
-                        if (status === 'created') {
-                            newStatus.created++;
-                            if (onReplayAdded) {
-                                onReplayAdded(data);
-                            }
-                        } else if (status === 'loading') {
-                            newStatus.loading++;
-                        } else if (status === 'completed') {
-                            newStatus.loading = Math.max(0, newStatus.loading - 1);
-                            newStatus.completed++;
-                            if (onReplayAdded) {
-                                onReplayAdded(data);
-                            }
-                        } else if (status === 'error') {
-                            if (data.url) {
-                                // Error during creation
-                                newStatus.error++;
-                            } else {
-                                // Error during processing
-                                newStatus.loading = Math.max(0, newStatus.loading - 1);
-                                newStatus.error++;
-                            }
-                        }
-
-                        return newStatus;
-                    });
-                }
-            );
-
-            // Show success message
-            setError(`Successfully added ${replayEntries.length} replays. Content is being loaded in the background.`);
-
-            // Auto-close after a delay if all replays were created successfully
-            if (replayEntries.length === validation.valid.length) {
-                setTimeout(() => {
-                    if (processingStatus && processingStatus.created === validation.valid.length) {
-                        handleClose();
-                    }
-                }, 2000);
+            // For now, we'll add them one by one
+            // In a real implementation, you might want to use ReplaysService.createManyFromUrls
+            for (const url of urls) {
+                await onAddReplay(url, '');
             }
 
+            // Modal will be closed by parent component on success
         } catch (err) {
-            setError(`Bulk import failed: ${err.message}`);
-            setProcessingStatus(null);
+            setError(err.message || 'Failed to add some replays. Please try again.');
         } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleSubmit = () => {
-        if (importMode === 'single') {
-            handleSingleImport();
-        } else {
-            handleBulkImport();
+            setLoading(false);
         }
     };
 
@@ -185,222 +82,213 @@ const AddReplayModal = ({ isOpen, onClose, teamId, teamName, onReplayAdded, team
         setError('');
     };
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-gray-100">
-                            Add Replay to {teamName}
-                        </h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-slate-800 border border-slate-700 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-auto">
+                {/* Header */}
+                <div className="flex justify-between items-center p-6 border-b border-slate-700">
+                    <h2 className="text-xl font-semibold text-gray-100">Add Replay</h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-200 transition-colors"
+                        disabled={loading}
+                    >
+                        <X className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {/* Mode Toggle */}
+                <div className="p-6 border-b border-slate-700">
+                    <div className="flex gap-4">
                         <button
-                            onClick={handleClose}
-                            disabled={isLoading}
-                            className="text-gray-400 hover:text-gray-200 text-2xl leading-none disabled:opacity-50"
+                            onClick={() => {
+                                setBulkMode(false);
+                                clearError();
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                                !bulkMode
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                            }`}
+                            disabled={loading}
                         >
-                            ×
+                            <LinkIcon className="h-4 w-4" />
+                            Single Replay
+                        </button>
+                        <button
+                            onClick={() => {
+                                setBulkMode(true);
+                                clearError();
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                                bulkMode
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                            }`}
+                            disabled={loading}
+                        >
+                            <Plus className="h-4 w-4" />
+                            Bulk Import
                         </button>
                     </div>
+                </div>
 
-                    {/* Import Mode Toggle */}
-                    <div className="mb-6">
-                        <div className="flex rounded-lg bg-slate-700 p-1">
-                            <button
-                                onClick={() => setImportMode('single')}
-                                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                                    importMode === 'single'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-300 hover:text-white'
-                                }`}
-                            >
-                                Single Replay
-                            </button>
-                            <button
-                                onClick={() => setImportMode('bulk')}
-                                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                                    importMode === 'bulk'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'text-gray-300 hover:text-white'
-                                }`}
-                            >
-                                Bulk Import
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Warning for missing Showdown usernames */}
-                    {team && (!team.showdownUsernames || team.showdownUsernames.length === 0) && (
-                        <div className="mb-4 p-3 bg-amber-900/50 border border-amber-700 rounded-md">
-                            <div className="flex items-center gap-2">
-                                <span className="text-amber-400">⚠️</span>
-                                <div>
-                                    <p className="text-amber-200 text-sm font-medium">Win/Loss detection may be inaccurate</p>
-                                    <p className="text-amber-300 text-xs">
-                                        No Showdown usernames are configured for this team. Replays will be imported but win/loss detection may not work correctly.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {importMode === 'single' ? (
-                        <>
-                            {/* Single Replay URL Input */}
-                            <div className="mb-4">
+                {/* Content */}
+                <div className="p-6">
+                    {!bulkMode ? (
+                        <form onSubmit={handleSingleSubmit} className="space-y-6">
+                            {/* Single URL Input */}
+                            <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Replay URL
+                                    Replay URL *
                                 </label>
                                 <input
                                     type="url"
                                     value={replayUrl}
                                     onChange={(e) => {
                                         setReplayUrl(e.target.value);
-                                        if (error) clearError();
+                                        clearError();
                                     }}
                                     placeholder="https://replay.pokemonshowdown.com/..."
-                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    disabled={isLoading}
+                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-400"
+                                    disabled={loading}
+                                    required
                                 />
                                 <p className="text-xs text-gray-400 mt-1">
-                                    Paste a Pokemon Showdown replay URL
+                                    Paste the URL from a Pokémon Showdown replay page
                                 </p>
                             </div>
 
                             {/* Notes Input */}
-                            <div className="mb-6">
+                            <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Notes (Optional)
+                                    Notes (optional)
                                 </label>
                                 <textarea
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Add notes about this battle..."
+                                    placeholder="Add any notes about this game..."
                                     rows={3}
-                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                    disabled={isLoading}
+                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-400 resize-none"
+                                    disabled={loading}
                                 />
                             </div>
-                        </>
+
+                            {/* Error Display */}
+                            {error && (
+                                <div className="flex items-start gap-2 p-3 bg-red-600/20 border border-red-600/30 rounded-lg">
+                                    <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
+                                    <p className="text-red-400 text-sm">{error}</p>
+                                </div>
+                            )}
+
+                            {/* Actions */}
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-4 py-2 text-gray-300 hover:text-gray-100 transition-colors"
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading || !replayUrl.trim()}
+                                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                            Adding Replay...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Plus className="h-4 w-4" />
+                                            Add Replay
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     ) : (
-                        <>
-                            {/* Bulk Import Text Area */}
-                            <div className="mb-4">
+                        <form onSubmit={handleBulkSubmit} className="space-y-6">
+                            {/* Bulk URLs Input */}
+                            <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Replay URLs or Text
+                                    Replay URLs *
                                 </label>
                                 <textarea
-                                    value={bulkText}
+                                    value={bulkUrls}
                                     onChange={(e) => {
-                                        setBulkText(e.target.value);
-                                        if (error) clearError();
+                                        setBulkUrls(e.target.value);
+                                        clearError();
                                     }}
-                                    placeholder="Paste multiple replay URLs or text containing URLs..."
+                                    placeholder={`https://replay.pokemonshowdown.com/game1
+https://replay.pokemonshowdown.com/game2
+https://replay.pokemonshowdown.com/game3`}
                                     rows={8}
-                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                    disabled={isLoading}
+                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-400 resize-none font-mono text-sm"
+                                    disabled={loading}
+                                    required
                                 />
                                 <p className="text-xs text-gray-400 mt-1">
-                                    Paste replay URLs (one per line) or any text containing URLs. They will be automatically extracted.
+                                    Enter one replay URL per line
                                 </p>
                             </div>
 
-                            {/* Shared Notes for Bulk Import */}
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Shared Notes (Optional)
-                                </label>
-                                <input
-                                    type="text"
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Notes to add to all imported replays..."
-                                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    disabled={isLoading}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    {/* Processing Status for Bulk Import */}
-                    {processingStatus && (
-                        <div className="mb-4 p-4 bg-slate-700/50 border border-slate-600 rounded-md">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-gray-200">Import Progress</span>
-                                <span className="text-xs text-gray-400">
-                  {processingStatus.completed + processingStatus.error} / {processingStatus.total}
-                </span>
-                            </div>
-
-                            {/* Progress Bar */}
-                            <div className="w-full bg-slate-600 rounded-full h-2 mb-3">
-                                <div
-                                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                    style={{
-                                        width: `${((processingStatus.completed + processingStatus.error) / processingStatus.total) * 100}%`
-                                    }}
-                                ></div>
-                            </div>
-
-                            {/* Status Breakdown */}
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div className="flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span className="text-gray-300">Added: {processingStatus.created}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                    <span className="text-gray-300">Loading: {processingStatus.loading}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                                    <span className="text-gray-300">Completed: {processingStatus.completed}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                    <span className="text-gray-300">Failed: {processingStatus.error}</span>
+                            {/* Info Box */}
+                            <div className="bg-blue-600/20 border border-blue-600/30 rounded-lg p-4">
+                                <div className="flex items-start gap-2">
+                                    <FileText className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                                    <div className="text-sm">
+                                        <p className="text-blue-400 font-medium mb-1">Bulk Import</p>
+                                        <p className="text-gray-300">
+                                            This will import multiple replays at once. Each replay will be processed individually,
+                                            so if some fail, others may still succeed.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
-                            {processingStatus.loading > 0 && (
-                                <p className="text-xs text-gray-400 mt-2">
-                                    Content is being loaded in the background. You can close this modal and replays will continue processing.
-                                </p>
+                            {/* Error Display */}
+                            {error && (
+                                <div className="flex items-start gap-2 p-3 bg-red-600/20 border border-red-600/30 rounded-lg">
+                                    <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
+                                    <p className="text-red-400 text-sm">{error}</p>
+                                </div>
                             )}
-                        </div>
-                    )}
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-md">
-                            <p className="text-red-300 text-sm">{error}</p>
-                        </div>
+                            {/* Actions */}
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-4 py-2 text-gray-300 hover:text-gray-100 transition-colors"
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading || !bulkUrls.trim()}
+                                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                            Importing Replays...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Plus className="h-4 w-4" />
+                                            Import All
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     )}
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-3 justify-end">
-                        <button
-                            onClick={handleClose}
-                            disabled={isLoading}
-                            className="px-4 py-2 text-gray-300 hover:text-white transition-colors disabled:opacity-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleSubmit}
-                            disabled={isLoading || (importMode === 'single' ? !replayUrl.trim() : !bulkText.trim())}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                            {isLoading && (
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                            )}
-                            {isLoading
-                                ? (importMode === 'single' ? 'Importing...' : 'Importing Replays...')
-                                : (importMode === 'single' ? 'Import Replay' : 'Import All Replays')
-                            }
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

@@ -1,70 +1,75 @@
-// src/pages/TeamPage.jsx - Updated with Replay Functionality
+// src/pages/TeamPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { StorageService } from '../services/StorageService';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+    ArrowLeft,
+    Plus,
+    Edit3,
+    Trash2,
+    Calendar,
+    Trophy,
+    TrendingUp,
+    Users,
+    BarChart3,
+    Target,
+    Zap
+} from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal';
 import AddReplayModal from '../components/AddReplayModal';
-import EditTeamModal from '../components/EditTeamModal';
+import TeamsService from '../services/TeamsService';
+import ReplaysService from '../services/ReplaysService';
 
 const TeamPage = () => {
     const { teamId } = useParams();
     const navigate = useNavigate();
+
     const [team, setTeam] = useState(null);
-    const [replays, setReplays] = useState({});
-    const [teamStats, setTeamStats] = useState(null);
-    const [processingStatus, setProcessingStatus] = useState(null);
+    const [replays, setReplays] = useState([]);
+    const [teamStats, setTeamStats] = useState({
+        gamesPlayed: 0,
+        wins: 0,
+        losses: 0,
+        winRate: 0
+    });
+    const [activeTab, setActiveTab] = useState('game-by-game');
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('gameByGame');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAddReplayModal, setShowAddReplayModal] = useState(false);
-    const [showEditTeamModal, setShowEditTeamModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         loadTeamData();
     }, [teamId]);
 
-    // Auto-update processing status when there's active processing
-    useEffect(() => {
-        let interval;
-
-        if (processingStatus && (processingStatus.loading > 0 || processingStatus.pending > 0)) {
-            interval = setInterval(() => {
-                updateProcessingStatus();
-            }, 2000); // Update every 2 seconds
-        }
-
-        return () => {
-            if (interval) {
-                clearInterval(interval);
-            }
-        };
-    }, [processingStatus, teamId]);
-
     const loadTeamData = async () => {
         try {
             setLoading(true);
-            const [teamData, teamReplays, stats] = await Promise.all([
-                StorageService.getTeam(teamId),
-                StorageService.getReplaysForTeam(teamId),
-                StorageService.getTeamStats(teamId)
-            ]);
 
+            // Load team
+            const teamData = await TeamsService.getById(teamId);
             if (!teamData) {
                 navigate('/');
                 return;
             }
-
             setTeam(teamData);
-            setReplays(teamReplays);
-            setTeamStats(stats);
 
-            // Check processing status
-            const { default: ReplayProcessor } = await import('../services/ReplayProcessor');
-            const status = await ReplayProcessor.getProcessingStatus(teamId);
-            setProcessingStatus(status);
+            // Load replays
+            const replaysData = await ReplaysService.getByTeamId(teamId);
+            setReplays(replaysData);
+
+            // Calculate stats
+            const wins = replaysData.filter(r => r.result === 'win').length;
+            const losses = replaysData.filter(r => r.result === 'loss').length;
+
+            setTeamStats({
+                gamesPlayed: replaysData.length,
+                wins,
+                losses,
+                winRate: replaysData.length > 0 ? Math.round((wins / replaysData.length) * 100) : 0
+            });
 
         } catch (error) {
-            console.error('Failed to load team:', error);
+            console.error('Error loading team data:', error);
         } finally {
             setLoading(false);
         }
@@ -72,191 +77,58 @@ const TeamPage = () => {
 
     const handleDeleteTeam = async () => {
         try {
-            await StorageService.deleteTeam(teamId);
+            setDeleting(true);
+
+            // Delete all replays for this team
+            await ReplaysService.deleteByTeamId(teamId);
+
+            // Delete the team
+            await TeamsService.delete(teamId);
+
+            // Navigate back to home
             navigate('/');
         } catch (error) {
-            console.error('Failed to delete team:', error);
+            console.error('Error deleting team:', error);
+            setDeleting(false);
         }
     };
 
-    const handleReplayAdded = (newReplay) => {
-        setReplays(prev => ({
-            ...prev,
-            [newReplay.id]: newReplay
-        }));
-
-        // Update processing status when replay status changes
-        updateProcessingStatus();
-
-        // Reload team stats only when replay is completed
-        if (newReplay.status === 'completed') {
-            loadTeamData();
-        }
-    };
-
-    const updateProcessingStatus = async () => {
+    const handleAddReplay = async (replayUrl, notes) => {
         try {
-            const { default: ReplayProcessor } = await import('../services/ReplayProcessor');
-            const status = await ReplayProcessor.getProcessingStatus(teamId);
-            setProcessingStatus(status);
+            await ReplaysService.createFromUrl(teamId, replayUrl, notes);
+            await loadTeamData(); // Refresh data
+            setShowAddReplayModal(false);
         } catch (error) {
-            console.error('Failed to update processing status:', error);
-        }
-    };
-
-    const handleTeamUpdated = (updatedTeam) => {
-        setTeam(updatedTeam);
-        // Optionally reload team data to refresh stats
-        loadTeamData();
-    };
-
-    const retryReplay = async (replayId) => {
-        try {
-            const { default: ReplayProcessor } = await import('../services/ReplayProcessor');
-            await ReplayProcessor.retryReplay(replayId, (id, status, data) => {
-                setReplays(prev => ({
-                    ...prev,
-                    [id]: data
-                }));
-
-                // Update processing status
-                updateProcessingStatus();
-
-                // Reload team data to update stats when completed
-                if (status === 'completed') {
-                    loadTeamData();
-                }
-            });
-        } catch (error) {
-            console.error('Failed to retry replay:', error);
+            console.error('Error adding replay:', error);
+            throw error;
         }
     };
 
     const formatTimeAgo = (dateString) => {
         const date = new Date(dateString);
         const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
+        const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
-        if (diffInSeconds < 60) return 'Just now';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-        return date.toLocaleDateString();
-    };
+        if (diffInHours < 1) return 'Just now';
+        if (diffInHours < 24) return `${diffInHours}h ago`;
 
-    const tabs = [
-        { id: 'gameByGame', name: 'Game by Game', icon: '🎯' },
-        { id: 'matchByMatch', name: 'Match by Match', icon: '🏆' },
-        { id: 'usage', name: 'Usage Stats', icon: '📊' },
-        { id: 'matchups', name: 'Matchup Analysis', icon: '⚔️' },
-        { id: 'moves', name: 'Move Usage', icon: '💥' }
-    ];
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) return `${diffInDays}d ago`;
 
-    const renderReplayList = () => {
-        const replayArray = Object.values(replays).sort((a, b) =>
-            new Date(b.dateAdded) - new Date(a.dateAdded)
-        );
+        const diffInWeeks = Math.floor(diffInDays / 7);
+        if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
 
-        if (replayArray.length === 0) {
-            return (
-                <div className="text-center py-12">
-                    <div className="text-6xl mb-4">🎮</div>
-                    <h3 className="text-lg font-medium text-gray-300 mb-2">No replays yet</h3>
-                    <p className="text-gray-400 mb-6">Import your first replay to start analyzing your battles</p>
-                    <button
-                        onClick={() => setShowAddReplayModal(true)}
-                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
-                    >
-                        Add First Replay
-                    </button>
-                </div>
-            );
-        }
-
-        return (
-            <div className="space-y-4">
-                {replayArray.map((replay) => {
-                    const isWin = replay.parsedData?.winner === replay.parsedData?.players?.[0]?.name;
-                    const opponent = replay.parsedData?.players?.[1]?.name || 'Unknown Opponent';
-
-                    return (
-                        <div key={replay.id} className="bg-slate-700/50 rounded-lg p-4 border border-slate-600">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-3 h-3 rounded-full ${isWin ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-200">
-                        vs {opponent}
-                      </span>
-                                            <span className={`px-2 py-1 text-xs rounded ${
-                                                isWin ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'
-                                            }`}>
-                        {isWin ? 'WIN' : 'LOSS'}
-                      </span>
-                                        </div>
-                                        <div className="text-sm text-gray-400">
-                                            {replay.parsedData?.tier || replay.format} • {formatTimeAgo(replay.dateAdded)}
-                                        </div>
-                                        {replay.notes && (
-                                            <div className="text-sm text-gray-300 mt-1">{replay.notes}</div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400">
-                    {replay.parsedData?.turns || 0} turns
-                  </span>
-                                    <a
-                                        href={replay.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-400 hover:text-blue-300 text-sm"
-                                    >
-                                        View Replay
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
-
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'gameByGame':
-                return (
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-medium text-gray-200">Battle History</h3>
-                            <button
-                                onClick={() => setShowAddReplayModal(true)}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
-                            >
-                                Add Replay
-                            </button>
-                        </div>
-                        {renderReplayList()}
-                    </div>
-                );
-            default:
-                return (
-                    <div className="text-center py-12">
-                        <div className="text-4xl mb-4">🚧</div>
-                        <h3 className="text-lg font-medium text-gray-300 mb-2">{tabs.find(t => t.id === activeTab)?.name}</h3>
-                        <p className="text-gray-400">Coming soon! This feature is currently under development.</p>
-                    </div>
-                );
-        }
+        const diffInMonths = Math.floor(diffInDays / 30);
+        return `${diffInMonths}mo ago`;
     };
 
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 to-slate-900 p-6">
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex items-center justify-center h-64">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400"></div>
+                    </div>
                 </div>
             </div>
         );
@@ -265,227 +137,307 @@ const TeamPage = () => {
     if (!team) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 to-slate-900 p-6">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-100 mb-4">Team Not Found</h1>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-                    >
-                        Back to Home
-                    </button>
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold text-gray-100 mb-4">Team not found</h2>
+                        <Link to="/" className="text-emerald-400 hover:text-emerald-300">
+                            Return to Home
+                        </Link>
+                    </div>
                 </div>
             </div>
         );
     }
 
+    const tabs = [
+        { id: 'game-by-game', label: 'Game by Game', icon: Calendar },
+        { id: 'match-by-match', label: 'Match by Match', icon: Users },
+        { id: 'usage-stats', label: 'Usage Stats', icon: BarChart3 },
+        { id: 'matchup-stats', label: 'Matchup Stats', icon: Target },
+        { id: 'move-usage', label: 'Move Usage', icon: Zap }
+    ];
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 to-slate-900 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-4 mb-4">
-                        <button
-                            onClick={() => navigate('/')}
-                            className="text-gray-400 hover:text-gray-200 text-sm flex items-center gap-1"
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center">
+                        <Link
+                            to="/"
+                            className="mr-4 p-2 text-gray-400 hover:text-gray-200 rounded-lg hover:bg-slate-800 transition-colors"
                         >
-                            ← Back to Teams
-                        </button>
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-100">{team.name}</h1>
+                            <p className="text-gray-400">{team.format}</p>
+                        </div>
                     </div>
 
-                    <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-slate-700">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-100 mb-2">{team.name}</h1>
-                                {team.description && (
-                                    <p className="text-gray-300 mb-4">{team.description}</p>
-                                )}
-
-                                {/* Processing Status Indicator */}
-                                {processingStatus && (processingStatus.loading > 0 || processingStatus.pending > 0) && (
-                                    <div className="mb-4 p-3 bg-blue-900/50 border border-blue-700 rounded-md">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent"></div>
-                                                <div>
-                                                    <p className="text-blue-200 text-sm font-medium">
-                                                        Processing replays in background
-                                                    </p>
-                                                    <p className="text-blue-300 text-xs">
-                                                        {processingStatus.loading} loading, {processingStatus.pending} queued
-                                                        {processingStatus.completed > 0 && ` • ${processingStatus.completed} completed`}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={updateProcessingStatus}
-                                                className="text-blue-300 hover:text-blue-200 text-xs"
-                                                title="Refresh status"
-                                            >
-                                                🔄
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Warning for missing Showdown usernames */}
-                                {(!team.showdownUsernames || team.showdownUsernames.length === 0) && (
-                                    <div className="mb-4 p-3 bg-amber-900/50 border border-amber-700 rounded-md">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-amber-400">⚠️</span>
-                                            <div>
-                                                <p className="text-amber-200 text-sm font-medium">No Showdown usernames configured</p>
-                                                <p className="text-amber-300 text-xs">
-                                                    Add your Showdown usernames to automatically detect wins/losses in imported replays.{' '}
-                                                    <button
-                                                        onClick={() => setShowEditTeamModal(true)}
-                                                        className="underline hover:no-underline"
-                                                    >
-                                                        Edit team
-                                                    </button> to add them.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                    {team.format && (
-                                        <span className="px-3 py-1 bg-blue-900/50 text-blue-300 rounded-full text-sm">
-                      {team.format}
-                    </span>
-                                    )}
-                                    {team.showdownUsernames && team.showdownUsernames.length > 0 && (
-                                        <span className="px-3 py-1 bg-green-900/50 text-green-300 rounded-full text-sm">
-                      👤 {team.showdownUsernames.join(', ')}
-                    </span>
-                                    )}
-                                    {team.tags?.map(tag => (
-                                        <span key={tag} className="px-3 py-1 bg-slate-700 text-gray-300 rounded-full text-sm">
-                      {tag}
-                    </span>
-                                    ))}
-                                </div>
-
-                                {/* Team Pokemon Display - Placeholder */}
-                                <div className="flex gap-2 mb-4">
-                                    {Array.from({ length: 6 }, (_, i) => (
-                                        <div key={i} className="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center">
-                                            <span className="text-2xl">🔥</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="text-right">
-                                {teamStats && (
-                                    <div className="mb-4">
-                                        <div className="text-2xl font-bold text-gray-100">
-                                            {teamStats.winRate}%
-                                        </div>
-                                        <div className="text-sm text-gray-400">
-                                            {teamStats.wins}W - {teamStats.losses}L
-                                        </div>
-                                        <div className="text-sm text-gray-400">
-                                            {teamStats.totalGames} battles
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setShowAddReplayModal(true)}
-                                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
-                                    >
-                                        Add Replay
-                                    </button>
-                                    <button
-                                        onClick={() => setShowEditTeamModal(true)}
-                                        className="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white rounded text-sm"
-                                    >
-                                        Edit Team
-                                    </button>
-                                    <button
-                                        onClick={() => setShowDeleteModal(true)}
-                                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setShowAddReplayModal(true)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Replay
+                        </button>
+                        <button
+                            className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Edit3 className="h-4 w-4" />
+                            Edit Team
+                        </button>
+                        <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                        </button>
                     </div>
                 </div>
 
+                {/* Team Info Card */}
+                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* Pokemon Display */}
+                        <div className="lg:col-span-2">
+                            <h3 className="text-lg font-semibold text-gray-100 mb-3">Team</h3>
+                            <div className="flex gap-2">
+                                {['🔥', '💧', '⚡', '🌿', '🧊', '👻'].map((emoji, index) => (
+                                    <div key={index} className="bg-slate-700 rounded-lg p-3">
+                                        <span className="text-3xl">{emoji}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            {team.description && (
+                                <p className="text-gray-300 mt-3">{team.description}</p>
+                            )}
+                        </div>
+
+                        {/* Stats */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-100 mb-3">Performance</h3>
+                            <div className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-400">Games:</span>
+                                    <span className="text-gray-100">{teamStats.gamesPlayed}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-400">Wins:</span>
+                                    <span className="text-green-400">{teamStats.wins}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-400">Losses:</span>
+                                    <span className="text-red-400">{teamStats.losses}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-400">Win Rate:</span>
+                                    <span className="text-emerald-400 font-semibold">{teamStats.winRate}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Meta */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-100 mb-3">Details</h3>
+                            <div className="space-y-2">
+                                <div>
+                                    <span className="text-gray-400 text-sm">Created:</span>
+                                    <p className="text-gray-100">{formatTimeAgo(team.createdAt)}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-400 text-sm">Last Updated:</span>
+                                    <p className="text-gray-100">{formatTimeAgo(team.updatedAt)}</p>
+                                </div>
+                                {team.showdownUsernames && team.showdownUsernames.length > 0 && (
+                                    <div>
+                                        <span className="text-gray-400 text-sm">Showdown Users:</span>
+                                        <p className="text-gray-100">{team.showdownUsernames.join(', ')}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tags */}
+                    {team.tags && team.tags.length > 0 && (
+                        <div className="mt-6">
+                            <h3 className="text-lg font-semibold text-gray-100 mb-3">Tags</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {team.tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="bg-slate-700 text-gray-300 px-3 py-1 rounded-full text-sm"
+                                    >
+                    {tag}
+                  </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* Tab Navigation */}
-                <div className="mb-6">
-                    <div className="border-b border-slate-700">
-                        <nav className="flex space-x-8">
-                            {tabs.map(tab => (
+                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg mb-8">
+                    <div className="flex overflow-x-auto">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            return (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                                    className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                                         activeTab === tab.id
-                                            ? 'border-blue-500 text-blue-400'
-                                            : 'border-transparent text-gray-400 hover:text-gray-300'
+                                            ? 'border-emerald-400 text-emerald-400'
+                                            : 'border-transparent text-gray-400 hover:text-gray-200'
                                     }`}
                                 >
-                                    <span>{tab.icon}</span>
-                                    {tab.name}
+                                    <Icon className="h-4 w-4" />
+                                    {tab.label}
                                 </button>
-                            ))}
-                        </nav>
+                            );
+                        })}
                     </div>
                 </div>
 
                 {/* Tab Content */}
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-slate-700">
-                    {renderTabContent()}
+                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6">
+                    {activeTab === 'game-by-game' && (
+                        <GameByGameTab replays={replays} formatTimeAgo={formatTimeAgo} />
+                    )}
+                    {activeTab === 'match-by-match' && (
+                        <ComingSoonTab title="Match by Match Analysis" />
+                    )}
+                    {activeTab === 'usage-stats' && (
+                        <ComingSoonTab title="Usage Statistics" />
+                    )}
+                    {activeTab === 'matchup-stats' && (
+                        <ComingSoonTab title="Matchup Analysis" />
+                    )}
+                    {activeTab === 'move-usage' && (
+                        <ComingSoonTab title="Move Usage Analysis" />
+                    )}
                 </div>
-            </div>
 
-            {/* Modals */}
-            <ConfirmationModal
-                isOpen={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                onConfirm={handleDeleteTeam}
-                title="Delete Team"
-                message={
-                    <div>
-                        <p className="mb-4">Are you sure you want to delete "{team?.name}"?</p>
-                        {teamStats && (
-                            <div className="bg-slate-700 p-3 rounded text-sm">
-                                <p>This will permanently delete:</p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>{teamStats.totalGames} battle replays</li>
-                                    <li>All team configuration and notes</li>
-                                    <li>All statistics and analysis data</li>
-                                </ul>
+                {/* Delete Confirmation Modal */}
+                {showDeleteModal && (
+                    <ConfirmationModal
+                        title="Delete Team"
+                        message={
+                            <div>
+                                <p className="mb-4">
+                                    Are you sure you want to delete <strong>{team.name}</strong>?
+                                </p>
+                                <div className="bg-slate-700 rounded-lg p-4 text-sm">
+                                    <p className="text-gray-300 mb-2">This will permanently delete:</p>
+                                    <ul className="text-gray-400 space-y-1">
+                                        <li>• The team and all its data</li>
+                                        <li>• {teamStats.gamesPlayed} associated replays</li>
+                                        <li>• All analysis and statistics</li>
+                                    </ul>
+                                </div>
+                                <p className="mt-4 text-red-400 font-medium">
+                                    This action cannot be undone.
+                                </p>
                             </div>
-                        )}
-                    </div>
-                }
-                confirmText="Delete Team"
-                confirmButtonClass="bg-red-600 hover:bg-red-700"
-            />
+                        }
+                        onConfirm={handleDeleteTeam}
+                        onCancel={() => setShowDeleteModal(false)}
+                        loading={deleting}
+                        confirmText="Delete Team"
+                        confirmButtonClass="bg-red-600 hover:bg-red-700"
+                    />
+                )}
 
-            <EditTeamModal
-                isOpen={showEditTeamModal}
-                onClose={() => setShowEditTeamModal(false)}
-                teamData={team}
-                onTeamUpdated={handleTeamUpdated}
-            />
-
-            <AddReplayModal
-                isOpen={showAddReplayModal}
-                onClose={() => setShowAddReplayModal(false)}
-                teamId={teamId}
-                teamName={team?.name}
-                team={team}
-                onReplayAdded={handleReplayAdded}
-            />
+                {/* Add Replay Modal */}
+                {showAddReplayModal && (
+                    <AddReplayModal
+                        onClose={() => setShowAddReplayModal(false)}
+                        onAddReplay={handleAddReplay}
+                    />
+                )}
+            </div>
         </div>
     );
 };
+
+// Game by Game Tab Component
+const GameByGameTab = ({ replays, formatTimeAgo }) => {
+    if (replays.length === 0) {
+        return (
+            <div className="text-center py-12">
+                <Calendar className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">No replays yet</h3>
+                <p className="text-gray-400">Add your first replay to start analyzing your performance</p>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-100">Game History</h3>
+                <p className="text-gray-400">{replays.length} games</p>
+            </div>
+
+            <div className="space-y-4">
+                {replays.map((replay) => (
+                    <div
+                        key={replay.id}
+                        className="bg-slate-700/50 border border-slate-600 rounded-lg p-4"
+                    >
+                        <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                  <span className={`px-2 py-1 rounded text-sm font-medium ${
+                      replay.result === 'win'
+                          ? 'bg-green-600/20 text-green-400 border border-green-600/30'
+                          : replay.result === 'loss'
+                              ? 'bg-red-600/20 text-red-400 border border-red-600/30'
+                              : 'bg-gray-600/20 text-gray-400 border border-gray-600/30'
+                  }`}>
+                    {replay.result ? replay.result.toUpperCase() : 'UNKNOWN'}
+                  </span>
+                                    {replay.opponent && (
+                                        <span className="text-gray-300">vs {replay.opponent}</span>
+                                    )}
+                                </div>
+
+                                {replay.notes && (
+                                    <p className="text-gray-400 text-sm mb-2">{replay.notes}</p>
+                                )}
+
+                                <a
+                                    href={replay.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-emerald-400 hover:text-emerald-300 text-sm"
+                                >
+                                    View Replay →
+                                </a>
+                            </div>
+
+                            <div className="text-right text-sm text-gray-400">
+                                {formatTimeAgo(replay.createdAt)}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+// Coming Soon Tab Component
+const ComingSoonTab = ({ title }) => (
+    <div className="text-center py-12">
+        <TrendingUp className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-gray-300 mb-2">{title}</h3>
+        <p className="text-gray-400">This feature is coming soon!</p>
+    </div>
+);
 
 export default TeamPage;

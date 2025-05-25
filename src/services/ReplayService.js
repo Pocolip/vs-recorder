@@ -1,312 +1,339 @@
-// src/services/ReplayService.js
+// src/services/ReplaysService.js
+import StorageService from './StorageService.js';
 
-console.log('🎮 ReplayService module loading...');
+class ReplaysService {
+    static STORAGE_KEY = 'replays';
 
-export class ReplayService {
     /**
-     * Validates and processes a Showdown replay URL
-     * @param {string}
-
-     console.log('✅ ReplayService created with methods:', Object.getOwnPropertyNames(ReplayService).filter(name => name !== 'length' && name !== 'name' && name !== 'prototype'));
-
-     // Export both named and default for consistency
-     export { ReplayService };
-     export default ReplayService; url - The replay URL
-     * @returns {Object} - Parsed URL information or null if invalid
+     * Get all replays
      */
-    static parseReplayUrl(url) {
-        // Remove any trailing .log or .json if already present
-        const cleanUrl = url.replace(/\.(log|json)$/, '');
+    static async getAll() {
+        const replays = await StorageService.get(this.STORAGE_KEY) || {};
+        return replays;
+    }
 
-        // Regex to match Showdown replay URLs
-        const replayRegex = /^https?:\/\/replay\.pokemonshowdown\.com\/([^-]+)-(\d+)-([a-z0-9]+)$/i;
-        const match = cleanUrl.match(replayRegex);
+    /**
+     * Get a single replay by ID
+     */
+    static async getById(id) {
+        const replays = await this.getAll();
+        return replays[id] || null;
+    }
 
-        if (!match) {
+    /**
+     * Create a new replay
+     */
+    static async create(replayData) {
+        const replays = await this.getAll();
+        const id = Date.now().toString();
+
+        const replay = {
+            id,
+            teamId: replayData.teamId,
+            url: replayData.url,
+            battleData: replayData.battleData || null,
+            result: replayData.result || null, // 'win' | 'loss' | null
+            opponent: replayData.opponent || null,
+            notes: replayData.notes || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        replays[id] = replay;
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return replay;
+    }
+
+    /**
+     * Update an existing replay
+     */
+    static async update(id, updates) {
+        const replays = await this.getAll();
+
+        if (!replays[id]) {
             return null;
         }
 
-        const [, format, battleId, authString] = match;
-
-        return {
-            originalUrl: cleanUrl,
-            format,
-            battleId,
-            authString,
-            logUrl: `${cleanUrl}.log`,
-            jsonUrl: `${cleanUrl}.json`,
-            battleIdentifier: `${format}-${battleId}-${authString}`
+        replays[id] = {
+            ...replays[id],
+            ...updates,
+            id, // Ensure ID doesn't get overwritten
+            updatedAt: new Date().toISOString()
         };
+
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return replays[id];
     }
 
     /**
-     * Fetches the raw log data from a Showdown replay
-     * @param {string} url - The replay URL
-     * @returns {Promise<string>} - The raw log text
+     * Delete a replay by ID
      */
-    static async fetchReplayLog(url) {
-        const parsedUrl = this.parseReplayUrl(url);
+    static async delete(id) {
+        const replays = await this.getAll();
 
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
+        if (!replays[id]) {
+            return false;
         }
 
+        delete replays[id];
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return true;
+    }
+
+    /**
+     * Delete all replays for a team
+     */
+    static async deleteByTeamId(teamId) {
+        const replays = await this.getAll();
+        const replayIds = Object.keys(replays).filter(id => replays[id].teamId === teamId);
+
+        for (const id of replayIds) {
+            delete replays[id];
+        }
+
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return replayIds.length;
+    }
+
+    /**
+     * Get replays as array (sorted by most recent)
+     */
+    static async getList() {
+        const replays = await this.getAll();
+        return Object.values(replays).sort((a, b) =>
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
+    }
+
+    /**
+     * Get replays for a specific team
+     */
+    static async getByTeamId(teamId) {
+        const replays = await this.getList();
+        return replays.filter(replay => replay.teamId === teamId);
+    }
+
+    /**
+     * Get replays by result (wins/losses)
+     */
+    static async getByResult(result) {
+        const replays = await this.getList();
+        return replays.filter(replay => replay.result === result);
+    }
+
+    /**
+     * Get replays for a team by result
+     */
+    static async getByTeamIdAndResult(teamId, result) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.filter(replay => replay.result === result);
+    }
+
+    /**
+     * Search replays by opponent name or notes
+     */
+    static async search(query) {
+        const replays = await this.getList();
+        const lowerQuery = query.toLowerCase();
+
+        return replays.filter(replay =>
+            (replay.opponent && replay.opponent.toLowerCase().includes(lowerQuery)) ||
+            replay.notes.toLowerCase().includes(lowerQuery) ||
+            replay.url.toLowerCase().includes(lowerQuery)
+        );
+    }
+
+    /**
+     * Check if replay exists
+     */
+    static async exists(id) {
+        const replay = await this.getById(id);
+        return replay !== null;
+    }
+
+    /**
+     * Check if replay URL already exists
+     */
+    static async existsByUrl(url) {
+        const replays = await this.getList();
+        return replays.some(replay => replay.url === url);
+    }
+
+    /**
+     * Get replay count for a team
+     */
+    static async getCountByTeamId(teamId) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.length;
+    }
+
+    /**
+     * Create replay from Showdown URL (fetches and parses automatically)
+     */
+    static async createFromUrl(teamId, replayUrl, notes = '') {
         try {
-            const response = await fetch(parsedUrl.logUrl);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch replay: ${response.status} ${response.statusText}`);
+            // Check if URL already exists
+            if (await this.existsByUrl(replayUrl)) {
+                throw new Error('Replay already exists');
             }
 
-            const logText = await response.text();
+            // Fetch and parse the replay data
+            const battleData = await this.fetchAndParseReplay(replayUrl);
 
-            if (!logText || logText.trim().length === 0) {
-                throw new Error('Replay log is empty or unavailable');
-            }
-
-            return logText;
-        } catch (error) {
-            if (error.message.includes('Failed to fetch')) {
-                throw new Error('Network error: Unable to connect to Pokemon Showdown');
-            }
-            throw error;
-        }
-    }
-
-    /**
-     * Fetches the JSON metadata from a Showdown replay
-     * @param {string} url - The replay URL
-     * @returns {Promise<Object>} - The replay metadata
-     */
-    static async fetchReplayJson(url) {
-        const parsedUrl = this.parseReplayUrl(url);
-
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
-        }
-
-        try {
-            const response = await fetch(parsedUrl.jsonUrl);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch replay metadata: ${response.status} ${response.statusText}`);
-            }
-
-            const jsonData = await response.json();
-            return jsonData;
-        } catch (error) {
-            if (error.message.includes('Failed to fetch')) {
-                throw new Error('Network error: Unable to connect to Pokemon Showdown');
-            }
-            throw error;
-        }
-    }
-
-    /**
-     * Creates a replay entry immediately without fetching content
-     * @param {string} url - The replay URL
-     * @param {string} teamId - The team ID this replay belongs to
-     * @param {string} notes - Optional notes about the replay
-     * @returns {Object} - Replay entry ready for storage (without parsed data)
-     */
-    static createReplayEntry(url, teamId, notes = '') {
-        const parsedUrl = this.parseReplayUrl(url);
-
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
-        }
-
-        return {
-            id: `replay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            url: parsedUrl.originalUrl,
-            battleId: parsedUrl.battleIdentifier,
-            teamId,
-            notes,
-            logText: null, // Will be fetched later
-            metadata: null, // Will be fetched later
-            parsedData: null, // Will be parsed later
-            dateAdded: new Date().toISOString(),
-            format: parsedUrl.format,
-            status: 'pending', // pending, loading, completed, error
-            error: null
-        };
-    }
-
-    /**
-     * Fetches and parses content for an existing replay entry
-     * @param {Object} replayEntry - The replay entry to populate
-     * @returns {Promise<Object>} - Updated replay entry with content
-     */
-    static async fetchReplayContent(replayEntry) {
-        try {
-            // Update status to loading
-            const updatedEntry = { ...replayEntry, status: 'loading', error: null };
-
-            // Fetch both log and metadata in parallel
-            const [logText, metadata] = await Promise.all([
-                this.fetchReplayLog(replayEntry.url),
-                this.fetchReplayJson(replayEntry.url).catch(() => null) // JSON is optional
-            ]);
-
-            // Parse the log to extract basic battle info
-            const parsedData = this.parseLogBasicInfo(logText);
-
-            return {
-                ...updatedEntry,
-                logText,
-                metadata,
-                parsedData,
-                status: 'completed',
-                lastUpdated: new Date().toISOString()
-            };
-        } catch (error) {
-            return {
-                ...replayEntry,
-                status: 'error',
-                error: error.message,
-                lastUpdated: new Date().toISOString()
-            };
-        }
-    }
-
-    /**
-     * Imports a complete replay with both log and metadata (original method)
-     * @param {string} url - The replay URL
-     * @param {string} teamId - The team ID this replay belongs to
-     * @param {string} notes - Optional notes about the replay
-     * @returns {Promise<Object>} - Complete replay data ready for storage
-     */
-    static async importReplay(url, teamId, notes = '') {
-        const parsedUrl = this.parseReplayUrl(url);
-
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
-        }
-
-        try {
-            // Fetch both log and metadata in parallel
-            const [logText, metadata] = await Promise.all([
-                this.fetchReplayLog(url),
-                this.fetchReplayJson(url).catch(() => null) // JSON is optional, don't fail if unavailable
-            ]);
-
-            // Parse the log to extract basic battle info
-            const parsedBattle = this.parseLogBasicInfo(logText);
-
-            return {
-                id: `replay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                url: parsedUrl.originalUrl,
-                battleId: parsedUrl.battleIdentifier,
+            return await this.create({
                 teamId,
-                notes,
-                logText,
-                metadata,
-                parsedData: parsedBattle,
-                dateAdded: new Date().toISOString(),
-                format: parsedUrl.format
+                url: replayUrl,
+                battleData,
+                result: battleData.result,
+                opponent: battleData.opponent,
+                notes
+            });
+        } catch (error) {
+            console.error('Error creating replay from URL:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Fetch replay data from Showdown URL and parse it
+     */
+    static async fetchAndParseReplay(url) {
+        try {
+            // Convert replay URL to JSON endpoint
+            const jsonUrl = url.endsWith('.json') ? url : `${url}.json`;
+
+            const response = await fetch(jsonUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch replay: ${response.status}`);
+            }
+
+            const replayData = await response.json();
+            return this.parseReplayData(replayData);
+        } catch (error) {
+            console.error('Error fetching replay:', error);
+            throw new Error('Failed to fetch or parse replay data');
+        }
+    }
+
+    /**
+     * Parse replay JSON data into structured battle information
+     */
+    static parseReplayData(replayData) {
+        try {
+            const log = replayData.log || '';
+            const lines = log.split('\n');
+
+            let players = {};
+            let winner = null;
+            let teams = { p1: [], p2: [] };
+
+            // Parse the log for battle information
+            for (const line of lines) {
+                // Extract player information
+                if (line.startsWith('|player|')) {
+                    const parts = line.split('|');
+                    const playerId = parts[2];
+                    const playerName = parts[3];
+                    players[playerId] = playerName;
+                }
+
+                // Extract team information (pokemon reveals)
+                if (line.startsWith('|poke|')) {
+                    const parts = line.split('|');
+                    const player = parts[2];
+                    const pokemon = parts[3].split(',')[0]; // Remove level/gender info
+                    teams[player].push(pokemon);
+                }
+
+                // Extract winner
+                if (line.startsWith('|win|')) {
+                    winner = line.split('|')[2];
+                }
+            }
+
+            // Determine result based on winner
+            let result = null;
+            let opponent = null;
+
+            if (winner && players.p1 && players.p2) {
+                // This is simplified - in a real implementation, you'd need to know which player is "you"
+                // For now, we'll assume p2 is the opponent
+                opponent = players.p2;
+                result = winner === players.p1 ? 'win' : 'loss';
+            }
+
+            return {
+                players,
+                teams,
+                winner,
+                result,
+                opponent,
+                raw: replayData
             };
         } catch (error) {
-            throw new Error(`Failed to import replay: ${error.message}`);
+            console.error('Error parsing replay data:', error);
+            return {
+                players: {},
+                teams: { p1: [], p2: [] },
+                winner: null,
+                result: null,
+                opponent: null,
+                raw: replayData
+            };
         }
     }
 
     /**
-     * Basic log parsing to extract essential battle information
-     * This is a minimal parser - we'll expand this in the next task
-     * @param {string} logText - The raw log text
-     * @returns {Object} - Basic battle information
+     * Batch create replays from multiple URLs
      */
-    static parseLogBasicInfo(logText) {
-        const lines = logText.split('\n');
-        const info = {
-            players: [],
-            format: null,
-            tier: null,
-            winner: null,
-            timestamp: null,
-            turns: 0
-        };
+    static async createManyFromUrls(teamId, replayUrls, progressCallback = null) {
+        const results = [];
+        const errors = [];
 
-        for (const line of lines) {
-            // Extract player information
-            if (line.startsWith('|player|')) {
-                const parts = line.split('|');
-                const playerData = {
-                    id: parts[2],
-                    name: parts[3],
-                    avatar: parts[4],
-                    rating: parts[5] ? parseInt(parts[5]) : null
-                };
-                info.players.push(playerData);
+        for (let i = 0; i < replayUrls.length; i++) {
+            const url = replayUrls[i].trim();
+            if (!url) continue;
+
+            try {
+                const replay = await this.createFromUrl(teamId, url);
+                results.push(replay);
+            } catch (error) {
+                errors.push({ url, error: error.message });
             }
 
-            // Extract format and tier
-            if (line.startsWith('|tier|')) {
-                info.tier = line.split('|')[2];
+            // Call progress callback if provided
+            if (progressCallback) {
+                progressCallback(i + 1, replayUrls.length, results.length, errors.length);
             }
 
-            // Extract timestamp
-            if (line.startsWith('|t:|')) {
-                info.timestamp = parseInt(line.split('|')[2]);
-            }
-
-            // Extract winner
-            if (line.startsWith('|win|')) {
-                info.winner = line.split('|')[2];
-            }
-
-            // Count turns
-            if (line.startsWith('|turn|')) {
-                info.turns = parseInt(line.split('|')[2]);
-            }
+            // Small delay to avoid overwhelming the API
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
-        return info;
+        return { results, errors };
     }
 
     /**
-     * Validates multiple replay URLs at once
-     * @param {string[]} urls - Array of replay URLs
-     * @returns {Object} - Validation results with valid/invalid URLs
+     * Re-process an existing replay (useful if parsing logic improves)
      */
-    static validateMultipleUrls(urls) {
-        const results = {
-            valid: [],
-            invalid: []
-        };
-
-        for (const url of urls) {
-            const parsed = this.parseReplayUrl(url.trim());
-            if (parsed) {
-                results.valid.push({
-                    url: url.trim(),
-                    parsed
-                });
-            } else {
-                results.invalid.push({
-                    url: url.trim(),
-                    reason: 'Invalid Showdown replay URL format'
-                });
-            }
+    static async reprocessReplay(id) {
+        const replay = await this.getById(id);
+        if (!replay) {
+            return null;
         }
 
-        return results;
-    }
-
-    /**
-     * Extracts replay URLs from text (useful for bulk import)
-     * @param {string} text - Text containing potential replay URLs
-     * @returns {string[]} - Array of found replay URLs
-     */
-    static extractUrlsFromText(text) {
-        const urlRegex = /https?:\/\/replay\.pokemonshowdown\.com\/[^\s]+/gi;
-        const matches = text.match(urlRegex) || [];
-
-        // Clean up URLs and remove duplicates
-        const cleanUrls = matches
-            .map(url => url.replace(/[.,;!?]$/, '')) // Remove trailing punctuation
-            .filter((url, index, array) => array.indexOf(url) === index); // Remove duplicates
-
-        return cleanUrls;
+        try {
+            const battleData = await this.fetchAndParseReplay(replay.url);
+            return await this.update(id, {
+                battleData,
+                result: battleData.result,
+                opponent: battleData.opponent
+            });
+        } catch (error) {
+            console.error('Error reprocessing replay:', error);
+            throw error;
+        }
     }
 }
+
+export default ReplaysService;
