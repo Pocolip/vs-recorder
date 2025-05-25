@@ -16,8 +16,8 @@ import {
 } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal';
 import AddReplayModal from '../components/AddReplayModal';
-import TeamsService from '../services/TeamsService';
-import ReplaysService from '../services/ReplaysService';
+import TeamService from '../services/TeamService';
+import ReplayService from '../services/ReplayService';
 
 const TeamPage = () => {
     const { teamId } = useParams();
@@ -41,12 +41,23 @@ const TeamPage = () => {
         loadTeamData();
     }, [teamId]);
 
+    const handleDeleteReplay = async (replayId) => {
+        try {
+            await ReplayService.delete(replayId);
+            await loadTeamData(); // Refresh data
+        } catch (error) {
+            console.error('Error deleting replay:', error);
+            throw error;
+        }
+    };
+
+
     const loadTeamData = async () => {
         try {
             setLoading(true);
 
             // Load team
-            const teamData = await TeamsService.getById(teamId);
+            const teamData = await TeamService.getById(teamId);
             if (!teamData) {
                 navigate('/');
                 return;
@@ -54,7 +65,7 @@ const TeamPage = () => {
             setTeam(teamData);
 
             // Load replays
-            const replaysData = await ReplaysService.getByTeamId(teamId);
+            const replaysData = await ReplayService.getByTeamId(teamId);
             setReplays(replaysData);
 
             // Calculate stats
@@ -80,10 +91,10 @@ const TeamPage = () => {
             setDeleting(true);
 
             // Delete all replays for this team
-            await ReplaysService.deleteByTeamId(teamId);
+            await ReplayService.deleteByTeamId(teamId);
 
             // Delete the team
-            await TeamsService.delete(teamId);
+            await TeamService.delete(teamId);
 
             // Navigate back to home
             navigate('/');
@@ -95,7 +106,7 @@ const TeamPage = () => {
 
     const handleAddReplay = async (replayUrl, notes) => {
         try {
-            await ReplaysService.createFromUrl(teamId, replayUrl, notes);
+            await ReplayService.createFromUrl(teamId, replayUrl, notes);
             await loadTeamData(); // Refresh data
             setShowAddReplayModal(false);
         } catch (error) {
@@ -306,7 +317,11 @@ const TeamPage = () => {
                 {/* Tab Content */}
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6">
                     {activeTab === 'game-by-game' && (
-                        <GameByGameTab replays={replays} formatTimeAgo={formatTimeAgo} />
+                        <GameByGameTab
+                            replays={replays}
+                            formatTimeAgo={formatTimeAgo}
+                            onDeleteReplay={handleDeleteReplay}
+                        />
                     )}
                     {activeTab === 'match-by-match' && (
                         <ComingSoonTab title="Match by Match Analysis" />
@@ -365,7 +380,21 @@ const TeamPage = () => {
 };
 
 // Game by Game Tab Component
-const GameByGameTab = ({ replays, formatTimeAgo }) => {
+const GameByGameTab = ({ replays, formatTimeAgo, onDeleteReplay }) => {
+    const [deletingReplayId, setDeletingReplayId] = useState(null);
+
+    const handleDeleteReplay = async (replayId) => {
+        try {
+            setDeletingReplayId(replayId);
+            await onDeleteReplay(replayId);
+        } catch (error) {
+            console.error('Error deleting replay:', error);
+            // You could add a toast notification here
+        } finally {
+            setDeletingReplayId(null);
+        }
+    };
+
     if (replays.length === 0) {
         return (
             <div className="text-center py-12">
@@ -392,15 +421,15 @@ const GameByGameTab = ({ replays, formatTimeAgo }) => {
                         <div className="flex justify-between items-start">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`px-2 py-1 rounded text-sm font-medium ${
-                      replay.result === 'win'
-                          ? 'bg-green-600/20 text-green-400 border border-green-600/30'
-                          : replay.result === 'loss'
-                              ? 'bg-red-600/20 text-red-400 border border-red-600/30'
-                              : 'bg-gray-600/20 text-gray-400 border border-gray-600/30'
-                  }`}>
-                    {replay.result ? replay.result.toUpperCase() : 'UNKNOWN'}
-                  </span>
+                                    <span className={`px-2 py-1 rounded text-sm font-medium ${
+                                        replay.result === 'win'
+                                            ? 'bg-green-600/20 text-green-400 border border-green-600/30'
+                                            : replay.result === 'loss'
+                                                ? 'bg-red-600/20 text-red-400 border border-red-600/30'
+                                                : 'bg-gray-600/20 text-gray-400 border border-gray-600/30'
+                                    }`}>
+                                        {replay.result ? replay.result.toUpperCase() : 'UNKNOWN'}
+                                    </span>
                                     {replay.opponent && (
                                         <span className="text-gray-300">vs {replay.opponent}</span>
                                     )}
@@ -420,8 +449,23 @@ const GameByGameTab = ({ replays, formatTimeAgo }) => {
                                 </a>
                             </div>
 
-                            <div className="text-right text-sm text-gray-400">
-                                {formatTimeAgo(replay.createdAt)}
+                            <div className="flex items-center gap-3">
+                                <div className="text-right text-sm text-gray-400">
+                                    {formatTimeAgo(replay.createdAt)}
+                                </div>
+
+                                <button
+                                    onClick={() => handleDeleteReplay(replay.id)}
+                                    disabled={deletingReplayId === replay.id}
+                                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="Delete replay"
+                                >
+                                    {deletingReplayId === replay.id ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent"></div>
+                                    ) : (
+                                        <Trash2 className="h-4 w-4" />
+                                    )}
+                                </button>
                             </div>
                         </div>
                     </div>

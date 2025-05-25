@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Calendar, TrendingUp, Trophy } from 'lucide-react';
 import NewTeamModal from '../components/NewTeamModal';
-import TeamsService from '../services/TeamsService';
-import ReplaysService from '../services/ReplaysService';
+import TeamService from '../services/TeamService';
+import ReplayService from '../services/ReplayService';
 
 const HomePage = () => {
   const [teams, setTeams] = useState([]);
@@ -26,7 +26,7 @@ const HomePage = () => {
       setLoading(true);
 
       // Load teams
-      const teamsList = await TeamsService.getList();
+      const teamsList = await TeamService.getList();
       setTeams(teamsList);
 
       // Calculate overall stats
@@ -34,7 +34,7 @@ const HomePage = () => {
       let totalWins = 0;
 
       for (const team of teamsList) {
-        const teamReplays = await ReplaysService.getByTeamId(team.id);
+        const teamReplays = await ReplayService.getByTeamId(team.id);
         const teamWins = teamReplays.filter(r => r.result === 'win').length;
 
         totalGames += teamReplays.length;
@@ -57,7 +57,7 @@ const HomePage = () => {
 
   const handleCreateTeam = async (teamData) => {
     try {
-      await TeamsService.create(teamData);
+      await TeamService.create(teamData);
       await loadData(); // Refresh data
       setShowNewTeamModal(false);
     } catch (error) {
