@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Calendar, TrendingUp, Trophy } from 'lucide-react';
-import NewTeamModal from '../components/NewTeamModal';
+import { NewTeamModal, PokemonTeam } from '../components';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
 
@@ -199,7 +199,7 @@ const HomePage = () => {
   );
 };
 
-// Separate component for individual team cards
+// Updated TeamCard component with Pokemon integration
 const TeamCard = ({ team, formatTimeAgo }) => {
   const [teamStats, setTeamStats] = useState({
     gamesPlayed: 0,
@@ -214,7 +214,7 @@ const TeamCard = ({ team, formatTimeAgo }) => {
 
   const loadTeamStats = async () => {
     try {
-      const replays = await ReplaysService.getByTeamId(team.id);
+      const replays = await ReplayService.getByTeamId(team.id);
       const wins = replays.filter(r => r.result === 'win').length;
 
       setTeamStats({
@@ -264,11 +264,14 @@ const TeamCard = ({ team, formatTimeAgo }) => {
           <span>{formatTimeAgo(team.updatedAt)}</span>
         </div>
 
-        {/* Pokemon placeholder emojis */}
-        <div className="flex gap-1 mb-4">
-          {['🔥', '💧', '⚡', '🌿', '🧊', '👻'].map((emoji, index) => (
-              <span key={index} className="text-2xl">{emoji}</span>
-          ))}
+        {/* Pokemon Team Display - This is the key change! */}
+        <div className="mb-4">
+          <PokemonTeam
+              pokepaste={team.pokepaste}
+              size="sm"
+              maxDisplay={6}
+              className="justify-center"
+          />
         </div>
 
         {/* Tags */}

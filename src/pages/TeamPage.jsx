@@ -21,6 +21,7 @@ import {
 } from '../components';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
+import {PokemonTeam} from "@/components";
 
 const TeamPage = () => {
     const { teamId } = useParams();
@@ -309,15 +310,15 @@ const TeamInfoCard = ({ team, teamStats, formatTimeAgo }) => (
             {/* Pokemon Display */}
             <div className="lg:col-span-2">
                 <h3 className="text-lg font-semibold text-gray-100 mb-3">Team</h3>
-                <div className="flex gap-2">
-                    {['🔥', '💧', '⚡', '🌿', '🧊', '👻'].map((emoji, index) => (
-                        <div key={index} className="bg-slate-700 rounded-lg p-3">
-                            <span className="text-3xl">{emoji}</span>
-                        </div>
-                    ))}
-                </div>
+                <PokemonTeam
+                    pokepaste={team.pokepaste}
+                    size="lg"
+                    showNames={true}
+                    maxDisplay={6}
+                    className="justify-start"
+                />
                 {team.description && (
-                    <p className="text-gray-300 mt-3">{team.description}</p>
+                    <p className="text-gray-300 mt-4">{team.description}</p>
                 )}
             </div>
 

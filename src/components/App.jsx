@@ -4,6 +4,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import TeamPage from '../pages/TeamPage';
 import StorageService from '../services/StorageService';
+import PokemonService from '../services/PokemonService';
 
 const App = () => {
     useEffect(() => {
@@ -26,6 +27,15 @@ const App = () => {
 
                 console.log('VS Recorder initialized successfully');
             }
+
+            // Initialize Pokemon service
+            const pokemonInitialized = await PokemonService.initialize();
+            if (pokemonInitialized) {
+                console.log('PokemonService initialized with API support');
+            } else {
+                console.log('PokemonService initialized with fallback data only');
+            }
+
         } catch (error) {
             console.error('Error initializing app:', error);
         }

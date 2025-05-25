@@ -4,3 +4,6 @@ export { default as ConfirmationModal } from './ConfirmationModal';
 export { default as AddReplayModal } from './AddReplayModal';
 export { default as EditTeamModal } from './EditTeamModal';
 export { default as ReplaysTab } from './ReplaysTab';
+export { default as PokemonSprite } from './PokemonSprite';
+export { default as PokemonTeam } from './PokemonTeam';
+export { default as CompactReplayCard } from './CompactReplayCard';
