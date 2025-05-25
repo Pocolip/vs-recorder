@@ -17,7 +17,7 @@ import {
     ConfirmationModal,
     AddReplayModal,
     EditTeamModal,
-    GameByGameTab
+    ReplaysTab
 } from '../components';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
@@ -34,7 +34,7 @@ const TeamPage = () => {
         losses: 0,
         winRate: 0
     });
-    const [activeTab, setActiveTab] = useState('game-by-game');
+    const [activeTab, setActiveTab] = useState('replays');
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAddReplayModal, setShowAddReplayModal] = useState(false);
@@ -154,9 +154,10 @@ const TeamPage = () => {
     }
 
     const tabs = [
-        { id: 'game-by-game', label: 'Game by Game', icon: Calendar },
+        { id: 'replays', label: 'Replays', icon: Calendar },
+        { id: 'game-by-game', label: 'Game by Game', icon: BarChart3 },
         { id: 'match-by-match', label: 'Match by Match', icon: Users },
-        { id: 'usage-stats', label: 'Usage Stats', icon: BarChart3 },
+        { id: 'usage-stats', label: 'Usage Stats', icon: TrendingUp },
         { id: 'matchup-stats', label: 'Matchup Stats', icon: Target },
         { id: 'move-usage', label: 'Move Usage', icon: Zap }
     ];
@@ -188,15 +189,15 @@ const TeamPage = () => {
 
                 {/* Tab Content */}
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6">
-                    {activeTab === 'game-by-game' && (
-                        <GameByGameTab
+                    {activeTab === 'replays' && (
+                        <ReplaysTab
                             replays={replays}
                             formatTimeAgo={formatTimeAgo}
                             onDeleteReplay={handleDeleteReplay}
                             onUpdateReplay={handleUpdateReplay}
                         />
                     )}
-                    {activeTab !== 'game-by-game' && (
+                    {activeTab !== 'replays' && (
                         <ComingSoonTab title={tabs.find(t => t.id === activeTab)?.label} />
                     )}
                 </div>
