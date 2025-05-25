@@ -1,8 +1,8 @@
-// src/components/NewTeamModal.jsx - Fixed version
-import React, { useState } from 'react';
+// src/components/EditTeamModal.jsx
+import React, { useState, useEffect } from 'react';
 import { StorageService } from '../services/StorageService';
 
-const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
+const EditTeamModal = ({ isOpen, onClose, teamData, onTeamUpdated }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -14,16 +14,22 @@ const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    // Populate form when teamData changes
+    useEffect(() => {
+        if (teamData) {
+            setFormData({
+                name: teamData.name || '',
+                description: teamData.description || '',
+                pokepaste: teamData.pokepaste || '',
+                showdownUsernames: (teamData.showdownUsernames || []).join(', '),
+                format: teamData.format || '',
+                tags: (teamData.tags || []).join(', ')
+            });
+        }
+    }, [teamData]);
+
     const handleClose = () => {
         if (!isLoading) {
-            setFormData({
-                name: '',
-                description: '',
-                pokepaste: '',
-                showdownUsernames: '',
-                format: '',
-                tags: ''
-            });
             setErrors({});
             onClose();
         }
@@ -58,12 +64,8 @@ const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
         setErrors({});
 
         try {
-            // Debug logging
-            console.log('StorageService:', StorageService);
-            console.log('StorageService.addTeam:', StorageService.addTeam);
-
-            const teamData = {
-                id: `team_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            const updatedTeamData = {
+                ...teamData,
                 name: formData.name.trim(),
                 description: formData.description.trim(),
                 pokepaste: formData.pokepaste.trim(),
@@ -74,26 +76,23 @@ const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
                 tags: formData.tags
                     ? formData.tags.split(',').map(t => t.trim()).filter(t => t)
                     : [],
-                dateCreated: new Date().toISOString(),
-                lastModified: new Date().toISOString(),
-                isArchived: false
+                lastModified: new Date().toISOString()
             };
 
-            console.log('Creating team with data:', teamData);
+            console.log('Updating team with data:', updatedTeamData);
 
-            // Use addTeam method
-            const savedTeam = await StorageService.addTeam(teamData);
+            const savedTeam = await StorageService.saveTeam(updatedTeamData);
 
-            console.log('Team saved successfully:', savedTeam);
+            console.log('Team updated successfully:', savedTeam);
 
-            if (onTeamCreated) {
-                onTeamCreated(savedTeam);
+            if (onTeamUpdated) {
+                onTeamUpdated(savedTeam);
             }
 
             handleClose();
         } catch (error) {
-            console.error('Error creating team:', error);
-            setErrors({ submit: 'Failed to create team. Please try again.' });
+            console.error('Error updating team:', error);
+            setErrors({ submit: 'Failed to update team. Please try again.' });
         } finally {
             setIsLoading(false);
         }
@@ -114,14 +113,14 @@ const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
         }
     };
 
-    if (!isOpen) return null;
+    if (!isOpen || !teamData) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-gray-100">Create New Team</h2>
+                        <h2 className="text-xl font-semibold text-gray-100">Edit Team</h2>
                         <button
                             onClick={handleClose}
                             disabled={isLoading}
@@ -266,7 +265,7 @@ const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
                             {isLoading && (
                                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                             )}
-                            {isLoading ? 'Creating...' : 'Create Team'}
+                            {isLoading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
                 </div>
@@ -275,4 +274,4 @@ const NewTeamModal = ({ isOpen, onClose, onTeamCreated }) => {
     );
 };
 
-export default NewTeamModal;
+export default EditTeamModal;

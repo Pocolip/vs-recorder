@@ -3,24 +3,34 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-module-source-map',
+
   entry: {
-    popup: './src/index.jsx',
+    // Main React app
+    app: './src/index.jsx',
+    // Extension background script
     background: './src/background.js',
+    // Content script for future Pokémon site integration
     content: './src/content.js'
   },
+
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     clean: true
   },
+
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react']
+          }
         }
       },
       {
@@ -29,25 +39,53 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: './public/index.html',
-      filename: 'index.html',
-      chunks: ['popup']
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: 'manifest.json', to: 'manifest.json' },
-        { from: 'icons', to: 'icons' }
-      ]
-    })
-  ],
+
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
   },
-  devtool: 'cheap-module-source-map',
-  watch: process.env.NODE_ENV === 'development'
+
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      filename: 'index.html',
+      chunks: ['app']
+    }),
+
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'manifest.json',
+          to: 'manifest.json'
+        },
+        {
+          from: 'icons',
+          to: 'icons'
+        }
+      ]
+    })
+  ],
+
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        }
+      }
+    }
+  },
+
+  // Development server settings (for testing outside extension)
+  devServer: {
+    static: path.join(__dirname, 'dist'),
+    port: 3000,
+    hot: true,
+    historyApiFallback: true
+  }
 };
