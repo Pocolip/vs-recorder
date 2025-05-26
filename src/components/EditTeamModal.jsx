@@ -1,6 +1,6 @@
 // src/components/EditTeamModal.jsx
 import React, { useState, useEffect } from 'react';
-import StorageService from '../services/StorageService';
+import TeamService from '../services/TeamService';
 
 const EditTeamModal = ({ isOpen, onClose, teamData, onTeamUpdated }) => {
     const [formData, setFormData] = useState({
@@ -64,8 +64,7 @@ const EditTeamModal = ({ isOpen, onClose, teamData, onTeamUpdated }) => {
         setErrors({});
 
         try {
-            const updatedTeamData = {
-                ...teamData,
+            const updatedData = {
                 name: formData.name.trim(),
                 description: formData.description.trim(),
                 pokepaste: formData.pokepaste.trim(),
@@ -75,13 +74,12 @@ const EditTeamModal = ({ isOpen, onClose, teamData, onTeamUpdated }) => {
                 format: formData.format.trim(),
                 tags: formData.tags
                     ? formData.tags.split(',').map(t => t.trim()).filter(t => t)
-                    : [],
-                lastModified: new Date().toISOString()
+                    : []
             };
 
-            console.log('Updating team with data:', updatedTeamData);
+            console.log('Updating team with data:', updatedData);
 
-            const savedTeam = await StorageService.saveTeam(updatedTeamData);
+            const savedTeam = await TeamService.update(teamData.id, updatedData);
 
             console.log('Team updated successfully:', savedTeam);
 

@@ -1,7 +1,7 @@
-// src/services/ReplayService.js
+// src/services/ReplaysService.js
 import StorageService from './StorageService.js';
 
-class ReplayService {
+class ReplaysService {
     static STORAGE_KEY = 'replays';
 
     /**
@@ -168,13 +168,21 @@ class ReplayService {
     }
 
     /**
+     * Check if replay URL already exists for a specific team
+     */
+    static async existsByUrlForTeam(url, teamId) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.some(replay => replay.url === url);
+    }
+
+    /**
      * Create replay from Showdown URL (fetches and parses automatically)
      */
     static async createFromUrl(teamId, replayUrl, notes = '') {
         try {
-            // Check if URL already exists
-            if (await this.existsByUrl(replayUrl)) {
-                throw new Error('Replay already exists');
+            // Check if URL already exists for this specific team
+            if (await this.existsByUrlForTeam(replayUrl, teamId)) {
+                throw new Error('This replay is already added to this team');
             }
 
             // Get team data to access Showdown usernames
@@ -434,4 +442,4 @@ class ReplayService {
     }
 }
 
-export default ReplayService;
+export default ReplaysService;

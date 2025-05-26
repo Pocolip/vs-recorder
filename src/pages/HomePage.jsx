@@ -264,11 +264,10 @@ const TeamCard = ({ team, formatTimeAgo }) => {
           <span>{formatTimeAgo(team.updatedAt)}</span>
         </div>
 
-        {/* Pokemon Team Display - This is the key change! */}
         <div className="mb-4">
           <PokemonTeam
               pokepaste={team.pokepaste}
-              size="sm"
+              size="md"
               maxDisplay={6}
               className="justify-center"
           />
