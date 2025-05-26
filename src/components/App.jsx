@@ -3,6 +3,9 @@ import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import TeamPage from '../pages/TeamPage';
+import ImportPage from '../pages/ImportPage';
+import ExportPage from '../pages/ExportPage';
+import AboutPage from '../pages/AboutPage';
 import StorageService from '../services/StorageService';
 import PokemonService from '../services/PokemonService';
 
@@ -47,6 +50,9 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/team/:teamId" element={<TeamPage />} />
+                    <Route path="/import" element={<ImportPage />} />
+                    <Route path="/export" element={<ExportPage />} />
+                    <Route path="/about" element={<AboutPage />} />
                     {/* 404 fallback - redirect to home */}
                     <Route path="*" element={<HomePage />} />
                 </Routes>

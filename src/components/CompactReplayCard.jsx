@@ -232,7 +232,7 @@ const CompactReplayCard = ({
                             <span className="text-xs text-gray-400 whitespace-nowrap">vs</span>
                             <PokemonTeam
                                 pokemonNames={opponentTeam}
-                                size="sm"
+                                size="md"
                                 showNames={false}
                                 maxDisplay={6}
                                 className="flex-shrink-0"
