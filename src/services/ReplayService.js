@@ -250,7 +250,8 @@ class ReplaysService {
             let opponentPlayer = null;
 
             // New data structures for enhanced parsing
-            let actualPicks = { p1: new Set(), p2: new Set() };
+            let actualPicks = { p1: new Set(), p2: new Set() }; // Back to Set for unique Pokemon
+            let pokemonTransformations = new Map(); // Track transformations: "original" -> "final"
             let teraEvents = { p1: [], p2: [] };
             let eloChanges = { p1: null, p2: null };
 
@@ -298,6 +299,24 @@ class ReplaysService {
                     }
                 }
 
+                // Handle Pokemon transformations (like Terapagos Tera Shift)
+                if (line.startsWith('|detailschange|')) {
+                    const parts = line.split('|');
+                    const playerSlot = parts[2]; // e.g., "p2a: Terapagos"
+                    const newPokemonInfo = parts[3]; // e.g., "Terapagos-Terastal, L50, M"
+
+                    if (playerSlot && newPokemonInfo) {
+                        const originalName = playerSlot.includes(':') ?
+                            playerSlot.split(':')[1].trim() :
+                            playerSlot.substring(3);
+                        const newPokemon = newPokemonInfo.split(',')[0];
+
+                        // Track the transformation
+                        pokemonTransformations.set(originalName, newPokemon);
+                        console.log(`Pokemon transformation tracked: ${originalName} → ${newPokemon}`);
+                    }
+                }
+
                 // Extract terastallization events
                 if (line.includes('-terastallize|')) {
                     const parts = line.split('|');
@@ -324,26 +343,40 @@ class ReplaysService {
 
                 // Extract ELO changes from raw messages
                 if (line.startsWith('|raw|') && line.includes('rating:')) {
+                    console.log(`Found ELO line: ${line}`);
+
                     // Parse lines like: "|raw|doctor_mug's rating: 1355 &rarr; <strong>1336</strong><br />(-19 for losing)"
-                    const ratingMatch = line.match(/(.+)'s rating: (\d+) (?:&rarr;|→) <strong>(\d+)<\/strong>/);
+                    // Skip the |raw| prefix and capture the player name
+                    const ratingMatch = line.match(/\|raw\|(.+?)'s rating: (\d+) (?:&rarr;|→|&gt;) <strong>(\d+)<\/strong>/);
                     if (ratingMatch) {
-                        const playerName = ratingMatch[1];
+                        const playerName = ratingMatch[1].trim();
                         const beforeRating = parseInt(ratingMatch[2]);
                         const afterRating = parseInt(ratingMatch[3]);
 
-                        console.log(`Found ELO change: ${playerName} ${beforeRating} → ${afterRating}`);
+                        console.log(`Found ELO change: "${playerName}" ${beforeRating} → ${afterRating}`);
 
-                        // Find which player this is
-                        const playerId = Object.keys(players).find(id => players[id] === playerName);
+                        // Find which player this is (case-insensitive comparison)
+                        const playerId = Object.keys(players).find(id =>
+                            players[id].toLowerCase() === playerName.toLowerCase()
+                        );
+
                         if (playerId) {
                             eloChanges[playerId] = {
                                 before: beforeRating,
                                 after: afterRating,
                                 change: afterRating - beforeRating
                             };
-                            console.log(`Mapped ELO to player ${playerId}: ${beforeRating} → ${afterRating}`);
+                            console.log(`Mapped ELO to player ${playerId} (${players[playerId]}): ${beforeRating} → ${afterRating}`);
                         } else {
-                            console.log(`Could not find player ID for ${playerName}. Available players:`, players);
+                            console.log(`Could not find player ID for "${playerName}". Available players:`, players);
+                            console.log(`Player names: ${Object.values(players).map(name => `"${name}"`).join(', ')}`);
+                        }
+                    } else {
+                        console.log(`ELO regex didn't match line: ${line}`);
+                        // Try a more permissive regex
+                        const altMatch = line.match(/\|raw\|(.+?)'s rating: (\d+).*?(\d+)/);
+                        if (altMatch) {
+                            console.log(`Alternative regex matched: ${altMatch[1]} | ${altMatch[2]} | ${altMatch[3]}`);
                         }
                     }
                 }
@@ -355,10 +388,24 @@ class ReplaysService {
                 }
             }
 
-            // Convert Sets to Arrays for actual picks
+            // Apply transformations and convert to final arrays
+            const applyTransformations = (pokemonSet) => {
+                const result = [];
+                for (const pokemon of pokemonSet) {
+                    // Check if this Pokemon transformed
+                    const finalForm = pokemonTransformations.get(pokemon) || pokemon;
+
+                    // Only add if not already in result (avoid duplicates from transformations)
+                    if (!result.includes(finalForm)) {
+                        result.push(finalForm);
+                    }
+                }
+                return result;
+            };
+
             const finalPicks = {
-                p1: Array.from(actualPicks.p1),
-                p2: Array.from(actualPicks.p2)
+                p1: applyTransformations(actualPicks.p1),
+                p2: applyTransformations(actualPicks.p2)
             };
 
             // Determine result and opponent based on our analysis
@@ -437,6 +484,15 @@ class ReplaysService {
                 console.log('Missing data for result determination:', { winner, p1: players.p1, p2: players.p2 });
             }
 
+            console.log('Final parsing results:', {
+                players,
+                userPlayer,
+                opponentPlayer,
+                teraEvents,
+                eloChanges,
+                finalPicks
+            });
+
             return {
                 players,
                 teams,
@@ -470,6 +526,7 @@ class ReplaysService {
             };
         }
     }
+
     /**
      * Batch create replays from multiple URLs
      */

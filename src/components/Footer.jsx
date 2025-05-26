@@ -1,7 +1,7 @@
 // src/components/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Upload, Info, Github, Heart } from 'lucide-react';
+import { Download, Upload, Info, Github } from 'lucide-react';
 
 const Footer = () => {
 
@@ -63,7 +63,7 @@ const Footer = () => {
                     {/* Right - Version/Copyright */}
                     <div className="text-center md:text-right">
                         <p className="text-xs text-gray-400">
-                            © 2025 Built with <Heart className="h-3 w-3 inline mx-0.5 text-red-400" /> for VGC
+                            © 2025 Luis Medina
                         </p>
                         <p className="text-xs text-gray-500">v1.0.0</p>
                     </div>

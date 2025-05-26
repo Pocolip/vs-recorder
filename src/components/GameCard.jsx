@@ -116,6 +116,7 @@ const GameCard = ({ replay, formatTimeAgo }) => {
     // Extract ELO data
     const getEloData = () => {
         if (!replay.battleData || !replay.battleData.eloChanges) {
+            console.log('No ELO data found in battleData:', replay.battleData);
             return {
                 userElo: { before: null, after: null },
                 opponentElo: { before: null, after: null }
@@ -123,6 +124,7 @@ const GameCard = ({ replay, formatTimeAgo }) => {
         }
 
         const { eloChanges, userPlayer, opponentPlayer } = replay.battleData;
+        console.log('ELO data found:', { eloChanges, userPlayer, opponentPlayer });
 
         const userElo = eloChanges[userPlayer] || { before: null, after: null };
         const opponentElo = eloChanges[opponentPlayer] || { before: null, after: null };
@@ -315,23 +317,21 @@ const GameCard = ({ replay, formatTimeAgo }) => {
                     <p className="text-xs text-blue-400 mb-1">Your Picks</p>
                     <div className="bg-blue-200/25 border border-blue-400/40 rounded-lg p-2">
                         <div className="flex gap-1">
-                            {teamData.userPicks.length > 0 ? (
-                                teamData.userPicks.map((pokemon, index) => (
-                                    <PokemonSprite
-                                        key={index}
-                                        name={cleanPokemonName(pokemon)}
-                                        size="md"
-                                        fallbackText={(index + 1).toString()}
-                                    />
-                                ))
-                            ) : (
-                                // Show empty slots when no picks
-                                Array.from({ length: 4 }).map((_, index) => (
-                                    <div key={index} className="w-12 h-12 bg-slate-700/50 border-2 border-slate-600 border-dashed rounded-lg flex items-center justify-center">
-                                        <span className="text-gray-500 text-xs">—</span>
-                                    </div>
-                                ))
-                            )}
+                            {/* Show actual picked Pokemon */}
+                            {teamData.userPicks.map((pokemon, index) => (
+                                <PokemonSprite
+                                    key={index}
+                                    name={cleanPokemonName(pokemon)}
+                                    size="md"
+                                    fallbackText={(index + 1).toString()}
+                                />
+                            ))}
+                            {/* Fill remaining slots with placeholders */}
+                            {Array.from({ length: Math.max(0, 4 - teamData.userPicks.length) }).map((_, index) => (
+                                <div key={`empty-${index}`} className="w-12 h-12 bg-slate-700/50 border-2 border-slate-600 border-dashed rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-500 text-xs">—</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -341,23 +341,21 @@ const GameCard = ({ replay, formatTimeAgo }) => {
                     <p className="text-xs text-red-400 mb-1">Their Picks</p>
                     <div className="bg-red-200/25 border border-red-400/40 rounded-lg p-2">
                         <div className="flex gap-1">
-                            {teamData.opponentPicks.length > 0 ? (
-                                teamData.opponentPicks.map((pokemon, index) => (
-                                    <PokemonSprite
-                                        key={index}
-                                        name={cleanPokemonName(pokemon)}
-                                        size="md"
-                                        fallbackText={(index + 1).toString()}
-                                    />
-                                ))
-                            ) : (
-                                // Show empty slots when no picks
-                                Array.from({ length: 4 }).map((_, index) => (
-                                    <div key={index} className="w-12 h-12 bg-slate-700/50 border-2 border-slate-600 border-dashed rounded-lg flex items-center justify-center">
-                                        <span className="text-gray-500 text-xs">—</span>
-                                    </div>
-                                ))
-                            )}
+                            {/* Show actual picked Pokemon */}
+                            {teamData.opponentPicks.map((pokemon, index) => (
+                                <PokemonSprite
+                                    key={index}
+                                    name={cleanPokemonName(pokemon)}
+                                    size="md"
+                                    fallbackText={(index + 1).toString()}
+                                />
+                            ))}
+                            {/* Fill remaining slots with placeholders */}
+                            {Array.from({ length: Math.max(0, 4 - teamData.opponentPicks.length) }).map((_, index) => (
+                                <div key={`empty-${index}`} className="w-12 h-12 bg-slate-700/50 border-2 border-slate-600 border-dashed rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-500 text-xs">—</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -369,9 +367,16 @@ const GameCard = ({ replay, formatTimeAgo }) => {
                         <div className="flex items-center gap-1">
                             <span className="text-xs text-blue-400 w-8">You:</span>
                             {teraData.userTera ? (
-                                <span className="text-lg" title={`${teraData.userTera.pokemon} → ${teraData.userTera.type}`}>
-                                    {typeEmojis[teraData.userTera.type] || '❓'}
-                                </span>
+                                <div className="flex items-center gap-1">
+                                    <PokemonSprite
+                                        name={cleanPokemonName(teraData.userTera.pokemon)}
+                                        size="sm"
+                                        fallbackText="?"
+                                    />
+                                    <span className="text-lg" title={`${teraData.userTera.pokemon} → ${teraData.userTera.type}`}>
+                                        {typeEmojis[teraData.userTera.type] || '❓'}
+                                    </span>
+                                </div>
                             ) : (
                                 <span className="text-xs text-gray-500">—</span>
                             )}
@@ -379,9 +384,16 @@ const GameCard = ({ replay, formatTimeAgo }) => {
                         <div className="flex items-center gap-1">
                             <span className="text-xs text-red-400 w-8">Opp:</span>
                             {teraData.opponentTera ? (
-                                <span className="text-lg" title={`${teraData.opponentTera.pokemon} → ${teraData.opponentTera.type}`}>
-                                    {typeEmojis[teraData.opponentTera.type] || '❓'}
-                                </span>
+                                <div className="flex items-center gap-1">
+                                    <PokemonSprite
+                                        name={cleanPokemonName(teraData.opponentTera.pokemon)}
+                                        size="sm"
+                                        fallbackText="?"
+                                    />
+                                    <span className="text-lg" title={`${teraData.opponentTera.pokemon} → ${teraData.opponentTera.type}`}>
+                                        {typeEmojis[teraData.opponentTera.type] || '❓'}
+                                    </span>
+                                </div>
                             ) : (
                                 <span className="text-xs text-gray-500">—</span>
                             )}
