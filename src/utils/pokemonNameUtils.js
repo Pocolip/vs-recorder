@@ -78,13 +78,16 @@ const POKEMON_FORM_MAPPINGS = {
 
     // Gender-based forms
     'Indeedee-F': 'indeedee-female',
-    'Indeedee-M': 'indeedee',
+    'Indeedee-M': 'indeedee-male',
+    'Indeedee': 'indeedee-male',
     'Meowstic-F': 'meowstic-female',
     'Meowstic-M': 'meowstic',
     'Basculegion-F': 'basculegion-female',
-    'Basculegion-M': 'basculegion',
+    'Basculegion-M': 'basculegion-male',
+    'Basculegion': 'basculegion-male',
     'Oinkologne-F': 'oinkologne-female',
-    'Oinkologne-M': 'oinkologne',
+    'Oinkologne-M': 'oinkologne-male',
+    'Oinkologne': 'oinkologne-male',
 
     // Terapagos forms
     'Terapagos-Terastal': 'terapagos-terastal',

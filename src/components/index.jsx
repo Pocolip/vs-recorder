@@ -10,3 +10,5 @@ export { default as PokemonSprite } from './PokemonSprite';
 export { default as PokemonTeam } from './PokemonTeam';
 export { default as CompactReplayCard } from './CompactReplayCard';
 export { default as Footer } from './Footer';
+export { default as BestOf3Card } from './BestOf3Card';
+export { default as MatchByMatchTab } from './MatchByMatchTab';

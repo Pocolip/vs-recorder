@@ -1,4 +1,4 @@
-// src/services/ReplaysService.js
+// src/services/ReplayService.js - Enhanced with Bo3 support
 import StorageService from './StorageService.js';
 
 class ReplaysService {
@@ -249,29 +249,92 @@ class ReplaysService {
             let userPlayer = null;
             let opponentPlayer = null;
 
-            // New data structures for enhanced parsing
-            let actualPicks = { p1: new Set(), p2: new Set() }; // Back to Set for unique Pokemon
-            let pokemonTransformations = new Map(); // Track transformations: "original" -> "final"
+            // Enhanced data structures
+            let actualPicks = { p1: new Set(), p2: new Set() };
+            let pokemonTransformations = new Map();
             let teraEvents = { p1: [], p2: [] };
             let eloChanges = { p1: null, p2: null };
 
+            // NEW: Best-of-3 data structures
+            let bestOf3Data = {
+                isBestOf3: false,
+                matchId: null,
+                gameNumber: null,
+                gameTitle: null,
+                matchUrl: null,
+                seriesScore: null // Will store current score like "1-0", "1-1", etc.
+            };
+
             // Parse the log for battle information
             for (const line of lines) {
+                // NEW: Extract Best-of-3 information
+                if (line.includes('|uhtml|bestof|')) {
+                    bestOf3Data.isBestOf3 = true;
+
+                    // Extract the HTML content
+                    const htmlMatch = line.match(/\|uhtml\|bestof\|(.+)$/);
+                    if (htmlMatch) {
+                        const htmlContent = htmlMatch[1];
+                        console.log('Found Bo3 HTML:', htmlContent);
+
+                        // Extract game number and URL from HTML like:
+                        // <h2><strong>Game 1</strong> of <a href="/game-bestof3-gen9vgc2025regibo3-2370418907-63ye7u6d1d90ht3h8obgwvq4uijrl0qpw">a best-of-3</a></h2>
+                        const gameMatch = htmlContent.match(/<strong>Game (\d+)<\/strong>/);
+                        if (gameMatch) {
+                            bestOf3Data.gameNumber = parseInt(gameMatch[1]);
+                            bestOf3Data.gameTitle = `Game ${gameMatch[1]}`;
+                        }
+
+                        const urlMatch = htmlContent.match(/href="([^"]+)"/);
+                        if (urlMatch) {
+                            bestOf3Data.matchUrl = urlMatch[1];
+                            // Extract match ID from URL (the long string after the last dash)
+                            const idMatch = urlMatch[1].match(/-([a-zA-Z0-9]+)$/);
+                            if (idMatch) {
+                                bestOf3Data.matchId = idMatch[1];
+                            }
+                        }
+                    }
+                }
+
+                // NEW: Extract series score from HTML table
+                if (line.includes('|html|') && line.includes('<table') && line.includes('fa fa-circle')) {
+                    const htmlContent = line.substring(line.indexOf('|html|') + 6);
+                    console.log('Found series score HTML:', htmlContent);
+
+                    // Count filled circles (wins) for each player
+                    // Pattern: <i class="fa fa-circle"></i> for wins, <i class="fa fa-circle-o"></i> for losses/empty
+                    const leftWins = (htmlContent.match(/<td align="left">.*?<\/td>/s)?.[0] || '')
+                        .split('fa fa-circle"></i>').length - 1;
+                    const rightWins = (htmlContent.match(/<td align="right">.*?<\/td>/s)?.[0] || '')
+                        .split('fa fa-circle"></i>').length - 1;
+
+                    bestOf3Data.seriesScore = `${leftWins}-${rightWins}`;
+                    console.log('Extracted series score:', bestOf3Data.seriesScore);
+                }
+
                 // Extract player information
                 if (line.startsWith('|player|')) {
                     const parts = line.split('|');
                     const playerId = parts[2]; // p1 or p2
                     const playerName = parts[3];
-                    players[playerId] = playerName;
 
-                    // Check if this player is one of our usernames
-                    if (teamShowdownUsernames.length > 0 &&
-                        teamShowdownUsernames.some(username =>
-                            username.toLowerCase() === playerName.toLowerCase()
-                        )) {
-                        userPlayer = playerId;
-                        opponentPlayer = playerId === 'p1' ? 'p2' : 'p1';
-                        console.log(`Found user player: ${playerId} (${playerName})`);
+                    // Only set if we have a valid player name
+                    if (playerName && playerName.trim()) {
+                        players[playerId] = playerName.trim();
+                        console.log(`Found player: ${playerId} = "${playerName.trim()}"`);
+
+                        // Check if this player is one of our usernames
+                        if (teamShowdownUsernames.length > 0 &&
+                            teamShowdownUsernames.some(username =>
+                                username.toLowerCase() === playerName.toLowerCase()
+                            )) {
+                            userPlayer = playerId;
+                            opponentPlayer = playerId === 'p1' ? 'p2' : 'p1';
+                            console.log(`Found user player: ${playerId} (${playerName})`);
+                        }
+                    } else {
+                        console.warn(`Empty or invalid player name for ${playerId}: "${playerName}"`);
                     }
                 }
 
@@ -371,13 +434,6 @@ class ReplaysService {
                             console.log(`Could not find player ID for "${playerName}". Available players:`, players);
                             console.log(`Player names: ${Object.values(players).map(name => `"${name}"`).join(', ')}`);
                         }
-                    } else {
-                        console.log(`ELO regex didn't match line: ${line}`);
-                        // Try a more permissive regex
-                        const altMatch = line.match(/\|raw\|(.+?)'s rating: (\d+).*?(\d+)/);
-                        if (altMatch) {
-                            console.log(`Alternative regex matched: ${altMatch[1]} | ${altMatch[2]} | ${altMatch[3]}`);
-                        }
                     }
                 }
 
@@ -420,21 +476,25 @@ class ReplaysService {
                 teamShowdownUsernames
             });
 
-            if (winner && players.p1 && players.p2) {
+            if (winner && (players.p1 || players.p2)) {
                 if (userPlayer && opponentPlayer) {
                     // We successfully identified which player is the user
-                    opponent = players[opponentPlayer];
+                    opponent = players[opponentPlayer] || 'Unknown opponent';
 
                     // Compare winner name with our player name (case-insensitive)
                     const userPlayerName = players[userPlayer];
-                    const isUserWinner = winner.toLowerCase() === userPlayerName.toLowerCase();
-                    result = isUserWinner ? 'win' : 'loss';
+                    if (userPlayerName) {
+                        const isUserWinner = winner.toLowerCase() === userPlayerName.toLowerCase();
+                        result = isUserWinner ? 'win' : 'loss';
 
-                    console.log(`Result determination: userPlayer=${userPlayer} (${userPlayerName}), winner="${winner}", result=${result}`);
+                        console.log(`Result determination: userPlayer=${userPlayer} (${userPlayerName}), winner="${winner}", result=${result}`);
+                    } else {
+                        console.warn(`User player name not found for ${userPlayer}`);
+                    }
                 } else {
                     // Fallback: try to guess based on username patterns
-                    const p1Name = players.p1.toLowerCase();
-                    const p2Name = players.p2.toLowerCase();
+                    const p1Name = (players.p1 || '').toLowerCase();
+                    const p2Name = (players.p2 || '').toLowerCase();
 
                     console.log('Fallback matching:', { p1Name, p2Name, teamShowdownUsernames });
 
@@ -442,27 +502,27 @@ class ReplaysService {
                         let foundUserPlayer = null;
 
                         // Check if p1 matches any of our usernames
-                        const p1Matches = teamShowdownUsernames.some(username =>
+                        const p1Matches = p1Name && teamShowdownUsernames.some(username =>
                             p1Name.includes(username.toLowerCase()) ||
                             username.toLowerCase().includes(p1Name)
                         );
 
                         // Check if p2 matches any of our usernames
-                        const p2Matches = teamShowdownUsernames.some(username =>
+                        const p2Matches = p2Name && teamShowdownUsernames.some(username =>
                             p2Name.includes(username.toLowerCase()) ||
                             username.toLowerCase().includes(p2Name)
                         );
 
                         if (p1Matches && !p2Matches) {
                             foundUserPlayer = 'p1';
-                            opponent = players.p2;
-                            result = winner.toLowerCase() === players.p1.toLowerCase() ? 'win' : 'loss';
+                            opponent = players.p2 || 'Unknown opponent';
+                            result = winner.toLowerCase() === p1Name ? 'win' : 'loss';
                         } else if (p2Matches && !p1Matches) {
                             foundUserPlayer = 'p2';
-                            opponent = players.p1;
-                            result = winner.toLowerCase() === players.p2.toLowerCase() ? 'win' : 'loss';
+                            opponent = players.p1 || 'Unknown opponent';
+                            result = winner.toLowerCase() === p2Name ? 'win' : 'loss';
                         } else if (p1Matches && p2Matches) {
-                            opponent = `${players.p1} vs ${players.p2}`;
+                            opponent = `${players.p1 || 'Player 1'} vs ${players.p2 || 'Player 2'}`;
                             result = null;
                         }
 
@@ -473,15 +533,50 @@ class ReplaysService {
                         }
                     }
 
-                    // If still no match, leave result as null (unknown)
+                    // If still no match, use winner comparison if we have player data
+                    if (!result && winner) {
+                        if (players.p1 && winner.toLowerCase() === players.p1.toLowerCase()) {
+                            // P1 won, determine if that's us
+                            if (teamShowdownUsernames.some(username =>
+                                username.toLowerCase() === players.p1.toLowerCase())) {
+                                result = 'win';
+                                opponent = players.p2 || 'Unknown opponent';
+                            } else {
+                                result = 'loss';
+                                opponent = players.p1;
+                            }
+                        } else if (players.p2 && winner.toLowerCase() === players.p2.toLowerCase()) {
+                            // P2 won, determine if that's us
+                            if (teamShowdownUsernames.some(username =>
+                                username.toLowerCase() === players.p2.toLowerCase())) {
+                                result = 'win';
+                                opponent = players.p1 || 'Unknown opponent';
+                            } else {
+                                result = 'loss';
+                                opponent = players.p2;
+                            }
+                        }
+
+                        if (result) {
+                            console.log(`Winner-based determination: winner="${winner}", result=${result}, opponent=${opponent}`);
+                        }
+                    }
+
+                    // Final fallback
                     if (!result && !opponent) {
-                        opponent = `${players.p1} vs ${players.p2}`;
+                        opponent = `${players.p1 || 'Player 1'} vs ${players.p2 || 'Player 2'}`;
                         result = null;
                         console.log('No match found, setting unknown result');
                     }
                 }
             } else {
-                console.log('Missing data for result determination:', { winner, p1: players.p1, p2: players.p2 });
+                console.log('Missing data for result determination:', {
+                    winner,
+                    p1: players.p1,
+                    p2: players.p2,
+                    hasWinner: !!winner,
+                    hasPlayers: !!(players.p1 || players.p2)
+                });
             }
 
             console.log('Final parsing results:', {
@@ -490,7 +585,8 @@ class ReplaysService {
                 opponentPlayer,
                 teraEvents,
                 eloChanges,
-                finalPicks
+                finalPicks,
+                bestOf3Data // NEW: Include Bo3 data in logs
             });
 
             return {
@@ -506,6 +602,8 @@ class ReplaysService {
                 actualPicks: finalPicks,
                 teraEvents,
                 eloChanges,
+                // NEW: Best-of-3 data
+                bestOf3: bestOf3Data,
                 raw: replayData
             };
         } catch (error) {
@@ -522,6 +620,15 @@ class ReplaysService {
                 actualPicks: { p1: [], p2: [] },
                 teraEvents: { p1: [], p2: [] },
                 eloChanges: { p1: null, p2: null },
+                // NEW: Default Bo3 data for errors
+                bestOf3: {
+                    isBestOf3: false,
+                    matchId: null,
+                    gameNumber: null,
+                    gameTitle: null,
+                    matchUrl: null,
+                    seriesScore: null
+                },
                 raw: replayData
             };
         }
@@ -577,6 +684,151 @@ class ReplaysService {
             console.error('Error reprocessing replay:', error);
             throw error;
         }
+    }
+
+    /**
+     * NEW: Get replays that are part of Best-of-3 matches
+     */
+    static async getBestOf3Replays(teamId) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.filter(replay =>
+            replay.battleData?.bestOf3?.isBestOf3
+        );
+    }
+
+    /**
+     * NEW: Group Best-of-3 replays by match ID
+     */
+    static async getBestOf3Matches(teamId) {
+        const bo3Replays = await this.getBestOf3Replays(teamId);
+        const matches = new Map();
+
+        for (const replay of bo3Replays) {
+            const matchId = replay.battleData.bestOf3.matchId;
+            if (!matchId) continue;
+
+            if (!matches.has(matchId)) {
+                matches.set(matchId, {
+                    matchId,
+                    opponent: replay.opponent,
+                    games: [],
+                    completedAt: null,
+                    isComplete: false,
+                    seriesScore: null,
+                    matchUrl: replay.battleData.bestOf3.matchUrl,
+                    gameResults: [], // NEW: Array of individual game results
+                    matchResult: null // NEW: Overall match result ('win', 'loss', 'incomplete')
+                });
+            }
+
+            matches.get(matchId).games.push(replay);
+        }
+
+        // Sort games within each match and determine completion status
+        for (const [matchId, match] of matches) {
+            // Sort games by game number
+            match.games.sort((a, b) => {
+                const gameA = a.battleData.bestOf3.gameNumber || 0;
+                const gameB = b.battleData.bestOf3.gameNumber || 0;
+                return gameA - gameB;
+            });
+
+            // Build game-by-game results array
+            match.gameResults = match.games.map(game => ({
+                gameNumber: game.battleData.bestOf3.gameNumber,
+                result: game.result, // 'win', 'loss', or null
+                replayId: game.id,
+                replayUrl: game.url,
+                seriesScoreAfter: game.battleData.bestOf3.seriesScore
+            }));
+
+            // Determine if match is complete and get final series score
+            const gameCount = match.games.length;
+            const wins = match.games.filter(game => game.result === 'win').length;
+            const losses = match.games.filter(game => game.result === 'loss').length;
+            const unknownResults = match.games.filter(game => !game.result).length;
+
+            // Match is complete if:
+            // 1. Someone has won 2+ games (normal completion)
+            // 2. We have 3 games total (went the distance)
+            // 3. Premature ending: fewer than 3 games but someone is clearly ahead
+            const normalCompletion = wins >= 2 || losses >= 2 || gameCount >= 3;
+            const prematureEnding = gameCount < 3 && gameCount > 0 && (wins > losses || losses > wins);
+
+            match.isComplete = normalCompletion || prematureEnding;
+            match.seriesScore = `${wins}-${losses}`;
+
+            // Determine overall match result
+            if (match.isComplete) {
+                if (wins > losses) {
+                    match.matchResult = 'win';
+                } else if (losses > wins) {
+                    match.matchResult = 'loss';
+                } else {
+                    // Tied score - should be rare but handle gracefully
+                    if (gameCount >= 3) {
+                        match.matchResult = 'draw'; // Shouldn't happen in Bo3, but just in case
+                    } else {
+                        match.matchResult = 'incomplete'; // Still tied, need more games
+                    }
+                }
+            } else {
+                match.matchResult = 'incomplete';
+            }
+
+            // Add completion reason for debugging/display
+            if (match.isComplete) {
+                if (wins >= 2 || losses >= 2) {
+                    match.completionReason = 'normal'; // Someone reached 2 wins
+                } else if (gameCount >= 3) {
+                    match.completionReason = 'full_series'; // Went all 3 games
+                } else if (prematureEnding) {
+                    match.completionReason = 'forfeit'; // Premature ending with clear leader
+                }
+            }
+
+            // Use the most recent game's timestamp as match completion time
+            match.completedAt = match.games[match.games.length - 1]?.createdAt;
+        }
+
+        // Convert to array and sort by completion time (most recent first)
+        return Array.from(matches.values()).sort((a, b) =>
+            new Date(b.completedAt) - new Date(a.completedAt)
+        );
+    }
+
+    /**
+     * NEW: Get detailed game results for a specific match
+     */
+    static getGameByGameResults(match) {
+        if (!match || !match.gameResults) return [];
+
+        return match.gameResults.map(game => ({
+            ...game,
+            displayResult: game.result ? (game.result === 'win' ? 'W' : 'L') : '?',
+            resultClass: game.result === 'win' ? 'text-green-400' :
+                game.result === 'loss' ? 'text-red-400' : 'text-gray-400'
+        }));
+    }
+
+    /**
+     * NEW: Get match summary string (e.g., "Won 2-1", "Lost 0-2", "Won 1-0 (FF)")
+     */
+    static getMatchSummary(match) {
+        if (!match) return 'Unknown';
+
+        const status = match.matchResult === 'win' ? 'Won' :
+            match.matchResult === 'loss' ? 'Lost' :
+                match.matchResult === 'incomplete' ? 'Incomplete' : 'Unknown';
+
+        let suffix = '';
+
+        // Add forfeit indicator for premature endings
+        if (match.isComplete && match.completionReason === 'forfeit') {
+            suffix = ' (FF)'; // FF = Forfeit
+        }
+
+        return `${status} ${match.seriesScore}${suffix}`;
     }
 }
 

@@ -19,10 +19,12 @@ import {
     EditTeamModal,
     ReplaysTab,
     GameByGameTab,
+    MatchByMatchTab,
     PokemonTeam
 } from '../components';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
+import MatchService from "@/services/MatchService";
 import { useTeamStats } from '@/hooks/useTeamStats';
 import { formatTimeAgo } from '@/utils/timeUtils';
 
@@ -80,6 +82,7 @@ const TeamPage = () => {
         try {
             setDeleting(true);
             await ReplayService.deleteByTeamId(teamId);
+            await MatchService.deleteByTeamId(teamId);  // ADD THIS LINE
             await TeamService.delete(teamId);
             navigate('/');
         } catch (error) {
@@ -189,7 +192,12 @@ const TeamPage = () => {
                             replays={replays}
                         />
                     )}
-                    {!['replays', 'game-by-game'].includes(activeTab) && (
+                    {activeTab === 'match-by-match' && (
+                        <MatchByMatchTab
+                            teamId={teamId}
+                        />
+                    )}
+                    {!['replays', 'game-by-game', 'match-by-match'].includes(activeTab) && (
                         <ComingSoonTab title={tabs.find(t => t.id === activeTab)?.label} />
                     )}
                 </div>
