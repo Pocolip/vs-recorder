@@ -1,11 +1,12 @@
 // src/services/PokemonService.js
 import StorageService from './StorageService.js';
+import { parseShowdownName } from '../utils/pokemonNameUtils';
 
 class PokemonService {
     static STORAGE_KEY = 'pokemon_cache';
     static SPRITE_CACHE_KEY = 'pokemon_sprites';
     static CACHE_EXPIRY_DAYS = 7; // Cache data for 7 days
-    
+
     // Static fallback data for most common VGC Pokemon
     static COMMON_VGC_POKEMON = {
         // Generation 9 VGC 2025 common picks
@@ -68,7 +69,7 @@ class PokemonService {
         try {
             // Dynamic import of pokeapi-js-wrapper
             const PokeAPI = await import('pokeapi-js-wrapper');
-            
+
             this.pokedexAPI = new PokeAPI.Pokedex({
                 cache: true,
                 timeout: 10000, // 10 second timeout
@@ -91,8 +92,8 @@ class PokemonService {
     static async getPokemon(identifier) {
         try {
             // Normalize identifier
-            const normalizedName = typeof identifier === 'string' 
-                ? identifier.toLowerCase().replace(/\s+/g, '-') 
+            const normalizedName = typeof identifier === 'string'
+                ? identifier.toLowerCase().replace(/\s+/g, '-')
                 : identifier;
 
             // Check cache first
@@ -106,7 +107,7 @@ class PokemonService {
                 try {
                     const apiData = await this.pokedexAPI.getPokemonByName(normalizedName);
                     const processedData = this.processPokemonData(apiData);
-                    
+
                     // Cache the result
                     await this.cachePokemon(normalizedName, processedData);
                     return processedData;
@@ -141,7 +142,7 @@ class PokemonService {
     static async getMultiplePokemon(identifiers) {
         const promises = identifiers.map(id => this.getPokemon(id));
         const results = await Promise.allSettled(promises);
-        
+
         return results.map((result, index) => {
             if (result.status === 'fulfilled') {
                 return result.value;
@@ -208,7 +209,7 @@ class PokemonService {
      */
     static enrichFallbackData(fallbackData) {
         const sprites = this.generateSpriteUrls(fallbackData.id);
-        
+
         return {
             ...fallbackData,
             displayName: this.formatDisplayName(fallbackData.name),
@@ -361,7 +362,7 @@ class PokemonService {
             const total = Object.keys(cache).length;
             const expired = Object.values(cache)
                 .filter(entry => this.isCacheExpired(entry.cached_at)).length;
-            
+
             return {
                 total,
                 active: total - expired,
@@ -372,21 +373,6 @@ class PokemonService {
             console.error('Failed to get cache stats:', error);
             return { total: 0, active: 0, expired: 0, expiryDays: this.CACHE_EXPIRY_DAYS };
         }
-    }
-
-    /**
-     * Parse Pokemon name from Showdown format
-     * @param {string} showdownName - Pokemon name from Showdown (e.g., "Urshifu-*", "Calyrex-Shadow")
-     * @returns {string} Normalized Pokemon name
-     */
-    static parseShowdownName(showdownName) {
-        // Handle special Showdown formats
-        if (showdownName.includes('-*')) {
-            // Handle forms like "Urshifu-*" - we'll need context to determine the form
-            return showdownName.replace('-*', '').toLowerCase();
-        }
-        
-        return showdownName.toLowerCase().replace(/\s+/g, '-');
     }
 
     /**

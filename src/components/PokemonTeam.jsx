@@ -2,9 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import PokemonSprite from './PokemonSprite';
 import PokemonService from '../services/PokemonService';
-
-// Cache for Pokepaste data to prevent duplicate fetches
-const pokepasteCache = new Map();
+import PokepasteService from '../services/PokepasteService';
 
 const PokemonTeam = ({
                          pokepaste = null,
@@ -17,6 +15,7 @@ const PokemonTeam = ({
     const [teamPokemon, setTeamPokemon] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [pokepasteMetadata, setPokepasteMetadata] = useState(null);
 
     // Memoize the cache key to prevent unnecessary re-renders
     const cacheKey = useMemo(() => {
@@ -33,12 +32,26 @@ const PokemonTeam = ({
         try {
             setLoading(true);
             setError(null);
+            setPokepasteMetadata(null);
 
             let pokemonToLoad = [];
 
-            // If we have a pokepaste URL, parse it
+            // If we have a pokepaste URL, use the service to parse it
             if (pokepaste) {
-                pokemonToLoad = await parsePokepaste(pokepaste);
+                const parsed = await PokepasteService.fetchAndParse(pokepaste, {
+                    maxPokemon: maxDisplay
+                });
+
+                // Extract Pokemon names from the parsed data
+                pokemonToLoad = parsed.pokemon.map(p => p.name).filter(name => name);
+                setPokepasteMetadata(parsed.metadata);
+
+                console.log('Pokepaste parsed successfully:', {
+                    url: pokepaste,
+                    pokemonCount: pokemonToLoad.length,
+                    format: parsed.metadata.format,
+                    pokemon: pokemonToLoad
+                });
             }
             // Otherwise use the provided pokemon names
             else if (pokemonNames && pokemonNames.length > 0) {
@@ -49,7 +62,7 @@ const PokemonTeam = ({
                 pokemonToLoad = ['miraidon', 'koraidon', 'calyrex-shadow', 'kyogre', 'incineroar', 'rillaboom'].slice(0, maxDisplay);
             }
 
-            // Load Pokemon data
+            // Load Pokemon data using the Pokemon service
             const pokemonData = await PokemonService.getMultiplePokemon(pokemonToLoad);
             setTeamPokemon(pokemonData);
 
@@ -61,148 +74,6 @@ const PokemonTeam = ({
         } finally {
             setLoading(false);
         }
-    };
-
-    const parsePokepaste = async (pokepasteUrl) => {
-        try {
-            // Check cache first
-            if (pokepasteCache.has(pokepasteUrl)) {
-                return pokepasteCache.get(pokepasteUrl);
-            }
-
-            // Extract the pokepaste ID from URL
-            const pasteId = pokepasteUrl.split('/').pop();
-            const rawUrl = `https://pokepast.es/${pasteId}/raw`;
-
-            // Fetch the raw pokepaste data
-            const response = await fetch(rawUrl);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch pokepaste: ${response.status}`);
-            }
-
-            const rawText = await response.text();
-            const parsedNames = parsePokepasteText(rawText);
-
-            // Cache the result
-            pokepasteCache.set(pokepasteUrl, parsedNames);
-
-            return parsedNames;
-        } catch (error) {
-            console.error('Error parsing pokepaste:', error);
-            throw error;
-        }
-    };
-
-    const parsePokepasteText = (rawText) => {
-        const lines = rawText.split('\n');
-        const pokemonNames = [];
-
-        let currentPokemon = null;
-        let isInPokemonBlock = false;
-
-        for (const line of lines) {
-            const trimmedLine = line.trim();
-
-            // Skip empty lines and comments
-            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
-
-            // Check if this line starts a new Pokemon block
-            // Pokemon names are usually followed by @ (item) or on their own line
-            // They don't contain colons (which are used for stats, moves, etc.)
-            if (!trimmedLine.includes(':') && !trimmedLine.toLowerCase().includes('nature') &&
-                !trimmedLine.toLowerCase().includes('ability') && !trimmedLine.toLowerCase().includes('level') &&
-                !trimmedLine.toLowerCase().includes('evs') && !trimmedLine.toLowerCase().includes('ivs') &&
-                !trimmedLine.startsWith('-')) {
-
-                // This might be a Pokemon name line
-                let pokemonName = trimmedLine;
-
-                // Remove everything after @ (item)
-                if (pokemonName.includes('@')) {
-                    pokemonName = pokemonName.split('@')[0].trim();
-                }
-
-                // Remove nickname in parentheses (e.g., "Pikachu (Sparky)" -> "Pikachu")
-                if (pokemonName.includes('(') && pokemonName.includes(')')) {
-                    const parts = pokemonName.split('(');
-                    pokemonName = parts[0].trim();
-                }
-
-                // Remove gender indicators
-                pokemonName = pokemonName.replace(/\s*\(M\)|\s*\(F\)/g, '').trim();
-
-                // Clean up the name
-                pokemonName = pokemonName.trim();
-
-                // Check if this looks like a valid Pokemon name (not empty, not too short, contains letters)
-                if (pokemonName && pokemonName.length > 2 && /[a-zA-Z]/.test(pokemonName) &&
-                    pokemonNames.length < maxDisplay) {
-
-                    // Convert to API format (lowercase, hyphens, handle special cases)
-                    const apiName = convertToApiName(pokemonName);
-                    pokemonNames.push(apiName);
-                    isInPokemonBlock = true;
-                    currentPokemon = apiName;
-                }
-            }
-            // If we're in a Pokemon block and hit a move line (starts with -), we're still in the same block
-            else if (trimmedLine.startsWith('-') && isInPokemonBlock) {
-                // This is a move line, continue with current Pokemon
-                continue;
-            }
-            // If we hit a stat line or other data, we're still in the same Pokemon block
-            else if ((trimmedLine.includes(':') || trimmedLine.toLowerCase().includes('nature') ||
-                    trimmedLine.toLowerCase().includes('ability') || trimmedLine.toLowerCase().includes('level') ||
-                    trimmedLine.toLowerCase().includes('evs') || trimmedLine.toLowerCase().includes('ivs')) &&
-                isInPokemonBlock) {
-                // This is Pokemon data (nature, ability, stats, etc.), continue with current Pokemon
-                continue;
-            }
-            // Empty line or unrecognized format might indicate end of Pokemon block
-            else {
-                isInPokemonBlock = false;
-                currentPokemon = null;
-            }
-        }
-
-        return pokemonNames.length > 0 ? pokemonNames : ['miraidon', 'koraidon', 'calyrex-shadow', 'kyogre', 'incineroar', 'rillaboom'];
-    };
-
-    const convertToApiName = (pokemonName) => {
-        // Handle special cases and forms
-        const nameMap = {
-            'Calyrex-Ice': 'calyrex-ice',
-            'Calyrex-Shadow': 'calyrex-shadow',
-            'Urshifu-Rapid-Strike': 'urshifu-rapid-strike',
-            'Urshifu-Single-Strike': 'urshifu',
-            'Kyurem-Black': 'kyurem-black',
-            'Kyurem-White': 'kyurem-white',
-            'Necrozma-Dawn-Wings': 'necrozma-dawn-wings',
-            'Necrozma-Dusk-Mane': 'necrozma-dusk-mane',
-            'Zacian-Crowned': 'zacian-crowned',
-            'Zamazenta-Crowned': 'zamazenta-crowned',
-            'Tornadus-Therian': 'tornadus-therian',
-            'Thundurus-Therian': 'thundurus-therian',
-            'Landorus-Therian': 'landorus-therian',
-            'Flutter Mane': 'flutter-mane',
-            'Iron Hands': 'iron-hands',
-            'Chien-Pao': 'chien-pao',
-            'Wo-Chien': 'wo-chien',
-            'Ting-Lu': 'ting-lu',
-            'Chi-Yu': 'chi-yu'
-        };
-
-        // Check if we have a direct mapping
-        if (nameMap[pokemonName]) {
-            return nameMap[pokemonName];
-        }
-
-        // Convert to standard API format
-        return pokemonName.toLowerCase()
-            .replace(/\s+/g, '-')           // Replace spaces with hyphens
-            .replace(/[^a-z0-9\-]/g, '')    // Remove special characters except hyphens
-            .replace(/--+/g, '-')           // Replace multiple hyphens with single hyphen
-            .replace(/^-|-$/g, '');         // Remove leading/trailing hyphens
     };
 
     const generateFallbackTeam = () => {
@@ -240,34 +111,53 @@ const PokemonTeam = ({
             <div className={`text-center p-4 ${className}`}>
                 <p className="text-red-400 text-sm">Failed to load team</p>
                 <p className="text-gray-500 text-xs">{error}</p>
+                {pokepaste && (
+                    <p className="text-gray-500 text-xs mt-1">
+                        Check if the Pokepaste URL is valid and accessible
+                    </p>
+                )}
             </div>
         );
     }
 
     return (
-        <div className={`grid ${getGridClasses()} gap-2 ${className}`}>
-            {teamPokemon.map((pokemon, index) => (
-                <PokemonSprite
-                    key={pokemon?.name || index}
-                    name={pokemon?.name}
-                    size={size}
-                    showName={showNames}
-                    fallbackText={(index + 1).toString()}
-                />
-            ))}
-            {/* Fill remaining slots with placeholders if we have fewer than maxDisplay */}
-            {teamPokemon.length < maxDisplay && Array.from({
-                length: maxDisplay - teamPokemon.length
-            }).map((_, index) => (
-                <div key={`placeholder-${index}`} className="flex flex-col items-center gap-1">
-                    <div className={`${size === 'xs' ? 'w-6 h-6' : size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-12 h-12' : size === 'lg' ? 'w-16 h-16' : 'w-20 h-20'} bg-slate-800 rounded-lg border-2 border-slate-600 border-dashed flex items-center justify-center`}>
-                        <span className="text-gray-500 text-xs">—</span>
-                    </div>
-                    {showNames && (
-                        <span className="text-xs text-gray-500">Empty</span>
-                    )}
+        <div className={className}>
+            {/* Optional metadata display for debugging/development */}
+            {pokepasteMetadata && process.env.NODE_ENV === 'development' && (
+                <div className="mb-2 p-2 bg-slate-800/50 rounded text-xs text-gray-400">
+                    Format: {pokepasteMetadata.format} |
+                    Pokemon: {pokepasteMetadata.pokemonCount} |
+                    {pokepasteMetadata.hasMoves && ' Has Moves'}
+                    {pokepasteMetadata.hasAbilities && ' Has Abilities'}
+                    {pokepasteMetadata.errors.length > 0 && ` | ${pokepasteMetadata.errors.length} warnings`}
                 </div>
-            ))}
+            )}
+
+            <div className={`grid ${getGridClasses()} gap-2`}>
+                {teamPokemon.map((pokemon, index) => (
+                    <PokemonSprite
+                        key={pokemon?.name || index}
+                        name={pokemon?.name}
+                        size={size}
+                        showName={showNames}
+                        fallbackText={(index + 1).toString()}
+                    />
+                ))}
+
+                {/* Fill remaining slots with placeholders if we have fewer than maxDisplay */}
+                {teamPokemon.length < maxDisplay && Array.from({
+                    length: maxDisplay - teamPokemon.length
+                }).map((_, index) => (
+                    <div key={`placeholder-${index}`} className="flex flex-col items-center gap-1">
+                        <div className={`${size === 'xs' ? 'w-6 h-6' : size === 'sm' ? 'w-8 h-8' : size === 'md' ? 'w-12 h-12' : size === 'lg' ? 'w-16 h-16' : 'w-20 h-20'} bg-slate-800 rounded-lg border-2 border-slate-600 border-dashed flex items-center justify-center`}>
+                            <span className="text-gray-500 text-xs">—</span>
+                        </div>
+                        {showNames && (
+                            <span className="text-xs text-gray-500">Empty</span>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

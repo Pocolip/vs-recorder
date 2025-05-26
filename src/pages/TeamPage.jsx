@@ -1,4 +1,4 @@
-// src/pages/TeamPage.jsx - Simplified version with extracted components
+// src/pages/TeamPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
@@ -18,30 +18,39 @@ import {
     AddReplayModal,
     EditTeamModal,
     ReplaysTab,
-    GameByGameTab
+    GameByGameTab,
+    PokemonTeam
 } from '../components';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
-import {PokemonTeam} from "@/components";
+import { useTeamStats } from '@/hooks/useTeamStats';
+import { formatTimeAgo } from '@/utils/timeUtils';
 
 const TeamPage = () => {
     const { teamId } = useParams();
     const navigate = useNavigate();
 
     const [team, setTeam] = useState(null);
-    const [replays, setReplays] = useState([]);
-    const [teamStats, setTeamStats] = useState({
-        gamesPlayed: 0,
-        wins: 0,
-        losses: 0,
-        winRate: 0
-    });
     const [activeTab, setActiveTab] = useState('replays');
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAddReplayModal, setShowAddReplayModal] = useState(false);
     const [showEditTeamModal, setShowEditTeamModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    // Use the custom hook for team statistics
+    const {
+        gamesPlayed,
+        wins,
+        losses,
+        winRate,
+        replays,
+        loading: statsLoading,
+        refreshStats,
+        hasGames,
+        perfectRecord,
+        lastGameResult
+    } = useTeamStats(teamId);
 
     useEffect(() => {
         loadTeamData();
@@ -51,7 +60,7 @@ const TeamPage = () => {
         try {
             setLoading(true);
 
-            // Load team
+            // Load team data
             const teamData = await TeamService.getById(teamId);
             if (!teamData) {
                 navigate('/');
@@ -59,21 +68,7 @@ const TeamPage = () => {
             }
             setTeam(teamData);
 
-            // Load replays
-            const replaysData = await ReplayService.getByTeamId(teamId);
-            setReplays(replaysData);
-
-            // Calculate stats
-            const wins = replaysData.filter(r => r.result === 'win').length;
-            const losses = replaysData.filter(r => r.result === 'loss').length;
-
-            setTeamStats({
-                gamesPlayed: replaysData.length,
-                wins,
-                losses,
-                winRate: replaysData.length > 0 ? Math.round((wins / replaysData.length) * 100) : 0
-            });
-
+            // Team stats are handled by the hook automatically
         } catch (error) {
             console.error('Error loading team data:', error);
         } finally {
@@ -96,7 +91,8 @@ const TeamPage = () => {
     const handleAddReplay = async (replayUrl, notes) => {
         try {
             await ReplayService.createFromUrl(teamId, replayUrl, notes);
-            await loadTeamData();
+            // Refresh stats after adding a replay
+            refreshStats();
             setShowAddReplayModal(false);
         } catch (error) {
             console.error('Error adding replay:', error);
@@ -107,7 +103,8 @@ const TeamPage = () => {
     const handleDeleteReplay = async (replayId) => {
         try {
             await ReplayService.delete(replayId);
-            await loadTeamData();
+            // Refresh stats after deleting a replay
+            refreshStats();
         } catch (error) {
             console.error('Error deleting replay:', error);
             throw error;
@@ -117,7 +114,8 @@ const TeamPage = () => {
     const handleUpdateReplay = async (replayId, updates) => {
         try {
             await ReplayService.update(replayId, updates);
-            await loadTeamData();
+            // Refresh stats after updating a replay (in case result changed)
+            refreshStats();
         } catch (error) {
             console.error('Error updating replay:', error);
             throw error;
@@ -127,24 +125,6 @@ const TeamPage = () => {
     const handleTeamUpdated = (updatedTeam) => {
         setTeam(updatedTeam);
         setShowEditTeamModal(false);
-    };
-
-    const formatTimeAgo = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-
-        if (diffInHours < 1) return 'Just now';
-        if (diffInHours < 24) return `${diffInHours}h ago`;
-
-        const diffInDays = Math.floor(diffInHours / 24);
-        if (diffInDays < 7) return `${diffInDays}d ago`;
-
-        const diffInWeeks = Math.floor(diffInDays / 7);
-        if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
-
-        const diffInMonths = Math.floor(diffInDays / 30);
-        return `${diffInMonths}mo ago`;
     };
 
     if (loading) {
@@ -178,8 +158,14 @@ const TeamPage = () => {
                 {/* Team Info Card */}
                 <TeamInfoCard
                     team={team}
-                    teamStats={teamStats}
-                    formatTimeAgo={formatTimeAgo}
+                    gamesPlayed={gamesPlayed}
+                    wins={wins}
+                    losses={losses}
+                    winRate={winRate}
+                    statsLoading={statsLoading}
+                    hasGames={hasGames}
+                    perfectRecord={perfectRecord}
+                    lastGameResult={lastGameResult}
                 />
 
                 {/* Tab Navigation */}
@@ -194,7 +180,6 @@ const TeamPage = () => {
                     {activeTab === 'replays' && (
                         <ReplaysTab
                             replays={replays}
-                            formatTimeAgo={formatTimeAgo}
                             onDeleteReplay={handleDeleteReplay}
                             onUpdateReplay={handleUpdateReplay}
                         />
@@ -202,7 +187,6 @@ const TeamPage = () => {
                     {activeTab === 'game-by-game' && (
                         <GameByGameTab
                             replays={replays}
-                            formatTimeAgo={formatTimeAgo}
                         />
                     )}
                     {!['replays', 'game-by-game'].includes(activeTab) && (
@@ -214,7 +198,7 @@ const TeamPage = () => {
                 {showDeleteModal && (
                     <ConfirmationModal
                         title="Delete Team"
-                        message={<DeleteTeamMessage team={team} teamStats={teamStats} />}
+                        message={<DeleteTeamMessage team={team} gamesPlayed={gamesPlayed} />}
                         onConfirm={handleDeleteTeam}
                         onCancel={() => setShowDeleteModal(false)}
                         loading={deleting}
@@ -310,8 +294,18 @@ const TeamHeader = ({ team, onAddReplay, onEditTeam, onDeleteTeam }) => (
     </div>
 );
 
-// Team Info Card Component
-const TeamInfoCard = ({ team, teamStats, formatTimeAgo }) => (
+// Enhanced Team Info Card Component
+const TeamInfoCard = ({
+                          team,
+                          gamesPlayed,
+                          wins,
+                          losses,
+                          winRate,
+                          statsLoading,
+                          hasGames,
+                          perfectRecord,
+                          lastGameResult
+                      }) => (
     <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Pokemon Display */}
@@ -332,24 +326,47 @@ const TeamInfoCard = ({ team, teamStats, formatTimeAgo }) => (
             {/* Stats */}
             <div>
                 <h3 className="text-lg font-semibold text-gray-100 mb-3">Performance</h3>
-                <div className="space-y-2">
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Games:</span>
-                        <span className="text-gray-100">{teamStats.gamesPlayed}</span>
+                {statsLoading ? (
+                    <div className="space-y-2">
+                        <div className="animate-pulse bg-slate-700 h-4 rounded w-20"></div>
+                        <div className="animate-pulse bg-slate-700 h-4 rounded w-16"></div>
+                        <div className="animate-pulse bg-slate-700 h-4 rounded w-24"></div>
+                        <div className="animate-pulse bg-slate-700 h-4 rounded w-18"></div>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Wins:</span>
-                        <span className="text-green-400">{teamStats.wins}</span>
+                ) : (
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-gray-400">Games:</span>
+                            <span className="text-gray-100">{gamesPlayed}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-400">Wins:</span>
+                            <span className="text-green-400">{wins}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-400">Losses:</span>
+                            <span className="text-red-400">{losses}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-400">Win Rate:</span>
+                            <span className="text-emerald-400 font-semibold">{winRate}%</span>
+                        </div>
+
+                        {/* Additional insights */}
+                        {perfectRecord && hasGames && (
+                            <div className="mt-3 px-2 py-1 bg-yellow-600/20 border border-yellow-600/30 rounded text-xs text-yellow-400">
+                                🏆 Perfect Record!
+                            </div>
+                        )}
+                        {lastGameResult && (
+                            <div className="text-xs text-gray-500 mt-2">
+                                Last game: <span className={lastGameResult === 'win' ? 'text-green-400' : 'text-red-400'}>
+                                    {lastGameResult.toUpperCase()}
+                                </span>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Losses:</span>
-                        <span className="text-red-400">{teamStats.losses}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Win Rate:</span>
-                        <span className="text-emerald-400 font-semibold">{teamStats.winRate}%</span>
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Meta */}
@@ -419,7 +436,7 @@ const TabNavigation = ({ tabs, activeTab, onTabChange }) => (
 );
 
 // Delete Team Message Component
-const DeleteTeamMessage = ({ team, teamStats }) => (
+const DeleteTeamMessage = ({ team, gamesPlayed }) => (
     <div>
         <p className="mb-4">
             Are you sure you want to delete <strong>{team.name}</strong>?
@@ -428,7 +445,7 @@ const DeleteTeamMessage = ({ team, teamStats }) => (
             <p className="text-gray-300 mb-2">This will permanently delete:</p>
             <ul className="text-gray-400 space-y-1">
                 <li>• The team and all its data</li>
-                <li>• {teamStats.gamesPlayed} associated replays</li>
+                <li>• {gamesPlayed} associated replays</li>
                 <li>• All analysis and statistics</li>
             </ul>
         </div>

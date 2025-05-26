@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Calendar, Filter, SortAsc, SortDesc } from 'lucide-react';
 import GameCard from './GameCard';
+import {formatTimeAgo} from "@/utils/timeUtils";
 
-const GameByGameTab = ({ replays, formatTimeAgo }) => {
+const GameByGameTab = ({ replays }) => {
     const [sortBy, setSortBy] = useState('date');
     const [sortOrder, setSortOrder] = useState('desc');
     const [filterResult, setFilterResult] = useState('all');

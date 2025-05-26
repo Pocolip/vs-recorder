@@ -4,52 +4,36 @@ import { Link } from 'react-router-dom';
 import { Plus, Calendar, TrendingUp, Trophy } from 'lucide-react';
 import { NewTeamModal, PokemonTeam, Footer } from '../components';
 import TeamService from '../services/TeamService';
-import ReplayService from '../services/ReplayService';
+import { useMultipleTeamStats } from '@/hooks/useTeamStats';
+import { formatTimeAgo } from '@/utils/timeUtils';
 
 const HomePage = () => {
   const [teams, setTeams] = useState([]);
-  const [overallStats, setOverallStats] = useState({
-    totalTeams: 0,
-    totalGames: 0,
-    totalWins: 0,
-    winRate: 0
-  });
   const [showNewTeamModal, setShowNewTeamModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Get team IDs for the stats hook
+  const teamIds = teams.map(team => team.id);
+
+  // Use the custom hook to load all team stats
+  const {
+    teamStats,
+    overallStats,
+    loading: statsLoading,
+    refreshAll: refreshAllStats
+  } = useMultipleTeamStats(teamIds);
+
   useEffect(() => {
-    loadData();
+    loadTeams();
   }, []);
 
-  const loadData = async () => {
+  const loadTeams = async () => {
     try {
       setLoading(true);
-
-      // Load teams
       const teamsList = await TeamService.getList();
       setTeams(teamsList);
-
-      // Calculate overall stats
-      let totalGames = 0;
-      let totalWins = 0;
-
-      for (const team of teamsList) {
-        const teamReplays = await ReplayService.getByTeamId(team.id);
-        const teamWins = teamReplays.filter(r => r.result === 'win').length;
-
-        totalGames += teamReplays.length;
-        totalWins += teamWins;
-      }
-
-      setOverallStats({
-        totalTeams: teamsList.length,
-        totalGames,
-        totalWins,
-        winRate: totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0
-      });
-
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Error loading teams:', error);
     } finally {
       setLoading(false);
     }
@@ -58,30 +42,13 @@ const HomePage = () => {
   const handleCreateTeam = async (teamData) => {
     try {
       await TeamService.create(teamData);
-      await loadData(); // Refresh data
+      await loadTeams(); // Refresh teams list
+      // The useMultipleTeamStats hook will automatically refresh when teamIds change
       setShowNewTeamModal(false);
     } catch (error) {
       console.error('Error creating team:', error);
       throw error;
     }
-  };
-
-  const formatTimeAgo = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
-
-    const diffInMonths = Math.floor(diffInDays / 30);
-    return `${diffInMonths}mo ago`;
   };
 
   if (loading) {
@@ -117,7 +84,7 @@ const HomePage = () => {
                 <div className="flex items-center">
                   <Trophy className="h-8 w-8 text-emerald-400 mr-3" />
                   <div>
-                    <p className="text-2xl font-bold text-gray-100">{overallStats.totalTeams}</p>
+                    <p className="text-2xl font-bold text-gray-100">{teams.length}</p>
                     <p className="text-gray-400 text-sm">Teams</p>
                   </div>
                 </div>
@@ -127,7 +94,9 @@ const HomePage = () => {
                 <div className="flex items-center">
                   <Calendar className="h-8 w-8 text-blue-400 mr-3" />
                   <div>
-                    <p className="text-2xl font-bold text-gray-100">{overallStats.totalGames}</p>
+                    <p className="text-2xl font-bold text-gray-100">
+                      {statsLoading ? '...' : overallStats.totalGames}
+                    </p>
                     <p className="text-gray-400 text-sm">Games Played</p>
                   </div>
                 </div>
@@ -137,7 +106,9 @@ const HomePage = () => {
                 <div className="flex items-center">
                   <TrendingUp className="h-8 w-8 text-green-400 mr-3" />
                   <div>
-                    <p className="text-2xl font-bold text-gray-100">{overallStats.totalWins}</p>
+                    <p className="text-2xl font-bold text-gray-100">
+                      {statsLoading ? '...' : overallStats.totalWins}
+                    </p>
                     <p className="text-gray-400 text-sm">Wins</p>
                   </div>
                 </div>
@@ -147,7 +118,9 @@ const HomePage = () => {
                 <div className="flex items-center">
                   <Trophy className="h-8 w-8 text-yellow-400 mr-3" />
                   <div>
-                    <p className="text-2xl font-bold text-gray-100">{overallStats.winRate}%</p>
+                    <p className="text-2xl font-bold text-gray-100">
+                      {statsLoading ? '...' : `${overallStats.overallWinRate}%`}
+                    </p>
                     <p className="text-gray-400 text-sm">Win Rate</p>
                   </div>
                 </div>
@@ -185,7 +158,8 @@ const HomePage = () => {
                       <TeamCard
                           key={team.id}
                           team={team}
-                          formatTimeAgo={formatTimeAgo}
+                          stats={teamStats[team.id]}
+                          statsLoading={statsLoading}
                       />
                   ))}
                 </div>
@@ -205,34 +179,13 @@ const HomePage = () => {
   );
 };
 
-// Updated TeamCard component with Pokemon integration
-const TeamCard = ({ team, formatTimeAgo }) => {
-  const [teamStats, setTeamStats] = useState({
+// Simplified TeamCard component - no longer manages its own stats
+const TeamCard = ({ team, stats, statsLoading }) => {
+  // Use the stats passed from parent (from the hook)
+  const teamStats = stats || {
     gamesPlayed: 0,
     wins: 0,
     winRate: 0
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadTeamStats();
-  }, [team.id]);
-
-  const loadTeamStats = async () => {
-    try {
-      const replays = await ReplayService.getByTeamId(team.id);
-      const wins = replays.filter(r => r.result === 'win').length;
-
-      setTeamStats({
-        gamesPlayed: replays.length,
-        wins,
-        winRate: replays.length > 0 ? Math.round((wins / replays.length) * 100) : 0
-      });
-    } catch (error) {
-      console.error('Error loading team stats:', error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -246,7 +199,7 @@ const TeamCard = ({ team, formatTimeAgo }) => {
             <p className="text-sm text-gray-400">{team.format}</p>
           </div>
           <div className="text-right">
-            {loading ? (
+            {statsLoading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-emerald-400"></div>
             ) : (
                 <>
@@ -262,7 +215,7 @@ const TeamCard = ({ team, formatTimeAgo }) => {
         )}
 
         <div className="flex justify-between items-center text-sm text-gray-400 mb-4">
-          {loading ? (
+          {statsLoading ? (
               <span>Loading stats...</span>
           ) : (
               <span>{teamStats.gamesPlayed} games • {teamStats.wins} wins</span>

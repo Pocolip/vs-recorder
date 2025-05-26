@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Calendar, Trash2, Edit3, Save, X, MessageSquare, ExternalLink } from 'lucide-react';
 import {CompactReplayCard} from "@/components/index";
+import { formatTimeAgo } from '../utils/timeUtils';
 
-const ReplaysTab = ({ replays, formatTimeAgo, onDeleteReplay, onUpdateReplay }) => {
+const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
     const [deletingReplayId, setDeletingReplayId] = useState(null);
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [noteText, setNoteText] = useState('');
