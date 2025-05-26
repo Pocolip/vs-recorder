@@ -4,7 +4,25 @@ import { ExternalLink } from 'lucide-react';
 import PokemonSprite from './PokemonSprite';
 
 const GameCard = ({ replay, formatTimeAgo }) => {
-    // Type emoji mapping for Terastallization
+    // Type icon component for cleaner rendering
+    const TypeIcon = ({ type, size = 'w-4 h-4' }) => {
+        if (!type) return <span className="text-gray-500">?</span>;
+
+        return (
+            <img
+                src={`/icons/types/${type}.png`} // Updated to PNG
+                alt={type}
+                className={`${size} flex-shrink-0`}
+                onError={(e) => {
+                    // Fallback to emoji if icon fails to load
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'inline';
+                }}
+            />
+        );
+    };
+
+    // Keep emoji fallbacks
     const typeEmojis = {
         normal: '⚪',
         fire: '🔥',
@@ -367,15 +385,20 @@ const GameCard = ({ replay, formatTimeAgo }) => {
                         <div className="flex items-center gap-1">
                             <span className="text-xs text-blue-400 w-8">You:</span>
                             {teraData.userTera ? (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center rounded-lg border-2 border-slate-600 bg-slate-700 p-1 gap-1">
                                     <PokemonSprite
                                         name={cleanPokemonName(teraData.userTera.pokemon)}
                                         size="sm"
                                         fallbackText="?"
+                                        noContainer={true}
                                     />
-                                    <span className="text-lg" title={`${teraData.userTera.pokemon} → ${teraData.userTera.type}`}>
-                                        {typeEmojis[teraData.userTera.type] || '❓'}
-                                    </span>
+                                    <TypeIcon type={teraData.userTera.type} size="w-4 h-4" />
+                                    <span
+                                        className="text-sm hidden"
+                                        title={`${teraData.userTera.pokemon} → ${teraData.userTera.type}`}
+                                    >
+                        {typeEmojis[teraData.userTera.type] || '❓'}
+                    </span>
                                 </div>
                             ) : (
                                 <span className="text-xs text-gray-500">—</span>
@@ -384,15 +407,20 @@ const GameCard = ({ replay, formatTimeAgo }) => {
                         <div className="flex items-center gap-1">
                             <span className="text-xs text-red-400 w-8">Opp:</span>
                             {teraData.opponentTera ? (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center rounded-lg border-2 border-slate-600 bg-slate-700 p-1 gap-1">
                                     <PokemonSprite
                                         name={cleanPokemonName(teraData.opponentTera.pokemon)}
                                         size="sm"
                                         fallbackText="?"
+                                        noContainer={true}
                                     />
-                                    <span className="text-lg" title={`${teraData.opponentTera.pokemon} → ${teraData.opponentTera.type}`}>
-                                        {typeEmojis[teraData.opponentTera.type] || '❓'}
-                                    </span>
+                                    <TypeIcon type={teraData.opponentTera.type} size="w-4 h-4" />
+                                    <span
+                                        className="text-sm hidden"
+                                        title={`${teraData.opponentTera.pokemon} → ${teraData.opponentTera.type}`}
+                                    >
+                        {typeEmojis[teraData.opponentTera.type] || '❓'}
+                    </span>
                                 </div>
                             ) : (
                                 <span className="text-xs text-gray-500">—</span>

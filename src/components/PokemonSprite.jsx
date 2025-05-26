@@ -8,7 +8,8 @@ const PokemonSprite = memo(({
                                 variant = 'front_default',
                                 showName = false,
                                 className = '',
-                                fallbackText = '?'
+                                fallbackText = '?',
+                                noContainer = false
                             }) => {
     const [pokemon, setPokemon] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -98,11 +99,14 @@ const PokemonSprite = memo(({
 
     const renderContent = () => {
         const spriteUrl = getSpriteUrl();
-        const containerClasses = `${sizeClasses[size]} ${className} flex items-center justify-center rounded-lg border-2 border-slate-600 relative overflow-hidden`;
+        const baseClasses = `${sizeClasses[size]} ${className} flex items-center justify-center relative overflow-hidden`;
+        const containerClasses = noContainer ?
+            baseClasses :
+            `${baseClasses} rounded-lg border-2 border-slate-600`;
 
         if (loading) {
             return (
-                <div className={`${containerClasses} bg-slate-700`}>
+                <div className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'}`}>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
                 </div>
             );
@@ -110,7 +114,7 @@ const PokemonSprite = memo(({
 
         if (error || !pokemon) {
             return (
-                <div className={`${containerClasses} bg-slate-700 text-gray-400`}>
+                <div className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'} text-gray-400`}>
                     <span className={textSizeClasses[size]}>{fallbackText}</span>
                 </div>
             );
@@ -122,14 +126,14 @@ const PokemonSprite = memo(({
             // Show Pokemon initial with type-based background color
             const initial = pokemon.displayName ? pokemon.displayName.charAt(0).toUpperCase() : '?';
             return (
-                <div className={`${containerClasses} ${typeColor} text-white font-bold`}>
+                <div className={`${containerClasses} ${noContainer ? typeColor : `${typeColor}`} text-white font-bold`}>
                     <span className={textSizeClasses[size]}>{initial}</span>
                 </div>
             );
         }
 
         return (
-            <div className={`${containerClasses} bg-slate-700`}>
+            <div className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'}`}>
                 <img
                     src={spriteUrl}
                     alt={pokemon.displayName || pokemon.name}
