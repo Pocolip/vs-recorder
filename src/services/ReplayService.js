@@ -246,8 +246,13 @@ class ReplaysService {
             let players = {};
             let winner = null;
             let teams = { p1: [], p2: [] };
-            let userPlayer = null; // Which player (p1/p2) is the user
+            let userPlayer = null;
             let opponentPlayer = null;
+
+            // New data structures for enhanced parsing
+            let actualPicks = { p1: new Set(), p2: new Set() };
+            let teraEvents = { p1: [], p2: [] };
+            let eloChanges = { p1: null, p2: null };
 
             // Parse the log for battle information
             for (const line of lines) {
@@ -258,7 +263,7 @@ class ReplaysService {
                     const playerName = parts[3];
                     players[playerId] = playerName;
 
-                    // Check if this player is one of our usernames (case-insensitive exact match)
+                    // Check if this player is one of our usernames
                     if (teamShowdownUsernames.length > 0 &&
                         teamShowdownUsernames.some(username =>
                             username.toLowerCase() === playerName.toLowerCase()
@@ -277,12 +282,84 @@ class ReplaysService {
                     teams[player].push(pokemon);
                 }
 
+                // Extract actual picks (pokemon that entered battle)
+                if (line.startsWith('|switch|')) {
+                    const parts = line.split('|');
+                    const playerSlot = parts[2]; // e.g., "p1a: Kingambit" or "p2b: Urshifu"
+                    const pokemonInfo = parts[3]; // e.g., "Kingambit, L50, M" or "Urshifu-Rapid-Strike, L50, M"
+
+                    if (playerSlot && pokemonInfo) {
+                        const player = playerSlot.substring(0, 2); // Extract "p1" or "p2"
+                        const pokemon = pokemonInfo.split(',')[0]; // Extract just the pokemon name
+
+                        if (actualPicks[player]) {
+                            actualPicks[player].add(pokemon);
+                        }
+                    }
+                }
+
+                // Extract terastallization events
+                if (line.includes('-terastallize|')) {
+                    const parts = line.split('|');
+                    if (parts.length >= 4) {
+                        const playerSlot = parts[2]; // e.g., "p2a: Terapagos"
+                        const teraType = parts[3]; // e.g., "Stellar"
+
+                        if (playerSlot && teraType) {
+                            const player = playerSlot.substring(0, 2); // Extract "p1" or "p2"
+                            const pokemon = playerSlot.includes(':') ?
+                                playerSlot.split(':')[1].trim() :
+                                playerSlot.substring(3); // Extract pokemon name
+
+                            if (teraEvents[player]) {
+                                teraEvents[player].push({
+                                    pokemon: pokemon,
+                                    type: teraType.toLowerCase()
+                                });
+                                console.log(`Found Tera event: ${player} - ${pokemon} → ${teraType}`);
+                            }
+                        }
+                    }
+                }
+
+                // Extract ELO changes from raw messages
+                if (line.startsWith('|raw|') && line.includes('rating:')) {
+                    // Parse lines like: "|raw|doctor_mug's rating: 1355 &rarr; <strong>1336</strong><br />(-19 for losing)"
+                    const ratingMatch = line.match(/(.+)'s rating: (\d+) (?:&rarr;|→) <strong>(\d+)<\/strong>/);
+                    if (ratingMatch) {
+                        const playerName = ratingMatch[1];
+                        const beforeRating = parseInt(ratingMatch[2]);
+                        const afterRating = parseInt(ratingMatch[3]);
+
+                        console.log(`Found ELO change: ${playerName} ${beforeRating} → ${afterRating}`);
+
+                        // Find which player this is
+                        const playerId = Object.keys(players).find(id => players[id] === playerName);
+                        if (playerId) {
+                            eloChanges[playerId] = {
+                                before: beforeRating,
+                                after: afterRating,
+                                change: afterRating - beforeRating
+                            };
+                            console.log(`Mapped ELO to player ${playerId}: ${beforeRating} → ${afterRating}`);
+                        } else {
+                            console.log(`Could not find player ID for ${playerName}. Available players:`, players);
+                        }
+                    }
+                }
+
                 // Extract winner
                 if (line.startsWith('|win|')) {
                     winner = line.split('|')[2];
                     console.log(`Battle winner: "${winner}"`);
                 }
             }
+
+            // Convert Sets to Arrays for actual picks
+            const finalPicks = {
+                p1: Array.from(actualPicks.p1),
+                p2: Array.from(actualPicks.p2)
+            };
 
             // Determine result and opponent based on our analysis
             let result = null;
@@ -314,7 +391,6 @@ class ReplaysService {
 
                     console.log('Fallback matching:', { p1Name, p2Name, teamShowdownUsernames });
 
-                    // If we have team usernames, try partial matching
                     if (teamShowdownUsernames.length > 0) {
                         let foundUserPlayer = null;
 
@@ -339,7 +415,6 @@ class ReplaysService {
                             opponent = players.p1;
                             result = winner.toLowerCase() === players.p2.toLowerCase() ? 'win' : 'loss';
                         } else if (p1Matches && p2Matches) {
-                            // Both players match our usernames - this shouldn't happen normally
                             opponent = `${players.p1} vs ${players.p2}`;
                             result = null;
                         }
@@ -354,7 +429,7 @@ class ReplaysService {
                     // If still no match, leave result as null (unknown)
                     if (!result && !opponent) {
                         opponent = `${players.p1} vs ${players.p2}`;
-                        result = null; // Unknown who won from our perspective
+                        result = null;
                         console.log('No match found, setting unknown result');
                     }
                 }
@@ -371,6 +446,10 @@ class ReplaysService {
                 userPlayer,
                 opponentPlayer,
                 teamShowdownUsernames,
+                // Enhanced data
+                actualPicks: finalPicks,
+                teraEvents,
+                eloChanges,
                 raw: replayData
             };
         } catch (error) {
@@ -384,11 +463,13 @@ class ReplaysService {
                 userPlayer: null,
                 opponentPlayer: null,
                 teamShowdownUsernames: [],
+                actualPicks: { p1: [], p2: [] },
+                teraEvents: { p1: [], p2: [] },
+                eloChanges: { p1: null, p2: null },
                 raw: replayData
             };
         }
     }
-
     /**
      * Batch create replays from multiple URLs
      */

@@ -17,7 +17,8 @@ import {
     ConfirmationModal,
     AddReplayModal,
     EditTeamModal,
-    ReplaysTab
+    ReplaysTab,
+    GameByGameTab
 } from '../components';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
@@ -198,7 +199,13 @@ const TeamPage = () => {
                             onUpdateReplay={handleUpdateReplay}
                         />
                     )}
-                    {activeTab !== 'replays' && (
+                    {activeTab === 'game-by-game' && (
+                        <GameByGameTab
+                            replays={replays}
+                            formatTimeAgo={formatTimeAgo}
+                        />
+                    )}
+                    {!['replays', 'game-by-game'].includes(activeTab) && (
                         <ComingSoonTab title={tabs.find(t => t.id === activeTab)?.label} />
                     )}
                 </div>
