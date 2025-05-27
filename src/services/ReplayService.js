@@ -255,6 +255,9 @@ class ReplaysService {
             let teraEvents = { p1: [], p2: [] };
             let eloChanges = { p1: null, p2: null };
 
+            let nicknameToSpecies = new Map(); // Maps "p1a: RRRAAAAARW" -> "Tyranitar"
+            let slotToNickname = new Map();    // Maps "p1a" -> "RRRAAAAARW"
+
             // NEW: Best-of-3 data structures
             let bestOf3Data = {
                 isBestOf3: false,
@@ -349,15 +352,26 @@ class ReplaysService {
                 // Extract actual picks (pokemon that entered battle)
                 if (line.startsWith('|switch|')) {
                     const parts = line.split('|');
-                    const playerSlot = parts[2]; // e.g., "p1a: Kingambit" or "p2b: Urshifu"
-                    const pokemonInfo = parts[3]; // e.g., "Kingambit, L50, M" or "Urshifu-Rapid-Strike, L50, M"
+                    const playerSlot = parts[2]; // e.g., "p1a: RRRAAAAARW" or "p2b: Urshifu"
+                    const pokemonInfo = parts[3]; // e.g., "Tyranitar, L50, F" or "Urshifu-Rapid-Strike, L50, M"
 
                     if (playerSlot && pokemonInfo) {
                         const player = playerSlot.substring(0, 2); // Extract "p1" or "p2"
-                        const pokemon = pokemonInfo.split(',')[0]; // Extract just the pokemon name
+                        const pokemon = pokemonInfo.split(',')[0]; // Extract just the pokemon species name
+                        const slot = playerSlot.substring(0, 3); // Extract "p1a" or "p2b"
 
+                        // Store the actual species for usage tracking
                         if (actualPicks[player]) {
                             actualPicks[player].add(pokemon);
+                        }
+
+                        // Build nickname mapping for tera events
+                        if (playerSlot.includes(':')) {
+                            const nickname = playerSlot.split(':')[1].trim();
+                            nicknameToSpecies.set(playerSlot, pokemon);
+                            slotToNickname.set(slot, nickname);
+
+                            console.log(`Nickname mapping: ${playerSlot} -> ${pokemon}`);
                         }
                     }
                 }
@@ -384,21 +398,44 @@ class ReplaysService {
                 if (line.includes('-terastallize|')) {
                     const parts = line.split('|');
                     if (parts.length >= 4) {
-                        const playerSlot = parts[2]; // e.g., "p2a: Terapagos"
-                        const teraType = parts[3]; // e.g., "Stellar"
+                        const playerSlot = parts[2]; // e.g., "p1b: RRRAAAAARW"
+                        const teraType = parts[3]; // e.g., "Fairy"
 
                         if (playerSlot && teraType) {
                             const player = playerSlot.substring(0, 2); // Extract "p1" or "p2"
-                            const pokemon = playerSlot.includes(':') ?
-                                playerSlot.split(':')[1].trim() :
-                                playerSlot.substring(3); // Extract pokemon name
 
-                            if (teraEvents[player]) {
+                            // Try to get the actual species name from our mapping
+                            let pokemon;
+                            if (nicknameToSpecies.has(playerSlot)) {
+                                // We have a direct mapping from the switch event
+                                pokemon = nicknameToSpecies.get(playerSlot);
+                            } else if (playerSlot.includes(':')) {
+                                // Fallback: extract nickname and try to find it
+                                const nickname = playerSlot.split(':')[1].trim();
+                                // Search for this nickname in our mappings
+                                for (const [key, species] of nicknameToSpecies.entries()) {
+                                    if (key.includes(nickname)) {
+                                        pokemon = species;
+                                        break;
+                                    }
+                                }
+
+                                // If still not found, use the nickname as-is (will get cleaned later)
+                                if (!pokemon) {
+                                    pokemon = nickname;
+                                    console.warn(`Could not map nickname "${nickname}" to species, using nickname`);
+                                }
+                            } else {
+                                // No colon, assume it's already the species name
+                                pokemon = playerSlot.substring(3); // Remove "p1a" prefix
+                            }
+
+                            if (teraEvents[player] && pokemon) {
                                 teraEvents[player].push({
-                                    pokemon: pokemon,
+                                    pokemon: pokemon, // This will now be the actual species name
                                     type: teraType.toLowerCase()
                                 });
-                                console.log(`Found Tera event: ${player} - ${pokemon} → ${teraType}`);
+                                console.log(`Fixed Tera event: ${player} - ${pokemon} (was ${playerSlot}) → ${teraType}`);
                             }
                         }
                     }

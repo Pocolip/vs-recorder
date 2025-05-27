@@ -20,6 +20,7 @@ import {
     ReplaysTab,
     GameByGameTab,
     MatchByMatchTab,
+    UsageStatsTab,
     PokemonTeam
 } from '../components';
 import TeamService from '../services/TeamService';
@@ -82,7 +83,7 @@ const TeamPage = () => {
         try {
             setDeleting(true);
             await ReplayService.deleteByTeamId(teamId);
-            await MatchService.deleteByTeamId(teamId);  // ADD THIS LINE
+            await MatchService.deleteByTeamId(teamId);
             await TeamService.delete(teamId);
             navigate('/');
         } catch (error) {
@@ -197,7 +198,13 @@ const TeamPage = () => {
                             teamId={teamId}
                         />
                     )}
-                    {!['replays', 'game-by-game', 'match-by-match'].includes(activeTab) && (
+                    {activeTab === 'usage-stats' && (
+                        <UsageStatsTab
+                            replays={replays}
+                            team={team}
+                        />
+                    )}
+                    {!['replays', 'game-by-game', 'match-by-match', 'usage-stats'].includes(activeTab) && (
                         <ComingSoonTab title={tabs.find(t => t.id === activeTab)?.label} />
                     )}
                 </div>
