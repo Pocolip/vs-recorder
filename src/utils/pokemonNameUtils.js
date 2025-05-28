@@ -130,6 +130,43 @@ const POKEMON_FORM_MAPPINGS = {
     'Alcremie-Caramel Swirl': 'alcremie',
     'Alcremie-Rainbow Swirl': 'alcremie',
 
+    // Maushold forms
+    'Maushold': 'maushold-family-of-three',
+    'Maushold-Family-of-Three': 'maushold-family-of-three',
+    'Maushold-Three': 'maushold-family-of-three',
+    'Maushold-Family-of-Four': 'maushold-family-of-four', // if API supports, otherwise 'maushold'
+    'Maushold-Four': 'maushold-family-of-four', // if API supports, otherwise 'maushold'
+
+    // Tatsugiri forms
+    'Tatsugiri-Curly': 'tatsugiri',
+    'Tatsugiri': 'tatsugiri-curly',
+    'Tatsugiri-Droopy': 'tatsugiri-droopy',
+    'Tatsugiri-Stretchy': 'tatsugiri-stretchy',
+
+    //Palafin
+    'Palafin':'palafin-hero',
+
+    //Mimikyu
+    'Mimikyu': 'mimikyu-disguised',
+
+    //Tauros
+    'Tauros-Paldea-Aqua': 'tauros-paldea-aqua-breed',
+    'Tauros-Paldea-Blaze': 'tauros-paldea-blaze-breed',
+    'Tauros-Paldea-Combat': 'tauros-paldea-combat-breed',
+
+    //Vivillon
+    'Vivillon-Pokeball': 'vivillon',
+
+    //Eiscue
+    "Eiscue": "eiscue-ice",
+
+    //Lycanroc
+    "Lycanroc": "lycanroc-midday",
+
+    //Toxtricity
+    "Toxtricity": "toxtricity-amped",
+
+
     // Regional forms
     'Articuno-Galar': 'articuno-galar',
     'Zapdos-Galar': 'zapdos-galar',

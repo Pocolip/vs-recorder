@@ -1,6 +1,7 @@
 // src/services/MatchService.js
 import StorageService from './StorageService.js';
 import ReplayService from './ReplayService.js';
+import { cleanPokemonName } from '../utils/pokemonNameUtils.js';
 
 class MatchService {
     static STORAGE_KEY = 'matches';
@@ -232,17 +233,75 @@ class MatchService {
     }
 
     /**
-     * Search matches by opponent name, notes, or tags
+     * Extract opponent Pokemon names from a match
+     * @param {Object} match - Enhanced match object
+     * @returns {Array<string>} Array of cleaned Pokemon names
+     */
+    static getOpponentPokemonFromMatch(match) {
+        if (!match.games || match.games.length === 0) {
+            return [];
+        }
+
+        // Get the first game's battle data (teams don't change within a match)
+        const firstGame = match.games[0];
+        if (!firstGame.battleData || !firstGame.battleData.teams || !firstGame.battleData.opponentPlayer) {
+            return [];
+        }
+
+        const opponentTeam = firstGame.battleData.teams[firstGame.battleData.opponentPlayer] || [];
+
+        // Clean and return the Pokemon names
+        return opponentTeam.map(pokemon => cleanPokemonName(pokemon)).filter(name => name);
+    }
+
+    /**
+     * Enhanced search matches by opponent name, notes, tags, AND opponent Pokemon
      */
     static async search(teamId, query) {
         const matches = await this.getEnhancedMatches(teamId);
         const lowerQuery = query.toLowerCase();
 
-        return matches.filter(match =>
-            (match.opponent && match.opponent.toLowerCase().includes(lowerQuery)) ||
-            (match.notes && match.notes.toLowerCase().includes(lowerQuery)) ||
-            (match.tags && match.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
-        );
+        return matches.filter(match => {
+            // Build searchable text from existing fields
+            const searchableText = [
+                match.opponent || '',
+                match.notes || '',
+                ...(match.tags || [])
+            ].join(' ').toLowerCase();
+
+            // Check if basic text matches
+            if (searchableText.includes(lowerQuery)) {
+                return true;
+            }
+
+            // Check opponent Pokemon names
+            const opponentPokemon = this.getOpponentPokemonFromMatch(match);
+            const pokemonSearchText = opponentPokemon.join(' ').toLowerCase();
+
+            // Also check display names (with spaces instead of hyphens)
+            const pokemonDisplayText = opponentPokemon
+                .map(name => name.replace(/-/g, ' '))
+                .join(' ')
+                .toLowerCase();
+
+            return pokemonSearchText.includes(lowerQuery) || pokemonDisplayText.includes(lowerQuery);
+        });
+    }
+
+    /**
+     * Get unique opponent Pokemon across all matches for a team
+     * Useful for building filter dropdowns or autocomplete
+     */
+    static async getUniqueOpponentPokemon(teamId) {
+        const matches = await this.getEnhancedMatches(teamId);
+        const pokemonSet = new Set();
+
+        matches.forEach(match => {
+            const opponentPokemon = this.getOpponentPokemonFromMatch(match);
+            opponentPokemon.forEach(pokemon => pokemonSet.add(pokemon));
+        });
+
+        return Array.from(pokemonSet).sort();
     }
 
     /**

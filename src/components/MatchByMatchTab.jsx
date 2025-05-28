@@ -1,6 +1,6 @@
 // src/components/MatchByMatchTab.jsx
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Users, Filter, Search, Trophy, Calendar } from 'lucide-react';
+import { RefreshCw, Users, Filter, Search, Trophy, Calendar, Info } from 'lucide-react';
 import BestOf3Card from './BestOf3Card';
 import MatchService from '../services/MatchService';
 
@@ -17,9 +17,19 @@ const MatchByMatchTab = ({ teamId }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
 
+    // Enhanced search state
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [uniqueOpponentPokemon, setUniqueOpponentPokemon] = useState([]);
+    const [showSearchHints, setShowSearchHints] = useState(false);
+
     useEffect(() => {
         loadMatches();
     }, [teamId]);
+
+    useEffect(() => {
+        // Load unique Pokemon for search hints
+        loadUniqueOpponentPokemon();
+    }, [matches]);
 
     const loadMatches = async () => {
         try {
@@ -42,6 +52,15 @@ const MatchByMatchTab = ({ teamId }) => {
             setError(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadUniqueOpponentPokemon = async () => {
+        try {
+            const pokemon = await MatchService.getUniqueOpponentPokemon(teamId);
+            setUniqueOpponentPokemon(pokemon);
+        } catch (err) {
+            console.error('Error loading unique opponent Pokemon:', err);
         }
     };
 
@@ -88,37 +107,86 @@ const MatchByMatchTab = ({ teamId }) => {
         }
     };
 
+    const handleSearch = async (query) => {
+        setSearchQuery(query);
+
+        if (!query.trim()) {
+            // If query is empty, show all matches (filtered by other criteria)
+            return;
+        }
+
+        try {
+            setSearchLoading(true);
+            // The search will be applied in the filteredMatches logic below
+        } catch (err) {
+            console.error('Error searching matches:', err);
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
     // Apply filters and search
-    const filteredMatches = matches.filter(match => {
+    const filteredMatches = React.useMemo(() => {
+        let filtered = matches;
+
         // Result filter
-        if (filterResult !== 'all' && match.matchResult !== filterResult) {
-            return false;
+        if (filterResult !== 'all') {
+            filtered = filtered.filter(match => match.matchResult === filterResult);
         }
 
         // Status filter
-        if (filterStatus === 'complete' && !match.isComplete) {
-            return false;
-        }
-        if (filterStatus === 'incomplete' && match.isComplete) {
-            return false;
-        }
-
-        // Search filter
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            const searchableText = [
-                match.opponent || '',
-                match.notes || '',
-                ...(match.tags || [])
-            ].join(' ').toLowerCase();
-
-            if (!searchableText.includes(query)) {
-                return false;
-            }
+        if (filterStatus === 'complete') {
+            filtered = filtered.filter(match => match.isComplete);
+        } else if (filterStatus === 'incomplete') {
+            filtered = filtered.filter(match => !match.isComplete);
         }
 
-        return true;
-    });
+        // Search filter (enhanced with Pokemon search)
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase().trim();
+
+            filtered = filtered.filter(match => {
+                // Basic text search (opponent, notes, tags)
+                const basicSearchText = [
+                    match.opponent || '',
+                    match.notes || '',
+                    ...(match.tags || [])
+                ].join(' ').toLowerCase();
+
+                if (basicSearchText.includes(query)) {
+                    return true;
+                }
+
+                // Pokemon search
+                const opponentPokemon = MatchService.getOpponentPokemonFromMatch(match);
+                const pokemonSearchText = opponentPokemon.join(' ').toLowerCase();
+                const pokemonDisplayText = opponentPokemon
+                    .map(name => name.replace(/-/g, ' '))
+                    .join(' ')
+                    .toLowerCase();
+
+                return pokemonSearchText.includes(query) || pokemonDisplayText.includes(query);
+            });
+        }
+
+        return filtered;
+    }, [matches, filterResult, filterStatus, searchQuery]);
+
+    // Get search suggestions based on current query
+    const getSearchSuggestions = () => {
+        if (!searchQuery.trim() || searchQuery.length < 2) return [];
+
+        const query = searchQuery.toLowerCase();
+        return uniqueOpponentPokemon
+            .filter(pokemon => {
+                const pokemonLower = pokemon.toLowerCase();
+                const displayName = pokemon.replace(/-/g, ' ').toLowerCase();
+                return pokemonLower.includes(query) || displayName.includes(query);
+            })
+            .slice(0, 5); // Show top 5 suggestions
+    };
+
+    const searchSuggestions = getSearchSuggestions();
 
     if (loading) {
         return (
@@ -185,16 +253,44 @@ const MatchByMatchTab = ({ teamId }) => {
 
                     {/* Search and filters */}
                     <div className="flex items-center gap-2">
-                        {/* Search */}
+                        {/* Enhanced Search */}
                         <div className="relative">
                             <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search matches..."
+                                placeholder="Search matches, opponents, or Pokemon..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 pr-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-400 w-48"
+                                onChange={(e) => handleSearch(e.target.value)}
+                                onFocus={() => setShowSearchHints(true)}
+                                onBlur={() => setTimeout(() => setShowSearchHints(false), 200)}
+                                className="pl-9 pr-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-400 w-64"
                             />
+                            {searchLoading && (
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-emerald-400"></div>
+                                </div>
+                            )}
+
+                            {/* Search suggestions dropdown */}
+                            {showSearchHints && searchSuggestions.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                    <div className="p-2 border-b border-slate-600">
+                                        <p className="text-xs text-gray-400">Pokemon suggestions:</p>
+                                    </div>
+                                    {searchSuggestions.map((pokemon, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => {
+                                                setSearchQuery(pokemon.replace(/-/g, ' '));
+                                                setShowSearchHints(false);
+                                            }}
+                                            className="w-full text-left px-3 py-2 hover:bg-slate-700 text-gray-300 hover:text-gray-100 text-sm transition-colors"
+                                        >
+                                            {pokemon.replace(/-/g, ' ')}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Filter toggle */}
@@ -211,6 +307,16 @@ const MatchByMatchTab = ({ teamId }) => {
                         </button>
                     </div>
                 </div>
+
+                {/* Search info */}
+                {searchQuery && (
+                    <div className="flex items-center gap-2 text-sm">
+                        <Info className="h-4 w-4 text-blue-400" />
+                        <span className="text-gray-400">
+                            Search includes opponent names, notes, tags, and opponent Pokemon names
+                        </span>
+                    </div>
+                )}
 
                 {/* Filter controls */}
                 {showFilters && (
@@ -260,6 +366,11 @@ const MatchByMatchTab = ({ teamId }) => {
                 {/* Results count */}
                 <div className="text-sm text-gray-400">
                     Showing {filteredMatches.length} of {matches.length} matches
+                    {searchQuery && (
+                        <span className="ml-2 text-emerald-400">
+                            (searching for "{searchQuery}")
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -279,7 +390,7 @@ const MatchByMatchTab = ({ teamId }) => {
                         </>
                     ) : (
                         <>
-                            <div className="text-gray-400 mb-2">No matches match the current filters</div>
+                            <div className="text-gray-400 mb-2">No matches match the current filters or search</div>
                             <button
                                 onClick={() => {
                                     setFilterResult('all');
@@ -288,7 +399,7 @@ const MatchByMatchTab = ({ teamId }) => {
                                 }}
                                 className="text-emerald-400 hover:text-emerald-300 text-sm"
                             >
-                                Clear all filters
+                                Clear all filters and search
                             </button>
                         </>
                     )}

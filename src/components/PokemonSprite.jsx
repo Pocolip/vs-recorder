@@ -97,6 +97,23 @@ const PokemonSprite = memo(({
         return typeColorMap[types[0]] || 'bg-gray-600';
     };
 
+    // Get tooltip text for hover
+    const getTooltipText = () => {
+        if (loading) return 'Loading...';
+        if (error || !pokemon) return name || fallbackText;
+
+        // Use display name if available, otherwise the name, with type information
+        const pokemonName = pokemon.displayName || pokemon.name || name;
+        if (pokemon.types && pokemon.types.length > 0) {
+            const typeText = pokemon.types.map(type =>
+                type.charAt(0).toUpperCase() + type.slice(1)
+            ).join('/');
+            return `${pokemonName} (${typeText})`;
+        }
+
+        return pokemonName;
+    };
+
     const renderContent = () => {
         const spriteUrl = getSpriteUrl();
         const baseClasses = `${sizeClasses[size]} ${className} flex items-center justify-center relative overflow-hidden`;
@@ -104,9 +121,15 @@ const PokemonSprite = memo(({
             baseClasses :
             `${baseClasses} rounded-lg border-2 border-slate-600`;
 
+        // Add tooltip to all containers
+        const tooltipText = getTooltipText();
+
         if (loading) {
             return (
-                <div className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'}`}>
+                <div
+                    className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'}`}
+                    title={tooltipText}
+                >
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
                 </div>
             );
@@ -114,7 +137,10 @@ const PokemonSprite = memo(({
 
         if (error || !pokemon) {
             return (
-                <div className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'} text-gray-400`}>
+                <div
+                    className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'} text-gray-400`}
+                    title={tooltipText}
+                >
                     <span className={textSizeClasses[size]}>{fallbackText}</span>
                 </div>
             );
@@ -126,14 +152,20 @@ const PokemonSprite = memo(({
             // Show Pokemon initial with type-based background color
             const initial = pokemon.displayName ? pokemon.displayName.charAt(0).toUpperCase() : '?';
             return (
-                <div className={`${containerClasses} ${noContainer ? typeColor : `${typeColor}`} text-white font-bold`}>
+                <div
+                    className={`${containerClasses} ${noContainer ? typeColor : `${typeColor}`} text-white font-bold`}
+                    title={tooltipText}
+                >
                     <span className={textSizeClasses[size]}>{initial}</span>
                 </div>
             );
         }
 
         return (
-            <div className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'}`}>
+            <div
+                className={`${containerClasses} ${noContainer ? '' : 'bg-slate-700'}`}
+                title={tooltipText}
+            >
                 <img
                     src={spriteUrl}
                     alt={pokemon.displayName || pokemon.name}
