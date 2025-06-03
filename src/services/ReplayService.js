@@ -258,7 +258,7 @@ class ReplaysService {
             let nicknameToSpecies = new Map(); // Maps "p1a: RRRAAAAARW" -> "Tyranitar"
             let slotToNickname = new Map();    // Maps "p1a" -> "RRRAAAAARW"
 
-            // NEW: Best-of-3 data structures
+            // Best-of-3 data structures
             let bestOf3Data = {
                 isBestOf3: false,
                 matchId: null,
@@ -270,7 +270,7 @@ class ReplaysService {
 
             // Parse the log for battle information
             for (const line of lines) {
-                // NEW: Extract Best-of-3 information
+                // Extract Best-of-3 information
                 if (line.includes('|uhtml|bestof|')) {
                     bestOf3Data.isBestOf3 = true;
 
@@ -300,7 +300,7 @@ class ReplaysService {
                     }
                 }
 
-                // NEW: Extract series score from HTML table
+                // Extract series score from HTML table
                 if (line.includes('|html|') && line.includes('<table') && line.includes('fa fa-circle')) {
                     const htmlContent = line.substring(line.indexOf('|html|') + 6);
                     console.log('Found series score HTML:', htmlContent);
@@ -390,7 +390,6 @@ class ReplaysService {
 
                         // Track the transformation
                         pokemonTransformations.set(originalName, newPokemon);
-                        console.log(`Pokemon transformation tracked: ${originalName} → ${newPokemon}`);
                     }
                 }
 
@@ -443,7 +442,6 @@ class ReplaysService {
 
                 // Extract ELO changes from raw messages
                 if (line.startsWith('|raw|') && line.includes('rating:')) {
-                    console.log(`Found ELO line: ${line}`);
 
                     // Parse lines like: "|raw|doctor_mug's rating: 1355 &rarr; <strong>1336</strong><br />(-19 for losing)"
                     // Skip the |raw| prefix and capture the player name
@@ -453,7 +451,6 @@ class ReplaysService {
                         const beforeRating = parseInt(ratingMatch[2]);
                         const afterRating = parseInt(ratingMatch[3]);
 
-                        console.log(`Found ELO change: "${playerName}" ${beforeRating} → ${afterRating}`);
 
                         // Find which player this is (case-insensitive comparison)
                         const playerId = Object.keys(players).find(id =>
@@ -466,7 +463,6 @@ class ReplaysService {
                                 after: afterRating,
                                 change: afterRating - beforeRating
                             };
-                            console.log(`Mapped ELO to player ${playerId} (${players[playerId]}): ${beforeRating} → ${afterRating}`);
                         } else {
                             console.log(`Could not find player ID for "${playerName}". Available players:`, players);
                             console.log(`Player names: ${Object.values(players).map(name => `"${name}"`).join(', ')}`);
@@ -505,14 +501,6 @@ class ReplaysService {
             let result = null;
             let opponent = null;
 
-            console.log('Player analysis:', {
-                players,
-                winner,
-                userPlayer,
-                opponentPlayer,
-                teamShowdownUsernames
-            });
-
             if (winner && (players.p1 || players.p2)) {
                 if (userPlayer && opponentPlayer) {
                     // We successfully identified which player is the user
@@ -524,7 +512,6 @@ class ReplaysService {
                         const isUserWinner = winner.toLowerCase() === userPlayerName.toLowerCase();
                         result = isUserWinner ? 'win' : 'loss';
 
-                        console.log(`Result determination: userPlayer=${userPlayer} (${userPlayerName}), winner="${winner}", result=${result}`);
                     } else {
                         console.warn(`User player name not found for ${userPlayer}`);
                     }
@@ -532,8 +519,6 @@ class ReplaysService {
                     // Fallback: try to guess based on username patterns
                     const p1Name = (players.p1 || '').toLowerCase();
                     const p2Name = (players.p2 || '').toLowerCase();
-
-                    console.log('Fallback matching:', { p1Name, p2Name, teamShowdownUsernames });
 
                     if (teamShowdownUsernames.length > 0) {
                         let foundUserPlayer = null;
@@ -595,7 +580,6 @@ class ReplaysService {
                         }
 
                         if (result) {
-                            console.log(`Winner-based determination: winner="${winner}", result=${result}, opponent=${opponent}`);
                         }
                     }
 
@@ -616,16 +600,6 @@ class ReplaysService {
                 });
             }
 
-            console.log('Final parsing results:', {
-                players,
-                userPlayer,
-                opponentPlayer,
-                teraEvents,
-                eloChanges,
-                finalPicks,
-                bestOf3Data // NEW: Include Bo3 data in logs
-            });
-
             return {
                 players,
                 teams,
@@ -635,11 +609,9 @@ class ReplaysService {
                 userPlayer,
                 opponentPlayer,
                 teamShowdownUsernames,
-                // Enhanced data
                 actualPicks: finalPicks,
                 teraEvents,
                 eloChanges,
-                // NEW: Best-of-3 data
                 bestOf3: bestOf3Data,
                 raw: replayData
             };
@@ -657,7 +629,7 @@ class ReplaysService {
                 actualPicks: { p1: [], p2: [] },
                 teraEvents: { p1: [], p2: [] },
                 eloChanges: { p1: null, p2: null },
-                // NEW: Default Bo3 data for errors
+                // Default Bo3 data for errors
                 bestOf3: {
                     isBestOf3: false,
                     matchId: null,
@@ -724,7 +696,7 @@ class ReplaysService {
     }
 
     /**
-     * NEW: Get replays that are part of Best-of-3 matches
+     * Get replays that are part of Best-of-3 matches
      */
     static async getBestOf3Replays(teamId) {
         const replays = await this.getByTeamId(teamId);
@@ -734,7 +706,7 @@ class ReplaysService {
     }
 
     /**
-     * NEW: Group Best-of-3 replays by match ID
+     * Group Best-of-3 replays by match ID
      */
     static async getBestOf3Matches(teamId) {
         const bo3Replays = await this.getBestOf3Replays(teamId);
@@ -753,8 +725,8 @@ class ReplaysService {
                     isComplete: false,
                     seriesScore: null,
                     matchUrl: replay.battleData.bestOf3.matchUrl,
-                    gameResults: [], // NEW: Array of individual game results
-                    matchResult: null // NEW: Overall match result ('win', 'loss', 'incomplete')
+                    gameResults: [], // Array of individual game results
+                    matchResult: null // Overall match result ('win', 'loss', 'incomplete')
                 });
             }
 
@@ -835,7 +807,7 @@ class ReplaysService {
     }
 
     /**
-     * NEW: Get detailed game results for a specific match
+     * Get detailed game results for a specific match
      */
     static getGameByGameResults(match) {
         if (!match || !match.gameResults) return [];
@@ -849,7 +821,7 @@ class ReplaysService {
     }
 
     /**
-     * NEW: Get match summary string (e.g., "Won 2-1", "Lost 0-2", "Won 1-0 (FF)")
+     * Get match summary string (e.g., "Won 2-1", "Lost 0-2", "Won 1-0 (FF)")
      */
     static getMatchSummary(match) {
         if (!match) return 'Unknown';

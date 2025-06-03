@@ -118,7 +118,7 @@ const GameCard = ({ replay }) => {
     // Extract ELO data
     const getEloData = () => {
         if (!replay.battleData || !replay.battleData.eloChanges) {
-            console.log('No ELO data found in battleData:', replay.battleData);
+            //console.log('No ELO data found in battleData:', replay.battleData);
             return {
                 userElo: { before: null, after: null },
                 opponentElo: { before: null, after: null }
@@ -126,7 +126,7 @@ const GameCard = ({ replay }) => {
         }
 
         const { eloChanges, userPlayer, opponentPlayer } = replay.battleData;
-        console.log('ELO data found:', { eloChanges, userPlayer, opponentPlayer });
+        //console.log('ELO data found:', { eloChanges, userPlayer, opponentPlayer });
 
         const userElo = eloChanges[userPlayer] || { before: null, after: null };
         const opponentElo = eloChanges[opponentPlayer] || { before: null, after: null };

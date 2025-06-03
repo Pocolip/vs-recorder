@@ -21,6 +21,7 @@ import {
     GameByGameTab,
     MatchByMatchTab,
     UsageStatsTab,
+    MatchupStatsTab,
     PokemonTeam
 } from '../components';
 import TeamService from '../services/TeamService';
@@ -204,7 +205,13 @@ const TeamPage = () => {
                             team={team}
                         />
                     )}
-                    {!['replays', 'game-by-game', 'match-by-match', 'usage-stats'].includes(activeTab) && (
+                    {activeTab === 'matchup-stats' && (
+                        <MatchupStatsTab
+                            replays={replays}
+                        />
+                    )}
+                    {!['replays', 'game-by-game', 'match-by-match', 'usage-stats', 'matchup-stats']
+                        .includes(activeTab) && (
                         <ComingSoonTab title={tabs.find(t => t.id === activeTab)?.label} />
                     )}
                 </div>

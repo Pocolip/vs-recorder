@@ -23,7 +23,7 @@ class PokepasteService {
         try {
             // Validate URL
             if (!this.isValidPokepasteUrl(pokepasteUrl)) {
-                throw new Error('Invalid Pokepaste URL format');
+                throw  new Error('Invalid Pokepaste URL format');
             }
 
             // Check cache first
