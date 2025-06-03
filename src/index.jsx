@@ -5,8 +5,8 @@ import App from './components/App';
 import './styles/index.css';
 
 // Import services directly for immediate availability
-import { StorageService } from './services/StorageService';
-import { ReplayService } from './services/ReplayService';
+import StorageService from './services/StorageService';
+import ReplayService from './services/ReplayService';
 
 console.log('🚀 VS Recorder Extension Loading...');
 

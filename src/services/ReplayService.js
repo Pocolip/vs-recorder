@@ -1,312 +1,844 @@
-// src/services/ReplayService.js
+// src/services/ReplayService.js - Enhanced with Bo3 support
+import StorageService from './StorageService.js';
 
-console.log('🎮 ReplayService module loading...');
+class ReplaysService {
+    static STORAGE_KEY = 'replays';
 
-export class ReplayService {
     /**
-     * Validates and processes a Showdown replay URL
-     * @param {string}
-
-     console.log('✅ ReplayService created with methods:', Object.getOwnPropertyNames(ReplayService).filter(name => name !== 'length' && name !== 'name' && name !== 'prototype'));
-
-     // Export both named and default for consistency
-     export { ReplayService };
-     export default ReplayService; url - The replay URL
-     * @returns {Object} - Parsed URL information or null if invalid
+     * Get all replays
      */
-    static parseReplayUrl(url) {
-        // Remove any trailing .log or .json if already present
-        const cleanUrl = url.replace(/\.(log|json)$/, '');
+    static async getAll() {
+        const replays = await StorageService.get(this.STORAGE_KEY) || {};
+        return replays;
+    }
 
-        // Regex to match Showdown replay URLs
-        const replayRegex = /^https?:\/\/replay\.pokemonshowdown\.com\/([^-]+)-(\d+)-([a-z0-9]+)$/i;
-        const match = cleanUrl.match(replayRegex);
+    /**
+     * Get a single replay by ID
+     */
+    static async getById(id) {
+        const replays = await this.getAll();
+        return replays[id] || null;
+    }
 
-        if (!match) {
+    /**
+     * Create a new replay
+     */
+    static async create(replayData) {
+        const replays = await this.getAll();
+        const id = Date.now().toString();
+
+        const replay = {
+            id,
+            teamId: replayData.teamId,
+            url: replayData.url,
+            battleData: replayData.battleData || null,
+            result: replayData.result || null, // 'win' | 'loss' | null
+            opponent: replayData.opponent || null,
+            notes: replayData.notes || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        replays[id] = replay;
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return replay;
+    }
+
+    /**
+     * Update an existing replay
+     */
+    static async update(id, updates) {
+        const replays = await this.getAll();
+
+        if (!replays[id]) {
             return null;
         }
 
-        const [, format, battleId, authString] = match;
-
-        return {
-            originalUrl: cleanUrl,
-            format,
-            battleId,
-            authString,
-            logUrl: `${cleanUrl}.log`,
-            jsonUrl: `${cleanUrl}.json`,
-            battleIdentifier: `${format}-${battleId}-${authString}`
+        replays[id] = {
+            ...replays[id],
+            ...updates,
+            id, // Ensure ID doesn't get overwritten
+            updatedAt: new Date().toISOString()
         };
+
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return replays[id];
     }
 
     /**
-     * Fetches the raw log data from a Showdown replay
-     * @param {string} url - The replay URL
-     * @returns {Promise<string>} - The raw log text
+     * Delete a replay by ID
      */
-    static async fetchReplayLog(url) {
-        const parsedUrl = this.parseReplayUrl(url);
+    static async delete(id) {
+        const replays = await this.getAll();
 
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
+        if (!replays[id]) {
+            return false;
         }
 
+        delete replays[id];
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return true;
+    }
+
+    /**
+     * Delete all replays for a team
+     */
+    static async deleteByTeamId(teamId) {
+        const replays = await this.getAll();
+        const replayIds = Object.keys(replays).filter(id => replays[id].teamId === teamId);
+
+        for (const id of replayIds) {
+            delete replays[id];
+        }
+
+        await StorageService.set(this.STORAGE_KEY, replays);
+        return replayIds.length;
+    }
+
+    /**
+     * Get replays as array (sorted by most recent)
+     */
+    static async getList() {
+        const replays = await this.getAll();
+        return Object.values(replays).sort((a, b) =>
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
+    }
+
+    /**
+     * Get replays for a specific team
+     */
+    static async getByTeamId(teamId) {
+        const replays = await this.getList();
+        return replays.filter(replay => replay.teamId === teamId);
+    }
+
+    /**
+     * Get replays by result (wins/losses)
+     */
+    static async getByResult(result) {
+        const replays = await this.getList();
+        return replays.filter(replay => replay.result === result);
+    }
+
+    /**
+     * Get replays for a team by result
+     */
+    static async getByTeamIdAndResult(teamId, result) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.filter(replay => replay.result === result);
+    }
+
+    /**
+     * Search replays by opponent name or notes
+     */
+    static async search(query) {
+        const replays = await this.getList();
+        const lowerQuery = query.toLowerCase();
+
+        return replays.filter(replay =>
+            (replay.opponent && replay.opponent.toLowerCase().includes(lowerQuery)) ||
+            replay.notes.toLowerCase().includes(lowerQuery) ||
+            replay.url.toLowerCase().includes(lowerQuery)
+        );
+    }
+
+    /**
+     * Check if replay exists
+     */
+    static async exists(id) {
+        const replay = await this.getById(id);
+        return replay !== null;
+    }
+
+    /**
+     * Check if replay URL already exists
+     */
+    static async existsByUrl(url) {
+        const replays = await this.getList();
+        return replays.some(replay => replay.url === url);
+    }
+
+    /**
+     * Get replay count for a team
+     */
+    static async getCountByTeamId(teamId) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.length;
+    }
+
+    /**
+     * Check if replay URL already exists for a specific team
+     */
+    static async existsByUrlForTeam(url, teamId) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.some(replay => replay.url === url);
+    }
+
+    /**
+     * Create replay from Showdown URL (fetches and parses automatically)
+     */
+    static async createFromUrl(teamId, replayUrl, notes = '') {
         try {
-            const response = await fetch(parsedUrl.logUrl);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch replay: ${response.status} ${response.statusText}`);
+            // Check if URL already exists for this specific team
+            if (await this.existsByUrlForTeam(replayUrl, teamId)) {
+                throw new Error('This replay is already added to this team');
             }
 
-            const logText = await response.text();
+            // Get team data to access Showdown usernames
+            // Import TeamService directly instead of dynamic import
+            const { default: TeamService } = await import('./TeamService.js');
+            const team = await TeamService.getById(teamId);
+            const teamShowdownUsernames = team?.showdownUsernames || [];
 
-            if (!logText || logText.trim().length === 0) {
-                throw new Error('Replay log is empty or unavailable');
-            }
-
-            return logText;
-        } catch (error) {
-            if (error.message.includes('Failed to fetch')) {
-                throw new Error('Network error: Unable to connect to Pokemon Showdown');
-            }
-            throw error;
-        }
-    }
-
-    /**
-     * Fetches the JSON metadata from a Showdown replay
-     * @param {string} url - The replay URL
-     * @returns {Promise<Object>} - The replay metadata
-     */
-    static async fetchReplayJson(url) {
-        const parsedUrl = this.parseReplayUrl(url);
-
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
-        }
-
-        try {
-            const response = await fetch(parsedUrl.jsonUrl);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch replay metadata: ${response.status} ${response.statusText}`);
-            }
-
-            const jsonData = await response.json();
-            return jsonData;
-        } catch (error) {
-            if (error.message.includes('Failed to fetch')) {
-                throw new Error('Network error: Unable to connect to Pokemon Showdown');
-            }
-            throw error;
-        }
-    }
-
-    /**
-     * Creates a replay entry immediately without fetching content
-     * @param {string} url - The replay URL
-     * @param {string} teamId - The team ID this replay belongs to
-     * @param {string} notes - Optional notes about the replay
-     * @returns {Object} - Replay entry ready for storage (without parsed data)
-     */
-    static createReplayEntry(url, teamId, notes = '') {
-        const parsedUrl = this.parseReplayUrl(url);
-
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
-        }
-
-        return {
-            id: `replay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            url: parsedUrl.originalUrl,
-            battleId: parsedUrl.battleIdentifier,
-            teamId,
-            notes,
-            logText: null, // Will be fetched later
-            metadata: null, // Will be fetched later
-            parsedData: null, // Will be parsed later
-            dateAdded: new Date().toISOString(),
-            format: parsedUrl.format,
-            status: 'pending', // pending, loading, completed, error
-            error: null
-        };
-    }
-
-    /**
-     * Fetches and parses content for an existing replay entry
-     * @param {Object} replayEntry - The replay entry to populate
-     * @returns {Promise<Object>} - Updated replay entry with content
-     */
-    static async fetchReplayContent(replayEntry) {
-        try {
-            // Update status to loading
-            const updatedEntry = { ...replayEntry, status: 'loading', error: null };
-
-            // Fetch both log and metadata in parallel
-            const [logText, metadata] = await Promise.all([
-                this.fetchReplayLog(replayEntry.url),
-                this.fetchReplayJson(replayEntry.url).catch(() => null) // JSON is optional
-            ]);
-
-            // Parse the log to extract basic battle info
-            const parsedData = this.parseLogBasicInfo(logText);
-
-            return {
-                ...updatedEntry,
-                logText,
-                metadata,
-                parsedData,
-                status: 'completed',
-                lastUpdated: new Date().toISOString()
-            };
-        } catch (error) {
-            return {
-                ...replayEntry,
-                status: 'error',
-                error: error.message,
-                lastUpdated: new Date().toISOString()
-            };
-        }
-    }
-
-    /**
-     * Imports a complete replay with both log and metadata (original method)
-     * @param {string} url - The replay URL
-     * @param {string} teamId - The team ID this replay belongs to
-     * @param {string} notes - Optional notes about the replay
-     * @returns {Promise<Object>} - Complete replay data ready for storage
-     */
-    static async importReplay(url, teamId, notes = '') {
-        const parsedUrl = this.parseReplayUrl(url);
-
-        if (!parsedUrl) {
-            throw new Error('Invalid Showdown replay URL');
-        }
-
-        try {
-            // Fetch both log and metadata in parallel
-            const [logText, metadata] = await Promise.all([
-                this.fetchReplayLog(url),
-                this.fetchReplayJson(url).catch(() => null) // JSON is optional, don't fail if unavailable
-            ]);
-
-            // Parse the log to extract basic battle info
-            const parsedBattle = this.parseLogBasicInfo(logText);
-
-            return {
-                id: `replay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                url: parsedUrl.originalUrl,
-                battleId: parsedUrl.battleIdentifier,
+            console.log('Team data for replay parsing:', {
                 teamId,
-                notes,
-                logText,
-                metadata,
-                parsedData: parsedBattle,
-                dateAdded: new Date().toISOString(),
-                format: parsedUrl.format
+                teamName: team?.name,
+                teamShowdownUsernames
+            });
+
+            // Fetch and parse the replay data
+            const battleData = await this.fetchAndParseReplay(replayUrl, teamShowdownUsernames);
+
+            return await this.create({
+                teamId,
+                url: replayUrl,
+                battleData,
+                result: battleData.result,
+                opponent: battleData.opponent,
+                notes
+            });
+        } catch (error) {
+            console.error('Error creating replay from URL:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Fetch replay data from Showdown URL and parse it
+     */
+    static async fetchAndParseReplay(url, teamShowdownUsernames = []) {
+        try {
+            // Convert replay URL to JSON endpoint
+            const jsonUrl = url.endsWith('.json') ? url : `${url}.json`;
+
+            const response = await fetch(jsonUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch replay: ${response.status}`);
+            }
+
+            const replayData = await response.json();
+            return this.parseReplayData(replayData, teamShowdownUsernames);
+        } catch (error) {
+            console.error('Error fetching replay:', error);
+            throw new Error('Failed to fetch or parse replay data');
+        }
+    }
+
+    /**
+     * Parse replay JSON data into structured battle information
+     */
+    static parseReplayData(replayData, teamShowdownUsernames = []) {
+        try {
+            const log = replayData.log || '';
+            const lines = log.split('\n');
+
+            let players = {};
+            let winner = null;
+            let teams = { p1: [], p2: [] };
+            let userPlayer = null;
+            let opponentPlayer = null;
+
+            // Enhanced data structures
+            let actualPicks = { p1: new Set(), p2: new Set() };
+            let pokemonTransformations = new Map();
+            let teraEvents = { p1: [], p2: [] };
+            let eloChanges = { p1: null, p2: null };
+
+            let nicknameToSpecies = new Map(); // Maps "p1a: RRRAAAAARW" -> "Tyranitar"
+            let slotToNickname = new Map();    // Maps "p1a" -> "RRRAAAAARW"
+
+            // Best-of-3 data structures
+            let bestOf3Data = {
+                isBestOf3: false,
+                matchId: null,
+                gameNumber: null,
+                gameTitle: null,
+                matchUrl: null,
+                seriesScore: null // Will store current score like "1-0", "1-1", etc.
+            };
+
+            // Parse the log for battle information
+            for (const line of lines) {
+                // Extract Best-of-3 information
+                if (line.includes('|uhtml|bestof|')) {
+                    bestOf3Data.isBestOf3 = true;
+
+                    // Extract the HTML content
+                    const htmlMatch = line.match(/\|uhtml\|bestof\|(.+)$/);
+                    if (htmlMatch) {
+                        const htmlContent = htmlMatch[1];
+                        console.log('Found Bo3 HTML:', htmlContent);
+
+                        // Extract game number and URL from HTML like:
+                        // <h2><strong>Game 1</strong> of <a href="/game-bestof3-gen9vgc2025regibo3-2370418907-63ye7u6d1d90ht3h8obgwvq4uijrl0qpw">a best-of-3</a></h2>
+                        const gameMatch = htmlContent.match(/<strong>Game (\d+)<\/strong>/);
+                        if (gameMatch) {
+                            bestOf3Data.gameNumber = parseInt(gameMatch[1]);
+                            bestOf3Data.gameTitle = `Game ${gameMatch[1]}`;
+                        }
+
+                        const urlMatch = htmlContent.match(/href="([^"]+)"/);
+                        if (urlMatch) {
+                            bestOf3Data.matchUrl = urlMatch[1];
+                            // Extract match ID from URL (the long string after the last dash)
+                            const idMatch = urlMatch[1].match(/-([a-zA-Z0-9]+)$/);
+                            if (idMatch) {
+                                bestOf3Data.matchId = idMatch[1];
+                            }
+                        }
+                    }
+                }
+
+                // Extract series score from HTML table
+                if (line.includes('|html|') && line.includes('<table') && line.includes('fa fa-circle')) {
+                    const htmlContent = line.substring(line.indexOf('|html|') + 6);
+                    console.log('Found series score HTML:', htmlContent);
+
+                    // Count filled circles (wins) for each player
+                    // Pattern: <i class="fa fa-circle"></i> for wins, <i class="fa fa-circle-o"></i> for losses/empty
+                    const leftWins = (htmlContent.match(/<td align="left">.*?<\/td>/s)?.[0] || '')
+                        .split('fa fa-circle"></i>').length - 1;
+                    const rightWins = (htmlContent.match(/<td align="right">.*?<\/td>/s)?.[0] || '')
+                        .split('fa fa-circle"></i>').length - 1;
+
+                    bestOf3Data.seriesScore = `${leftWins}-${rightWins}`;
+                    console.log('Extracted series score:', bestOf3Data.seriesScore);
+                }
+
+                // Extract player information
+                if (line.startsWith('|player|')) {
+                    const parts = line.split('|');
+                    const playerId = parts[2]; // p1 or p2
+                    const playerName = parts[3];
+
+                    // Only set if we have a valid player name
+                    if (playerName && playerName.trim()) {
+                        players[playerId] = playerName.trim();
+                        console.log(`Found player: ${playerId} = "${playerName.trim()}"`);
+
+                        // Check if this player is one of our usernames
+                        if (teamShowdownUsernames.length > 0 &&
+                            teamShowdownUsernames.some(username =>
+                                username.toLowerCase() === playerName.toLowerCase()
+                            )) {
+                            userPlayer = playerId;
+                            opponentPlayer = playerId === 'p1' ? 'p2' : 'p1';
+                            console.log(`Found user player: ${playerId} (${playerName})`);
+                        }
+                    } else {
+                        console.warn(`Empty or invalid player name for ${playerId}: "${playerName}"`);
+                    }
+                }
+
+                // Extract team information (pokemon reveals)
+                if (line.startsWith('|poke|')) {
+                    const parts = line.split('|');
+                    const player = parts[2];
+                    const pokemon = parts[3].split(',')[0]; // Remove level/gender info
+                    teams[player].push(pokemon);
+                }
+
+                // Extract actual picks (pokemon that entered battle)
+                if (line.startsWith('|switch|')) {
+                    const parts = line.split('|');
+                    const playerSlot = parts[2]; // e.g., "p1a: RRRAAAAARW" or "p2b: Urshifu"
+                    const pokemonInfo = parts[3]; // e.g., "Tyranitar, L50, F" or "Urshifu-Rapid-Strike, L50, M"
+
+                    if (playerSlot && pokemonInfo) {
+                        const player = playerSlot.substring(0, 2); // Extract "p1" or "p2"
+                        const pokemon = pokemonInfo.split(',')[0]; // Extract just the pokemon species name
+                        const slot = playerSlot.substring(0, 3); // Extract "p1a" or "p2b"
+
+                        // Store the actual species for usage tracking
+                        if (actualPicks[player]) {
+                            actualPicks[player].add(pokemon);
+                        }
+
+                        // Build nickname mapping for tera events
+                        if (playerSlot.includes(':')) {
+                            const nickname = playerSlot.split(':')[1].trim();
+                            nicknameToSpecies.set(playerSlot, pokemon);
+                            slotToNickname.set(slot, nickname);
+
+                            console.log(`Nickname mapping: ${playerSlot} -> ${pokemon}`);
+                        }
+                    }
+                }
+
+                // Handle Pokemon transformations (like Terapagos Tera Shift)
+                if (line.startsWith('|detailschange|')) {
+                    const parts = line.split('|');
+                    const playerSlot = parts[2]; // e.g., "p2a: Terapagos"
+                    const newPokemonInfo = parts[3]; // e.g., "Terapagos-Terastal, L50, M"
+
+                    if (playerSlot && newPokemonInfo) {
+                        const originalName = playerSlot.includes(':') ?
+                            playerSlot.split(':')[1].trim() :
+                            playerSlot.substring(3);
+                        const newPokemon = newPokemonInfo.split(',')[0];
+
+                        // Track the transformation
+                        pokemonTransformations.set(originalName, newPokemon);
+                    }
+                }
+
+                // Extract terastallization events
+                if (line.includes('-terastallize|')) {
+                    const parts = line.split('|');
+                    if (parts.length >= 4) {
+                        const playerSlot = parts[2]; // e.g., "p1b: RRRAAAAARW"
+                        const teraType = parts[3]; // e.g., "Fairy"
+
+                        if (playerSlot && teraType) {
+                            const player = playerSlot.substring(0, 2); // Extract "p1" or "p2"
+
+                            // Try to get the actual species name from our mapping
+                            let pokemon;
+                            if (nicknameToSpecies.has(playerSlot)) {
+                                // We have a direct mapping from the switch event
+                                pokemon = nicknameToSpecies.get(playerSlot);
+                            } else if (playerSlot.includes(':')) {
+                                // Fallback: extract nickname and try to find it
+                                const nickname = playerSlot.split(':')[1].trim();
+                                // Search for this nickname in our mappings
+                                for (const [key, species] of nicknameToSpecies.entries()) {
+                                    if (key.includes(nickname)) {
+                                        pokemon = species;
+                                        break;
+                                    }
+                                }
+
+                                // If still not found, use the nickname as-is (will get cleaned later)
+                                if (!pokemon) {
+                                    pokemon = nickname;
+                                    console.warn(`Could not map nickname "${nickname}" to species, using nickname`);
+                                }
+                            } else {
+                                // No colon, assume it's already the species name
+                                pokemon = playerSlot.substring(3); // Remove "p1a" prefix
+                            }
+
+                            if (teraEvents[player] && pokemon) {
+                                teraEvents[player].push({
+                                    pokemon: pokemon, // This will now be the actual species name
+                                    type: teraType.toLowerCase()
+                                });
+                                console.log(`Fixed Tera event: ${player} - ${pokemon} (was ${playerSlot}) → ${teraType}`);
+                            }
+                        }
+                    }
+                }
+
+                // Extract ELO changes from raw messages
+                if (line.startsWith('|raw|') && line.includes('rating:')) {
+
+                    // Parse lines like: "|raw|doctor_mug's rating: 1355 &rarr; <strong>1336</strong><br />(-19 for losing)"
+                    // Skip the |raw| prefix and capture the player name
+                    const ratingMatch = line.match(/\|raw\|(.+?)'s rating: (\d+) (?:&rarr;|→|&gt;) <strong>(\d+)<\/strong>/);
+                    if (ratingMatch) {
+                        const playerName = ratingMatch[1].trim();
+                        const beforeRating = parseInt(ratingMatch[2]);
+                        const afterRating = parseInt(ratingMatch[3]);
+
+
+                        // Find which player this is (case-insensitive comparison)
+                        const playerId = Object.keys(players).find(id =>
+                            players[id].toLowerCase() === playerName.toLowerCase()
+                        );
+
+                        if (playerId) {
+                            eloChanges[playerId] = {
+                                before: beforeRating,
+                                after: afterRating,
+                                change: afterRating - beforeRating
+                            };
+                        } else {
+                            console.log(`Could not find player ID for "${playerName}". Available players:`, players);
+                            console.log(`Player names: ${Object.values(players).map(name => `"${name}"`).join(', ')}`);
+                        }
+                    }
+                }
+
+                // Extract winner
+                if (line.startsWith('|win|')) {
+                    winner = line.split('|')[2];
+                    console.log(`Battle winner: "${winner}"`);
+                }
+            }
+
+            // Apply transformations and convert to final arrays
+            const applyTransformations = (pokemonSet) => {
+                const result = [];
+                for (const pokemon of pokemonSet) {
+                    // Check if this Pokemon transformed
+                    const finalForm = pokemonTransformations.get(pokemon) || pokemon;
+
+                    // Only add if not already in result (avoid duplicates from transformations)
+                    if (!result.includes(finalForm)) {
+                        result.push(finalForm);
+                    }
+                }
+                return result;
+            };
+
+            const finalPicks = {
+                p1: applyTransformations(actualPicks.p1),
+                p2: applyTransformations(actualPicks.p2)
+            };
+
+            // Determine result and opponent based on our analysis
+            let result = null;
+            let opponent = null;
+
+            if (winner && (players.p1 || players.p2)) {
+                if (userPlayer && opponentPlayer) {
+                    // We successfully identified which player is the user
+                    opponent = players[opponentPlayer] || 'Unknown opponent';
+
+                    // Compare winner name with our player name (case-insensitive)
+                    const userPlayerName = players[userPlayer];
+                    if (userPlayerName) {
+                        const isUserWinner = winner.toLowerCase() === userPlayerName.toLowerCase();
+                        result = isUserWinner ? 'win' : 'loss';
+
+                    } else {
+                        console.warn(`User player name not found for ${userPlayer}`);
+                    }
+                } else {
+                    // Fallback: try to guess based on username patterns
+                    const p1Name = (players.p1 || '').toLowerCase();
+                    const p2Name = (players.p2 || '').toLowerCase();
+
+                    if (teamShowdownUsernames.length > 0) {
+                        let foundUserPlayer = null;
+
+                        // Check if p1 matches any of our usernames
+                        const p1Matches = p1Name && teamShowdownUsernames.some(username =>
+                            p1Name.includes(username.toLowerCase()) ||
+                            username.toLowerCase().includes(p1Name)
+                        );
+
+                        // Check if p2 matches any of our usernames
+                        const p2Matches = p2Name && teamShowdownUsernames.some(username =>
+                            p2Name.includes(username.toLowerCase()) ||
+                            username.toLowerCase().includes(p2Name)
+                        );
+
+                        if (p1Matches && !p2Matches) {
+                            foundUserPlayer = 'p1';
+                            opponent = players.p2 || 'Unknown opponent';
+                            result = winner.toLowerCase() === p1Name ? 'win' : 'loss';
+                        } else if (p2Matches && !p1Matches) {
+                            foundUserPlayer = 'p2';
+                            opponent = players.p1 || 'Unknown opponent';
+                            result = winner.toLowerCase() === p2Name ? 'win' : 'loss';
+                        } else if (p1Matches && p2Matches) {
+                            opponent = `${players.p1 || 'Player 1'} vs ${players.p2 || 'Player 2'}`;
+                            result = null;
+                        }
+
+                        if (foundUserPlayer) {
+                            userPlayer = foundUserPlayer;
+                            opponentPlayer = foundUserPlayer === 'p1' ? 'p2' : 'p1';
+                            console.log(`Fallback found: userPlayer=${userPlayer}, opponent=${opponent}, result=${result}`);
+                        }
+                    }
+
+                    // If still no match, use winner comparison if we have player data
+                    if (!result && winner) {
+                        if (players.p1 && winner.toLowerCase() === players.p1.toLowerCase()) {
+                            // P1 won, determine if that's us
+                            if (teamShowdownUsernames.some(username =>
+                                username.toLowerCase() === players.p1.toLowerCase())) {
+                                result = 'win';
+                                opponent = players.p2 || 'Unknown opponent';
+                            } else {
+                                result = 'loss';
+                                opponent = players.p1;
+                            }
+                        } else if (players.p2 && winner.toLowerCase() === players.p2.toLowerCase()) {
+                            // P2 won, determine if that's us
+                            if (teamShowdownUsernames.some(username =>
+                                username.toLowerCase() === players.p2.toLowerCase())) {
+                                result = 'win';
+                                opponent = players.p1 || 'Unknown opponent';
+                            } else {
+                                result = 'loss';
+                                opponent = players.p2;
+                            }
+                        }
+
+                        if (result) {
+                        }
+                    }
+
+                    // Final fallback
+                    if (!result && !opponent) {
+                        opponent = `${players.p1 || 'Player 1'} vs ${players.p2 || 'Player 2'}`;
+                        result = null;
+                        console.log('No match found, setting unknown result');
+                    }
+                }
+            } else {
+                console.log('Missing data for result determination:', {
+                    winner,
+                    p1: players.p1,
+                    p2: players.p2,
+                    hasWinner: !!winner,
+                    hasPlayers: !!(players.p1 || players.p2)
+                });
+            }
+
+            return {
+                players,
+                teams,
+                winner,
+                result,
+                opponent,
+                userPlayer,
+                opponentPlayer,
+                teamShowdownUsernames,
+                actualPicks: finalPicks,
+                teraEvents,
+                eloChanges,
+                bestOf3: bestOf3Data,
+                raw: replayData
             };
         } catch (error) {
-            throw new Error(`Failed to import replay: ${error.message}`);
+            console.error('Error parsing replay data:', error);
+            return {
+                players: {},
+                teams: { p1: [], p2: [] },
+                winner: null,
+                result: null,
+                opponent: null,
+                userPlayer: null,
+                opponentPlayer: null,
+                teamShowdownUsernames: [],
+                actualPicks: { p1: [], p2: [] },
+                teraEvents: { p1: [], p2: [] },
+                eloChanges: { p1: null, p2: null },
+                // Default Bo3 data for errors
+                bestOf3: {
+                    isBestOf3: false,
+                    matchId: null,
+                    gameNumber: null,
+                    gameTitle: null,
+                    matchUrl: null,
+                    seriesScore: null
+                },
+                raw: replayData
+            };
         }
     }
 
     /**
-     * Basic log parsing to extract essential battle information
-     * This is a minimal parser - we'll expand this in the next task
-     * @param {string} logText - The raw log text
-     * @returns {Object} - Basic battle information
+     * Batch create replays from multiple URLs
      */
-    static parseLogBasicInfo(logText) {
-        const lines = logText.split('\n');
-        const info = {
-            players: [],
-            format: null,
-            tier: null,
-            winner: null,
-            timestamp: null,
-            turns: 0
-        };
+    static async createManyFromUrls(teamId, replayUrls, progressCallback = null) {
+        const results = [];
+        const errors = [];
 
-        for (const line of lines) {
-            // Extract player information
-            if (line.startsWith('|player|')) {
-                const parts = line.split('|');
-                const playerData = {
-                    id: parts[2],
-                    name: parts[3],
-                    avatar: parts[4],
-                    rating: parts[5] ? parseInt(parts[5]) : null
-                };
-                info.players.push(playerData);
+        for (let i = 0; i < replayUrls.length; i++) {
+            const url = replayUrls[i].trim();
+            if (!url) continue;
+
+            try {
+                const replay = await this.createFromUrl(teamId, url);
+                results.push(replay);
+            } catch (error) {
+                errors.push({ url, error: error.message });
             }
 
-            // Extract format and tier
-            if (line.startsWith('|tier|')) {
-                info.tier = line.split('|')[2];
+            // Call progress callback if provided
+            if (progressCallback) {
+                progressCallback(i + 1, replayUrls.length, results.length, errors.length);
             }
 
-            // Extract timestamp
-            if (line.startsWith('|t:|')) {
-                info.timestamp = parseInt(line.split('|')[2]);
-            }
-
-            // Extract winner
-            if (line.startsWith('|win|')) {
-                info.winner = line.split('|')[2];
-            }
-
-            // Count turns
-            if (line.startsWith('|turn|')) {
-                info.turns = parseInt(line.split('|')[2]);
-            }
+            // Small delay to avoid overwhelming the API
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
-        return info;
+        return { results, errors };
     }
 
     /**
-     * Validates multiple replay URLs at once
-     * @param {string[]} urls - Array of replay URLs
-     * @returns {Object} - Validation results with valid/invalid URLs
+     * Re-process an existing replay (useful if parsing logic improves)
      */
-    static validateMultipleUrls(urls) {
-        const results = {
-            valid: [],
-            invalid: []
-        };
+    static async reprocessReplay(id) {
+        const replay = await this.getById(id);
+        if (!replay) {
+            return null;
+        }
 
-        for (const url of urls) {
-            const parsed = this.parseReplayUrl(url.trim());
-            if (parsed) {
-                results.valid.push({
-                    url: url.trim(),
-                    parsed
+        try {
+            const battleData = await this.fetchAndParseReplay(replay.url);
+            return await this.update(id, {
+                battleData,
+                result: battleData.result,
+                opponent: battleData.opponent
+            });
+        } catch (error) {
+            console.error('Error reprocessing replay:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get replays that are part of Best-of-3 matches
+     */
+    static async getBestOf3Replays(teamId) {
+        const replays = await this.getByTeamId(teamId);
+        return replays.filter(replay =>
+            replay.battleData?.bestOf3?.isBestOf3
+        );
+    }
+
+    /**
+     * Group Best-of-3 replays by match ID
+     */
+    static async getBestOf3Matches(teamId) {
+        const bo3Replays = await this.getBestOf3Replays(teamId);
+        const matches = new Map();
+
+        for (const replay of bo3Replays) {
+            const matchId = replay.battleData.bestOf3.matchId;
+            if (!matchId) continue;
+
+            if (!matches.has(matchId)) {
+                matches.set(matchId, {
+                    matchId,
+                    opponent: replay.opponent,
+                    games: [],
+                    completedAt: null,
+                    isComplete: false,
+                    seriesScore: null,
+                    matchUrl: replay.battleData.bestOf3.matchUrl,
+                    gameResults: [], // Array of individual game results
+                    matchResult: null // Overall match result ('win', 'loss', 'incomplete')
                 });
+            }
+
+            matches.get(matchId).games.push(replay);
+        }
+
+        // Sort games within each match and determine completion status
+        for (const [matchId, match] of matches) {
+            // Sort games by game number
+            match.games.sort((a, b) => {
+                const gameA = a.battleData.bestOf3.gameNumber || 0;
+                const gameB = b.battleData.bestOf3.gameNumber || 0;
+                return gameA - gameB;
+            });
+
+            // Build game-by-game results array
+            match.gameResults = match.games.map(game => ({
+                gameNumber: game.battleData.bestOf3.gameNumber,
+                result: game.result, // 'win', 'loss', or null
+                replayId: game.id,
+                replayUrl: game.url,
+                seriesScoreAfter: game.battleData.bestOf3.seriesScore
+            }));
+
+            // Determine if match is complete and get final series score
+            const gameCount = match.games.length;
+            const wins = match.games.filter(game => game.result === 'win').length;
+            const losses = match.games.filter(game => game.result === 'loss').length;
+            const unknownResults = match.games.filter(game => !game.result).length;
+
+            // Match is complete if:
+            // 1. Someone has won 2+ games (normal completion)
+            // 2. We have 3 games total (went the distance)
+            // 3. Premature ending: fewer than 3 games but someone is clearly ahead
+            const normalCompletion = wins >= 2 || losses >= 2 || gameCount >= 3;
+            const prematureEnding = gameCount < 3 && gameCount > 0 && (wins > losses || losses > wins);
+
+            match.isComplete = normalCompletion || prematureEnding;
+            match.seriesScore = `${wins}-${losses}`;
+
+            // Determine overall match result
+            if (match.isComplete) {
+                if (wins > losses) {
+                    match.matchResult = 'win';
+                } else if (losses > wins) {
+                    match.matchResult = 'loss';
+                } else {
+                    // Tied score - should be rare but handle gracefully
+                    if (gameCount >= 3) {
+                        match.matchResult = 'draw'; // Shouldn't happen in Bo3, but just in case
+                    } else {
+                        match.matchResult = 'incomplete'; // Still tied, need more games
+                    }
+                }
             } else {
-                results.invalid.push({
-                    url: url.trim(),
-                    reason: 'Invalid Showdown replay URL format'
-                });
+                match.matchResult = 'incomplete';
             }
+
+            // Add completion reason for debugging/display
+            if (match.isComplete) {
+                if (wins >= 2 || losses >= 2) {
+                    match.completionReason = 'normal'; // Someone reached 2 wins
+                } else if (gameCount >= 3) {
+                    match.completionReason = 'full_series'; // Went all 3 games
+                } else if (prematureEnding) {
+                    match.completionReason = 'forfeit'; // Premature ending with clear leader
+                }
+            }
+
+            // Use the most recent game's timestamp as match completion time
+            match.completedAt = match.games[match.games.length - 1]?.createdAt;
         }
 
-        return results;
+        // Convert to array and sort by completion time (most recent first)
+        return Array.from(matches.values()).sort((a, b) =>
+            new Date(b.completedAt) - new Date(a.completedAt)
+        );
     }
 
     /**
-     * Extracts replay URLs from text (useful for bulk import)
-     * @param {string} text - Text containing potential replay URLs
-     * @returns {string[]} - Array of found replay URLs
+     * Get detailed game results for a specific match
      */
-    static extractUrlsFromText(text) {
-        const urlRegex = /https?:\/\/replay\.pokemonshowdown\.com\/[^\s]+/gi;
-        const matches = text.match(urlRegex) || [];
+    static getGameByGameResults(match) {
+        if (!match || !match.gameResults) return [];
 
-        // Clean up URLs and remove duplicates
-        const cleanUrls = matches
-            .map(url => url.replace(/[.,;!?]$/, '')) // Remove trailing punctuation
-            .filter((url, index, array) => array.indexOf(url) === index); // Remove duplicates
+        return match.gameResults.map(game => ({
+            ...game,
+            displayResult: game.result ? (game.result === 'win' ? 'W' : 'L') : '?',
+            resultClass: game.result === 'win' ? 'text-green-400' :
+                game.result === 'loss' ? 'text-red-400' : 'text-gray-400'
+        }));
+    }
 
-        return cleanUrls;
+    /**
+     * Get match summary string (e.g., "Won 2-1", "Lost 0-2", "Won 1-0 (FF)")
+     */
+    static getMatchSummary(match) {
+        if (!match) return 'Unknown';
+
+        const status = match.matchResult === 'win' ? 'Won' :
+            match.matchResult === 'loss' ? 'Lost' :
+                match.matchResult === 'incomplete' ? 'Incomplete' : 'Unknown';
+
+        let suffix = '';
+
+        // Add forfeit indicator for premature endings
+        if (match.isComplete && match.completionReason === 'forfeit') {
+            suffix = ' (FF)'; // FF = Forfeit
+        }
+
+        return `${status} ${match.seriesScore}${suffix}`;
     }
 }
+
+export default ReplaysService;
