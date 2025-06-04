@@ -1,4 +1,4 @@
-// src/pages/TeamPage.jsx
+// src/pages/TeamPage.jsx - Updated with MoveUsageTab
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
@@ -22,6 +22,7 @@ import {
     MatchByMatchTab,
     UsageStatsTab,
     MatchupStatsTab,
+    MoveUsageTab,
     PokemonTeam
 } from '../components';
 import TeamService from '../services/TeamService';
@@ -210,9 +211,11 @@ const TeamPage = () => {
                             replays={replays}
                         />
                     )}
-                    {!['replays', 'game-by-game', 'match-by-match', 'usage-stats', 'matchup-stats']
-                        .includes(activeTab) && (
-                        <ComingSoonTab title={tabs.find(t => t.id === activeTab)?.label} />
+                    {activeTab === 'move-usage' && (
+                        <MoveUsageTab
+                            replays={replays}
+                            team={team}
+                        />
                     )}
                 </div>
 
@@ -474,15 +477,6 @@ const DeleteTeamMessage = ({ team, gamesPlayed }) => (
         <p className="mt-4 text-red-400 font-medium">
             This action cannot be undone.
         </p>
-    </div>
-);
-
-// Coming Soon Tab Component
-const ComingSoonTab = ({ title }) => (
-    <div className="text-center py-12">
-        <TrendingUp className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-300 mb-2">{title}</h3>
-        <p className="text-gray-400">This feature is coming soon!</p>
     </div>
 );
 

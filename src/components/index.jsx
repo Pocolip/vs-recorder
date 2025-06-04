@@ -14,3 +14,4 @@ export { default as BestOf3Card } from './BestOf3Card';
 export { default as MatchByMatchTab } from './MatchByMatchTab';
 export { default as UsageStatsTab } from './UsageStatsTab';
 export { default as MatchupStatsTab } from './MatchupStatsTab';
+export { default as MoveUsageTab } from './MoveUsageTab';
