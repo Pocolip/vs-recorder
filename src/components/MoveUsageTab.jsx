@@ -4,7 +4,6 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Zap, AlertTriangle, Info } from 'lucide-react';
 import { PokemonSprite } from './index';
 import PokepasteService from '../services/PokepasteService';
-import { cleanPokemonName } from '../utils/pokemonNameUtils';
 
 const MoveUsageTab = ({ replays, team }) => {
     const [teamMovesets, setTeamMovesets] = useState({});
@@ -42,20 +41,21 @@ const MoveUsageTab = ({ replays, team }) => {
                 try {
                     const parsed = await PokepasteService.fetchAndParse(team.pokepaste);
                     pokepasteMovesets = parsed.pokemon.reduce((acc, pokemon) => {
-                        const normalizedName = cleanPokemonName(pokemon.name);
-                        if (normalizedName && pokemon.moves) {
-                            // If we already have moves for this normalized name, merge them
-                            if (acc[normalizedName]) {
+                        // Use raw pokemon name - no normalization
+                        const pokemonName = pokemon.name;
+                        if (pokemonName && pokemon.moves) {
+                            // If we already have moves for this name, merge them
+                            if (acc[pokemonName]) {
                                 // Merge unique moves
-                                const existingMoves = new Set(acc[normalizedName]);
+                                const existingMoves = new Set(acc[pokemonName]);
                                 pokemon.moves.forEach(move => {
                                     if (move && move.trim()) {
                                         existingMoves.add(move.trim());
                                     }
                                 });
-                                acc[normalizedName] = Array.from(existingMoves);
+                                acc[pokemonName] = Array.from(existingMoves);
                             } else {
-                                acc[normalizedName] = pokemon.moves.filter(move => move && move.trim());
+                                acc[pokemonName] = pokemon.moves.filter(move => move && move.trim());
                             }
                         }
                         return acc;
@@ -67,7 +67,7 @@ const MoveUsageTab = ({ replays, team }) => {
                 }
             }
 
-            // Calculate move usage statistics directly from replays (fresh calculation)
+            // Calculate move usage statistics - just aggregate, no normalization
             const usageStats = calculateMoveUsageFromReplays(replays);
             console.log('Calculated fresh move usage stats:', usageStats);
 
@@ -93,24 +93,22 @@ const MoveUsageTab = ({ replays, team }) => {
             const userMoveUsage = replay.battleData.moveUsage[replay.battleData.userPlayer];
             if (!userMoveUsage) continue;
 
-            // Aggregate move usage across all replays with normalization
+            // Just aggregate - NO additional normalization
             for (const [pokemon, moves] of Object.entries(userMoveUsage)) {
-                // Use the existing cleanPokemonName utility for normalization
-                const normalizedPokemon = cleanPokemonName(pokemon);
-
-                if (!moveStats[normalizedPokemon]) {
-                    moveStats[normalizedPokemon] = {};
+                if (!moveStats[pokemon]) {
+                    moveStats[pokemon] = {};
                 }
 
                 for (const [move, count] of Object.entries(moves)) {
-                    const currentCount = moveStats[normalizedPokemon][move] || 0;
-                    moveStats[normalizedPokemon][move] = currentCount + count;
+                    const currentCount = moveStats[pokemon][move] || 0;
+                    moveStats[pokemon][move] = currentCount + count;
                 }
             }
         }
 
         return moveStats;
     };
+
 
     // Custom label function for pie chart
     const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, value, inPokepaste }) => {
@@ -395,9 +393,6 @@ const PokemonMoveChart = ({ pokemon, data, CustomTooltip, renderCustomLabel }) =
                     </div>
                 </div>
             )}
-
-            {/* Keep only the "Other moves" section if applicable */}
-            {/* Removed individual Pokemon warnings section */}
         </div>
     );
 };

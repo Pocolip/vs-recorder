@@ -1,6 +1,5 @@
-// src/services/ReplayService.js - Enhanced with move tracking
+// src/services/ReplayService.js - Enhanced with Bo3 support
 import StorageService from './StorageService.js';
-import { cleanPokemonName } from '../utils/pokemonNameUtils';
 
 class ReplaysService {
     static STORAGE_KEY = 'replays';
@@ -256,10 +255,7 @@ class ReplaysService {
             let teraEvents = { p1: [], p2: [] };
             let eloChanges = { p1: null, p2: null };
 
-            // NEW: Move usage tracking
-            let moveUsage = { p1: new Map(), p2: new Map() }; // Map: pokemon -> Map(move -> count)
-            let pokemonToSlot = new Map(); // Maps "Tyranitar" -> "p1a"
-            let slotToPokemon = new Map(); // Maps "p1a" -> "Tyranitar"
+            let moveUsage = { p1: {}, p2: {} }; // Will store: { pokemon: { move: count } }
 
             let nicknameToSpecies = new Map(); // Maps "p1a: RRRAAAAARW" -> "Tyranitar"
             let slotToNickname = new Map();    // Maps "p1a" -> "RRRAAAAARW"
@@ -273,6 +269,51 @@ class ReplaysService {
                 matchUrl: null,
                 seriesScore: null // Will store current score like "1-0", "1-1", etc.
             };
+
+            function findBestPokemonMatch(plainName, teamPokemon) {
+                const cleanPlainName = plainName.toLowerCase();
+
+                // Step 1: Try exact match first (case-insensitive)
+                const exactMatch = teamPokemon.find(p =>
+                    p.toLowerCase() === cleanPlainName
+                );
+                if (exactMatch) {
+                    console.log(`Exact match: ${plainName} -> ${exactMatch}`);
+                    return exactMatch;
+                }
+
+                // Step 2: Find all potential matches
+                const potentialMatches = teamPokemon.filter(p => {
+                    const pokepasteName = p.toLowerCase();
+                    // Both directions: pokepaste contains battle name OR battle name contains pokepaste
+                    return pokepasteName.includes(cleanPlainName) || cleanPlainName.includes(pokepasteName);
+                });
+
+                if (potentialMatches.length === 0) {
+                    return null;
+                }
+
+                if (potentialMatches.length === 1) {
+                    console.log(`Single match: ${plainName} -> ${potentialMatches[0]}`);
+                    return potentialMatches[0];
+                }
+
+                // Step 3: Multiple matches - prioritize longer, more specific names
+                // Exclude names with "*" (wildcards from team preview)
+                const nonWildcardMatches = potentialMatches.filter(p => !p.includes('*'));
+
+                if (nonWildcardMatches.length > 0) {
+                    // Sort by length (longer = more specific) and take the longest
+                    const bestMatch = nonWildcardMatches.sort((a, b) => b.length - a.length)[0];
+                    console.log(`Best match (no wildcards): ${plainName} -> ${bestMatch} (from ${potentialMatches.join(', ')})`);
+                    return bestMatch;
+                }
+
+                // Step 4: Fallback to longest match even if it has wildcards
+                const fallbackMatch = potentialMatches.sort((a, b) => b.length - a.length)[0];
+                console.log(`Fallback match: ${plainName} -> ${fallbackMatch} (from ${potentialMatches.join(', ')})`);
+                return fallbackMatch;
+            }
 
             // Parse the log for battle information
             for (const line of lines) {
@@ -355,6 +396,48 @@ class ReplaysService {
                     teams[player].push(pokemon);
                 }
 
+                // Track move usage
+                if (line.startsWith('|move|')) {
+                    const parts = line.split('|');
+                    if (parts.length >= 4) {
+                        const slot = parts[2]; // e.g., "p1a: RRRAAAAARW" or "p1a"
+                        const move = parts[3]; // e.g., "Stone Edge"
+
+                        if (slot && move) {
+                            // Extract player (p1 or p2)
+                            const player = slot.substring(0, 2);
+
+                            // Get plain Pokemon name from slot
+                            let plainName = null;
+                            if (slot.includes(':')) {
+                                plainName = slot.split(':')[1].trim(); // "p1a: Urshifu" -> "Urshifu"
+                            }
+
+                            if (plainName && teams[player]) {
+                                // NEW: Use the improved matching function
+                                const pokepasteMatch = findBestPokemonMatch(plainName, teams[player]);
+
+                                if (pokepasteMatch) {
+                                    // Initialize Pokemon's move object if it doesn't exist
+                                    if (!moveUsage[player][pokepasteMatch]) {
+                                        moveUsage[player][pokepasteMatch] = {};
+                                    }
+
+                                    // Increment move count
+                                    const currentCount = moveUsage[player][pokepasteMatch][move] || 0;
+                                    moveUsage[player][pokepasteMatch][move] = currentCount + 1;
+
+                                    console.log(`Move usage: ${plainName} -> ${pokepasteMatch} used ${move} (count: ${currentCount + 1})`);
+                                } else {
+                                    console.log(`No Pokepaste match found for ${plainName} in team ${player}:`, teams[player]);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
                 // Extract actual picks (pokemon that entered battle)
                 if (line.startsWith('|switch|')) {
                     const parts = line.split('|');
@@ -371,48 +454,13 @@ class ReplaysService {
                             actualPicks[player].add(pokemon);
                         }
 
-                        // Build nickname mapping for tera events and move tracking
+                        // Build nickname mapping for tera events
                         if (playerSlot.includes(':')) {
                             const nickname = playerSlot.split(':')[1].trim();
                             nicknameToSpecies.set(playerSlot, pokemon);
                             slotToNickname.set(slot, nickname);
-                        }
 
-                        // NEW: Build slot-pokemon mappings for move tracking
-                        slotToPokemon.set(slot, pokemon);
-                        pokemonToSlot.set(`${player}-${pokemon}`, slot);
-
-                        console.log(`Switch mapping: ${playerSlot} -> ${pokemon} (slot: ${slot})`);
-                    }
-                }
-
-                // NEW: Track move usage
-                if (line.startsWith('|move|')) {
-                    const parts = line.split('|');
-                    if (parts.length >= 4) {
-                        const slot = parts[2]; // e.g., "p1a: RRRAAAAARW" or "p1a"
-                        const move = parts[3]; // e.g., "Stone Edge"
-
-                        if (slot && move) {
-                            // Extract just the slot identifier (p1a, p2b, etc.)
-                            const cleanSlot = slot.includes(':') ? slot.split(':')[0] : slot;
-                            const player = cleanSlot.substring(0, 2); // p1 or p2
-
-                            // Get the Pokemon for this slot
-                            const pokemon = slotToPokemon.get(cleanSlot);
-
-                            if (pokemon && moveUsage[player]) {
-                                // Initialize Pokemon's move map if it doesn't exist
-                                if (!moveUsage[player].has(pokemon)) {
-                                    moveUsage[player].set(pokemon, new Map());
-                                }
-
-                                const pokemonMoves = moveUsage[player].get(pokemon);
-                                const currentCount = pokemonMoves.get(move) || 0;
-                                pokemonMoves.set(move, currentCount + 1);
-
-                                console.log(`Move usage: ${pokemon} used ${move} (count: ${currentCount + 1})`);
-                            }
+                            console.log(`Nickname mapping: ${playerSlot} -> ${pokemon}`);
                         }
                     }
                 }
@@ -420,44 +468,17 @@ class ReplaysService {
                 // Handle Pokemon transformations (like Terapagos Tera Shift)
                 if (line.startsWith('|detailschange|')) {
                     const parts = line.split('|');
-                    const playerSlot = parts[2]; // e.g., "p2a: Terapagos" or "p1a: Terapagos"
+                    const playerSlot = parts[2]; // e.g., "p2a: Terapagos"
                     const newPokemonInfo = parts[3]; // e.g., "Terapagos-Terastal, L50, M"
 
                     if (playerSlot && newPokemonInfo) {
-                        const slot = playerSlot.substring(0, 3); // Extract "p1a" or "p2a"
-                        const originalPokemon = slotToPokemon.get(slot); // Get the original Pokemon name
-                        const newPokemon = newPokemonInfo.split(',')[0]; // Get the new form name
+                        const originalName = playerSlot.includes(':') ?
+                            playerSlot.split(':')[1].trim() :
+                            playerSlot.substring(3);
+                        const newPokemon = newPokemonInfo.split(',')[0];
 
-                        console.log(`Transformation detected: ${originalPokemon} -> ${newPokemon} (slot: ${slot})`);
-
-                        if (originalPokemon) {
-                            // Track the transformation for later normalization
-                            pokemonTransformations.set(newPokemon, originalPokemon);
-
-                            // Update slot mapping to the new form (for immediate move tracking)
-                            slotToPokemon.set(slot, newPokemon);
-
-                            // If we have move usage data for the new form, we need to transfer it to the original
-                            const player = slot.substring(0, 2);
-                            if (moveUsage[player] && moveUsage[player].has(newPokemon)) {
-                                // Move usage from new form to original form
-                                if (!moveUsage[player].has(originalPokemon)) {
-                                    moveUsage[player].set(originalPokemon, new Map());
-                                }
-
-                                const newFormMoves = moveUsage[player].get(newPokemon);
-                                const originalMoves = moveUsage[player].get(originalPokemon);
-
-                                // Merge move usage
-                                for (const [move, count] of newFormMoves.entries()) {
-                                    const currentCount = originalMoves.get(move) || 0;
-                                    originalMoves.set(move, currentCount + count);
-                                }
-
-                                // Remove the new form's separate tracking
-                                moveUsage[player].delete(newPokemon);
-                            }
-                        }
+                        // Track the transformation
+                        pokemonTransformations.set(originalName, newPokemon);
                     }
                 }
 
@@ -563,12 +584,6 @@ class ReplaysService {
             const finalPicks = {
                 p1: applyTransformations(actualPicks.p1),
                 p2: applyTransformations(actualPicks.p2)
-            };
-
-            // NEW: Convert move usage Maps to plain objects for serialization
-            const finalMoveUsage = {
-                p1: this.convertMoveUsageToObject(moveUsage.p1, pokemonTransformations),
-                p2: this.convertMoveUsageToObject(moveUsage.p2, pokemonTransformations)
             };
 
             // Determine result and opponent based on our analysis
@@ -686,7 +701,7 @@ class ReplaysService {
                 actualPicks: finalPicks,
                 teraEvents,
                 eloChanges,
-                moveUsage: finalMoveUsage, // NEW: Include move usage data
+                moveUsage,
                 bestOf3: bestOf3Data,
                 raw: replayData
             };
@@ -704,7 +719,7 @@ class ReplaysService {
                 actualPicks: { p1: [], p2: [] },
                 teraEvents: { p1: [], p2: [] },
                 eloChanges: { p1: null, p2: null },
-                moveUsage: { p1: {}, p2: {} }, // NEW: Default empty move usage
+                moveUsage: { p1: {}, p2: {} },
                 // Default Bo3 data for errors
                 bestOf3: {
                     isBestOf3: false,
@@ -718,78 +733,6 @@ class ReplaysService {
             };
         }
     }
-
-    /**
-     * NEW: Convert move usage Maps to plain objects for JSON serialization
-     * Also handles Pokemon form normalization using existing utility
-     */
-    static convertMoveUsageToObject(playerMoveUsage, pokemonTransformations) {
-        const result = {};
-
-        for (const [pokemon, movesMap] of playerMoveUsage.entries()) {
-            // Use the existing cleanPokemonName utility for normalization
-            let normalizedPokemon = cleanPokemonName(pokemon);
-
-            // Check if this Pokemon is a transformation of another
-            const originalForm = pokemonTransformations.get(pokemon);
-            if (originalForm) {
-                normalizedPokemon = cleanPokemonName(originalForm);
-            }
-
-            // Initialize the normalized Pokemon's moves if it doesn't exist
-            if (!result[normalizedPokemon]) {
-                result[normalizedPokemon] = {};
-            }
-
-            // Add moves to the normalized Pokemon
-            for (const [move, count] of movesMap.entries()) {
-                const currentCount = result[normalizedPokemon][move] || 0;
-                result[normalizedPokemon][move] = currentCount + count;
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * NEW: Get move usage statistics for a team
-     * @param {string} teamId - Team ID
-     * @returns {Promise<Object>} Move usage statistics per Pokemon
-     */
-    static async getMoveUsageStats(teamId) {
-        try {
-            const replays = await this.getByTeamId(teamId);
-            const moveStats = {};
-
-            for (const replay of replays) {
-                if (!replay.battleData || !replay.battleData.moveUsage || !replay.battleData.userPlayer) {
-                    continue;
-                }
-
-                const userMoveUsage = replay.battleData.moveUsage[replay.battleData.userPlayer];
-                if (!userMoveUsage) continue;
-
-                // Aggregate move usage across all replays
-                for (const [pokemon, moves] of Object.entries(userMoveUsage)) {
-                    if (!moveStats[pokemon]) {
-                        moveStats[pokemon] = {};
-                    }
-
-                    for (const [move, count] of Object.entries(moves)) {
-                        const currentCount = moveStats[pokemon][move] || 0;
-                        moveStats[pokemon][move] = currentCount + count;
-                    }
-                }
-            }
-
-            return moveStats;
-        } catch (error) {
-            console.error('Error getting move usage stats:', error);
-            return {};
-        }
-    }
-
-    // ... rest of the existing methods remain the same ...
 
     /**
      * Batch create replays from multiple URLs
