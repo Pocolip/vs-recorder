@@ -21,11 +21,7 @@ const Footer = () => {
 
                         {/* GitHub link */}
                         <a
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                alert('GitHub link coming soon!');
-                            }}
+                            href="https://github.com/Pocolip/vs-recorder"
                             className="text-gray-400 hover:text-gray-200 transition-colors"
                             title="GitHub Repository"
                         >
