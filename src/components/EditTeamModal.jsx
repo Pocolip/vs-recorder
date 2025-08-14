@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Users, Link as LinkIcon, User, AlertCircle } from 'lucide-react';
 
-const EditTeamModal = ({ team, onClose, onUpdateTeam }) => {
+const EditTeamModal = ({ isOpen, teamData, onClose, onTeamUpdated }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -27,18 +27,18 @@ const EditTeamModal = ({ team, onClose, onUpdateTeam }) => {
     ];
 
     useEffect(() => {
-        if (team) {
+        if (teamData) {
             setFormData({
-                name: team.name || '',
-                description: team.description || '',
-                pokepaste: team.pokepaste || '',
-                format: team.format || 'VGC 2025 Regulation H',
-                showdownUsernames: Array.isArray(team.showdownUsernames)
-                    ? team.showdownUsernames.join(', ')
-                    : (team.showdownUsernames || '')
+                name: teamData.name || '',
+                description: teamData.description || '',
+                pokepaste: teamData.pokepaste || '',
+                format: teamData.format || 'VGC 2025 Regulation H',
+                showdownUsernames: Array.isArray(teamData.showdownUsernames)
+                    ? teamData.showdownUsernames.join(', ')
+                    : (teamData.showdownUsernames || '')
             });
         }
-    }, [team]);
+    }, [teamData]);
 
     const validatePokepasteUrl = (url) => {
         if (!url.trim()) return true; // Optional field
@@ -93,8 +93,8 @@ const EditTeamModal = ({ team, onClose, onUpdateTeam }) => {
         try {
             setIsLoading(true);
 
-            const teamData = {
-                ...team,
+            const updatedTeamData = {
+                ...teamData,
                 name: formData.name.trim(),
                 description: formData.description.trim(),
                 pokepaste: formData.pokepaste.trim(),
@@ -102,7 +102,7 @@ const EditTeamModal = ({ team, onClose, onUpdateTeam }) => {
                 showdownUsernames: parseArrayField(formData.showdownUsernames)
             };
 
-            await onUpdateTeam(teamData);
+            await onTeamUpdated(updatedTeamData);
             // Modal will be closed by parent component on success
         } catch (error) {
             console.error('Error updating team:', error);
@@ -112,7 +112,7 @@ const EditTeamModal = ({ team, onClose, onUpdateTeam }) => {
         }
     };
 
-    if (!team) return null;
+    if (!isOpen || !teamData) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

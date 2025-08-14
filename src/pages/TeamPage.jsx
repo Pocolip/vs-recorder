@@ -128,9 +128,25 @@ const TeamPage = () => {
         }
     };
 
-    const handleTeamUpdated = (updatedTeam) => {
-        setTeam(updatedTeam);
-        setShowEditTeamModal(false);
+    const handleTeamUpdated = async (updatedTeam) => {
+        try {
+            // Save the updated team to Chrome Storage
+            const savedTeam = await TeamService.update(updatedTeam.id, {
+                name: updatedTeam.name,
+                description: updatedTeam.description,
+                pokepaste: updatedTeam.pokepaste,
+                format: updatedTeam.format,
+                showdownUsernames: updatedTeam.showdownUsernames
+            });
+
+            // Update local state with the saved team data
+            setTeam(savedTeam);
+            setShowEditTeamModal(false);
+        } catch (error) {
+            console.error('Error updating team:', error);
+            // Keep the modal open so user can try again
+            // Optionally show an error message
+        }
     };
 
     if (loading) {
