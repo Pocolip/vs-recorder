@@ -100,7 +100,6 @@ const ExportPage = () => {
                         pokepaste: team.pokepaste,
                         format: team.format,
                         showdownUsernames: team.showdownUsernames,
-                        tags: team.tags,
                         createdAt: team.createdAt,
                         updatedAt: team.updatedAt
                     };
@@ -260,18 +259,18 @@ const ExportPage = () => {
                                                 <p className="text-gray-200 font-medium truncate">{team.name}</p>
                                                 <div className="flex items-center gap-4 mt-1">
                                                     <p className="text-gray-400 text-sm">{team.format || 'VGC 2025'}</p>
-                                                    {team.tags && team.tags.length > 0 && (
-                                                        <div className="flex gap-1">
-                                                            {team.tags.slice(0, 2).map(tag => (
-                                                                <span key={tag} className="px-2 py-0.5 bg-slate-700 text-gray-300 text-xs rounded">
-                                                                    {tag}
-                                                                </span>
-                                                            ))}
-                                                            {team.tags.length > 2 && (
-                                                                <span className="text-gray-500 text-xs">+{team.tags.length - 2}</span>
-                                                            )}
-                                                        </div>
-                                                    )}
+                                                    {/*{team.tags && team.tags.length > 0 && (*/}
+                                                    {/*    <div className="flex gap-1">*/}
+                                                    {/*        {team.tags.slice(0, 2).map(tag => (*/}
+                                                    {/*            <span key={tag} className="px-2 py-0.5 bg-slate-700 text-gray-300 text-xs rounded">*/}
+                                                    {/*                {tag}*/}
+                                                    {/*            </span>*/}
+                                                    {/*        ))}*/}
+                                                    {/*        {team.tags.length > 2 && (*/}
+                                                    {/*            <span className="text-gray-500 text-xs">+{team.tags.length - 2}</span>*/}
+                                                    {/*        )}*/}
+                                                    {/*    </div>*/}
+                                                    {/*)}*/}
                                                 </div>
                                             </div>
                                         </label>

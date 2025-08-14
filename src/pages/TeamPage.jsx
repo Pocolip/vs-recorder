@@ -415,23 +415,6 @@ const TeamInfoCard = ({
                 </div>
             </div>
         </div>
-
-        {/* Tags */}
-        {team.tags && team.tags.length > 0 && (
-            <div className="mt-6">
-                <h3 className="text-lg font-semibold text-gray-100 mb-3">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                    {team.tags.map((tag, index) => (
-                        <span
-                            key={index}
-                            className="bg-slate-700 text-gray-300 px-3 py-1 rounded-full text-sm"
-                        >
-                            {tag}
-                        </span>
-                    ))}
-                </div>
-            </div>
-        )}
     </div>
 );
 

@@ -34,7 +34,6 @@ class TeamsService {
             pokepaste: teamData.pokepaste,
             format: teamData.format || 'VGC 2025',
             showdownUsernames: teamData.showdownUsernames || [],
-            tags: teamData.tags || [],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
@@ -91,7 +90,7 @@ class TeamsService {
     }
 
     /**
-     * Search teams by name or tags
+     * Search teams by name or description
      */
     static async search(query) {
         const teams = await this.getList();
@@ -99,8 +98,7 @@ class TeamsService {
 
         return teams.filter(team =>
             team.name.toLowerCase().includes(lowerQuery) ||
-            team.description.toLowerCase().includes(lowerQuery) ||
-            team.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+            team.description.toLowerCase().includes(lowerQuery)
         );
     }
 

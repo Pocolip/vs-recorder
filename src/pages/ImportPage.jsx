@@ -163,8 +163,7 @@ const ImportPage = () => {
                             description: teamData.description || '',
                             pokepaste: teamData.pokepaste,
                             format: teamData.format || 'VGC 2025',
-                            showdownUsernames: teamData.showdownUsernames || [],
-                            tags: teamData.tags || []
+                            showdownUsernames: teamData.showdownUsernames || []
                         });
                         results.teamsUpdated++;
                     } else {
@@ -174,8 +173,7 @@ const ImportPage = () => {
                             description: teamData.description || '',
                             pokepaste: teamData.pokepaste,
                             format: teamData.format || 'VGC 2025',
-                            showdownUsernames: teamData.showdownUsernames || [],
-                            tags: teamData.tags || []
+                            showdownUsernames: teamData.showdownUsernames || []
                         });
                         results.teamsCreated++;
                     }
