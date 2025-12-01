@@ -8,6 +8,29 @@ Relational approach chosen for:
 - No document size constraints
 - JSONB support for flexible battleLog storage
 
+## Development Strategy
+
+### Short-term (Development)
+- **H2 Database** (embedded, in-memory or file-based)
+  - Zero setup, runs with Spring Boot
+  - JPA/Hibernate auto-creates schema from entities
+  - Perfect for rapid iteration
+  - Configuration: `spring.jpa.hibernate.ddl-auto=create-drop`
+  - Easy for team members to clone and run without DB setup
+
+### Production & Long-term
+- **PostgreSQL** with full schema
+- Migration path:
+  - Once schema stabilizes (after implementing core features)
+  - Export H2 schema or use Flyway/Liquibase for migrations
+  - Switch `spring.datasource.url` to PostgreSQL connection
+  - Load Pokemon data into production database
+
+### Alternative: Docker Compose
+- Can use Docker Compose for local PostgreSQL during development
+- Provides closer parity to production environment
+- Slightly more setup overhead than H2
+
 ## Schema
 
 ### users
