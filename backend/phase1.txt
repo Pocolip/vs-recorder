@@ -1,0 +1,117 @@
+# VS Recorder Backend - Phase 1 Complete
+
+## Summary
+Phase 1 establishes the foundational database layer with JPA entities and repositories.
+
+## Files Created
+
+### 1. Configuration Files
+- **pom.xml** - Updated with JPA, H2, and validation dependencies
+- **application.properties** - H2 database configuration with development settings
+
+### 2. Entity Classes (com.yeskatronics.vs_recorder_backend.entities)
+- **User.java** - User accounts with authentication fields
+- **Team.java** - Pokemon teams with pokepaste and regulation info
+- **Replay.java** - Battle replays with JSON battleLog storage
+- **Match.java** - Bo3 match sets grouping replays
+
+### 3. Repository Interfaces (com.yeskatronics.vs_recorder_backend.repositories)
+- **UserRepository.java** - User data access with username/email lookups
+- **TeamRepository.java** - Team queries with user filtering
+- **ReplayRepository.java** - Replay queries with extensive filtering options
+- **MatchRepository.java** - Match queries with replay relationships
+
+## Key Design Decisions
+
+### Database Compatibility (H2 ↔ PostgreSQL)
+1. **Arrays (showdown_usernames, tags)**
+   - H2: Using `@ElementCollection` with separate join tables
+   - PostgreSQL: Will migrate to native TEXT[] arrays later
+
+2. **JSON Storage (battle_log)**
+   - H2: Stored as TEXT with `@JdbcTypeCode(SqlTypes.JSON)`
+   - PostgreSQL: Will use native JSONB column type
+   - Same annotation works for both databases
+
+### Entity Relationships
+```
+User (1) ─── (N) Team (1) ─── (N) Replay
+                   │                │
+                   │                │
+                   └─── (N) Match ─┘
+                         (1)   (N)
+```
+
+### Key Features Implemented
+- ✅ Bidirectional relationships with helper methods
+- ✅ Cascade operations (delete user → deletes teams → deletes replays)
+- ✅ Soft references (delete match → replays remain, match_id set to NULL)
+- ✅ Validation annotations on required fields
+- ✅ Timestamps (createdAt, updatedAt) auto-managed
+- ✅ Query methods in repositories for common filters
+- ✅ Custom JPQL queries for complex filtering
+
+## Testing the Setup
+
+### 1. Build the project
+```bash
+mvn clean install
+```
+
+### 2. Run the application
+```bash
+mvn spring-boot:run
+```
+
+### 3. Access H2 Console
+Navigate to: `http://localhost:8080/h2-console`
+- JDBC URL: `jdbc:h2:file:./data/vsrecorder`
+- Username: `sa`
+- Password: (leave blank)
+
+### 4. Verify tables created
+The following tables should be auto-created:
+- users
+- teams
+- team_showdown_usernames (collection table)
+- replays
+- matches
+- match_tags (collection table)
+
+## What's Working Now
+- Spring Boot starts successfully with JPA enabled
+- H2 database connects and creates schema
+- All entities are mapped and relationships configured
+- Repositories are ready for service layer integration
+
+## Next Steps - Phase 2
+
+### Service Layer Development
+1. **UserService** - User registration, authentication prep
+2. **TeamService** - CRUD operations for teams
+3. **ReplayService** - Replay management with battleLog parsing
+4. **MatchService** - Bo3 match grouping logic
+
+### Validation & Business Logic
+- Duplicate URL checking for replays
+- Team ownership verification
+- Win/loss calculation from replays
+- Match completion status logic
+
+## Migration Path to PostgreSQL
+
+When ready to migrate:
+1. Add PostgreSQL driver to pom.xml
+2. Update application.properties datasource URL
+3. Change column definitions:
+   - `showdown_usernames` → `TEXT[]`
+   - `tags` → `TEXT[]`
+   - `battle_log` → `JSONB`
+4. Update `@ElementCollection` to native array mapping
+5. Run with `ddl-auto=validate` (production)
+
+## Notes
+- Current setup uses `ddl-auto=create-drop` for rapid development
+- All data is lost on application restart (change to `update` to persist)
+- File-based H2 stores data in `./data/vsrecorder.mv.db`
+- SQL queries are logged to console for debugging
