@@ -6,6 +6,9 @@ target/
 dist/
 build/
 
+# H2
+data/
+
 # Environment files
 .env
 .env.local
