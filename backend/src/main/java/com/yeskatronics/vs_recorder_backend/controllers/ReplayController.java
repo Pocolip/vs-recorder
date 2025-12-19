@@ -4,12 +4,15 @@ import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.dto.ReplayDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.mappers.ReplayMapper;
+import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.ReplayService;
+import com.yeskatronics.vs_recorder_backend.services.TeamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,21 +32,45 @@ public class ReplayController {
 
     private final ReplayService replayService;
     private final ReplayMapper replayMapper;
+    private final TeamService teamService;
+    private final CustomUserDetailsService userDetailsService;
+
+    /**
+     * Helper method to get user ID from authentication
+     */
+    private Long getCurrentUserId(Authentication authentication) {
+        String username = authentication.getName();
+        return userDetailsService.getUserIdByUsername(username);
+    }
+
+    /**
+     * Helper method to verify team ownership
+     */
+    private void verifyTeamOwnership(Long teamId, Long userId) {
+        teamService.getTeamByIdAndUserId(teamId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found or access denied"));
+    }
 
     /**
      * Create a replay from URL (will fetch battle log from Showdown)
      * POST /api/replays/from-url?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @param request the replay URL and optional notes
      * @return the created replay
      */
     @PostMapping("/from-url")
     public ResponseEntity<ReplayDTO.Summary> createReplayFromUrl(
             @RequestParam Long teamId,
+            Authentication authentication,
             @Valid @RequestBody ReplayDTO.CreateFromUrlRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Creating replay from URL for team: {}", teamId);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         Replay savedReplay = replayService.createReplayFromUrl(teamId, request.getUrl());
 
@@ -63,15 +90,21 @@ public class ReplayController {
      * POST /api/replays?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @param request the replay creation request with all data
      * @return the created replay
      */
     @PostMapping
     public ResponseEntity<ReplayDTO.Response> createReplay(
             @RequestParam Long teamId,
+            Authentication authentication,
             @Valid @RequestBody ReplayDTO.CreateRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Creating replay for team: {}", teamId);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         Replay replay = replayMapper.toEntity(request);
         Replay savedReplay = replayService.createReplay(replay, teamId);
@@ -85,13 +118,22 @@ public class ReplayController {
      * GET /api/replays/{id}
      *
      * @param id the replay ID
+     * @param authentication the authenticated user
      * @return the replay with full battle log
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ReplayDTO.Response> getReplayById(@PathVariable Long id) {
+    public ResponseEntity<ReplayDTO.Response> getReplayById(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replay by ID: {}", id);
 
         return replayService.getReplayById(id)
+                .filter(replay -> {
+                    // Verify user owns the team this replay belongs to
+                    return teamService.getTeamByIdAndUserId(replay.getTeam().getId(), userId).isPresent();
+                })
                 .map(replayMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -102,11 +144,19 @@ public class ReplayController {
      * GET /api/replays?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @return list of replays (summary without battle logs)
      */
     @GetMapping
-    public ResponseEntity<List<ReplayDTO.Summary>> getReplaysByTeamId(@RequestParam Long teamId) {
+    public ResponseEntity<List<ReplayDTO.Summary>> getReplaysByTeamId(
+            @RequestParam Long teamId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for team: {}", teamId);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdOrderedByDate(teamId).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -120,11 +170,19 @@ public class ReplayController {
      * GET /api/replays/standalone?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @return list of standalone replays
      */
     @GetMapping("/standalone")
-    public ResponseEntity<List<ReplayDTO.Summary>> getStandaloneReplays(@RequestParam Long teamId) {
+    public ResponseEntity<List<ReplayDTO.Summary>> getStandaloneReplays(
+            @RequestParam Long teamId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching standalone replays for team: {}", teamId);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getStandaloneReplays(teamId).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -138,17 +196,30 @@ public class ReplayController {
      * GET /api/replays/match/{matchId}
      *
      * @param matchId the match ID
+     * @param authentication the authenticated user
      * @return list of replays in the match
      */
     @GetMapping("/match/{matchId}")
-    public ResponseEntity<List<ReplayDTO.Summary>> getReplaysByMatchId(@PathVariable Long matchId) {
+    public ResponseEntity<List<ReplayDTO.Summary>> getReplaysByMatchId(
+            @PathVariable Long matchId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for match: {}", matchId);
 
-        List<ReplayDTO.Summary> replays = replayService.getReplaysByMatchId(matchId).stream()
+        List<Replay> replays = replayService.getReplaysByMatchId(matchId);
+
+        // Verify ownership via first replay's team (all replays in a match belong to same team)
+        if (!replays.isEmpty()) {
+            Long teamId = replays.get(0).getTeam().getId();
+            verifyTeamOwnership(teamId, userId);
+        }
+
+        List<ReplayDTO.Summary> response = replays.stream()
                 .map(replayMapper::toSummaryDTO)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(replays);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -156,15 +227,21 @@ public class ReplayController {
      * POST /api/replays/filter?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @param filter the filter criteria
      * @return filtered list of replays
      */
     @PostMapping("/filter")
     public ResponseEntity<List<ReplayDTO.Summary>> getReplaysWithFilters(
             @RequestParam Long teamId,
+            Authentication authentication,
             @RequestBody ReplayDTO.FilterRequest filter) {
 
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays with filters for team: {}", teamId);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysWithFilters(
                         teamId,
@@ -185,15 +262,21 @@ public class ReplayController {
      * GET /api/replays/result/{result}?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @param result "win" or "loss"
      * @return list of replays
      */
     @GetMapping("/result/{result}")
     public ResponseEntity<List<ReplayDTO.Summary>> getReplaysByResult(
             @RequestParam Long teamId,
+            Authentication authentication,
             @PathVariable String result) {
 
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for team: {} with result: {}", teamId, result);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdAndResult(teamId, result).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -207,15 +290,21 @@ public class ReplayController {
      * GET /api/replays/opponent/{opponent}?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @param opponent the opponent name
      * @return list of replays
      */
     @GetMapping("/opponent/{opponent}")
     public ResponseEntity<List<ReplayDTO.Summary>> getReplaysByOpponent(
             @RequestParam Long teamId,
+            Authentication authentication,
             @PathVariable String opponent) {
 
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for team: {} against opponent: {}", teamId, opponent);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdAndOpponent(teamId, opponent).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -229,15 +318,23 @@ public class ReplayController {
      * PATCH /api/replays/{id}
      *
      * @param id the replay ID
+     * @param authentication the authenticated user
      * @param request the update request
      * @return the updated replay
      */
     @PatchMapping("/{id}")
     public ResponseEntity<ReplayDTO.Response> updateReplay(
             @PathVariable Long id,
+            Authentication authentication,
             @Valid @RequestBody ReplayDTO.UpdateRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Updating replay: {}", id);
+
+        // Verify ownership through replay's team
+        Replay existingReplay = replayService.getReplayById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
+        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
 
         Replay updates = replayMapper.toEntity(request);
         Replay updatedReplay = replayService.updateReplay(id, updates);
@@ -251,15 +348,23 @@ public class ReplayController {
      * PUT /api/replays/{id}/match
      *
      * @param id the replay ID
+     * @param authentication the authenticated user
      * @param request the match association request
      * @return the updated replay
      */
     @PutMapping("/{id}/match")
     public ResponseEntity<ReplayDTO.Summary> associateReplayWithMatch(
             @PathVariable Long id,
+            Authentication authentication,
             @Valid @RequestBody ReplayDTO.AssociateMatchRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Associating replay: {} with match: {}", id, request.getMatchId());
+
+        // Verify ownership through replay's team
+        Replay existingReplay = replayService.getReplayById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
+        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
 
         Replay updatedReplay = replayService.associateReplayWithMatch(id, request.getMatchId());
         ReplayDTO.Summary response = replayMapper.toSummaryDTO(updatedReplay);
@@ -272,11 +377,21 @@ public class ReplayController {
      * DELETE /api/replays/{id}/match
      *
      * @param id the replay ID
+     * @param authentication the authenticated user
      * @return the updated replay
      */
     @DeleteMapping("/{id}/match")
-    public ResponseEntity<ReplayDTO.Summary> dissociateReplayFromMatch(@PathVariable Long id) {
+    public ResponseEntity<ReplayDTO.Summary> dissociateReplayFromMatch(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.info("Dissociating replay: {} from its match", id);
+
+        // Verify ownership through replay's team
+        Replay existingReplay = replayService.getReplayById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
+        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
 
         Replay updatedReplay = replayService.dissociateReplayFromMatch(id);
         ReplayDTO.Summary response = replayMapper.toSummaryDTO(updatedReplay);
@@ -289,11 +404,21 @@ public class ReplayController {
      * DELETE /api/replays/{id}
      *
      * @param id the replay ID
+     * @param authentication the authenticated user
      * @return no content response
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReplay(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteReplay(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.info("Deleting replay: {}", id);
+
+        // Verify ownership through replay's team
+        Replay existingReplay = replayService.getReplayById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
+        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
 
         replayService.deleteReplay(id);
         return ResponseEntity.noContent().build();
@@ -319,11 +444,19 @@ public class ReplayController {
      * GET /api/replays/stats/win-rate?teamId={teamId}
      *
      * @param teamId the team ID
+     * @param authentication the authenticated user
      * @return win rate percentage
      */
     @GetMapping("/stats/win-rate")
-    public ResponseEntity<Double> getWinRate(@RequestParam Long teamId) {
+    public ResponseEntity<Double> getWinRate(
+            @RequestParam Long teamId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.debug("Calculating win rate for team: {}", teamId);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
 
         double winRate = replayService.calculateWinRate(teamId);
         return ResponseEntity.ok(winRate);

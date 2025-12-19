@@ -4,6 +4,7 @@ import com.yeskatronics.vs_recorder_backend.entities.User;
 import com.yeskatronics.vs_recorder_backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +14,7 @@ import java.util.Optional;
 
 /**
  * Service class for User entity business logic.
- * Handles user registration, retrieval, and management operations.
- *
- * Note: Password hashing and JWT authentication will be added in a future phase.
+ * Handles user registration, retrieval, and management operations with password hashing.
  */
 @Service
 @RequiredArgsConstructor
@@ -24,11 +23,12 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
-     * Create a new user
+     * Create a new user with hashed password
      *
-     * @param user the user to create
+     * @param user the user to create (password should be plain text)
      * @return the created user
      * @throws IllegalArgumentException if username or email already exists
      */
@@ -45,8 +45,8 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists: " + user.getEmail());
         }
 
-        // TODO: In future phase, hash the password before saving
-        // For now, we're storing it as-is (NOT PRODUCTION READY)
+        // Hash the password before saving
+        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
 
         User savedUser = userRepository.save(user);
         log.info("User created successfully with ID: {}", savedUser.getId());
@@ -123,10 +123,9 @@ public class UserService {
             existingUser.setEmail(updates.getEmail());
         }
 
-        // Update password if provided
+        // Update password if provided - hash it
         if (updates.getPasswordHash() != null && !updates.getPasswordHash().isEmpty()) {
-            // TODO: Hash the password in future phase
-            existingUser.setPasswordHash(updates.getPasswordHash());
+            existingUser.setPasswordHash(passwordEncoder.encode(updates.getPasswordHash()));
         }
 
         User savedUser = userRepository.save(existingUser);

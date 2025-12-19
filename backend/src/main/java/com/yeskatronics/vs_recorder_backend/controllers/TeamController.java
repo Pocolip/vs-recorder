@@ -4,12 +4,14 @@ import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.dto.TeamDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.mappers.TeamMapper;
+import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.TeamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,9 +23,7 @@ import java.util.stream.Collectors;
  *
  * Base path: /api/teams
  *
- * Note: In a real application with authentication, userId would come from
- * the authenticated user's session/JWT token, not from request parameters.
- * For now, we pass it as a query parameter for testing.
+ * Note: Uses Spring Security Authentication to identify the current user.
  */
 @RestController
 @RequestMapping("/api/teams")
@@ -33,20 +33,30 @@ public class TeamController {
 
     private final TeamService teamService;
     private final TeamMapper teamMapper;
+    private final CustomUserDetailsService userDetailsService;
+
+    /**
+     * Helper method to get user ID from authentication
+     */
+    private Long getCurrentUserId(Authentication authentication) {
+        String username = authentication.getName();
+        return userDetailsService.getUserIdByUsername(username);
+    }
 
     /**
      * Create a new team
-     * POST /api/teams?userId={userId}
+     * POST /api/teams
      *
-     * @param userId the user ID (TODO: get from auth token)
+     * @param authentication the authenticated user
      * @param request the team creation request
      * @return the created team
      */
     @PostMapping
     public ResponseEntity<TeamDTO.Response> createTeam(
-            @RequestParam Long userId,
+            Authentication authentication,
             @Valid @RequestBody TeamDTO.CreateRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Creating new team '{}' for user: {}", request.getName(), userId);
 
         Team team = teamMapper.toEntity(request);
@@ -62,13 +72,18 @@ public class TeamController {
      * GET /api/teams/{id}
      *
      * @param id the team ID
+     * @param authentication the authenticated user
      * @return the team details with statistics
      */
     @GetMapping("/{id}")
-    public ResponseEntity<TeamDTO.Response> getTeamById(@PathVariable Long id) {
-        log.debug("Fetching team by ID: {}", id);
+    public ResponseEntity<TeamDTO.Response> getTeamById(
+            @PathVariable Long id,
+            Authentication authentication) {
 
-        return teamService.getTeamById(id)
+        log.debug("Fetching team by ID: {}", id);
+        Long userId = getCurrentUserId(authentication);
+
+        return teamService.getTeamByIdAndUserId(id, userId)
                 .map(team -> {
                     TeamService.TeamStats stats = teamService.getTeamStats(team.getId());
                     return teamMapper.toDTO(team, stats);
@@ -78,14 +93,15 @@ public class TeamController {
     }
 
     /**
-     * Get all teams for a user
-     * GET /api/teams?userId={userId}
+     * Get all teams for the authenticated user
+     * GET /api/teams
      *
-     * @param userId the user ID
+     * @param authentication the authenticated user
      * @return list of teams
      */
     @GetMapping
-    public ResponseEntity<List<TeamDTO.Summary>> getTeamsByUserId(@RequestParam Long userId) {
+    public ResponseEntity<List<TeamDTO.Summary>> getTeamsByUserId(Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching teams for user: {}", userId);
 
         List<Team> teams = teamService.getTeamsByUserId(userId);
@@ -102,18 +118,19 @@ public class TeamController {
     }
 
     /**
-     * Get teams by user and regulation
-     * GET /api/teams/regulation/{regulation}?userId={userId}
+     * Get teams by regulation
+     * GET /api/teams/regulation/{regulation}
      *
-     * @param userId the user ID
+     * @param authentication the authenticated user
      * @param regulation the regulation filter
      * @return list of teams
      */
     @GetMapping("/regulation/{regulation}")
     public ResponseEntity<List<TeamDTO.Summary>> getTeamsByRegulation(
-            @RequestParam Long userId,
+            Authentication authentication,
             @PathVariable String regulation) {
 
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching teams for user: {} with regulation: {}", userId, regulation);
 
         List<Team> teams = teamService.getTeamsByUserIdAndRegulation(userId, regulation);
@@ -131,19 +148,20 @@ public class TeamController {
 
     /**
      * Update a team
-     * PATCH /api/teams/{id}?userId={userId}
+     * PATCH /api/teams/{id}
      *
      * @param id the team ID
-     * @param userId the user ID (for ownership verification)
+     * @param authentication the authenticated user
      * @param request the update request
      * @return the updated team
      */
     @PatchMapping("/{id}")
     public ResponseEntity<TeamDTO.Response> updateTeam(
             @PathVariable Long id,
-            @RequestParam Long userId,
+            Authentication authentication,
             @Valid @RequestBody TeamDTO.UpdateRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Updating team: {} for user: {}", id, userId);
 
         Team updates = teamMapper.toEntity(request);
@@ -156,17 +174,18 @@ public class TeamController {
 
     /**
      * Delete a team
-     * DELETE /api/teams/{id}?userId={userId}
+     * DELETE /api/teams/{id}
      *
      * @param id the team ID
-     * @param userId the user ID (for ownership verification)
+     * @param authentication the authenticated user
      * @return no content response
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeam(
             @PathVariable Long id,
-            @RequestParam Long userId) {
+            Authentication authentication) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Deleting team: {} for user: {}", id, userId);
 
         teamService.deleteTeam(id, userId);
@@ -178,11 +197,21 @@ public class TeamController {
      * GET /api/teams/{id}/stats
      *
      * @param id the team ID
+     * @param authentication the authenticated user
      * @return team statistics
      */
     @GetMapping("/{id}/stats")
-    public ResponseEntity<TeamDTO.TeamStats> getTeamStats(@PathVariable Long id) {
+    public ResponseEntity<TeamDTO.TeamStats> getTeamStats(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
         log.debug("Fetching statistics for team: {}", id);
+
+        // Verify ownership
+        if (!teamService.getTeamByIdAndUserId(id, userId).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
 
         TeamService.TeamStats stats = teamService.getTeamStats(id);
         TeamDTO.TeamStats response = teamMapper.toStatsDTO(stats);
@@ -192,19 +221,20 @@ public class TeamController {
 
     /**
      * Add a showdown username to a team
-     * POST /api/teams/{id}/showdown-usernames?userId={userId}
+     * POST /api/teams/{id}/showdown-usernames
      *
      * @param id the team ID
-     * @param userId the user ID (for ownership verification)
+     * @param authentication the authenticated user
      * @param request the username to add
      * @return the updated team
      */
     @PostMapping("/{id}/showdown-usernames")
     public ResponseEntity<TeamDTO.Response> addShowdownUsername(
             @PathVariable Long id,
-            @RequestParam Long userId,
+            Authentication authentication,
             @Valid @RequestBody TeamDTO.ShowdownUsernameRequest request) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Adding showdown username '{}' to team: {}", request.getUsername(), id);
 
         Team updatedTeam = teamService.addShowdownUsername(id, userId, request.getUsername());
@@ -216,19 +246,20 @@ public class TeamController {
 
     /**
      * Remove a showdown username from a team
-     * DELETE /api/teams/{id}/showdown-usernames/{username}?userId={userId}
+     * DELETE /api/teams/{id}/showdown-usernames/{username}
      *
      * @param id the team ID
-     * @param userId the user ID (for ownership verification)
+     * @param authentication the authenticated user
      * @param username the username to remove
      * @return the updated team
      */
     @DeleteMapping("/{id}/showdown-usernames/{username}")
     public ResponseEntity<TeamDTO.Response> removeShowdownUsername(
             @PathVariable Long id,
-            @RequestParam Long userId,
+            Authentication authentication,
             @PathVariable String username) {
 
+        Long userId = getCurrentUserId(authentication);
         log.info("Removing showdown username '{}' from team: {}", username, id);
 
         Team updatedTeam = teamService.removeShowdownUsername(id, userId, username);
