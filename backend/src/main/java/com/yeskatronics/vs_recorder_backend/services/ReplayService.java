@@ -1,5 +1,6 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
+import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Match;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
@@ -18,8 +19,6 @@ import java.util.Optional;
 /**
  * Service class for Replay entity business logic.
  * Handles replay creation, management, and battle log processing.
- *
- * Note: Battle log fetching from Pokemon Showdown will be added in a future phase.
  */
 @Service
 @RequiredArgsConstructor
@@ -30,9 +29,10 @@ public class ReplayService {
     private final ReplayRepository replayRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
+    private final ShowdownService showdownService;
 
     /**
-     * Create a new replay
+     * Create a new replay with full data
      *
      * @param replay the replay to create
      * @param teamId the ID of the team this replay belongs to
@@ -60,12 +60,12 @@ public class ReplayService {
     }
 
     /**
-     * Create a replay from a URL (will fetch and parse battle log)
+     * Create a replay from a URL (fetches and parses battle log from Showdown)
      *
      * @param teamId the team ID
      * @param url the Pokemon Showdown replay URL
      * @return the created replay
-     * @throws IllegalArgumentException if URL already exists or team not found
+     * @throws IllegalArgumentException if URL already exists, team not found, or fetch fails
      */
     public Replay createReplayFromUrl(Long teamId, String url) {
         log.info("Creating replay from URL for team ID: {}", teamId);
@@ -78,18 +78,39 @@ public class ReplayService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
-        // TODO: In future phase, fetch and parse battle log from Showdown
-        // For now, create a basic replay with the URL
-        Replay replay = new Replay();
-        replay.setTeam(team);
-        replay.setUrl(url);
-        replay.setBattleLog("{}"); // Placeholder - will be replaced with actual data
-        replay.setDate(LocalDateTime.now());
+        // Validate URL format
+        if (!showdownService.isValidReplayUrl(url)) {
+            throw new IllegalArgumentException("Invalid Pokemon Showdown replay URL format");
+        }
 
-        Replay savedReplay = replayRepository.save(replay);
-        log.info("Replay created from URL with ID: {}", savedReplay.getId());
+        try {
+            // Fetch and parse replay data from Showdown
+            ShowdownDTO.ReplayData replayData = showdownService.fetchReplayData(
+                    url,
+                    team.getShowdownUsernames()
+            );
 
-        return savedReplay;
+            // Create replay entity
+            Replay replay = new Replay();
+            replay.setTeam(team);
+            replay.setUrl(url);
+            replay.setBattleLog(replayData.getBattleLog());
+            replay.setOpponent(replayData.getOpponent());
+            replay.setResult(replayData.getResult());
+            replay.setDate(replayData.getDate());
+
+            Replay savedReplay = replayRepository.save(replay);
+            log.info("Replay created successfully from URL with ID: {}", savedReplay.getId());
+
+            return savedReplay;
+
+        } catch (IllegalArgumentException e) {
+            // Re-throw validation errors
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to create replay from URL: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to fetch replay data: " + e.getMessage());
+        }
     }
 
     /**
@@ -105,15 +126,15 @@ public class ReplayService {
     }
 
     /**
-     * Get a replay by URL
+     * Get all replays for a team, ordered by date
      *
-     * @param url the replay URL
-     * @return Optional containing the replay if found
+     * @param teamId the team ID
+     * @return list of replays
      */
     @Transactional(readOnly = true)
-    public Optional<Replay> getReplayByUrl(String url) {
-        log.debug("Fetching replay by URL: {}", url);
-        return replayRepository.findByUrl(url);
+    public List<Replay> getReplaysByTeamIdOrderedByDate(Long teamId) {
+        log.debug("Fetching replays for team ID: {} ordered by date", teamId);
+        return replayRepository.findByTeamIdOrderByDateDesc(teamId);
     }
 
     /**
@@ -129,30 +150,6 @@ public class ReplayService {
     }
 
     /**
-     * Get all replays for a team, ordered by date descending
-     *
-     * @param teamId the team ID
-     * @return list of replays
-     */
-    @Transactional(readOnly = true)
-    public List<Replay> getReplaysByTeamIdOrderedByDate(Long teamId) {
-        log.debug("Fetching replays for team ID: {} ordered by date", teamId);
-        return replayRepository.findByTeamIdOrderByDateDesc(teamId);
-    }
-
-    /**
-     * Get all replays for a match
-     *
-     * @param matchId the match ID
-     * @return list of replays
-     */
-    @Transactional(readOnly = true)
-    public List<Replay> getReplaysByMatchId(Long matchId) {
-        log.debug("Fetching replays for match ID: {}", matchId);
-        return replayRepository.findByMatchId(matchId);
-    }
-
-    /**
      * Get standalone replays (not part of any match)
      *
      * @param teamId the team ID
@@ -162,6 +159,18 @@ public class ReplayService {
     public List<Replay> getStandaloneReplays(Long teamId) {
         log.debug("Fetching standalone replays for team ID: {}", teamId);
         return replayRepository.findByTeamIdAndMatchIsNull(teamId);
+    }
+
+    /**
+     * Get replays by match
+     *
+     * @param matchId the match ID
+     * @return list of replays in the match
+     */
+    @Transactional(readOnly = true)
+    public List<Replay> getReplaysByMatchId(Long matchId) {
+        log.debug("Fetching replays for match ID: {}", matchId);
+        return replayRepository.findByMatchId(matchId);
     }
 
     /**
@@ -196,28 +205,20 @@ public class ReplayService {
      * @param teamId the team ID
      * @param matchId optional match ID filter
      * @param opponent optional opponent name filter
-     * @param result optional result filter ("win" or "loss")
+     * @param result optional result filter
      * @param startDate optional start date filter
      * @param endDate optional end date filter
-     * @return list of filtered replays
+     * @return filtered list of replays
      */
     @Transactional(readOnly = true)
-    public List<Replay> getReplaysWithFilters(
-            Long teamId,
-            Long matchId,
-            String opponent,
-            String result,
-            LocalDateTime startDate,
-            LocalDateTime endDate) {
-
-        log.debug("Fetching replays with filters - teamId: {}, matchId: {}, opponent: {}, result: {}",
-                teamId, matchId, opponent, result);
-
+    public List<Replay> getReplaysWithFilters(Long teamId, Long matchId, String opponent,
+                                              String result, LocalDateTime startDate, LocalDateTime endDate) {
+        log.debug("Fetching replays with filters for team ID: {}", teamId);
         return replayRepository.findWithFilters(teamId, matchId, opponent, result, startDate, endDate);
     }
 
     /**
-     * Update a replay
+     * Update a replay (battleLog is immutable)
      *
      * @param id the replay ID
      * @param updates the replay with updated fields
@@ -225,32 +226,26 @@ public class ReplayService {
      * @throws IllegalArgumentException if replay not found
      */
     public Replay updateReplay(Long id, Replay updates) {
-        log.info("Updating replay ID: {}", id);
+        log.info("Updating replay with ID: {}", id);
 
         Replay existingReplay = replayRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Replay not found with ID: " + id));
 
-        // Update notes if provided
+        // Update mutable fields only
         if (updates.getNotes() != null) {
             existingReplay.setNotes(updates.getNotes());
         }
-
-        // Update opponent if provided
         if (updates.getOpponent() != null) {
             existingReplay.setOpponent(updates.getOpponent());
         }
-
-        // Update result if provided
         if (updates.getResult() != null) {
             existingReplay.setResult(updates.getResult());
         }
-
-        // Update date if provided
         if (updates.getDate() != null) {
             existingReplay.setDate(updates.getDate());
         }
 
-        // Note: battleLog is immutable and should not be updated
+        // Note: battleLog is immutable and cannot be updated
 
         Replay savedReplay = replayRepository.save(existingReplay);
         log.info("Replay updated successfully: {}", savedReplay.getId());
@@ -264,7 +259,7 @@ public class ReplayService {
      * @param replayId the replay ID
      * @param matchId the match ID
      * @return the updated replay
-     * @throws IllegalArgumentException if replay or match not found
+     * @throws IllegalArgumentException if replay or match not found, or they belong to different teams
      */
     public Replay associateReplayWithMatch(Long replayId, Long matchId) {
         log.info("Associating replay ID: {} with match ID: {}", replayId, matchId);
@@ -275,13 +270,17 @@ public class ReplayService {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found with ID: " + matchId));
 
-        // Verify replay and match belong to the same team
+        // Verify replay and match belong to same team
         if (!replay.getTeam().getId().equals(match.getTeam().getId())) {
             throw new IllegalArgumentException("Replay and match must belong to the same team");
         }
 
         replay.setMatch(match);
-        return replayRepository.save(replay);
+
+        Replay savedReplay = replayRepository.save(replay);
+        log.info("Replay associated with match successfully");
+
+        return savedReplay;
     }
 
     /**
@@ -298,7 +297,11 @@ public class ReplayService {
                 .orElseThrow(() -> new IllegalArgumentException("Replay not found with ID: " + replayId));
 
         replay.setMatch(null);
-        return replayRepository.save(replay);
+
+        Replay savedReplay = replayRepository.save(replay);
+        log.info("Replay dissociated from match successfully");
+
+        return savedReplay;
     }
 
     /**
@@ -308,7 +311,7 @@ public class ReplayService {
      * @throws IllegalArgumentException if replay not found
      */
     public void deleteReplay(Long id) {
-        log.info("Deleting replay ID: {}", id);
+        log.info("Deleting replay with ID: {}", id);
 
         if (!replayRepository.existsById(id)) {
             throw new IllegalArgumentException("Replay not found with ID: " + id);
@@ -316,56 +319,6 @@ public class ReplayService {
 
         replayRepository.deleteById(id);
         log.info("Replay deleted successfully: {}", id);
-    }
-
-    /**
-     * Count replays for a team
-     *
-     * @param teamId the team ID
-     * @return number of replays
-     */
-    @Transactional(readOnly = true)
-    public long countReplaysByTeamId(Long teamId) {
-        return replayRepository.countByTeamId(teamId);
-    }
-
-    /**
-     * Count wins for a team
-     *
-     * @param teamId the team ID
-     * @return number of wins
-     */
-    @Transactional(readOnly = true)
-    public long countWinsByTeamId(Long teamId) {
-        return replayRepository.countByTeamIdAndResult(teamId, "win");
-    }
-
-    /**
-     * Count losses for a team
-     *
-     * @param teamId the team ID
-     * @return number of losses
-     */
-    @Transactional(readOnly = true)
-    public long countLossesByTeamId(Long teamId) {
-        return replayRepository.countByTeamIdAndResult(teamId, "loss");
-    }
-
-    /**
-     * Calculate win rate for a team
-     *
-     * @param teamId the team ID
-     * @return win rate as percentage (0-100)
-     */
-    @Transactional(readOnly = true)
-    public double calculateWinRate(Long teamId) {
-        long totalGames = countReplaysByTeamId(teamId);
-        if (totalGames == 0) {
-            return 0.0;
-        }
-
-        long wins = countWinsByTeamId(teamId);
-        return (double) wins / totalGames * 100;
     }
 
     /**
@@ -377,5 +330,28 @@ public class ReplayService {
     @Transactional(readOnly = true)
     public boolean replayUrlExists(String url) {
         return replayRepository.existsByUrl(url);
+    }
+
+    /**
+     * Calculate win rate for a team
+     *
+     * @param teamId the team ID
+     * @return win rate as percentage (0-100)
+     */
+    @Transactional(readOnly = true)
+    public double calculateWinRate(Long teamId) {
+        log.debug("Calculating win rate for team ID: {}", teamId);
+
+        List<Replay> replays = replayRepository.findByTeamId(teamId);
+
+        if (replays.isEmpty()) {
+            return 0.0;
+        }
+
+        long wins = replays.stream()
+                .filter(Replay::isWin)
+                .count();
+
+        return (wins * 100.0) / replays.size();
     }
 }
