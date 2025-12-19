@@ -6,6 +6,13 @@ import com.yeskatronics.vs_recorder_backend.entities.User;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.security.JwtUtil;
 import com.yeskatronics.vs_recorder_backend.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Authentication", description = "User registration and login endpoints")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -43,6 +51,22 @@ public class AuthController {
      * @return JWT token and user information
      */
     @PostMapping("/register")
+    @Operation(
+            summary = "Register a new user",
+            description = "Create a new user account and receive a JWT token for authentication"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User registered successfully",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input or username/email already exists",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
     public ResponseEntity<AuthDTO.AuthResponse> register(@Valid @RequestBody AuthDTO.RegisterRequest request) {
         log.info("Registering new user: {}", request.getUsername());
 
@@ -87,6 +111,22 @@ public class AuthController {
      * @return JWT token and user information
      */
     @PostMapping("/login")
+    @Operation(
+            summary = "Login user",
+            description = "Authenticate with username and password to receive a JWT token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Login successful",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
     public ResponseEntity<AuthDTO.AuthResponse> login(@Valid @RequestBody AuthDTO.LoginRequest request) {
         log.info("Login attempt for user: {}", request.getUsername());
 
@@ -139,6 +179,23 @@ public class AuthController {
      * @return current user information
      */
     @GetMapping("/me")
+    @Operation(
+            summary = "Get current user",
+            description = "Retrieve information about the currently authenticated user",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User information retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Not authenticated",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
     public ResponseEntity<AuthDTO.AuthResponse> getCurrentUser(Authentication authentication) {
         log.debug("Fetching current user info");
 
