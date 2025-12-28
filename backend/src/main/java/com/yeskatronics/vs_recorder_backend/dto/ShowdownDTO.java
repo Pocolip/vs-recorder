@@ -20,7 +20,7 @@ public class ShowdownDTO {
     public static class ReplayData {
         private String battleLog;
         private String opponent;
-        private String result; // "win" or "loss"
+        private String result; // "win" or "loss" from user pov
         private LocalDateTime date;
         private String format;
         private String player1;

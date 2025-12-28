@@ -1,5 +1,6 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,8 +68,8 @@ public class ShowdownService {
             String battleLog = jsonResponse; // Store full JSON
 
             // Extract metadata
-            String player1 = root.path("p1").asText();
-            String player2 = root.path("p2").asText();
+            String player1 = root.get("players").get(0).asText();
+            String player2 = root.get("players").get(1).asText();
             String format = root.path("format").asText();
 
             // Extract winner from log

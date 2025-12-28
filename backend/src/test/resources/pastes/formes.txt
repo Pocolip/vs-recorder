@@ -1,0 +1,69 @@
+Calyrex-Shadow @ Rocky Helmet
+Ability: As One (Spectrier)
+Level: 50
+Tera Type: Psychic
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+IVs: 0 Atk
+- Astral Barrage
+- Calm Mind
+- Dark Pulse
+- Draining Kiss
+
+Urshifu-Rapid-Strike @ Choice Band
+Ability: Unseen Fist
+Level: 50
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Close Combat
+- Brick Break
+- Aura Sphere
+- Aqua Jet
+
+Sinistcha-Masterpiece @ Focus Sash
+Ability: Hospitality
+Level: 50
+Tera Type: Grass
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+IVs: 0 Atk
+- Hex
+- Giga Drain
+- Foul Play
+- Energy Ball
+
+Maushold @ Eject Pack
+Ability: Friend Guard
+Level: 50
+Tera Type: Normal
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Encore
+- Beat Up
+- Fake Tears
+- Helping Hand
+
+Tatsugiri-Droopy @ Choice Specs
+Ability: Commander
+Level: 50
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+IVs: 0 Atk
+- Baton Pass
+- Chilling Water
+- Draco Meteor
+- Dragon Pulse
+
+Oricorio-Pom-Pom @ Assault Vest
+Ability: Dancer
+Level: 50
+Tera Type: Electric
+EVs: 252 HP / 252 Atk / 4 Def
+Sassy Nature
+- Acrobatics
+- Agility
+- Air Slash
+- Alluring Voice
+

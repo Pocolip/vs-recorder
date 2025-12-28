@@ -1,0 +1,55 @@
+Ho-Oh @ Assault Vest
+Ability: Pressure
+Level: 50
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpA
+Lonely Nature
+- Air Slash
+- Ancient Power
+- Body Slam
+- Brave Bird
+
+Basculegion-F (F) @ Choice Band
+Ability: Swift Swim
+Level: 50
+Tera Type: Water
+EVs: 4 Atk / 252 SpA / 252 Spe
+Mild Nature
+- Aqua Jet
+- Blizzard
+- Chilling Water
+- Agility
+
+Terapagos-Stellar @ Focus Sash
+Ability: Teraform Zero
+Level: 50
+Tera Type: Stellar
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+IVs: 15 Atk
+- Aura Sphere
+- Bug Buzz
+- Dark Pulse
+- Dazzling Gleam
+
+Arcanine-Hisui
+Ability: Intimidate
+Level: 50
+Tera Type: Fire
+
+Avalugg
+Ability: Own Tempo
+Level: 50
+Tera Type: Ice
+
+Porygon-Z @ Safety Goggles
+Ability: Adaptability
+Level: 50
+Tera Type: Normal
+EVs: 4 HP / 252 SpA / 252 Spe
+Hasty Nature
+- Blizzard
+- Dark Pulse
+- Discharge
+- Double-Edge
+

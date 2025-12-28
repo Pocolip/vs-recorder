@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,6 +146,11 @@ public class PokepasteService {
             pokemon.setItem(parts[1].trim());
         }
 
+
+        // Remove gender
+        namePart = namePart.replace("(M)", "")
+                .replace("(F)", "")
+                .trim();
         // Check for nickname vs species
         if (namePart.contains("(") && namePart.contains(")")) {
             // Format: Nickname (Species)
