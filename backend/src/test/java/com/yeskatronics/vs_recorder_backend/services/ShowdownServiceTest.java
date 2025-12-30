@@ -44,7 +44,7 @@ class ShowdownServiceTest {
         // Given: Load your saved replay JSON from file
         String replayJson =
                 loadTestFile(
-                        "kuronisa/gen9vgc2026regfbo3-2493189799-ne46kfyk1lr0f9cmnl1gigtosox6ge2pw.json");
+                        "bad/bad.json");
         when(restTemplate.getForObject(anyString(), eq(String.class)))
                 .thenReturn(replayJson);
 
