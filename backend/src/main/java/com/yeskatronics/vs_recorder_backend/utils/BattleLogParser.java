@@ -214,11 +214,139 @@ public class BattleLogParser {
     }
 
     /**
+     * Known Pokemon forme suffixes that should be removed during normalization.
+     * Ordered by length (longest first) to avoid partial matching issues.
+     * Examples: "-Galar-Zen" must come before "-Galar", "-Hearthflame-Tera" before "-Terastal"
+     */
+    private static final Set<String> FORME_SUFFIXES = new LinkedHashSet<>(Arrays.asList(
+            // Ogerpon (longest Tera forms first)
+            "-Hearthflame-Tera", "-Wellspring-Tera", "-Cornerstone-Tera",
+            "-Hearthflame", "-Wellspring", "-Cornerstone",
+
+            // Darmanitan (Galar-Zen before Galar)
+            "-Galar-Zen",
+
+            // Tauros Paldea forms
+            "-Paldea-Aqua", "-Paldea-Blaze", "-Paldea-Combat",
+
+            // Necrozma
+            "-Dawn-Wings", "-Dusk-Mane",
+
+            // Basculin
+            "-Blue-Striped", "-White-Striped",
+
+            // Urshifu
+            "-Rapid-Strike", "-Single-Strike",
+
+            // Dudunsparce
+            "-Three-Segment",
+
+            // Zygarde
+            "-Complete", "-10%",
+
+            // Rotom forms
+            "-Pom-Pom",
+
+            // Forces of Nature (Genies)
+            "-Therian",
+
+            // Dialga/Palkia/Giratina
+            "-Origin",
+
+            // Calyrex
+            "-Crowned",
+
+            // Greninja
+            "-Bond", "-Ash",
+
+            // Keldeo
+            "-Resolute",
+
+            // Gender forme
+            "-F",
+
+            // Toxtricity
+            "-Low-Key",
+
+            // Maushold
+            "-Four",
+
+            // Tatsugiri
+            "-Droopy", "-Stretchy",
+
+            // Lycanroc
+            "-Midnight",
+
+            // Regional forms
+            "-Hisui", "-Alola", "-Galar",
+
+            // Darmanitan
+            "-Zen",
+
+            // Palafin
+            "-Hero",
+
+            // Shaymin
+            "-Sky",
+
+            // Ursaluna
+            "-Bloodmoon",
+
+            // Sinistea/Polteageist
+            "-Antique", "-Masterpiece",
+
+            // Terapagos
+            "-Terastal", "-Stellar",
+
+            // Vivillon
+            "-Fancy", "-Pokeball",
+
+            // Oricorio
+            "-Pa'u", "-Sensu",
+
+            // Rotom (continued)
+            "-Fan", "-Frost", "-Heat", "-Mow", "-Wash",
+
+            // Deoxys
+            "-Speed", "-Attack", "-Defense",
+
+            // Squawkabilly
+            "-Blue", "-White", "-Yellow",
+
+            // Castform
+            "-Snowy", "-Rainy", "-Sunny",
+
+            // Cherrim
+            "-Sunshine",
+
+            // Arceus types
+            "-Bug", "-Dark", "-Dragon", "-Electric", "-Fairy", "-Fighting", "-Fire",
+            "-Flying", "-Ghost", "-Grass", "-Ground", "-Ice", "-Poison", "-Psychic",
+            "-Rock", "-Steel", "-Water",
+
+            // Meloetta
+            "-Pirouette",
+
+            // Morpeko
+            "-Hangry",
+
+            // Pumpkaboo/Gourgeist
+            "-Large", "-Small", "-Super",
+
+            // Wormadam
+            "-Sandy", "-Trash",
+
+            // Calyrex riders (Shadow/Ice - note these overlap with Arceus types above)
+            "-Shadow", "-Ice"
+    ));
+
+    /**
      * Normalize Pokemon name (remove forme indicators, gender, level)
      * Examples:
      * - "Urshifu-*, L50, F" -> "Urshifu"
      * - "Terapagos-Terastal, L50, M" -> "Terapagos"
-     * - "Calyrex-Shadow, L50" -> "Calyrex-Shadow"
+     * - "Calyrex-Shadow, L50" -> "Calyrex"
+     * - "Ogerpon-Hearthflame-Tera, L50" -> "Ogerpon"
      */
     public static String normalizePokemonName(String name) {
         if (name == null || name.isEmpty()) {
@@ -234,137 +362,12 @@ public class BattleLogParser {
         // Remove asterisk forme indicator (Urshifu-*)
         name = name.replace("-*", "");
 
-        // Misc
-        name = name
-                //genies
-                .replace("-Therian", "")
-                //dpp
-                .replace("-Origin", "")
-                //swsh
-                .replace("-Crowned", "")
-                //greninja
-                .replace("-Bond", "")
-                .replace("-Ash", "")
-                //keldeo
-                .replace("-Resolute", "")
-                //female
-                .replace("-F", "")
-                //tauros
-                .replace("-Paldea-Aqua", "")
-                .replace("-Paldea-Blaze", "")
-                .replace("-Paldea-Combat", "")
-                //toxtricity
-                .replace("-Low-Key", "")
-                //maushold
-                .replace("-Four", "")
-                //dudunsparce
-                .replace("-Three-Segment", "")
-                //tatsugiri
-                .replace("-Droopy", "")
-                .replace("-Stretchy", "")
-                //basculin
-                .replace("-Blue-Striped", "")
-                .replace("-White-Striped", "")
-                //lycanroc
-                .replace("-Midnight", "")
-                //necrozma
-                .replace("-Dawn-Wings", "")
-                .replace("-Dusk-Mane", "")
-                //regional
-                .replace("-Hisui", "")
-                .replace("-Alola", "")
-                .replace("-Galar", "")
-                //darm
-                .replace("-Zen", "")
-                .replace("-Galar-Zen", "")
-
-                //palafin
-                .replace("-Hero", "")
-                //shaymin
-                .replace("-Sky", "")
-                //ursa
-                .replace("-Bloodmoon", "")
-                //urshi
-                .replace("-Rapid-Strike", "")
-                .replace("-Single-Strike", "")
-                //sinis/polt
-                .replace("-Antique", "")
-                .replace("-Masterpiece", "")
-                //pagos
-                .replace("-Terastal", "")
-                .replace("-Stellar", "")
-                //vivillon
-                .replace("-Fancy", "")
-                .replace("-Pokeball", "")
-
-                //oricorio
-                .replace("-Pa'u", "")
-                .replace("-Pom-Pom", "")
-                .replace("-Sensu", "")
-                //rotom
-                .replace("-Fan", "")
-                .replace("-Frost", "")
-                .replace("-Heat", "")
-                .replace("-Mow", "")
-                .replace("-Wash", "")
-                //deoxys
-                .replace("-Speed", "")
-                .replace("-Attack", "")
-                .replace("-Defense", "")
-                //sqwak
-                .replace("-Blue", "")
-                .replace("-White", "")
-                .replace("-Yellow", "")
-
-                //castform
-                .replace("-Snowy", "")
-                .replace("-Rainy", "")
-                .replace("-Sunny", "")
-                //cherrim
-                .replace("-Sunshine", "")
-
-                //Arceus
-                .replace("-Bug", "")
-                .replace("-Dark", "")
-                .replace("-Dragon", "")
-                .replace("-Electric", "")
-                .replace("-Fairy", "")
-                .replace("-Fighting", "")
-                .replace("-Fire", "")
-                .replace("-Flying", "")
-                .replace("-Ghost", "")
-                .replace("-Grass", "")
-                .replace("-Ground", "")
-                .replace("-Ice", "")
-                .replace("-Poison", "")
-                .replace("-Psychic", "")
-                .replace("-Rock", "")
-                .replace("-Steel", "")
-                .replace("-Water", "")
-                //meloetta
-                .replace("-Pirouette", "")
-                //morpeko
-                .replace("-Hangry", "")
-                //pump
-                .replace("-Large", "")
-                .replace("-Small", "")
-                .replace("-Super", "")
-                //wormadam
-                .replace("-Sandy", "")
-                .replace("-Trash", "")
-                //zygarde
-                .replace("-10%", "")
-                .replace("-Complete", "")
-                //calyrex
-                .replace("-Shadow", "")
-                .replace("-Ice", "")
-                //ogerpon
-                .replace("-Hearthflame-Tera", "")
-                .replace("-Hearthflame", "")
-                .replace("-Wellspring-Tera", "")
-                .replace("-Wellspring", "")
-                .replace("-Cornerstone-Tera", "")
-                .replace("-Cornerstone", "");
+        // Check if name ends with any known suffix (longest first to avoid partial matches)
+        for (String suffix : FORME_SUFFIXES) {
+            if (name.endsWith(suffix)) {
+                return name.substring(0, name.length() - suffix.length()).trim();
+            }
+        }
 
         return name.trim();
     }

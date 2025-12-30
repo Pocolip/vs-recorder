@@ -400,20 +400,28 @@ class BattleLogParserTest {
     }
 
     @Test
-    void testParseBattleLog_withMalformedJson_shouldHandleGracefully() {
+    void testParseBattleLog_withMalformedJson_shouldHandleGracefully() throws IOException {
         // Test with invalid JSON
         // Should not crash, return empty BattleData
+        BattleLogParser.BattleData battleData =
+                BattleLogParser.parseBattleLog(
+                        loadTestFile(
+                                "/bad/malformed.json"));
+
+        assertEquals(0, battleData.getTurnCount());
+        assertNull(battleData.getWinner());
+        assertNull(battleData.getPlayer1());
     }
 
     @Test
-    void testParseBattleLog_withEmptyLog_shouldReturnEmptyData() {
-        // Test with "log": ""
-        // Should return BattleData with empty lists
-    }
-
-    @Test
-    void testParseBattleLog_withIncompleteGame_shouldParseAvailableData() {
+    void testParseBattleLog_withIncompleteGame_shouldParseAvailableData() throws IOException {
         // Test with game that ended early (forfeit)
         // Should parse whatever data is available
+        BattleLogParser.BattleData battleData =
+                BattleLogParser.parseBattleLog(
+                        loadTestFile(
+                                "/bo1/bothtera.json"));
+
+        assertEquals("surgevgc", battleData.getWinner());
     }
 }
