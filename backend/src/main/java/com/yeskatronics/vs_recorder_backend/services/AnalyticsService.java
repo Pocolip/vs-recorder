@@ -316,21 +316,24 @@ public class AnalyticsService {
 
             // Process each Pokemon that was brought
             for (String pokemon : playerPicks) {
-                Set<String> moves = BattleLogParser.getPokemonMoves(battleData, pokemon, playerSide);
+                Map<String, Integer> moves = BattleLogParser.getPokemonMoves(battleData, pokemon, playerSide);
 
                 Map<String, MoveUsageTracker> moveTrackers = pokemonMoveUsage.computeIfAbsent(
                         pokemon,
                         k -> new HashMap<>()
                 );
 
-                // Track each move used
-                for (String move : moves) {
+                // Track each move used (with counts)
+                for (Map.Entry<String, Integer> moveEntry : moves.entrySet()) {
+                    String move = moveEntry.getKey();
+                    int count = moveEntry.getValue();
+
                     MoveUsageTracker tracker = moveTrackers.computeIfAbsent(
                             move,
                             k -> new MoveUsageTracker()
                     );
 
-                    tracker.timesUsed++;
+                    tracker.timesUsed += count;  // Add the count from this game
                     tracker.gamesWithPokemon++;
 
                     if (replay.isWin()) {
@@ -340,7 +343,7 @@ public class AnalyticsService {
 
                 // Increment games count for all moves of this Pokemon
                 for (MoveUsageTracker tracker : moveTrackers.values()) {
-                    if (!moves.contains(tracker.getMoveName())) {
+                    if (!moves.containsKey(tracker.getMoveName())) {
                         // Increment games where Pokemon was brought but move wasn't used
                         tracker.gamesWithPokemon++;
                     }

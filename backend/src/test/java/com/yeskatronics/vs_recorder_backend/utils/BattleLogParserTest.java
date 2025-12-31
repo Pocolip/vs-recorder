@@ -184,14 +184,14 @@ class BattleLogParserTest {
                                 "/bo1/reggshadowvsice.json"));
 
         log.info(battleData.getP1MoveUsage().toString());
-        assertTrue(battleData.getP1MoveUsage().get("Calyrex").contains("Calm Mind"));
-        assertTrue(battleData.getP1MoveUsage().get("Calyrex").contains("Astral Barrage"));
-        assertFalse(battleData.getP1MoveUsage().get("Calyrex").contains("Protect"));
+        assertEquals(2, battleData.getP1MoveUsage().get("Calyrex").get("Calm Mind"));
+        assertEquals(1, battleData.getP1MoveUsage().get("Calyrex").get("Astral Barrage"));
+        assertFalse(battleData.getP1MoveUsage().get("Calyrex").containsKey("Protect"));
 
         log.info(battleData.getP2MoveUsage().toString());
-        assertTrue(battleData.getP2MoveUsage().get("Calyrex").contains("Protect"));
-        assertFalse(battleData.getP2MoveUsage().get("Calyrex").contains("Calm Mind"));
-        assertFalse(battleData.getP2MoveUsage().get("Calyrex").contains("Astral Barrage"));
+        assertEquals(1, battleData.getP2MoveUsage().get("Calyrex").get("Protect"));
+        assertFalse(battleData.getP2MoveUsage().get("Calyrex").containsKey("Calm Mind"));
+        assertFalse(battleData.getP2MoveUsage().get("Calyrex").containsKey("Astral Barrage"));
 
     }
 
@@ -204,14 +204,13 @@ class BattleLogParserTest {
                         loadTestFile(
                                 "/bo1/reggshadowvsice.json"));
 
-        // cm is used twice but we only want one instance
+        // cm is used twice
         long calmMindCount = battleData
                         .getP1MoveUsage()
                         .get("Calyrex")
-                        .stream()
-                        .filter("Calm Mind"::equals).count();
+                .get("Calm Mind");
         log.info(String.valueOf(calmMindCount));
-        assertEquals(1, calmMindCount);
+        assertEquals(2, calmMindCount);
 
     }
 
@@ -228,9 +227,9 @@ class BattleLogParserTest {
 
         assertTrue(BattleLogParser.getPokemonMoves(battleData, "Raging Bolt", "mofonguero").isEmpty());
         assertTrue(BattleLogParser.getPokemonMoves(battleData, "Ogerpon", "mofonguero")
-                .contains("Ivy Cudgel"));
+                .containsKey("Ivy Cudgel"));
         assertTrue(BattleLogParser.getPokemonMoves(battleData, "Ogerpon", "mofonguero")
-                .contains("Spiky Shield"));
+                .containsKey("Spiky Shield"));
     }
 
     @Test

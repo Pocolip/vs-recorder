@@ -39,8 +39,8 @@ public class BattleLogParser {
         private List<String> p2Leads;     // First 2 sent out
         private String p1Tera;            // Pokemon that Terastallized
         private String p2Tera;            // Pokemon that Terastallized
-        private Map<String, Set<String>> p1MoveUsage;  // p1 Pokemon -> Set of moves used
-        private Map<String, Set<String>> p2MoveUsage;  // p2 Pokemon -> Set of moves used
+        private Map<String, Map<String, Integer>> p1MoveUsage;  // p1 Pokemon -> Move -> Count
+        private Map<String, Map<String, Integer>> p2MoveUsage;  // p2 Pokemon -> Move -> Count
         private String winner;
         private int turnCount;
 
@@ -77,7 +77,7 @@ public class BattleLogParser {
             // Extract battle log text
             String logText = root.path("log").asText();
             if (logText.isEmpty()) {
-                log.warn("Battle log is empty. ID = {}", root.get("id"));
+                log.warn("Battle log is empty");
                 return data;
             }
 
@@ -163,12 +163,12 @@ public class BattleLogParser {
 
                 if ("1".equals(player)) {
                     data.getP1MoveUsage()
-                            .computeIfAbsent(pokemon, k -> new HashSet<>())
-                            .add(move);
+                            .computeIfAbsent(pokemon, k -> new HashMap<>())
+                            .merge(move, 1, Integer::sum);
                 } else {
                     data.getP2MoveUsage()
-                            .computeIfAbsent(pokemon, k -> new HashSet<>())
-                            .add(move);
+                            .computeIfAbsent(pokemon, k -> new HashMap<>())
+                            .merge(move, 1, Integer::sum);
                 }
                 continue;
             }
@@ -217,9 +217,6 @@ public class BattleLogParser {
      * Known Pokemon forme suffixes that should be removed during normalization.
      * Ordered by length (longest first) to avoid partial matching issues.
      * Examples: "-Galar-Zen" must come before "-Galar", "-Hearthflame-Tera" before "-Terastal"
-     * NOTE: We only want to cover formes that imply a different Pokemon competitively,
-     * Indeedee-F is very different to male, Calyice is different to Calydow, etc.,
-     * but we don't care if it's Darm Zen to regular, as they represent the same Pokemon.
      */
     private static final Set<String> FORME_SUFFIXES = new LinkedHashSet<>(Arrays.asList(
             // Ogerpon (longest Tera forms first)
@@ -376,13 +373,13 @@ public class BattleLogParser {
     }
 
     /**
-     * Get move usage for a specific Pokemon and player
+     * Get move usage for a specific Pokemon and player (with counts)
      */
-    public static Set<String> getPokemonMoves(BattleData data, String pokemon, String player) {
+    public static Map<String, Integer> getPokemonMoves(BattleData data, String pokemon, String player) {
         if ("p1".equalsIgnoreCase(player) || "1".equals(player)) {
-            return data.getP1MoveUsage().getOrDefault(pokemon, Collections.emptySet());
+            return data.getP1MoveUsage().getOrDefault(pokemon, Collections.emptyMap());
         } else {
-            return data.getP2MoveUsage().getOrDefault(pokemon, Collections.emptySet());
+            return data.getP2MoveUsage().getOrDefault(pokemon, Collections.emptyMap());
         }
     }
 

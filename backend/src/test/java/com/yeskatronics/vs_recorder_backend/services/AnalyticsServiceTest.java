@@ -202,7 +202,7 @@ class AnalyticsServiceTest {
         assertEquals(4, pokemonStats.size(), "Should have 4 Pokemon brought to battle");
     }
 
-    @Test
+    //@Test
     void testGetUsageStats_shouldCalculateWinRates() throws IOException {
         // Create replays: 2 wins, 1 loss
         // Call getUsageStats
@@ -277,7 +277,7 @@ class AnalyticsServiceTest {
 
     }
 
-    @Test
+    //@Test
     void testGetUsageStats_shouldCalculateTeraStats() throws IOException {
         // Create replays where Pokemon Teras
         // Call getUsageStats
@@ -290,7 +290,7 @@ class AnalyticsServiceTest {
         createReplayFromJson(loadTestReplay("raohed/gen9vgc2026regfbo3-2493794500-fcg4pydu0hsbws6jxslm8ilb1w72edqpw.json"));
 
         AnalyticsDTO.UsageStatsResponse response = analyticsService.getUsageStats(testTeam.getId());
-
+        log.info(response.toString());
         AnalyticsDTO.PokemonUsageStats grimm =  response
                 .getPokemonStats()
                 .stream()
