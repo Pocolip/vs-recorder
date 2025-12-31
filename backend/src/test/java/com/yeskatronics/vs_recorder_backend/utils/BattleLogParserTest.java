@@ -69,16 +69,16 @@ class BattleLogParserTest {
         assertEquals("Grimmsnarl", battleData.getP1Team().get(0));
         assertEquals("Landorus", battleData.getP1Team().get(1));
         assertEquals("Urshifu", battleData.getP1Team().get(2));
-        assertEquals("Ogerpon", battleData.getP1Team().get(3));
+        assertEquals("Ogerpon-Hearthflame", battleData.getP1Team().get(3));
         assertEquals("Raging Bolt", battleData.getP1Team().get(4));
         assertEquals("Chien-Pao", battleData.getP1Team().get(5));
 
         log.info(battleData.getP2Team().toString());
         assertEquals("Articuno", battleData.getP2Team().get(0));
-        assertEquals("Ninetales", battleData.getP2Team().get(1));
-        assertEquals("Ogerpon", battleData.getP2Team().get(2));
+        assertEquals("Ninetales-Alola", battleData.getP2Team().get(1));
+        assertEquals("Ogerpon-Wellspring", battleData.getP2Team().get(2));
         assertEquals("Raging Bolt", battleData.getP2Team().get(3));
-        assertEquals("Arcanine", battleData.getP2Team().get(4));
+        assertEquals("Arcanine-Hisui", battleData.getP2Team().get(4));
         assertEquals("Landorus", battleData.getP2Team().get(5));
     }
 
@@ -96,8 +96,8 @@ class BattleLogParserTest {
         log.info(battleData.getP1Leads().toString());
         log.info(battleData.getP1Picks().toString());
         assertTrue(battleData.getP1Team().contains("Urshifu"));
-        assertTrue(battleData.getP1Leads().contains("Urshifu"));
-        assertTrue(battleData.getP1Picks().contains("Urshifu"));
+        assertTrue(battleData.getP1Leads().contains("Urshifu-Rapid-Strike"));
+        assertTrue(battleData.getP1Picks().contains("Urshifu-Rapid-Strike"));
 
     }
 
@@ -113,17 +113,17 @@ class BattleLogParserTest {
                         loadTestFile(
                                 "/bo1/reggshadowvsice.json"));
 
-        assertTrue(battleData.getP1Picks().contains("Urshifu"));
+        assertTrue(battleData.getP1Picks().contains("Urshifu-Rapid-Strike"));
         assertTrue(battleData.getP1Picks().contains("Incineroar"));
         assertTrue(battleData.getP1Picks().contains("Clefairy"));
-        assertTrue(battleData.getP1Picks().contains("Calyrex"));
+        assertTrue(battleData.getP1Picks().contains("Calyrex-Shadow"));
 
-        assertTrue(battleData.getP1Leads().contains("Urshifu"));
+        assertTrue(battleData.getP1Leads().contains("Urshifu-Rapid-Strike"));
         assertTrue(battleData.getP1Leads().contains("Incineroar"));
 
         assertTrue(battleData.getP2Picks().contains("Landorus"));
         assertTrue(battleData.getP2Picks().contains("Grimmsnarl"));
-        assertTrue(battleData.getP2Picks().contains("Calyrex"));
+        assertTrue(battleData.getP2Picks().contains("Calyrex-Ice"));
         assertTrue(battleData.getP2Picks().contains("Raging Bolt"));
 
         assertTrue(battleData.getP2Leads().contains("Landorus"));
@@ -275,12 +275,12 @@ class BattleLogParserTest {
                 BattleLogParser.parseBattleLog(
                         loadTestFile(
                                 "/bo1/reggshadowvsice.json"));
-        assertTrue(BattleLogParser.wasLead(battleData, "Urshifu", "p1"));
+        assertTrue(BattleLogParser.wasLead(battleData, "Urshifu-Rapid-Strike", "p1"));
         assertTrue(BattleLogParser.wasLead(battleData, "Incineroar", "p1"));
         assertFalse(BattleLogParser.wasLead(battleData, "Landorus", "p1"));
         assertFalse(BattleLogParser.wasLead(battleData, "Grimmsnarl", "p1"));
 
-        assertFalse(BattleLogParser.wasLead(battleData, "Urshifu", "p2"));
+        assertFalse(BattleLogParser.wasLead(battleData, "Urshifu-Rapid-Strike", "p2"));
         assertFalse(BattleLogParser.wasLead(battleData, "Incineroar", "p2"));
         assertTrue(BattleLogParser.wasLead(battleData, "Landorus", "p2"));
         assertTrue(BattleLogParser.wasLead(battleData, "Grimmsnarl", "p2"));
@@ -386,11 +386,11 @@ class BattleLogParserTest {
     void testNormalizePokemonName_shouldHandleVariousFormats() {
         assertEquals("Urshifu", normalizePokemonName("Urshifu-*, L50, F"));
         assertEquals("Terapagos", normalizePokemonName("Terapagos-Stellar, L50"));
-        assertEquals("Calyrex", normalizePokemonName("Calyrex-Shadow, L50"));
+        assertEquals("Calyrex-Shadow", normalizePokemonName("Calyrex-Shadow, L50"));
         assertEquals("Miraidon", normalizePokemonName("Miraidon, L50"));
         assertEquals("Rillaboom", normalizePokemonName("Rillaboom"));
-        assertEquals("Ogerpon", normalizePokemonName("Ogerpon-Hearthflame, L50"));
-        assertEquals("Ogerpon", normalizePokemonName("Ogerpon-Hearthflame-Tera, L50"));
+        assertEquals("Ogerpon-Hearthflame", normalizePokemonName("Ogerpon-Hearthflame, L50"));
+        assertEquals("Ogerpon-Hearthflame", normalizePokemonName("Ogerpon-Hearthflame-Tera, L50"));
     }
 
     @Test

@@ -77,7 +77,7 @@ public class BattleLogParser {
             // Extract battle log text
             String logText = root.path("log").asText();
             if (logText.isEmpty()) {
-                log.warn("Battle log is empty");
+                log.warn("Battle log is empty. ID = {}", root.get("id"));
                 return data;
             }
 
@@ -217,26 +217,29 @@ public class BattleLogParser {
      * Known Pokemon forme suffixes that should be removed during normalization.
      * Ordered by length (longest first) to avoid partial matching issues.
      * Examples: "-Galar-Zen" must come before "-Galar", "-Hearthflame-Tera" before "-Terastal"
+     * NOTE: We only want to cover formes that imply a different Pokemon competitively,
+     * Indeedee-F is very different to male, Calyice is different to Calydow, etc.,
+     * but we don't care if it's Darm Zen to regular, as they represent the same Pokemon.
      */
     private static final Set<String> FORME_SUFFIXES = new LinkedHashSet<>(Arrays.asList(
             // Ogerpon (longest Tera forms first)
-            "-Hearthflame-Tera", "-Wellspring-Tera", "-Cornerstone-Tera",
-            "-Hearthflame", "-Wellspring", "-Cornerstone",
+            //"-Hearthflame-Tera", "-Wellspring-Tera", "-Cornerstone-Tera",
+            //"-Hearthflame", "-Wellspring", "-Cornerstone",
 
             // Darmanitan (Galar-Zen before Galar)
-            "-Galar-Zen",
+            //"-Galar-Zen",
 
             // Tauros Paldea forms
-            "-Paldea-Aqua", "-Paldea-Blaze", "-Paldea-Combat",
+            //"-Paldea-Aqua", "-Paldea-Blaze", "-Paldea-Combat",
 
             // Necrozma
-            "-Dawn-Wings", "-Dusk-Mane",
+            //"-Dawn-Wings", "-Dusk-Mane",
 
             // Basculin
             "-Blue-Striped", "-White-Striped",
 
             // Urshifu
-            "-Rapid-Strike", "-Single-Strike",
+            //"-Rapid-Strike", "-Single-Strike",
 
             // Dudunsparce
             "-Three-Segment",
@@ -244,16 +247,13 @@ public class BattleLogParser {
             // Zygarde
             "-Complete", "-10%",
 
-            // Rotom forms
-            "-Pom-Pom",
-
             // Forces of Nature (Genies)
-            "-Therian",
+            //"-Therian",
 
             // Dialga/Palkia/Giratina
-            "-Origin",
+            //"-Origin",
 
-            // Calyrex
+            // Zacian/Zamazenta
             "-Crowned",
 
             // Greninja
@@ -263,7 +263,7 @@ public class BattleLogParser {
             "-Resolute",
 
             // Gender forme
-            "-F",
+            //"-F",
 
             // Toxtricity
             "-Low-Key",
@@ -275,10 +275,10 @@ public class BattleLogParser {
             "-Droopy", "-Stretchy",
 
             // Lycanroc
-            "-Midnight",
+            //"-Midnight",
 
             // Regional forms
-            "-Hisui", "-Alola", "-Galar",
+            //"-Hisui", "-Alola", "-Galar",
 
             // Darmanitan
             "-Zen",
@@ -287,10 +287,10 @@ public class BattleLogParser {
             "-Hero",
 
             // Shaymin
-            "-Sky",
+            //"-Sky",
 
             // Ursaluna
-            "-Bloodmoon",
+            //"-Bloodmoon",
 
             // Sinistea/Polteageist
             "-Antique", "-Masterpiece",
@@ -302,13 +302,13 @@ public class BattleLogParser {
             "-Fancy", "-Pokeball",
 
             // Oricorio
-            "-Pa'u", "-Sensu",
+            //"-Pa'u", "-Sensu", "Pom-Pom",
 
             // Rotom (continued)
-            "-Fan", "-Frost", "-Heat", "-Mow", "-Wash",
+            //"-Fan", "-Frost", "-Heat", "-Mow", "-Wash",
 
             // Deoxys
-            "-Speed", "-Attack", "-Defense",
+            //"-Speed", "-Attack", "-Defense",
 
             // Squawkabilly
             "-Blue", "-White", "-Yellow",
@@ -320,9 +320,9 @@ public class BattleLogParser {
             "-Sunshine",
 
             // Arceus types
-            "-Bug", "-Dark", "-Dragon", "-Electric", "-Fairy", "-Fighting", "-Fire",
-            "-Flying", "-Ghost", "-Grass", "-Ground", "-Ice", "-Poison", "-Psychic",
-            "-Rock", "-Steel", "-Water",
+            //"-Bug", "-Dark", "-Dragon", "-Electric", "-Fairy", "-Fighting", "-Fire",
+            //"-Flying", "-Ghost", "-Grass", "-Ground", "-Ice", "-Poison", "-Psychic",
+            //"-Rock", "-Steel", "-Water",
 
             // Meloetta
             "-Pirouette",
@@ -331,13 +331,16 @@ public class BattleLogParser {
             "-Hangry",
 
             // Pumpkaboo/Gourgeist
-            "-Large", "-Small", "-Super",
+            //"-Large", "-Small", "-Super",
 
             // Wormadam
-            "-Sandy", "-Trash",
+            //"-Sandy", "-Trash",
 
-            // Calyrex riders (Shadow/Ice - note these overlap with Arceus types above)
-            "-Shadow", "-Ice"
+            // Calyrex riders (Shadow/Ice)
+            //"-Shadow", "-Ice"
+
+            // Ogerpon (just the Tera form)
+            "-Tera"
     ));
 
     /**

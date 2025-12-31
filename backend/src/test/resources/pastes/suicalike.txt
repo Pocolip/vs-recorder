@@ -1,0 +1,53 @@
+Pepe (Grimmsnarl) @ Light Clay
+Ability: Prankster
+Level: 50
+Tera Type: Ghost
+- Reflect
+- Light Screen
+- Thunder Wave
+- Spirit Break
+
+Landorus @ Life Orb
+Ability: Sheer Force
+Level: 50
+Tera Type: Water
+- Earth Power
+- Sludge Bomb
+- Sandsear Storm
+- Protect
+
+Urshifu-Rapid-Strike @ Mystic Water
+Ability: Unseen Fist
+Level: 50
+Tera Type: Water
+- Surging Strikes
+- Close Combat
+- Aqua Jet
+- Detect
+
+Ogerpon-Hearthflame @ Hearthflame Mask
+Ability: Mold Breaker
+Level: 50
+Tera Type: Fire
+- Ivy Cudgel
+- Wood Hammer
+- Follow Me
+- Spiky Shield
+
+Raging Bolt @ Assault Vest
+Ability: Protosynthesis
+Level: 50
+Tera Type: Electric
+- Electroweb
+- Dragon Pulse
+- Thunderclap
+- Volt Switch
+
+Chien-Pao @ Focus Sash
+Ability: Sword of Ruin
+Level: 50
+Tera Type: Ghost
+- Icicle Crash
+- Sucker Punch
+- Sacred Sword
+- Protect
