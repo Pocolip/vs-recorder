@@ -1,6 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -92,6 +93,7 @@ public class AnalyticsDTO {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class CustomMatchupRequest {
         private List<String> opponentPokemon;  // 4-6 Pokemon to analyze against
     }
@@ -117,7 +119,8 @@ public class AnalyticsDTO {
     @AllArgsConstructor
     public static class CustomMatchupResponse {
         private List<CustomPokemonAnalysis> pokemonAnalysis;
-        private int teamWinRate;            // Overall win rate against this core
+        private int teamWinRate;            // Weighted win rate (games where opponent had ANY of these Pokemon)
+        private int averageWinRate;         // Simple average of individual Pokemon win rates
         private int totalEncounters;        // Games against this exact team composition
     }
 
@@ -142,7 +145,6 @@ public class AnalyticsDTO {
         private String move;
         private int timesUsed;          // Total times this move was used
         private int usageRate;          // % of games where Pokemon was brought
-        private int winRate;            // Win rate in games where move was used
     }
 
     /**

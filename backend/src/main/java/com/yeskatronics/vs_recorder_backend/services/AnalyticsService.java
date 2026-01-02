@@ -200,7 +200,7 @@ public class AnalyticsService {
         List<Replay> replays = replayRepository.findByTeamId(teamId);
 
         if (replays.isEmpty()) {
-            return new AnalyticsDTO.CustomMatchupResponse(new ArrayList<>(), 0, 0);
+            return new AnalyticsDTO.CustomMatchupResponse(new ArrayList<>(), 0, 0, 0);
         }
 
         // Normalize opponent Pokemon names
@@ -215,6 +215,8 @@ public class AnalyticsService {
         Map<String, CustomMatchupTracker> pokemonTrackers = new HashMap<>();
         int exactMatchCount = 0;
         int exactMatchWins = 0;
+        int anyMatchCount = 0;
+        int anyMatchWins = 0;
 
         for (ParsedReplay pr : parsedReplays) {
             if (pr == null || pr.battleData == null) continue;
@@ -228,9 +230,13 @@ public class AnalyticsService {
             List<String> opponentTeam = BattleLogParser.getOpponentTeam(battleData, playerName);
             Set<String> opponentTeamSet = new HashSet<>(opponentTeam);
 
+            boolean hadAnyPokemon = false;
+
             // Check if opponent had each Pokemon from the custom team
             for (String pokemon : opponentCore) {
                 if (opponentTeamSet.contains(pokemon)) {
+                    hadAnyPokemon = true;
+
                     CustomMatchupTracker tracker = pokemonTrackers.computeIfAbsent(
                             pokemon,
                             k -> new CustomMatchupTracker()
@@ -243,7 +249,15 @@ public class AnalyticsService {
                 }
             }
 
-            // Check for exact match (opponent brought exactly this core)
+            // Track games where opponent had ANY of the requested Pokemon
+            if (hadAnyPokemon) {
+                anyMatchCount++;
+                if (replay.isWin()) {
+                    anyMatchWins++;
+                }
+            }
+
+            // Check for exact match (opponent had exactly this core)
             if (opponentTeamSet.containsAll(opponentCore)) {
                 exactMatchCount++;
                 if (replay.isWin()) {
@@ -270,13 +284,23 @@ public class AnalyticsService {
                 .sorted(Comparator.comparingInt(AnalyticsDTO.CustomPokemonAnalysis::getGamesAgainst).reversed())
                 .collect(Collectors.toList());
 
-        int teamWinRate = exactMatchCount > 0
-                ? (int) Math.round((exactMatchWins * 100.0) / exactMatchCount)
+        // Team win rate = win rate in games where opponent had ANY of the requested Pokemon
+        int teamWinRate = anyMatchCount > 0
+                ? (int) Math.round((anyMatchWins * 100.0) / anyMatchCount)
                 : 0;
+
+        // Average win rate (simple) = average of individual Pokemon win rates
+        int averageWinRate = pokemonAnalysis.isEmpty() ? 0 :
+                (int) Math.round(pokemonAnalysis.stream()
+                        .mapToInt(AnalyticsDTO.CustomPokemonAnalysis::getWinRate)
+                        .average()
+                        .orElse(0));
+
 
         return new AnalyticsDTO.CustomMatchupResponse(
                 pokemonAnalysis,
                 teamWinRate,
+                averageWinRate,
                 exactMatchCount
         );
     }
@@ -357,33 +381,29 @@ public class AnalyticsService {
                     String pokemon = entry.getKey();
                     Map<String, MoveUsageTracker> moveTrackers = entry.getValue();
 
-                    // Count total games this Pokemon was brought
-                    int totalGamesWithPokemon = (int) parsedReplays.stream()
-                            .filter(pr -> {
-                                if (pr == null || pr.battleData == null) return false;
-                                String playerName = identifyPlayer(team, pr.battleData);
-                                if (playerName == null) return false;
-                                List<String> picks = BattleLogParser.getPlayerPicks(pr.battleData,
-                                        playerName.equalsIgnoreCase(pr.battleData.getPlayer1()) ? "p1" : "p2");
-                                return picks.contains(pokemon);
-                            })
-                            .count();
+                    // Calculate total moves used by this Pokemon across all games
+                    int totalMovesUsed = moveTrackers.values().stream()
+                            .mapToInt(tracker -> tracker.timesUsed)
+                            .sum();
 
                     List<AnalyticsDTO.MoveStats> moves = moveTrackers.entrySet().stream()
                             .map(moveEntry -> {
                                 MoveUsageTracker tracker = moveEntry.getValue();
-                                int usageRate = totalGamesWithPokemon > 0
-                                        ? (int) Math.round((tracker.timesUsed * 100.0) / totalGamesWithPokemon)
+
+                                // Usage rate = percentage of total moves used by this Pokemon
+                                int usageRate = totalMovesUsed > 0
+                                        ? (int) Math.round((tracker.timesUsed * 100.0) / totalMovesUsed)
                                         : 0;
-                                int winRate = tracker.timesUsed > 0
-                                        ? (int) Math.round((tracker.winsWithMove * 100.0) / tracker.timesUsed)
+
+                                // Win rate = games won when this move was used
+                                int winRate = tracker.gamesWithPokemon > 0
+                                        ? (int) Math.round((tracker.winsWithMove * 100.0) / tracker.gamesWithPokemon)
                                         : 0;
 
                                 return new AnalyticsDTO.MoveStats(
                                         moveEntry.getKey(),
                                         tracker.timesUsed,
-                                        usageRate,
-                                        winRate
+                                        usageRate
                                 );
                             })
                             .sorted(Comparator.comparingInt(AnalyticsDTO.MoveStats::getTimesUsed).reversed())
@@ -395,6 +415,15 @@ public class AnalyticsService {
                 .collect(Collectors.toList());
 
         return new AnalyticsDTO.MoveUsageResponse(pokemonMoves);
+    }
+
+    /**
+     * Normalize Pokemon name for analytics grouping
+     * Removes temporary forme suffixes like -Tera, -Stellar
+     * Keeps competitive formes like -Rapid-Strike, -Hearthflame
+     */
+    private String normalizeForAnalytics(String pokemonName) {
+        return BattleLogParser.normalizePokemonName(pokemonName);
     }
 
     // ==================== Helper Methods ====================
@@ -473,8 +502,11 @@ public class AnalyticsService {
             List<String> picks = BattleLogParser.getPlayerPicks(battleData, playerSide);
 
             for (String pokemon : picks) {
+                // Normalize for grouping (e.g., Ogerpon-Hearthflame-Tera → Ogerpon-Hearthflame)
+                String normalizedPokemon = normalizeForAnalytics(pokemon);
+
                 PokemonUsageTracker tracker = usageTrackers.computeIfAbsent(
-                        pokemon,
+                        normalizedPokemon,
                         k -> new PokemonUsageTracker()
                 );
 
@@ -549,8 +581,12 @@ public class AnalyticsService {
                     : pr.battleData.getP2Leads();
 
             if (leads.size() == 2) {
+                // Normalize both leads for grouping
+                String lead1 = normalizeForAnalytics(leads.get(0));
+                String lead2 = normalizeForAnalytics(leads.get(1));
+
                 // Sort to ensure consistent pairing
-                List<String> sortedLeads = new ArrayList<>(leads);
+                List<String> sortedLeads = new ArrayList<>(List.of(lead1, lead2));
                 Collections.sort(sortedLeads);
                 String pairKey = sortedLeads.get(0) + " + " + sortedLeads.get(1);
 

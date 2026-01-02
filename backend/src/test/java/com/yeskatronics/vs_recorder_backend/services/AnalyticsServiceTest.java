@@ -202,7 +202,7 @@ class AnalyticsServiceTest {
         assertEquals(4, pokemonStats.size(), "Should have 4 Pokemon brought to battle");
     }
 
-    //@Test
+    @Test
     void testGetUsageStats_shouldCalculateWinRates() throws IOException {
         // Create replays: 2 wins, 1 loss
         // Call getUsageStats
@@ -224,7 +224,7 @@ class AnalyticsServiceTest {
         AnalyticsDTO.PokemonUsageStats oger =  response
                 .getPokemonStats()
                 .stream()
-                .filter(stats -> stats.getPokemon().equals("Ogerpon")).findFirst().get();
+                .filter(stats -> stats.getPokemon().equals("Ogerpon-Hearthflame")).findFirst().get();
         AnalyticsDTO.PokemonUsageStats lando =  response
                 .getPokemonStats()
                 .stream()
@@ -277,7 +277,7 @@ class AnalyticsServiceTest {
 
     }
 
-    //@Test
+    @Test
     void testGetUsageStats_shouldCalculateTeraStats() throws IOException {
         // Create replays where Pokemon Teras
         // Call getUsageStats
@@ -298,7 +298,7 @@ class AnalyticsServiceTest {
         AnalyticsDTO.PokemonUsageStats oger =  response
                 .getPokemonStats()
                 .stream()
-                .filter(stats -> stats.getPokemon().equals("Ogerpon")).findFirst().get();
+                .filter(stats -> stats.getPokemon().equals("Ogerpon-Hearthflame")).findFirst().get();
         AnalyticsDTO.PokemonUsageStats lando =  response
                 .getPokemonStats()
                 .stream()
@@ -523,29 +523,125 @@ class AnalyticsServiceTest {
         // Request analysis vs Pokemon never faced
         // Assert all stats are 0
 
+        populateAllBo3();
+
+        AnalyticsDTO.CustomMatchupRequest request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(List.of()).build();
+        AnalyticsDTO.CustomMatchupResponse response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+
+        log.info(response.toString());
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(10, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(Arrays.asList("Pikachu")).build();
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(Arrays.asList("Pikachu", "Raichu")).build();
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(Arrays.asList("Pikachu", "Raichu", "Nidoking")).build();
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(Arrays.asList("Pikachu", "Raichu", "Nidoking", "Nidoqueen")).build();
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(Arrays.asList("Pikachu", "Raichu", "Nidoking", "Nidoqueen", "Snorlax")).build();
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(Arrays.asList("Pikachu", "Raichu", "Nidoking", "Nidoqueen", "Snorlax", "Mewtwo")).build();
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        assertEquals(0, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+        assertEquals(0, response.getPokemonAnalysis().size());
+
     }
 
     @Test
-    void testGetCustomMatchupAnalysis_shouldAnalyzePokemonIndividually() {
+    void testGetCustomMatchupAnalysis_shouldAnalyzePokemonIndividually() throws IOException {
         // Create replays vs some of the requested Pokemon
         // Call getCustomMatchupAnalysis
         // Assert pokemonAnalysis has correct stats per Pokemon
-    }
 
-    @Test
-    void testGetCustomMatchupAnalysis_shouldCalculateExactMatches() {
-        // Create replays where opponent has EXACTLY the custom team
-        // Assert totalEncounters counts these
-        // Assert teamWinRate is calculated correctly
-    }
+        createReplayFromJson(loadTestReplay("raohed/gen9vgc2026regfbo3-2493790533-fl8jvhcfyt5ro0vlwdvpc9pq4iqxjmfpw.json"));
+        createReplayFromJson(loadTestReplay("raohed/gen9vgc2026regfbo3-2493792545-xmgmwjyed586p8xa20jmstvt8lh53frpw.json"));
+        createReplayFromJson(loadTestReplay("raohed/gen9vgc2026regfbo3-2493794500-fcg4pydu0hsbws6jxslm8ilb1w72edqpw.json"));
 
-    @Test
-    void testGetCustomMatchupAnalysis_withInvalidRequest_shouldThrowException() {
-        // Request with 3 Pokemon (min is 4)
-        // Assert throws IllegalArgumentException
+        AnalyticsDTO.CustomMatchupRequest request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(List.of("Torkoal")).build();
+        AnalyticsDTO.CustomMatchupResponse response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+        log.info(response.toString());
 
-        // Request with 7 Pokemon (max is 6)
-        // Assert throws IllegalArgumentException
+        assertEquals(67, response.getTeamWinRate());
+        assertEquals(3, response.getTotalEncounters());
+
+        createReplayFromJson(loadTestReplay("kuronisa/gen9vgc2026regfbo3-2493189799-ne46kfyk1lr0f9cmnl1gigtosox6ge2pw.json"));
+        createReplayFromJson(loadTestReplay("kuronisa/gen9vgc2026regfbo3-2493191775-5bm1cmanmkw9mcmnt9lv8u4txtuhu9upw.json"));
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(List.of("Torkoal", "Ninetales-Alola")).build();
+
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+
+        log.info(response.toString());
+        assertEquals(80, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(List.of("Torkoal", "Ninetales-Alola", "Landorus", "Smeargle")).build();
+
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+
+        log.info(response.toString());
+        assertEquals(80, response.getTeamWinRate());
+        assertEquals(0, response.getTotalEncounters());
+
+        createReplayFromJson(loadTestReplay("mark/gen9vgc2026regfbo3-2495304397-upfy04cncd98v89g6p62bxn2kofb4u7pw.json"));
+        createReplayFromJson(loadTestReplay("mark/gen9vgc2026regfbo3-2495306153-fyavxspkwdnwblptf000m1tj3a3j50gpw.json"));
+
+        request = AnalyticsDTO.CustomMatchupRequest
+                .builder()
+                .opponentPokemon(List.of("Torkoal", "Ninetales-Alola", "Landorus", "Smeargle")).build();
+
+        response = analyticsService.getCustomMatchupAnalysis(testTeam.getId(), request);
+
+        log.info(response.toString());
+        assertEquals(57, response.getTeamWinRate());
+        assertEquals(71, response.getAverageWinRate());
+        assertEquals(0, response.getTotalEncounters());
+
+
     }
 
     @Test
@@ -557,6 +653,34 @@ class AnalyticsServiceTest {
 
         assertEquals(0, response.getPokemonMoves().size());
 
+    }
+
+    AnalyticsDTO.PokemonMoveStats getMoveUsageStatsMon(AnalyticsDTO.MoveUsageResponse response, String name){
+        return response
+                .getPokemonMoves()
+                .stream()
+                .filter(pokemonMoveStats -> pokemonMoveStats.getPokemon().equals(name))
+                .findFirst().get();
+    }
+
+    int getUseCount(AnalyticsDTO.PokemonMoveStats mon, String move){
+        return mon
+                .getMoves()
+                .stream()
+                .filter(stats -> stats.getMove().equals(move))
+                .findFirst()
+                .get()
+                .getTimesUsed();
+    }
+
+    int getUseRate(AnalyticsDTO.PokemonMoveStats mon, String move){
+        return mon
+                .getMoves()
+                .stream()
+                .filter(stats -> stats.getMove().equals(move))
+                .findFirst()
+                .get()
+                .getUsageRate();
     }
 
     @Test
@@ -571,24 +695,67 @@ class AnalyticsServiceTest {
         AnalyticsDTO.MoveUsageResponse response = analyticsService.getMoveUsageStats(testTeam.getId());
 
         log.info(response.toString());
-    }
 
-    @Test
-    void testGetMoveUsageStats_shouldCalculateUsageRate() {
-        // Pokemon brought 10 times, move used 7 times
-        // Assert usageRate is 70%
-    }
+        assertEquals(6, response.getPokemonMoves().size());
 
-    @Test
-    void testGetMoveUsageStats_shouldCalculateMoveWinRate() {
-        // Move used in 5 games: 3 wins, 2 losses
-        // Assert winRate is 60%
-    }
+        AnalyticsDTO.PokemonMoveStats pao = getMoveUsageStatsMon(response, "Chien-Pao");
+        AnalyticsDTO.PokemonMoveStats grimm = getMoveUsageStatsMon(response, "Grimmsnarl");
+        AnalyticsDTO.PokemonMoveStats lando = getMoveUsageStatsMon(response, "Landorus");
+        AnalyticsDTO.PokemonMoveStats oger = getMoveUsageStatsMon(response, "Ogerpon-Hearthflame");
+        AnalyticsDTO.PokemonMoveStats raging = getMoveUsageStatsMon(response, "Raging Bolt");
+        AnalyticsDTO.PokemonMoveStats urshi = getMoveUsageStatsMon(response, "Urshifu-Rapid-Strike");
 
-    @Test
-    void testGetMoveUsageStats_shouldSortMovesByUsage() {
-        // Create data where Pokemon has multiple moves
-        // Assert moves are sorted by timesUsed descending
-    }
+        assertEquals(2, getUseCount(pao, "Sacred Sword"));
+        assertEquals(67, getUseRate(pao, "Sacred Sword"));
+        assertEquals(1, getUseCount(pao, "Protect"));
+        assertEquals(33, getUseRate(pao, "Protect"));
 
+        assertEquals(20, getUseCount(grimm, "Spirit Break"));
+        assertEquals(48, getUseRate(grimm, "Spirit Break"));
+        assertEquals(12, getUseCount(grimm, "Thunder Wave"));
+        assertEquals(29, getUseRate(grimm, "Thunder Wave"));
+        assertEquals(8, getUseCount(grimm, "Light Screen"));
+        assertEquals(19, getUseRate(grimm, "Light Screen"));
+        assertEquals(2, getUseCount(grimm, "Reflect"));
+        assertEquals(5, getUseRate(grimm, "Reflect"));
+
+        assertEquals(8, getUseCount(lando, "Protect"));
+        assertEquals(40, getUseRate(lando, "Protect"));
+        assertEquals(5, getUseCount(lando, "Sandsear Storm"));
+        assertEquals(25, getUseRate(lando, "Sandsear Storm"));
+        assertEquals(4, getUseCount(lando, "Earth Power"));
+        assertEquals(20, getUseRate(lando, "Earth Power"));
+        assertEquals(3, getUseCount(lando, "Sludge Bomb"));
+        assertEquals(15, getUseRate(lando, "Sludge Bomb"));
+
+        assertEquals(13, getUseCount(oger, "Ivy Cudgel"));
+        assertEquals(10, getUseCount(oger, "Follow Me"));
+        assertEquals(9, getUseCount(oger, "Spiky Shield"));
+        assertEquals(1, getUseCount(oger, "Wood Hammer"));
+
+        assertEquals(39, getUseRate(oger, "Ivy Cudgel"));
+        assertEquals(30, getUseRate(oger, "Follow Me"));
+        assertEquals(27, getUseRate(oger, "Spiky Shield"));
+        assertEquals(3, getUseRate(oger, "Wood Hammer"));
+
+        assertEquals(6, getUseCount(raging, "Dragon Pulse"));
+        assertEquals(4, getUseCount(raging, "Thunderclap"));
+        assertEquals(4, getUseCount(raging, "Electroweb"));
+        assertEquals(1, getUseCount(raging, "Volt Switch"));
+
+        assertEquals(40, getUseRate(raging, "Dragon Pulse"));
+        assertEquals(27, getUseRate(raging, "Thunderclap"));
+        assertEquals(27, getUseRate(raging, "Electroweb"));
+        assertEquals(7, getUseRate(raging, "Volt Switch"));
+
+        assertEquals(3, getUseCount(urshi, "Surging Strikes"));
+        assertEquals(3, getUseCount(urshi, "Detect"));
+        assertEquals(3, getUseCount(urshi, "Close Combat"));
+
+        assertEquals(33, getUseRate(urshi, "Surging Strikes"));
+        assertEquals(33, getUseRate(urshi, "Detect"));
+        assertEquals(33, getUseRate(urshi, "Close Combat"));
+
+
+    }
 }

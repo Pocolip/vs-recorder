@@ -23,6 +23,7 @@ public class BattleLogParser {
     private static final Pattern MOVE_PATTERN = Pattern.compile("\\|move\\|p([12])([ab]): ([^|]+)\\|([^|]+)");
     private static final Pattern TERA_PATTERN = Pattern.compile("\\|-terastallize\\|p([12])([ab]): ([^|]+)\\|([^|]+)");
     private static final Pattern POKE_PATTERN = Pattern.compile("\\|poke\\|p([12])\\|([^,|]+)");
+    private static final Pattern SHOWTEAM_PATTERN = Pattern.compile("\\|showteam\\|p([12])\\|(.+)");
 
     /**
      * Parsed battle data structure
@@ -112,7 +113,7 @@ public class BattleLogParser {
             Matcher pokeMatcher = POKE_PATTERN.matcher(line);
             if (pokeMatcher.find()) {
                 String player = pokeMatcher.group(1);
-                String pokemon = normalizePokemonName(pokeMatcher.group(2));
+                String pokemon = pokeMatcher.group(2); // Keep full name with forme
 
                 if ("1".equals(player)) {
                     data.getP1Team().add(pokemon);
@@ -122,32 +123,75 @@ public class BattleLogParser {
                 continue;
             }
 
+            // Parse open team sheet (|showteam|) to reveal Urshifu forme
+            Matcher showteamMatcher = SHOWTEAM_PATTERN.matcher(line);
+            if (showteamMatcher.find()) {
+                String player = showteamMatcher.group(1);
+                String teamData = showteamMatcher.group(2);
+
+                // Parse team data to find Urshifu forme
+                // Format: Pokemon||Item|Ability|Move1,Move2,...
+                String[] pokemons = teamData.split("\\]");
+                for (String pokeData : pokemons) {
+                    if (pokeData.contains("Urshifu")) {
+                        String pokemonName = pokeData.split("\\|")[0];
+
+                        // Replace Urshifu-* with actual forme
+                        List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
+                        for (int i = 0; i < team.size(); i++) {
+                            if (team.get(i).startsWith("Urshifu-*")) {
+                                team.set(i, pokemonName);
+                                break;
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
+
             // Parse switches (|switch|) - identifies picks and leads
             Matcher switchMatcher = SWITCH_PATTERN.matcher(line);
             if (switchMatcher.find()) {
                 String player = switchMatcher.group(1);
-                String pokemon = normalizePokemonName(switchMatcher.group(4));
+                String switchedPokemon = switchMatcher.group(4); // Full name from switch line
 
-                if ("1".equals(player)) {
-                    if (!p1Switched.contains(pokemon)) {
-                        p1Switched.add(pokemon);
-                        data.getP1Picks().add(pokemon);
-
-                        // First 2 switches are leads
-                        if (leadCount1 < 2) {
-                            data.getP1Leads().add(pokemon);
-                            leadCount1++;
+                // Check if this reveals Urshifu forme
+                List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
+                if (switchedPokemon.startsWith("Urshifu-") && !switchedPokemon.contains("*")) {
+                    for (int i = 0; i < team.size(); i++) {
+                        if (team.get(i).startsWith("Urshifu-*")) {
+                            team.set(i, switchedPokemon.split(",")[0].trim());
+                            break;
                         }
                     }
-                } else {
-                    if (!p2Switched.contains(pokemon)) {
-                        p2Switched.add(pokemon);
-                        data.getP2Picks().add(pokemon);
+                }
 
-                        // First 2 switches are leads
-                        if (leadCount2 < 2) {
-                            data.getP2Leads().add(pokemon);
-                            leadCount2++;
+                // Map switch species to team entry
+                String baseSpecies = switchedPokemon.split(",")[0].trim().split("-")[0];
+                String fullTeamEntry = findTeamEntry(team, baseSpecies);
+
+                if (fullTeamEntry != null) {
+                    if ("1".equals(player)) {
+                        if (!p1Switched.contains(fullTeamEntry)) {
+                            p1Switched.add(fullTeamEntry);
+                            data.getP1Picks().add(fullTeamEntry);
+
+                            // First 2 switches are leads
+                            if (leadCount1 < 2) {
+                                data.getP1Leads().add(fullTeamEntry);
+                                leadCount1++;
+                            }
+                        }
+                    } else {
+                        if (!p2Switched.contains(fullTeamEntry)) {
+                            p2Switched.add(fullTeamEntry);
+                            data.getP2Picks().add(fullTeamEntry);
+
+                            // First 2 switches are leads
+                            if (leadCount2 < 2) {
+                                data.getP2Leads().add(fullTeamEntry);
+                                leadCount2++;
+                            }
                         }
                     }
                 }
@@ -158,17 +202,24 @@ public class BattleLogParser {
             Matcher moveMatcher = MOVE_PATTERN.matcher(line);
             if (moveMatcher.find()) {
                 String player = moveMatcher.group(1);
-                String pokemon = normalizePokemonName(moveMatcher.group(3));
+                String moveSpecies = moveMatcher.group(3); // Base species name
                 String move = moveMatcher.group(4);
 
-                if ("1".equals(player)) {
-                    data.getP1MoveUsage()
-                            .computeIfAbsent(pokemon, k -> new HashMap<>())
-                            .merge(move, 1, Integer::sum);
-                } else {
-                    data.getP2MoveUsage()
-                            .computeIfAbsent(pokemon, k -> new HashMap<>())
-                            .merge(move, 1, Integer::sum);
+                // Map to full team entry
+                List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
+                String baseSpecies = moveSpecies.split("-")[0]; // Get base name
+                String fullTeamEntry = findTeamEntry(team, baseSpecies);
+
+                if (fullTeamEntry != null) {
+                    if ("1".equals(player)) {
+                        data.getP1MoveUsage()
+                                .computeIfAbsent(fullTeamEntry, k -> new HashMap<>())
+                                .merge(move, 1, Integer::sum);
+                    } else {
+                        data.getP2MoveUsage()
+                                .computeIfAbsent(fullTeamEntry, k -> new HashMap<>())
+                                .merge(move, 1, Integer::sum);
+                    }
                 }
                 continue;
             }
@@ -177,12 +228,19 @@ public class BattleLogParser {
             Matcher teraMatcher = TERA_PATTERN.matcher(line);
             if (teraMatcher.find()) {
                 String player = teraMatcher.group(1);
-                String pokemon = normalizePokemonName(teraMatcher.group(3));
+                String teraSpecies = teraMatcher.group(3);
 
-                if ("1".equals(player)) {
-                    data.setP1Tera(pokemon);
-                } else {
-                    data.setP2Tera(pokemon);
+                // Map to full team entry
+                List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
+                String baseSpecies = teraSpecies.split("-")[0];
+                String fullTeamEntry = findTeamEntry(team, baseSpecies);
+
+                if (fullTeamEntry != null) {
+                    if ("1".equals(player)) {
+                        data.setP1Tera(fullTeamEntry);
+                    } else {
+                        data.setP2Tera(fullTeamEntry);
+                    }
                 }
                 continue;
             }
@@ -197,6 +255,20 @@ public class BattleLogParser {
                 }
             }
         }
+    }
+
+    /**
+     * Find matching team entry for a base species name
+     * Uses Species Clause - only one match possible per team
+     */
+    private static String findTeamEntry(List<String> team, String baseSpecies) {
+        for (String teamEntry : team) {
+            // Check if team entry starts with or contains the base species
+            if (teamEntry.startsWith(baseSpecies) || teamEntry.contains(baseSpecies)) {
+                return teamEntry;
+            }
+        }
+        return null;
     }
 
     /**

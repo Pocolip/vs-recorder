@@ -68,7 +68,7 @@ class BattleLogParserTest {
         log.info(battleData.getP1Team().toString());
         assertEquals("Grimmsnarl", battleData.getP1Team().get(0));
         assertEquals("Landorus", battleData.getP1Team().get(1));
-        assertEquals("Urshifu", battleData.getP1Team().get(2));
+        assertEquals("Urshifu-Rapid-Strike", battleData.getP1Team().get(2));
         assertEquals("Ogerpon-Hearthflame", battleData.getP1Team().get(3));
         assertEquals("Raging Bolt", battleData.getP1Team().get(4));
         assertEquals("Chien-Pao", battleData.getP1Team().get(5));
@@ -95,7 +95,7 @@ class BattleLogParserTest {
         log.info(battleData.getP1Team().toString());
         log.info(battleData.getP1Leads().toString());
         log.info(battleData.getP1Picks().toString());
-        assertTrue(battleData.getP1Team().contains("Urshifu"));
+        assertTrue(battleData.getP1Team().contains("Urshifu-Rapid-Strike"));
         assertTrue(battleData.getP1Leads().contains("Urshifu-Rapid-Strike"));
         assertTrue(battleData.getP1Picks().contains("Urshifu-Rapid-Strike"));
 
@@ -151,7 +151,7 @@ class BattleLogParserTest {
                                 "/bo1/urshitera.json"));
 
         assertNull(battleData.getP1Tera());
-        assertEquals("Urshifu", battleData.getP2Tera());
+        assertEquals("Urshifu-Rapid-Strike", battleData.getP2Tera());
 
         battleData =
                 BattleLogParser.parseBattleLog(
@@ -184,14 +184,14 @@ class BattleLogParserTest {
                                 "/bo1/reggshadowvsice.json"));
 
         log.info(battleData.getP1MoveUsage().toString());
-        assertEquals(2, battleData.getP1MoveUsage().get("Calyrex").get("Calm Mind"));
-        assertEquals(1, battleData.getP1MoveUsage().get("Calyrex").get("Astral Barrage"));
-        assertFalse(battleData.getP1MoveUsage().get("Calyrex").containsKey("Protect"));
+        assertEquals(2, battleData.getP1MoveUsage().get("Calyrex-Shadow").get("Calm Mind"));
+        assertEquals(1, battleData.getP1MoveUsage().get("Calyrex-Shadow").get("Astral Barrage"));
+        assertNull(battleData.getP1MoveUsage().get("Calyrex-Ice"));
 
         log.info(battleData.getP2MoveUsage().toString());
-        assertEquals(1, battleData.getP2MoveUsage().get("Calyrex").get("Protect"));
-        assertFalse(battleData.getP2MoveUsage().get("Calyrex").containsKey("Calm Mind"));
-        assertFalse(battleData.getP2MoveUsage().get("Calyrex").containsKey("Astral Barrage"));
+        assertEquals(1, battleData.getP2MoveUsage().get("Calyrex-Ice").get("Protect"));
+        assertNull(battleData.getP2MoveUsage().get("Calyrex-Shadow"));
+        assertNull(battleData.getP2MoveUsage().get("Calyrex-Shadow"));
 
     }
 
@@ -207,7 +207,7 @@ class BattleLogParserTest {
         // cm is used twice
         long calmMindCount = battleData
                         .getP1MoveUsage()
-                        .get("Calyrex")
+                        .get("Calyrex-Shadow")
                 .get("Calm Mind");
         log.info(String.valueOf(calmMindCount));
         assertEquals(2, calmMindCount);
@@ -225,10 +225,11 @@ class BattleLogParserTest {
                         loadTestFile(
                                 "/kuronisa/gen9vgc2026regfbo3-2493189799-ne46kfyk1lr0f9cmnl1gigtosox6ge2pw.json"));
 
-        assertTrue(BattleLogParser.getPokemonMoves(battleData, "Raging Bolt", "mofonguero").isEmpty());
-        assertTrue(BattleLogParser.getPokemonMoves(battleData, "Ogerpon", "mofonguero")
+        log.info(battleData.getP1MoveUsage().toString());
+        assertTrue(BattleLogParser.getPokemonMoves(battleData, "Raging Bolt", "p1").isEmpty());
+        assertTrue(BattleLogParser.getPokemonMoves(battleData, "Ogerpon-Hearthflame", "p1")
                 .containsKey("Ivy Cudgel"));
-        assertTrue(BattleLogParser.getPokemonMoves(battleData, "Ogerpon", "mofonguero")
+        assertTrue(BattleLogParser.getPokemonMoves(battleData, "Ogerpon-Hearthflame", "p1")
                 .containsKey("Spiky Shield"));
     }
 
@@ -304,7 +305,7 @@ class BattleLogParserTest {
                         loadTestFile(
                                 "/bo1/urshitera.json"));
 
-        assertTrue(BattleLogParser.didTerastallize(battleData, "Urshifu", "p2"));
+        assertTrue(BattleLogParser.didTerastallize(battleData, "Urshifu-Rapid-Strike", "p2"));
         assertFalse(BattleLogParser.didTerastallize(battleData, "Terapagos", "p1"));
 
 
@@ -367,9 +368,9 @@ class BattleLogParserTest {
 
         log.info(getOpponentTeam(battleData, "ookkssiirr").toString());
         assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Chien-Pao"));
-        assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Zacian"));
+        assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Zacian-*"));
         assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Rillaboom"));
-        assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Urshifu"));
+        assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Urshifu-*"));
         assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Tornadus"));
         assertTrue(getOpponentTeam(battleData, "ookkssiirr").contains("Umbreon"));
         log.info(getOpponentTeam(battleData, "platanera").toString());
