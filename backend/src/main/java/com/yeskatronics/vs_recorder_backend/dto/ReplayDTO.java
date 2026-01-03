@@ -45,6 +45,8 @@ public class ReplayDTO {
         @Size(max = 10, message = "Result must not exceed 10 characters")
         private String result; // "win" or "loss"
 
+        private Integer gameNumber; // 1, 2, 3 for Bo3; null for Bo1
+
         private LocalDateTime date;
 
         private String notes;
@@ -82,6 +84,7 @@ public class ReplayDTO {
         private String battleLog;
         private String opponent;
         private String result;
+        private Integer gameNumber; // 1, 2, 3 for Bo3; null for Bo1
         private LocalDateTime date;
         private String notes;
         private LocalDateTime createdAt;
@@ -100,6 +103,7 @@ public class ReplayDTO {
         private String url;
         private String opponent;
         private String result;
+        private Integer gameNumber; // 1, 2, 3 for Bo3; null for Bo1
         private LocalDateTime date;
         private String notes;
         private LocalDateTime createdAt;

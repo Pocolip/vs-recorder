@@ -61,6 +61,14 @@ public class Replay {
     @Column(length = 10)
     private String result; // 'win' or 'loss'
 
+    /**
+     * Game number in a Bo3 match set.
+     * 1 = Game 1, 2 = Game 2, 3 = Game 3
+     * null = Bo1 (standalone game not part of a match)
+     */
+    @Column(name = "game_number")
+    private Integer gameNumber;
+
     @Column(name = "date")
     private LocalDateTime date;
 
@@ -73,6 +81,20 @@ public class Replay {
      */
     public boolean isPartOfMatch() {
         return match != null;
+    }
+
+    /**
+     * Helper method to check if this is a Bo1 game
+     */
+    public boolean isBo1() {
+        return gameNumber == null;
+    }
+
+    /**
+     * Helper method to check if this is part of a Bo3 set
+     */
+    public boolean isBo3() {
+        return gameNumber != null;
     }
 
     /**
