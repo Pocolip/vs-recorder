@@ -89,7 +89,7 @@ class ReplayServiceTest {
 
         return replayService.createReplay(replay, testTeam.getId());
     }
-    
+
     @Test
     void testCreateReplay_Bo1() throws IOException {
         String bo1Path = "/bo1/bothtera.json";
