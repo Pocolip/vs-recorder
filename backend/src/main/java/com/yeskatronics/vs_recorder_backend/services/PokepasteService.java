@@ -1,5 +1,6 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeskatronics.vs_recorder_backend.dto.PokepasteDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,51 +24,43 @@ public class PokepasteService {
 
     private final RestTemplate restTemplate;
 
+    private final ObjectMapper objectMapper;
+
     private static final String POKEPASTE_BASE = "https://pokepast.es";
+
+    private static final String POKEBIN_BASE = "https://pokebin.com";
+
     private static final Pattern POKEPASTE_URL_PATTERN = Pattern.compile(
             "https://pokepast\\.es/([a-zA-Z0-9]+)(?:/raw)?"
     );
+    private static final Pattern POKEBIN_URL_PATTERN = Pattern.compile(
+            "https://pokebin\\.com/([a-zA-Z0-9]+)(?:/json)?"
+    );
+
 
     /**
      * Fetch and parse team data from Pokepaste
      *
-     * @param pokepasteUrl the Pokepaste URL
+     * @param url the Pokepaste URL
      * @return parsed team data
      * @throws IllegalArgumentException if URL is invalid or fetch fails
      */
-    public PokepasteDTO.PasteData fetchPasteData(String pokepasteUrl) {
-        log.info("Fetching Pokepaste data from: {}", pokepasteUrl);
+    public PokepasteDTO.PasteData fetchPasteData(String url) {
+        log.info("Fetching paste data from: {}", url);
 
-        // Validate URL format
-        Matcher matcher = POKEPASTE_URL_PATTERN.matcher(pokepasteUrl);
-        if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid Pokepaste URL");
+        // Check if it's a Pokebin URL
+        Matcher pokebinMatcher = POKEBIN_URL_PATTERN.matcher(url);
+        if (pokebinMatcher.find()) {
+            return fetchPokebinData(url, pokebinMatcher.group(1));
         }
 
-        String pasteId = matcher.group(1);
-        String rawUrl = POKEPASTE_BASE + "/" + pasteId + "/raw";
-
-        try {
-            // Fetch raw text from Pokepaste
-            log.debug("Fetching from: {}", rawUrl);
-            String rawText = restTemplate.getForObject(rawUrl, String.class);
-
-            if (rawText == null || rawText.trim().isEmpty()) {
-                throw new IllegalArgumentException("Failed to fetch Pokepaste data or paste is empty");
-            }
-
-            // Parse the paste
-            PokepasteDTO.PasteData pasteData = parsePaste(rawText);
-            pasteData.setRawText(rawText);
-
-            log.info("Successfully fetched Pokepaste with {} Pokemon", pasteData.getPokemon().size());
-
-            return pasteData;
-
-        } catch (Exception e) {
-            log.error("Error fetching Pokepaste data: {}", e.getMessage(), e);
-            throw new IllegalArgumentException("Failed to fetch or parse Pokepaste data: " + e.getMessage());
+        // Check if it's a Pokepaste URL
+        Matcher pokepasteMatcher = POKEPASTE_URL_PATTERN.matcher(url);
+        if (pokepasteMatcher.find()) {
+            return fetchPokepasteData(url, pokepasteMatcher.group(1));
         }
+
+        throw new IllegalArgumentException("Invalid URL - must be a Pokepaste or Pokebin URL");
     }
 
     /**
@@ -96,6 +89,80 @@ public class PokepasteService {
         }
 
         return pasteData;
+    }
+
+    /**
+     * Fetch data from Pokepaste
+     */
+    private PokepasteDTO.PasteData fetchPokepasteData(String originalUrl, String pasteId) {
+        log.info("Fetching from Pokepaste: {}", pasteId);
+        String rawUrl = POKEPASTE_BASE + "/" + pasteId + "/raw";
+
+        try {
+            // Fetch raw text from Pokepaste
+            log.debug("Fetching from: {}", rawUrl);
+            String rawText = restTemplate.getForObject(rawUrl, String.class);
+
+            if (rawText == null || rawText.trim().isEmpty()) {
+                throw new IllegalArgumentException("Failed to fetch Pokepaste data or paste is empty");
+            }
+
+            // Parse the paste
+            PokepasteDTO.PasteData pasteData = parsePaste(rawText);
+            pasteData.setRawText(rawText);
+
+            log.info("Successfully fetched Pokepaste with {} Pokemon", pasteData.getPokemon().size());
+
+            return pasteData;
+
+        } catch (Exception e) {
+            log.error("Error fetching Pokepaste data: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to fetch or parse Pokepaste data: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Fetch data from Pokebin
+     */
+    private PokepasteDTO.PasteData fetchPokebinData(String originalUrl, String pasteId) {
+        log.info("Fetching from Pokebin: {}", pasteId);
+        String jsonUrl = POKEBIN_BASE + "/" + pasteId + "/json";
+
+        try {
+            // Fetch JSON from Pokebin
+            log.debug("Fetching from: {}", jsonUrl);
+            String jsonResponse = restTemplate.getForObject(jsonUrl, String.class);
+
+            if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
+                throw new IllegalArgumentException("Failed to fetch Pokebin data or paste is empty");
+            }
+
+            // Parse JSON to extract content
+            JsonNode root = objectMapper.readTree(jsonResponse);
+            JsonNode dataNode = root.path("data");
+
+            if (dataNode.isMissingNode()) {
+                throw new IllegalArgumentException("Invalid Pokebin response - missing 'data' field");
+            }
+
+            String content = dataNode.path("content").asText();
+
+            if (content == null || content.trim().isEmpty()) {
+                throw new IllegalArgumentException("Pokebin paste is empty or missing 'content' field");
+            }
+
+            // Parse the content (same format as Pokepaste)
+            PokepasteDTO.PasteData pasteData = parsePaste(content);
+            pasteData.setRawText(content);
+
+            log.info("Successfully fetched Pokebin with {} Pokemon", pasteData.getPokemon().size());
+
+            return pasteData;
+
+        } catch (Exception e) {
+            log.error("Error fetching Pokebin data: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to fetch or parse Pokebin data: " + e.getMessage());
+        }
     }
 
     /**
@@ -166,10 +233,11 @@ public class PokepasteService {
     }
 
     /**
-     * Validate a Pokepaste URL format
+     * Validate a Pokepaste or Pokebin URL format
      */
     public boolean isValidPokepasteUrl(String url) {
-        return POKEPASTE_URL_PATTERN.matcher(url).matches();
+        return POKEPASTE_URL_PATTERN.matcher(url).matches() ||
+                POKEBIN_URL_PATTERN.matcher(url).matches();
     }
 
     /**
