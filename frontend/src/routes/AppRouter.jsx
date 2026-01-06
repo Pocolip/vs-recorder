@@ -49,6 +49,14 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/team/:teamId"
+          element={
+            <ProtectedRoute>
+              <AuthPages.TeamDetailPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* 404 fallback */}
         <Route path="*" element={<NotFoundPage />} />
