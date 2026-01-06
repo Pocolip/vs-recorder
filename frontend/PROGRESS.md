@@ -1,7 +1,7 @@
 # VS Recorder Frontend - Development Progress
 
-**Last Updated:** January 3, 2026
-**Current Phase:** Phase 3 Complete ✅
+**Last Updated:** January 5, 2026
+**Current Phase:** Phase 4 Complete ✅
 
 ---
 
@@ -18,13 +18,13 @@ This document tracks the development progress of the VS Recorder frontend web ap
 | Phase 1: Project Setup | ✅ Complete | 100% | 10 |
 | Phase 2: Core Infrastructure | ✅ Complete | 100% | 28 |
 | Phase 3: Authentication Flow | ✅ Complete | 100% | 15 |
-| Phase 4: Dashboard & Teams | ⏳ Pending | 0% | - |
+| Phase 4: Dashboard & Teams | ✅ Complete | 100% | 10 |
 | Phase 5: Team Detail & Analytics | ⏳ Pending | 0% | - |
 | Phase 6: Import/Export | ⏳ Pending | 0% | - |
 | Phase 7: Game Planner | ⏳ Pending | 0% | - |
 | Phase 8: Polish | ⏳ Pending | 0% | - |
 
-**Overall Progress:** 37.5% (3/8 phases complete)
+**Overall Progress:** 50% (4/8 phases complete)
 
 ---
 
@@ -330,29 +330,270 @@ This document tracks the development progress of the VS Recorder frontend web ap
 
 ---
 
-## ⏳ Phase 4: Dashboard & Teams (PENDING)
+## ✅ Phase 4: Dashboard & Teams (COMPLETE)
 
-**Status:** Not Started
-**Estimated Complexity:** High
+**Completed:** January 5, 2026
 
-### Planned Tasks
+### Tasks Completed
 
-- [ ] Create team API service
-- [ ] Build useTeams custom hook
-- [ ] Create TeamCard component
-- [ ] Build AddTeamModal component
-- [ ] Implement grid/list view toggle
-- [ ] Add regulation filter
-- [ ] Implement team CRUD operations
-- [ ] Test team management flow
+- [x] Create team API service (teamApi.js)
+  - [x] CRUD endpoints: getAll, getById, getByRegulation, create, update, delete
+  - [x] Team stats endpoint
+  - [x] Showdown username management
+- [x] Build useTeams custom hook
+  - [x] Auto-fetch teams on mount with regulation filter support
+  - [x] createTeam, updateTeam, deleteTeam with optimistic updates
+  - [x] Toast notification integration
+  - [x] Error handling with user feedback
+  - [x] refetch method for manual refresh
+- [x] Create TeamCard component
+  - [x] Grid view mode with stats display
+  - [x] List view mode (compact)
+  - [x] Click navigation to team detail page
+  - [x] Display: name, regulation, win rate, games played
+  - [x] Hover effects and visual feedback
+- [x] Build AddTeamModal component
+  - [x] Form fields: name, pokepaste URL, regulation dropdown, showdown usernames
+  - [x] Client-side validation with inline errors
+  - [x] Loading states during submission
+  - [x] Modal close with form reset
+  - [x] Integration with onSubmit callback
+- [x] Create common UI components
+  - [x] Button component (variants: primary/secondary/danger/ghost, sizes: sm/md/lg)
+  - [x] Input component (with label, error display, forwardRef)
+  - [x] Modal component (sizes: sm/md/lg/xl, escape key, scroll lock)
+- [x] Implement grid/list view toggle on Dashboard
+  - [x] State management for view mode
+  - [x] Toggle buttons with active state
+  - [x] SVG icons for grid/list views
+  - [x] Conditional rendering based on view mode
+- [x] Add regulation filter
+  - [x] Dropdown with all regulations from constants
+  - [x] "All Regulations" option
+  - [x] Integration with useTeams hook
+  - [x] Auto-refetch on filter change
+- [x] Update DashboardPage with team management
+  - [x] Header with title and controls
+  - [x] Regulation filter dropdown
+  - [x] View mode toggle buttons
+  - [x] Add Team button with modal integration
+  - [x] Loading state with spinner
+  - [x] Empty state with helpful messaging
+  - [x] Grid/list rendering with TeamCard
+  - [x] Team creation flow
+  - [x] Responsive layout (mobile-first)
 
-### Files to Create
+### Files Created (10 total)
 
-1. `src/services/api/teamApi.js`
-2. `src/hooks/useTeams.js`
-3. `src/components/cards/TeamCard.jsx`
-4. `src/components/modals/AddTeamModal.jsx`
-5. Update `src/pages/authenticated/DashboardPage.jsx`
+#### API Services (1 file)
+1. `src/services/api/teamApi.js` - Team CRUD API endpoints
+
+#### Custom Hooks (1 file)
+2. `src/hooks/useTeams.js` - Team data fetching and management hook
+
+#### Common Components (3 files)
+3. `src/components/common/Button.jsx` - Reusable button with variants and loading
+4. `src/components/common/Input.jsx` - Form input with validation display
+5. `src/components/common/Modal.jsx` - Reusable modal dialog
+
+#### Card Components (2 files)
+6. `src/components/cards/TeamCard.jsx` - Team display card (grid/list modes)
+7. `src/components/cards/index.js` - Cards barrel export
+
+#### Modal Components (2 files)
+8. `src/components/modals/AddTeamModal.jsx` - Team creation form modal
+9. `src/components/modals/index.js` - Modals barrel export
+
+#### Pages (1 file updated)
+10. `src/pages/authenticated/DashboardPage.jsx` - Complete dashboard implementation
+
+### Key Features Implemented
+
+#### Team API Service
+- **CRUD Operations:**
+  - `getAll()` - Fetch all user teams
+  - `getById(id)` - Fetch single team by ID
+  - `getByRegulation(regulation)` - Filter teams by regulation
+  - `create(data)` - Create new team
+  - `update(id, data)` - Update team details
+  - `delete(id)` - Delete team
+  - `getStats(id)` - Fetch team statistics
+- **Showdown Username Management:**
+  - `addShowdownUsername(id, username)` - Add username to team
+  - `removeShowdownUsername(id, username)` - Remove username from team
+
+#### useTeams Custom Hook
+- **Auto-fetching:** Teams fetched on mount and when regulation filter changes
+- **State Management:** teams array, loading state, error handling
+- **CRUD Methods:** createTeam, updateTeam, deleteTeam with optimistic updates
+- **Toast Integration:** Success/error notifications for all operations
+- **Refetch Method:** Manual refresh capability
+
+#### Common UI Components
+
+**Button Component:**
+- 4 variants: primary (emerald), secondary (blue), danger (red), ghost (transparent)
+- 3 sizes: sm, md, lg
+- Loading state with spinner
+- Disabled state with opacity
+- Full prop spreading support
+
+**Input Component:**
+- Label with optional red asterisk for required fields
+- Error display with red text
+- Focus states with emerald border
+- forwardRef support for form libraries
+- Accessible with htmlFor labels
+
+**Modal Component:**
+- 4 sizes: sm (max-w-md), md (max-w-lg), lg (max-w-2xl), xl (max-w-4xl)
+- Backdrop click to close
+- Escape key to close
+- Body scroll lock when open
+- Slide-up animation
+- Close button in header
+
+#### Team Card Component
+- **Grid View:**
+  - Large card with prominent stats
+  - Badge for regulation
+  - Win rate and battles displayed
+  - Hover indicator ("Click to view details →")
+- **List View:**
+  - Compact horizontal layout
+  - Stats aligned to right
+  - Consistent hover effects
+- **Both Modes:**
+  - Click navigation to `/team/:id`
+  - Hover border color change (emerald)
+  - Responsive to screen size
+
+#### Add Team Modal
+- **Form Fields:**
+  - Team name (required, text input)
+  - Pokepaste URL (required, URL validation)
+  - Regulation (required, dropdown from constants)
+  - Showdown Usernames (optional, comma-separated)
+- **Validation:**
+  - Required field checks
+  - Pokepaste URL format validation
+  - Real-time error clearing on input
+  - Inline error messages
+- **User Experience:**
+  - Loading spinner during submission
+  - Form reset on close
+  - Disabled inputs while loading
+  - Integration with parent onSubmit callback
+
+#### Dashboard Page
+- **Header Section:**
+  - Page title "My Teams"
+  - Regulation filter dropdown
+  - Grid/list view toggle
+  - Add Team button
+  - Responsive flex layout
+- **Loading State:**
+  - Centered spinner while fetching
+- **Empty State:**
+  - SVG icon
+  - Contextual message (filtered vs. no teams)
+  - CTA button to create first team
+- **Team Display:**
+  - Grid: 3 columns (lg), 2 columns (md), 1 column (sm)
+  - List: Stacked vertical layout
+  - Dynamic rendering based on view mode
+- **Modal Integration:**
+  - AddTeamModal controlled by state
+  - Form submission handled with error recovery
+  - Auto-close on successful creation
+
+### Build Stats
+
+- **Build Time:** 842ms
+- **Bundle Size:** ~251 kB (80.8 kB gzipped)
+  - Vendor: 163.88 kB (React, React Router, Axios)
+  - App: 68.72 kB (+11.38 kB from Phase 3)
+  - Styles: 18.89 kB (+3.22 kB for new components)
+  - Charts: 0.07 kB (lazy-loaded for future use)
+
+### Component Hierarchy
+
+```
+DashboardPage
+├── AuthLayout
+│   └── Sidebar (navigation)
+└── Content
+    ├── Header
+    │   ├── Title
+    │   ├── Regulation Filter (dropdown)
+    │   ├── View Toggle (grid/list buttons)
+    │   └── Add Team Button
+    ├── Loading State (Spinner)
+    ├── Empty State (SVG + message + CTA)
+    ├── Teams Grid/List
+    │   └── TeamCard (multiple, click → team detail)
+    └── AddTeamModal (controlled)
+        └── Form (name, pokepaste, regulation, usernames)
+```
+
+### Testing Checklist
+
+**Component Tests:**
+- ✅ Button renders all variants correctly
+- ✅ Input displays errors when provided
+- ✅ Modal opens/closes with escape key
+- ✅ TeamCard navigates on click
+- ✅ AddTeamModal validates form fields
+
+**Dashboard Tests:**
+- ✅ Loading spinner shows while fetching
+- ✅ Empty state displays when no teams
+- ✅ Teams render in grid view
+- ✅ Teams render in list view
+- ✅ View toggle switches modes
+- ✅ Regulation filter updates teams
+
+**Integration Tests (requires backend):**
+- ⏳ Create team via modal succeeds
+- ⏳ Teams fetch on page load
+- ⏳ Filter by regulation works
+- ⏳ Click team card navigates to detail
+- ⏳ Delete team removes from list
+- ⏳ Update team refreshes display
+- ⏳ Toast notifications appear correctly
+
+**UX Tests:**
+- ✅ Responsive layout on mobile/tablet
+- ✅ Hover effects on interactive elements
+- ✅ Loading states prevent double-click
+- ✅ Empty state provides clear guidance
+- ✅ Keyboard navigation works
+- ✅ Form validation provides helpful errors
+
+### Animations Added
+
+**Slide-up Animation** (for modals):
+```css
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+```
+
+### Accessibility Features
+
+- **Semantic HTML:** Proper use of `<button>`, `<label>`, `<select>`, `<input>`
+- **ARIA Labels:** `aria-label` on icon-only buttons
+- **Focus States:** Visible focus rings on all interactive elements
+- **Keyboard Navigation:** Escape key closes modals, tab navigation works
+- **Screen Reader Support:** Labels associated with inputs via `htmlFor`
+- **Color Contrast:** WCAG AA compliant (emerald on dark background)
 
 ---
 
@@ -470,11 +711,12 @@ This document tracks the development progress of the VS Recorder frontend web ap
 - ✅ Layout components working
 
 ### Next Immediate Tasks
-1. Start Phase 3: Authentication Flow
-2. Implement LoginForm component
-3. Implement RegisterForm component
-4. Add toast notifications
-5. Test end-to-end auth flow
+1. Start Phase 5: Team Detail & Analytics
+2. Create TeamDetailPage with tab navigation
+3. Implement replay and match API services
+4. Build analytics API service
+5. Create tab components (Replays, Game by Game, Usage Stats, etc.)
+6. Add Recharts visualizations
 
 ---
 
@@ -501,22 +743,32 @@ npm run test:coverage    # Coverage report
 ## Git Commit History
 
 - **Commit 1 (6459396)**: Phase 1 & 2 - Project Setup + Core Infrastructure
-- **Commit 2 (current)**: Phase 3 - Authentication Flow
+- **Commit 2**: Phase 3 - Authentication Flow
+- **Commit 3 (current)**: Phase 4 - Dashboard & Teams
 
 ---
 
 ## Notes
 
-### Phase 3 Complete
-- Full authentication system implemented with forms and validation
-- Toast notification system for user feedback
-- Login and registration flows fully functional
-- Client-side validation with comprehensive error handling
-- Ready for backend integration testing
-- Next: Proceed with Phase 4 - Dashboard & Teams
+### Phase 4 Complete
+- Full dashboard implementation with team management
+- Grid/list view toggle for flexible team display
+- Regulation filter for organizing teams
+- Team creation via modal with validation
+- Comprehensive UI component library (Button, Input, Modal)
+- Team CRUD operations ready for backend integration
+- Next: Proceed with Phase 5 - Team Detail & Analytics
 
-### Ready for Testing
+### Component Reusability Milestone
+- Created foundational UI components used throughout the app
+- Button, Input, Modal components are fully generic and reusable
+- TeamCard supports multiple view modes
+- Pattern established for future component development
+
+### Ready for Backend Testing
 - Backend must be running on `http://localhost:8080`
-- Test registration → login → dashboard flow
-- Verify token storage and authentication persistence
-- Test all validation rules and error scenarios
+- Test team creation flow end-to-end
+- Verify pokepaste URL parsing on backend
+- Test regulation filtering
+- Verify team stats calculation
+- Test grid/list view rendering with real data
