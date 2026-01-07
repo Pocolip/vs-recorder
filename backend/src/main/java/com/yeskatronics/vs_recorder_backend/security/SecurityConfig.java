@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/api/auth/**",           // Auth endpoints (login, register)
                                 "/h2-console/**",         // H2 console (development only)
                                 "/api/users/check/**",    // Username/email check endpoints
+                                "/api/pokemon/**",        // Pokemon utility endpoints
                                 "/swagger-ui/**",         // Swagger UI
                                 "/v3/api-docs/**",        // OpenAPI docs
                                 "/swagger-ui.html"        // Swagger UI HTML

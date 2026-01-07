@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/common';
 
 /**
  * Team card component for displaying team summary
@@ -11,12 +12,20 @@ import { useNavigate } from 'react-router-dom';
  * @param {number} [props.team.winRate] - Win rate percentage
  * @param {number} [props.team.gamesPlayed] - Number of games played
  * @param {string} [props.viewMode] - View mode: 'grid' or 'list'
+ * @param {Function} [props.onDelete] - Delete handler
  */
-const TeamCard = ({ team, viewMode = 'grid' }) => {
+const TeamCard = ({ team, viewMode = 'grid', onDelete }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/team/${team.id}`);
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete "${team.name}"? This will also delete all replays and matches.`)) {
+      onDelete?.(team.id);
+    }
   };
 
   if (viewMode === 'list') {
@@ -42,6 +51,11 @@ const TeamCard = ({ team, viewMode = 'grid' }) => {
             <p className="text-gray-400">Battles</p>
             <p className="text-white font-semibold">{team.gamesPlayed || 0}</p>
           </div>
+          {onDelete && (
+            <Button variant="danger" size="sm" onClick={handleDelete}>
+              Delete
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -49,38 +63,47 @@ const TeamCard = ({ team, viewMode = 'grid' }) => {
 
   // Grid view (default)
   return (
-    <div
-      onClick={handleClick}
-      className="card hover:border-emerald-500 cursor-pointer transition-all"
-    >
-      {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-xl font-bold text-white truncate">{team.name}</h3>
-        <div className="flex items-center justify-between mt-2">
-          <span className="inline-block px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-sm">
-            {team.regulation || 'No regulation'}
-          </span>
+    <div className="card hover:border-emerald-500 transition-all relative">
+      {/* Delete button - top right */}
+      {onDelete && (
+        <div className="absolute top-4 right-4 z-10">
+          <Button variant="danger" size="sm" onClick={handleDelete}>
+            Delete
+          </Button>
         </div>
-      </div>
+      )}
 
-      {/* Stats */}
-      <div className="flex items-center justify-between pt-4 border-t border-slate-700">
-        <div className="text-center flex-1">
-          <p className="text-sm text-gray-400 mb-1">Win Rate</p>
-          <p className="text-xl font-bold text-emerald-400">
-            {team.winRate != null ? `${team.winRate.toFixed(1)}%` : 'N/A'}
-          </p>
+      {/* Card content - clickable */}
+      <div onClick={handleClick} className="cursor-pointer">
+        {/* Header */}
+        <div className="mb-4 pr-20">
+          <h3 className="text-xl font-bold text-white truncate">{team.name}</h3>
+          <div className="flex items-center justify-between mt-2">
+            <span className="inline-block px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-sm">
+              {team.regulation || 'No regulation'}
+            </span>
+          </div>
         </div>
-        <div className="h-12 w-px bg-slate-700"></div>
-        <div className="text-center flex-1">
-          <p className="text-sm text-gray-400 mb-1">Battles</p>
-          <p className="text-xl font-bold text-white">{team.gamesPlayed || 0}</p>
-        </div>
-      </div>
 
-      {/* Hover indicator */}
-      <div className="mt-4 text-center text-sm text-gray-500">
-        Click to view details →
+        {/* Stats */}
+        <div className="flex items-center justify-between pt-4 border-t border-slate-700">
+          <div className="text-center flex-1">
+            <p className="text-sm text-gray-400 mb-1">Win Rate</p>
+            <p className="text-xl font-bold text-emerald-400">
+              {team.winRate != null ? `${team.winRate.toFixed(1)}%` : 'N/A'}
+            </p>
+          </div>
+          <div className="h-12 w-px bg-slate-700"></div>
+          <div className="text-center flex-1">
+            <p className="text-sm text-gray-400 mb-1">Battles</p>
+            <p className="text-xl font-bold text-white">{team.gamesPlayed || 0}</p>
+          </div>
+        </div>
+
+        {/* Hover indicator */}
+        <div className="mt-4 text-center text-sm text-gray-500">
+          Click to view details →
+        </div>
       </div>
     </div>
   );

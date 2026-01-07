@@ -11,7 +11,7 @@ const DashboardPage = () => {
   const [regulationFilter, setRegulationFilter] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const { teams, loading, createTeam } = useTeams(regulationFilter || null);
+  const { teams, loading, createTeam, deleteTeam } = useTeams(regulationFilter || null);
 
   const handleCreateTeam = async (teamData) => {
     try {
@@ -20,6 +20,15 @@ const DashboardPage = () => {
     } catch (error) {
       // Error is already handled by useTeams hook (toast notification)
       console.error('Error creating team:', error);
+    }
+  };
+
+  const handleDeleteTeam = async (teamId) => {
+    try {
+      await deleteTeam(teamId);
+    } catch (error) {
+      // Error is already handled by useTeams hook (toast notification)
+      console.error('Error deleting team:', error);
     }
   };
 
@@ -148,13 +157,13 @@ const DashboardPage = () => {
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {teams.map((team) => (
-                    <TeamCard key={team.id} team={team} viewMode="grid" />
+                    <TeamCard key={team.id} team={team} viewMode="grid" onDelete={handleDeleteTeam} />
                   ))}
                 </div>
               ) : (
                 <div className="space-y-4">
                   {teams.map((team) => (
-                    <TeamCard key={team.id} team={team} viewMode="list" />
+                    <TeamCard key={team.id} team={team} viewMode="list" onDelete={handleDeleteTeam} />
                   ))}
                 </div>
               )}

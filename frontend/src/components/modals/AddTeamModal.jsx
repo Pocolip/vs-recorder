@@ -13,7 +13,7 @@ const AddTeamModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: '',
     pokepaste: '',
-    regulation: 'Regulation H',
+    regulation: 'Regulation F',
     showdownUsernames: '',
   });
 
@@ -90,7 +90,7 @@ const AddTeamModal = ({ isOpen, onClose, onSubmit }) => {
       setFormData({
         name: '',
         pokepaste: '',
-        regulation: 'Regulation H',
+        regulation: 'Regulation F',
         showdownUsernames: '',
       });
       onClose();
@@ -107,7 +107,7 @@ const AddTeamModal = ({ isOpen, onClose, onSubmit }) => {
       setFormData({
         name: '',
         pokepaste: '',
-        regulation: 'Regulation H',
+        regulation: 'Regulation F',
         showdownUsernames: '',
       });
       setErrors({});

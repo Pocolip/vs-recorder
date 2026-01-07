@@ -3,10 +3,16 @@
  */
 
 export const REGULATIONS = [
+  'Regulation A',
+  'Regulation B',
+  'Regulation C',
+  'Regulation D',
+  'Regulation E',
+  'Regulation F',
   'Regulation G',
   'Regulation H',
   'Regulation I',
-  'All',
+  'Regulation J',
 ];
 
 export const RESULTS = {
