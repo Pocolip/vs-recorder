@@ -1,7 +1,6 @@
-// Re-export hooks from contexts for convenience
-export { useAuth, useToast } from '@/contexts';
-
-// Custom hooks
-export { useTeams } from './useTeams';
-export { useTeamDetail } from './useTeamDetail';
-export { useAnalytics, useCustomMatchup } from './useAnalytics';
+/**
+ * Barrel export for all custom hooks
+ */
+export { useTeamStats, useMultipleTeamStats, useTeamComparison } from './useTeamStats';
+export { useGamePlans } from './useGamePlans';
+export { useGamePlan } from './useGamePlan';

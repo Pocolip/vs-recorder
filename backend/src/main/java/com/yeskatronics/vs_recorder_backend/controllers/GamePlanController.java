@@ -4,6 +4,7 @@ import com.yeskatronics.vs_recorder_backend.dto.GamePlanDTO;
 import com.yeskatronics.vs_recorder_backend.entities.GamePlan;
 import com.yeskatronics.vs_recorder_backend.entities.GamePlanTeam;
 import com.yeskatronics.vs_recorder_backend.mappers.GamePlanMapper;
+import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.GamePlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,6 +35,7 @@ public class GamePlanController {
 
     private final GamePlanService gamePlanService;
     private final GamePlanMapper gamePlanMapper;
+    private final CustomUserDetailsService userDetailsService;
 
     // ==================== GamePlan Endpoints ====================
 
@@ -309,6 +311,7 @@ public class GamePlanController {
     // ==================== Helper Methods ====================
 
     private Long getCurrentUserId(Authentication authentication) {
-        return Long.parseLong(authentication.getName());
+        String username = authentication.getName();
+        return userDetailsService.getUserIdByUsername(username);
     }
 }
