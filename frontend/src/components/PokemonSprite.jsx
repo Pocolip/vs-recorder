@@ -15,6 +15,7 @@ const PokemonSprite = memo(({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [imageError, setImageError] = useState(false);
+    const [useRemoteFallback, setUseRemoteFallback] = useState(false);
 
     // Size mappings
     const sizeClasses = {
@@ -36,6 +37,10 @@ const PokemonSprite = memo(({
     };
 
     useEffect(() => {
+        // Reset states when name changes
+        setUseRemoteFallback(false);
+        setImageError(false);
+
         if (name) {
             loadPokemon();
         } else {
@@ -60,11 +65,26 @@ const PokemonSprite = memo(({
     };
 
     const handleImageError = () => {
+        // If local sprite failed and we haven't tried remote yet, try remote fallback
+        if (!useRemoteFallback && pokemon?.sprites) {
+            const remoteKey = `${variant}_remote`;
+            if (pokemon.sprites[remoteKey]) {
+                setUseRemoteFallback(true);
+                return;
+            }
+        }
         setImageError(true);
     };
 
     const getSpriteUrl = () => {
         if (!pokemon || !pokemon.sprites) return null;
+
+        // If local failed, try remote fallback
+        if (useRemoteFallback) {
+            const remoteKey = `${variant}_remote`;
+            return pokemon.sprites[remoteKey] || pokemon.sprites.front_default_remote;
+        }
+
         return pokemon.sprites[variant] || pokemon.sprites.front_default;
     };
 

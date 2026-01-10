@@ -8,6 +8,7 @@ build/
 
 # H2
 data/
+!frontend/src/data/
 
 # Environment files
 .env

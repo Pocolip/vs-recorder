@@ -37,6 +37,7 @@ const POKEMON_FORM_MAPPINGS = {
     'Tornadus-Therian': 'tornadus-therian',
     'Thundurus-Therian': 'thundurus-therian',
     'Landorus-Therian': 'landorus-therian',
+    'Enamorus': 'enamorus-incarnate',
     'Enamorus-Therian': 'enamorus-therian',
 
     // Paradox Pokemon (Generation 9)

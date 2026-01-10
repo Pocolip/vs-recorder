@@ -1,5 +1,6 @@
 // src/components/modals/AddOpponentTeamModal.jsx
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import PokepasteService from '../../services/PokepasteService';
 
@@ -69,7 +70,8 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
     }
   };
 
-  return (
+  // Use portal to render at document.body level, bypassing parent stacking contexts
+  return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-slate-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-slate-700">
@@ -149,7 +151,8 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

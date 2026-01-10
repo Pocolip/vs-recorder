@@ -10,7 +10,9 @@ import {
     Heart,
     Shield,
     ExternalLink,
-    MessageCircle
+    MessageCircle,
+    Target,
+    Cloud
 } from 'lucide-react';
 import { Footer } from '../components';
 
@@ -19,7 +21,7 @@ const AboutPage = () => {
         {
             icon: Trophy,
             title: "Team Management",
-            description: "Import teams from Pokepaste and organize your VGC roster"
+            description: "Import teams from Pokepaste/Pokebin and organize your VGC roster"
         },
         {
             icon: BarChart3,
@@ -30,6 +32,11 @@ const AboutPage = () => {
             icon: Users,
             title: "Replay Analysis",
             description: "Import Showdown replays and analyze gameplay patterns"
+        },
+        {
+            icon: Target,
+            title: "Opponent Planning",
+            description: "Plan strategies against specific opponent teams with leads and backups"
         }
     ];
 
@@ -49,7 +56,7 @@ const AboutPage = () => {
                             <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
                                 VS Recorder
                             </h1>
-                            <p className="text-gray-400">VGC Analytics Chrome Extension</p>
+                            <p className="text-gray-400">VGC Analytics Platform</p>
                         </div>
                     </div>
 
@@ -91,20 +98,20 @@ const AboutPage = () => {
 
                         {/* Right Column */}
                         <div className="space-y-6">
-                            {/* Privacy & Security */}
+                            {/* Data & Security */}
                             <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6">
                                 <h2 className="text-xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-                                    <Shield className="h-5 w-5" />
-                                    Privacy & Security
+                                    <Cloud className="h-5 w-5" />
+                                    Data & Security
                                 </h2>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex items-center gap-2 text-gray-300">
                                         <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                                        All data stored locally on your device
+                                        Your data is synced securely to your account
                                     </div>
                                     <div className="flex items-center gap-2 text-gray-300">
                                         <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                                        No user tracking or analytics
+                                        Access your teams from any device
                                     </div>
                                     <div className="flex items-center gap-2 text-gray-300">
                                         <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>

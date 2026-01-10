@@ -7,6 +7,9 @@ import PokemonDropdown from '../PokemonDropdown';
 import ConfirmationModal from '../ConfirmationModal';
 import PokepasteService from '../../services/PokepasteService';
 
+// Consistent blue color for team cards
+const TEAM_COLOR = { border: 'border-l-blue-500', bg: 'bg-blue-500/10' };
+
 /**
  * Card component for displaying an opponent team and its strategies
  * @param {Object} opponentTeam - The opponent team data
@@ -101,14 +104,14 @@ const OpponentTeamCard = ({
   const compositions = opponentTeam.compositions || [];
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-lg">
+    <div className={`bg-slate-800/50 border border-slate-700 rounded-lg border-l-4 ${TEAM_COLOR.border}`}>
       {/* Header with Team Info and Notes */}
       <div className="p-4 bg-slate-700/30 border-b border-slate-700 rounded-t-lg">
         <div className="flex items-start gap-4">
           {/* Opponent Team Sprites - Left */}
-          <div className="flex-shrink-0">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-sm font-semibold text-gray-100">
+          <div className="flex-shrink-0 w-fit">
+            <div className="flex items-center gap-2 mb-2 max-w-[280px]">
+              <h3 className="text-sm font-semibold text-gray-100 truncate" title={pasteTitle || 'Opponent Team'}>
                 {loadingTitle ? 'Loading...' : (pasteTitle || 'Opponent Team')}
               </h3>
               {opponentTeam.pokepaste && (
@@ -116,7 +119,7 @@ const OpponentTeamCard = ({
                   href={opponentTeam.pokepaste}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-emerald-400 transition-colors"
+                  className="text-gray-400 hover:text-emerald-400 transition-colors flex-shrink-0"
                   title="View Pokepaste"
                 >
                   <ExternalLink className="h-3 w-3" />

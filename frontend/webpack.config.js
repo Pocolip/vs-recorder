@@ -24,6 +24,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
+    publicPath: '/',
     clean: true
   },
 
@@ -76,6 +77,11 @@ module.exports = {
         {
           from: 'icons',
           to: 'icons'
+        },
+        {
+          from: 'public/sprites',
+          to: 'sprites',
+          noErrorOnMissing: true
         }
       ]
     })
@@ -96,7 +102,10 @@ module.exports = {
 
   // Development server settings
   devServer: {
-    static: path.join(__dirname, 'dist'),
+    static: [
+      path.join(__dirname, 'dist'),
+      path.join(__dirname, 'public')
+    ],
     port: 3000,
     hot: true,
     historyApiFallback: true,

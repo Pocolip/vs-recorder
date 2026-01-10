@@ -1,6 +1,7 @@
 // src/services/PokemonService.js
 import StorageService from './StorageService.js';
 import { parseShowdownName } from '../utils/pokemonNameUtils';
+import SPRITE_MAP from '../data/pokemonSpriteMap.json';
 
 class PokemonService {
     static STORAGE_KEY = 'pokemon_cache';
@@ -98,7 +99,7 @@ class PokemonService {
 
             // Check cache first
             const cached = await this.getCachedPokemon(normalizedName);
-            if (cached && !this.isCacheExpired(cached.cached_at)) {
+            if (cached && !this.isCacheExpired(cached.cached_at) && this.hasLocalSprites(cached.data)) {
                 return cached.data;
             }
 
@@ -175,14 +176,21 @@ class PokemonService {
      * @returns {Object} Processed Pokemon data
      */
     static processPokemonData(apiData) {
+        // Use form-aware sprite generation based on Pokemon name, with ID fallback
+        const sprites = this.generateSpriteUrls(apiData.name, null, apiData.id);
+
         return {
             id: apiData.id,
             name: apiData.name,
             displayName: this.formatDisplayName(apiData.name),
             types: apiData.types.map(t => t.type.name),
             sprites: {
-                front_default: apiData.sprites.front_default,
-                front_shiny: apiData.sprites.front_shiny,
+                // Form-aware local sprites
+                front_default: sprites.front_default,
+                front_shiny: sprites.front_shiny,
+                // Keep remote as fallbacks
+                front_default_remote: apiData.sprites.front_default,
+                front_shiny_remote: apiData.sprites.front_shiny,
                 back_default: apiData.sprites.back_default,
                 back_shiny: apiData.sprites.back_shiny,
                 dream_world: apiData.sprites.other?.dream_world?.front_default,
@@ -208,7 +216,8 @@ class PokemonService {
      * @returns {Object} Enriched Pokemon data
      */
     static enrichFallbackData(fallbackData) {
-        const sprites = this.generateSpriteUrls(fallbackData.id);
+        // Use form-aware sprite generation based on Pokemon name, with ID fallback
+        const sprites = this.generateSpriteUrls(fallbackData.name, null, fallbackData.id);
 
         return {
             ...fallbackData,
@@ -224,15 +233,75 @@ class PokemonService {
     }
 
     /**
-     * Generate sprite URLs for a Pokemon ID
+     * Look up sprite info (ID and form index) from Pokemon name
+     * Uses the sprite map for form-aware lookups
+     * @param {string} pokemonName - Pokemon name (e.g., 'tornadus-therian', 'ogerpon-wellspring')
+     * @returns {Object|null} { id, form } or null if not found
+     */
+    static getSpriteInfo(pokemonName) {
+        if (!pokemonName) return null;
+        const normalized = pokemonName.toLowerCase().replace(/\s+/g, '-');
+        return SPRITE_MAP[normalized] || null;
+    }
+
+    /**
+     * Generate local sprite path for a Pokemon ID
+     * Local sprites use naming: icon{4-digit-ID}_f{2-digit-form}_s{shiny}.png
      * @param {number} id - Pokemon ID
+     * @param {number} form - Form index (default 0)
+     * @param {boolean} shiny - Whether shiny variant (default false)
+     * @returns {string} Local sprite path
+     */
+    static getLocalSpritePath(id, form = 0, shiny = false) {
+        if (!id || id < 0) return null;
+        const paddedId = String(id).padStart(4, '0');
+        const paddedForm = String(form).padStart(2, '0');
+        const shinyFlag = shiny ? '1' : '0';
+        return `/sprites/icon${paddedId}_f${paddedForm}_s${shinyFlag}.png`;
+    }
+
+    /**
+     * Generate sprite URLs for a Pokemon
+     * Prefers local sprites with form-awareness, falls back to PokeAPI
+     * @param {number|string} idOrName - Pokemon ID or name
+     * @param {number} formOverride - Optional form index override
+     * @param {number} idFallback - Optional ID fallback when name lookup fails
      * @returns {Object} Sprite URLs
      */
-    static generateSpriteUrls(id) {
+    static generateSpriteUrls(idOrName, formOverride = null, idFallback = null) {
+        let id, form;
+
+        if (typeof idOrName === 'string') {
+            // Normalize name for lookups
+            const normalized = idOrName.toLowerCase().replace(/\s+/g, '-');
+
+            // Look up form-aware sprite info from name
+            const spriteInfo = this.getSpriteInfo(idOrName);
+            if (spriteInfo) {
+                id = spriteInfo.id;
+                form = formOverride ?? spriteInfo.form;
+            } else {
+                // Fallback to COMMON_VGC_POKEMON, then to idFallback
+                const fallback = this.COMMON_VGC_POKEMON[normalized];
+                id = fallback?.id ?? idFallback;
+                form = formOverride ?? 0;
+            }
+        } else {
+            id = idOrName;
+            form = formOverride ?? 0;
+        }
+
+        const localDefault = this.getLocalSpritePath(id, form, false);
+        const localShiny = this.getLocalSpritePath(id, form, true);
         const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+
         return {
-            front_default: `${baseUrl}/${id}.png`,
-            front_shiny: `${baseUrl}/shiny/${id}.png`,
+            // Prefer local sprites for front_default
+            front_default: localDefault,
+            front_shiny: localShiny,
+            // Remote fallbacks
+            front_default_remote: `${baseUrl}/${id}.png`,
+            front_shiny_remote: `${baseUrl}/shiny/${id}.png`,
             back_default: `${baseUrl}/back/${id}.png`,
             back_shiny: `${baseUrl}/back/shiny/${id}.png`,
             dream_world: `${baseUrl}/other/dream-world/${id}.svg`,
@@ -337,6 +406,19 @@ class PokemonService {
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() - this.CACHE_EXPIRY_DAYS);
         return cacheDate < expiryDate;
+    }
+
+    /**
+     * Check if cached Pokemon data has local sprite URLs
+     * Used to invalidate old cache entries that only have remote URLs
+     * @param {Object} data - Cached Pokemon data
+     * @returns {boolean} Whether data has local sprites
+     */
+    static hasLocalSprites(data) {
+        if (!data || !data.sprites) return false;
+        // Local sprites start with /sprites/
+        const frontDefault = data.sprites.front_default;
+        return frontDefault && frontDefault.startsWith('/sprites/');
     }
 
     /**
