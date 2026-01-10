@@ -66,12 +66,21 @@ public interface MatchMapper {
     MatchDTO.TeamMatchStatsResponse toDTO(MatchService.TeamMatchStats stats);
 
     /**
-     * After mapping, set the stats for Response DTO
+     * After mapping, set the stats for Response DTO and fix opponent if needed
      */
     @AfterMapping
     default void setStats(@MappingTarget MatchDTO.Response response, @org.mapstruct.Context MatchService.MatchStats stats) {
         if (stats != null) {
             response.setStats(toStatsDTO(stats));
+        }
+
+        // Fix "TBD" opponent by using the opponent from the first replay
+        if (response.getOpponent() != null && response.getOpponent().equals("TBD")
+                && response.getReplays() != null && !response.getReplays().isEmpty()) {
+            String actualOpponent = response.getReplays().get(0).getOpponent();
+            if (actualOpponent != null && !actualOpponent.isEmpty()) {
+                response.setOpponent(actualOpponent);
+            }
         }
     }
 }

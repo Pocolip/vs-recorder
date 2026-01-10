@@ -1,36 +1,34 @@
 import apiClient from './client';
 
 /**
- * Team API endpoints
+ * Team API service
+ * Handles team CRUD operations
  */
 export const teamApi = {
   /**
-   * Get all teams for the current user
-   * @returns {Promise<Array>} List of team summaries
+   * Get all teams for current user
+   * @returns {Promise<Array>} List of teams
    */
   getAll: () => apiClient.get('/api/teams'),
 
   /**
    * Get team by ID
    * @param {number} id - Team ID
-   * @returns {Promise<Object>} Team details
+   * @returns {Promise<Object>} Team data with replays and matches
    */
   getById: (id) => apiClient.get(`/api/teams/${id}`),
 
   /**
    * Get teams by regulation
-   * @param {string} regulation - Regulation name
+   * @param {string} regulation - Regulation name (e.g., "Regulation H")
    * @returns {Promise<Array>} List of teams
    */
-  getByRegulation: (regulation) => apiClient.get(`/api/teams/regulation/${regulation}`),
+  getByRegulation: (regulation) =>
+    apiClient.get(`/api/teams/regulation/${regulation}`),
 
   /**
-   * Create new team
-   * @param {Object} data - Team data
-   * @param {string} data.name - Team name
-   * @param {string} data.pokepaste - Pokepaste URL or content
-   * @param {string} data.regulation - Regulation name
-   * @param {string[]} [data.showdownUsernames] - Optional showdown usernames
+   * Create a new team
+   * @param {Object} data - { name, pokepaste, regulation, showdownUsernames }
    * @returns {Promise<Object>} Created team
    */
   create: (data) => apiClient.post('/api/teams', data),
@@ -38,10 +36,10 @@ export const teamApi = {
   /**
    * Update team
    * @param {number} id - Team ID
-   * @param {Object} data - Update data
+   * @param {Object} updates - Team updates
    * @returns {Promise<Object>} Updated team
    */
-  update: (id, data) => apiClient.patch(`/api/teams/${id}`, data),
+  update: (id, updates) => apiClient.patch(`/api/teams/${id}`, updates),
 
   /**
    * Delete team
@@ -51,14 +49,14 @@ export const teamApi = {
   delete: (id) => apiClient.delete(`/api/teams/${id}`),
 
   /**
-   * Get team statistics
+   * Get team stats (win rate, games played, etc.)
    * @param {number} id - Team ID
-   * @returns {Promise<Object>} Team stats (wins, losses, winRate, totalGames)
+   * @returns {Promise<Object>} Team stats
    */
   getStats: (id) => apiClient.get(`/api/teams/${id}/stats`),
 
   /**
-   * Add showdown username to team
+   * Add Showdown username to team
    * @param {number} id - Team ID
    * @param {string} username - Showdown username
    * @returns {Promise<Object>} Updated team
@@ -67,7 +65,7 @@ export const teamApi = {
     apiClient.post(`/api/teams/${id}/showdown-usernames`, { username }),
 
   /**
-   * Remove showdown username from team
+   * Remove Showdown username from team
    * @param {number} id - Team ID
    * @param {string} username - Showdown username
    * @returns {Promise<Object>} Updated team
@@ -75,3 +73,5 @@ export const teamApi = {
   removeShowdownUsername: (id, username) =>
     apiClient.delete(`/api/teams/${id}/showdown-usernames/${username}`),
 };
+
+export default teamApi;

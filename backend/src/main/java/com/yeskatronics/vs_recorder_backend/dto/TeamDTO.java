@@ -79,6 +79,7 @@ public class TeamDTO {
     public static class Summary {
         private Long id;
         private String name;
+        private String pokepaste;
         private String regulation;
         private LocalDateTime createdAt;
         private int replayCount;

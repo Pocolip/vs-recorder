@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -160,5 +160,213 @@ public class ReplayMatcher {
         }
 
         return info1.getMatchId().equals(info2.getMatchId());
+    }
+
+    /**
+     * Battle data extracted from battle log
+     */
+    @Data
+    public static class BattleData {
+        private String winner;
+        private Map<String, String> players; // "p1" -> "Username", "p2" -> "Username"
+        private Map<String, List<String>> teams; // "p1" -> [pokemon], "p2" -> [pokemon]
+        private Map<String, List<String>> actualPicks; // "p1" -> [pokemon brought to battle]
+        private Map<String, List<TeraEvent>> teraEvents; // "p1" -> [tera events]
+        private Map<String, EloChange> eloChanges; // "p1" -> elo data
+        private Map<String, Map<String, Map<String, Integer>>> moveUsage; // "p1" -> {pokemon -> {move -> count}}
+    }
+
+    @Data
+    public static class TeraEvent {
+        private String pokemon;
+        private String type;
+
+        public TeraEvent(String pokemon, String type) {
+            this.pokemon = pokemon;
+            this.type = type;
+        }
+    }
+
+    @Data
+    public static class EloChange {
+        private Integer before;
+        private Integer after;
+        private Integer change;
+
+        public EloChange(Integer before, Integer after) {
+            this.before = before;
+            this.after = after;
+            this.change = after != null && before != null ? after - before : null;
+        }
+    }
+
+    /**
+     * Extract battle data (winner, players, teams) from battle log JSON
+     *
+     * @param battleLogJson the battle log JSON string
+     * @param userShowdownUsernames list of user's Showdown usernames to identify which player is the user
+     * @return BattleData with winner, players, and teams
+     */
+    public static BattleData extractBattleData(String battleLogJson, List<String> userShowdownUsernames) {
+        BattleData data = new BattleData();
+        data.setPlayers(new HashMap<>());
+        data.setTeams(new HashMap<>());
+        data.getTeams().put("p1", new ArrayList<>());
+        data.getTeams().put("p2", new ArrayList<>());
+        data.setActualPicks(new HashMap<>());
+        data.getActualPicks().put("p1", new ArrayList<>());
+        data.getActualPicks().put("p2", new ArrayList<>());
+        data.setTeraEvents(new HashMap<>());
+        data.getTeraEvents().put("p1", new ArrayList<>());
+        data.getTeraEvents().put("p2", new ArrayList<>());
+        data.setEloChanges(new HashMap<>());
+        data.setMoveUsage(new HashMap<>());
+        data.getMoveUsage().put("p1", new HashMap<>());
+        data.getMoveUsage().put("p2", new HashMap<>());
+
+        if (battleLogJson == null || battleLogJson.isEmpty()) {
+            return data;
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(battleLogJson);
+            String logText = root.path("log").asText();
+
+            if (logText.isEmpty()) {
+                return data;
+            }
+
+            String[] lines = logText.split("\n");
+            Set<String> seenPokemon = new HashSet<>();
+            Map<String, Set<String>> switchedIn = new HashMap<>();
+            switchedIn.put("p1", new HashSet<>());
+            switchedIn.put("p2", new HashSet<>());
+
+            // Map position (p1a, p2a, etc.) to species name for handling nicknames
+            Map<String, String> positionToSpecies = new HashMap<>();
+
+            for (String line : lines) {
+                // Extract player names: |player|p1|Username|...
+                if (line.startsWith("|player|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 4) {
+                        String player = parts[2];
+                        String username = parts[3];
+                        data.getPlayers().put(player, username);
+                    }
+                }
+                // Extract winner: |win|Username
+                else if (line.startsWith("|win|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 3) {
+                        data.setWinner(parts[2]);
+                    }
+                }
+                // Extract team rosters: |poke|p1|PokemonName|...
+                else if (line.startsWith("|poke|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 4) {
+                        String player = parts[2];
+                        String pokemonName = parts[3].split(",")[0];
+                        pokemonName = pokemonName.replaceAll("\\s*,\\s*[MF]\\s*$", "");
+
+                        String uniqueKey = player + ":" + pokemonName;
+                        if (!seenPokemon.contains(uniqueKey)) {
+                            data.getTeams().get(player).add(pokemonName);
+                            seenPokemon.add(uniqueKey);
+                        }
+                    }
+                }
+                // Extract switch-ins to determine actual picks: |switch|p1a: Nickname|Species, L50, F
+                else if (line.startsWith("|switch|") || line.startsWith("|drag|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 4) {
+                        String playerPoke = parts[2]; // "p1a: Nickname"
+                        String position = playerPoke.split(":")[0].trim(); // "p1a"
+                        String player = position.substring(0, 2); // "p1" or "p2"
+                        String speciesData = parts[3]; // "Species, L50, F" or "Species"
+                        String pokemonName = speciesData.split(",")[0].trim(); // Extract species name
+
+                        // Store position -> species mapping for tera event lookups
+                        positionToSpecies.put(position, pokemonName);
+
+                        // Add to actualPicks if not already there
+                        if (!switchedIn.get(player).contains(pokemonName)) {
+                            switchedIn.get(player).add(pokemonName);
+                            data.getActualPicks().get(player).add(pokemonName);
+                        }
+                    }
+                }
+                // Extract terastallization: |-terastallize|p1a: Nickname|Type
+                else if (line.startsWith("|-terastallize|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 4) {
+                        String playerPoke = parts[2]; // "p1a: Nickname"
+                        String position = playerPoke.split(":")[0].trim(); // "p1a"
+                        String player = position.substring(0, 2); // "p1" or "p2"
+                        String teraType = parts[3].toLowerCase();
+
+                        // Look up the actual species from the position mapping
+                        String pokemonName = positionToSpecies.getOrDefault(position, "Unknown");
+
+                        data.getTeraEvents().get(player).add(new TeraEvent(pokemonName, teraType));
+                    }
+                }
+                // Extract move usage: |move|p1a: Nickname|Move Name|p2a: Target
+                else if (line.startsWith("|move|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 3) {
+                        String playerPoke = parts[2]; // "p1a: Nickname"
+                        String position = playerPoke.split(":")[0].trim(); // "p1a"
+                        String player = position.substring(0, 2); // "p1" or "p2"
+                        String moveName = parts[3]; // "Move Name"
+
+                        // Look up the actual species from the position mapping
+                        String pokemonName = positionToSpecies.getOrDefault(position, "Unknown");
+
+                        if (pokemonName != null && !pokemonName.equals("Unknown")) {
+                            // Get or create the pokemon's move usage map
+                            Map<String, Map<String, Integer>> playerMoveUsage = data.getMoveUsage().get(player);
+                            Map<String, Integer> pokemonMoveUsage = playerMoveUsage.computeIfAbsent(pokemonName, k -> new HashMap<>());
+
+                            // Increment move count
+                            pokemonMoveUsage.put(moveName, pokemonMoveUsage.getOrDefault(moveName, 0) + 1);
+                        }
+                    }
+                }
+                // Extract ELO ratings: |raw|Username's rating: 1279 &rarr; <strong>1294</strong><br />(+15 for winning)
+                else if (line.startsWith("|raw|") && line.contains("rating:")) {
+                    try {
+                        // Extract username
+                        String username = line.substring(5, line.indexOf("'s rating:")).trim();
+
+                        // Extract ratings using regex to handle HTML tags
+                        // Pattern: "BEFORE &rarr; <strong>AFTER</strong>"
+                        java.util.regex.Pattern ratingPattern = java.util.regex.Pattern.compile("(\\d+)\\s*&rarr;\\s*<strong>(\\d+)</strong>");
+                        java.util.regex.Matcher matcher = ratingPattern.matcher(line);
+
+                        if (matcher.find()) {
+                            Integer before = Integer.parseInt(matcher.group(1));
+                            Integer after = Integer.parseInt(matcher.group(2));
+
+                            // Find which player this username belongs to
+                            for (Map.Entry<String, String> entry : data.getPlayers().entrySet()) {
+                                if (entry.getValue().equalsIgnoreCase(username)) {
+                                    data.getEloChanges().put(entry.getKey(), new EloChange(before, after));
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.debug("Could not parse ELO from raw line: {}", line);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Error extracting battle data: {}", e.getMessage());
+        }
+
+        return data;
     }
 }

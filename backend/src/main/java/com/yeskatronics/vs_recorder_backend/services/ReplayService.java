@@ -107,7 +107,9 @@ public class ReplayService {
         replay.setTeam(team);
         replay.setUrl(url);
         replay.setBattleLog(replayData.getBattleLog());
-        replay.setDate(LocalDateTime.now());
+        replay.setOpponent(replayData.getOpponent());
+        replay.setResult(replayData.getResult());
+        replay.setDate(replayData.getDate() != null ? replayData.getDate() : LocalDateTime.now());
 
         // Set game number if Bo3
         if (matchInfo.isBo3()) {
@@ -458,15 +460,15 @@ public class ReplayService {
     private void createNewMatch(Replay replay, ReplayMatcher.Bo3MatchInfo matchInfo, Team team) {
         Match match = new Match();
         match.setTeam(team);
-        match.setOpponent("TBD"); // Will be updated when more games are added
+        match.setOpponent(replay.getOpponent()); // Set opponent from replay data
 
         Match savedMatch = matchRepository.save(match);
 
         replay.setMatch(savedMatch);
         replayRepository.save(replay);
 
-        log.info("Created new Match ID: {} for replay ID: {} (Game {})",
-                savedMatch.getId(), replay.getId(), matchInfo.getGameNumber());
+        log.info("Created new Match ID: {} for replay ID: {} (Game {}) vs {}",
+                savedMatch.getId(), replay.getId(), matchInfo.getGameNumber(), replay.getOpponent());
     }
 
     /**
@@ -502,7 +504,7 @@ public class ReplayService {
             // Siblings exist but no match created yet - create one and associate all
             Match match = new Match();
             match.setTeam(team);
-            match.setOpponent("TBD");
+            match.setOpponent(replay.getOpponent()); // Set opponent from replay data
             Match savedMatch = matchRepository.save(match);
 
             // Associate this replay
@@ -517,8 +519,8 @@ public class ReplayService {
                         sibling.getId(), savedMatch.getId());
             });
 
-            log.info("Created Match ID: {} and associated {} replays (Game {})",
-                    savedMatch.getId(), siblings.size() + 1, matchInfo.getGameNumber());
+            log.info("Created Match ID: {} and associated {} replays (Game {}) vs {}",
+                    savedMatch.getId(), siblings.size() + 1, matchInfo.getGameNumber(), replay.getOpponent());
         }
     }
 }

@@ -50,6 +50,7 @@ public interface TeamMapper {
      */
     @Mapping(source = "team.id", target = "id")
     @Mapping(source = "team.name", target = "name")
+    @Mapping(source = "team.pokepaste", target = "pokepaste")
     @Mapping(source = "team.regulation", target = "regulation")
     @Mapping(source = "team.createdAt", target = "createdAt")
     @Mapping(source = "replayCount", target = "replayCount")

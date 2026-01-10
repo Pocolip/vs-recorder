@@ -6,15 +6,15 @@
  */
 const POKEMON_FORM_MAPPINGS = {
     // Urshifu forms
-    'Urshifu-*': 'urshifu',
+    'Urshifu-*': 'urshifu', // Showdown's ambiguous form notation
     'Urshifu-Rapid-Strike': 'urshifu-rapid-strike',
     'Urshifu-Single-Strike': 'urshifu',
-    'Urshifu-Single Strike': 'urshifu',
+    'Urshifu-Single Strike': 'urshifu', // Alternative spacing
 
     // Calyrex forms
     'Calyrex-Shadow': 'calyrex-shadow',
     'Calyrex-Ice': 'calyrex-ice',
-    'Calyrex-Shadow Rider': 'calyrex-shadow',
+    'Calyrex-Shadow Rider': 'calyrex-shadow', // Alternative naming
     'Calyrex-Ice Rider': 'calyrex-ice',
 
     // Kyurem forms
@@ -24,13 +24,13 @@ const POKEMON_FORM_MAPPINGS = {
     // Necrozma forms
     'Necrozma-Dawn-Wings': 'necrozma-dawn-wings',
     'Necrozma-Dusk-Mane': 'necrozma-dusk-mane',
-    'Necrozma-Dawn Wings': 'necrozma-dawn-wings',
+    'Necrozma-Dawn Wings': 'necrozma-dawn-wings', // Alternative spacing
     'Necrozma-Dusk Mane': 'necrozma-dusk-mane',
 
     // Zacian/Zamazenta forms
     'Zacian-Crowned': 'zacian-crowned',
     'Zamazenta-Crowned': 'zamazenta-crowned',
-    'Zacian-Crowned Sword': 'zacian-crowned',
+    'Zacian-Crowned Sword': 'zacian-crowned', // Alternative naming
     'Zamazenta-Crowned Shield': 'zamazenta-crowned',
 
     // Forces of Nature forms
@@ -72,7 +72,7 @@ const POKEMON_FORM_MAPPINGS = {
     'Ogerpon-Wellspring': 'ogerpon-wellspring-mask',
     'Ogerpon-Cornerstone': 'ogerpon-cornerstone-mask',
     'Ogerpon-Teal': 'ogerpon',
-    'Ogerpon-Hearthflame Mask': 'ogerpon-hearthflame-mask',
+    'Ogerpon-Hearthflame Mask': 'ogerpon-hearthflame-mask', // Alternative naming
     'Ogerpon-Wellspring Mask': 'ogerpon-wellspring-mask',
     'Ogerpon-Cornerstone Mask': 'ogerpon-cornerstone-mask',
 
@@ -134,8 +134,8 @@ const POKEMON_FORM_MAPPINGS = {
     'Maushold': 'maushold-family-of-three',
     'Maushold-Family-of-Three': 'maushold-family-of-three',
     'Maushold-Three': 'maushold-family-of-three',
-    'Maushold-Family-of-Four': 'maushold-family-of-four',
-    'Maushold-Four': 'maushold-family-of-four',
+    'Maushold-Family-of-Four': 'maushold-family-of-four', // if API supports, otherwise 'maushold'
+    'Maushold-Four': 'maushold-family-of-four', // if API supports, otherwise 'maushold'
 
     // Tatsugiri forms
     'Tatsugiri-Curly': 'tatsugiri',
@@ -143,28 +143,29 @@ const POKEMON_FORM_MAPPINGS = {
     'Tatsugiri-Droopy': 'tatsugiri-droopy',
     'Tatsugiri-Stretchy': 'tatsugiri-stretchy',
 
-    // Palafin
+    //Palafin
     'Palafin':'palafin-hero',
 
-    // Mimikyu
+    //Mimikyu
     'Mimikyu': 'mimikyu-disguised',
 
-    // Tauros
+    //Tauros
     'Tauros-Paldea-Aqua': 'tauros-paldea-aqua-breed',
     'Tauros-Paldea-Blaze': 'tauros-paldea-blaze-breed',
     'Tauros-Paldea-Combat': 'tauros-paldea-combat-breed',
 
-    // Vivillon
+    //Vivillon
     'Vivillon-Pokeball': 'vivillon',
 
-    // Eiscue
+    //Eiscue
     "Eiscue": "eiscue-ice",
 
-    // Lycanroc
+    //Lycanroc
     "Lycanroc": "lycanroc-midday",
 
-    // Toxtricity
+    //Toxtricity
     "Toxtricity": "toxtricity-amped",
+
 
     // Regional forms
     'Articuno-Galar': 'articuno-galar',
@@ -172,7 +173,7 @@ const POKEMON_FORM_MAPPINGS = {
     'Moltres-Galar': 'moltres-galar',
     'Slowking-Galar': 'slowking-galar',
     'Corsola-Galar': 'corsola-galar',
-    'Cursola': 'cursola',
+    'Cursola': 'cursola', // Evolution of Galarian Corsola
     'Darmanitan-Galar': 'darmanitan-galar',
     'Darmanitan-Galar-Zen': 'darmanitan-galar-zen',
 
@@ -195,18 +196,18 @@ export const cleanPokemonName = (pokemonName) => {
 
     // Remove metadata commonly found in Showdown logs
     let cleanName = pokemonName
-        .split(',')[0] // Remove level, gender, etc.
+        .split(',')[0] // Remove level, gender, etc. (e.g., "Pikachu, L50, M" -> "Pikachu")
         .trim();
 
-    // Remove nickname in parentheses
+    // Remove nickname in parentheses (e.g., "Pikachu (Sparky)" -> "Pikachu")
     if (cleanName.includes('(') && cleanName.includes(')')) {
         cleanName = cleanName.split('(')[0].trim();
     }
 
-    // Remove gender indicators
+    // Remove gender indicators that might be standalone
     cleanName = cleanName.replace(/\s*\(M\)|\s*\(F\)/g, '').trim();
 
-    // Check for direct mapping
+    // Check if we have a direct mapping for this specific form
     if (POKEMON_FORM_MAPPINGS[cleanName]) {
         return POKEMON_FORM_MAPPINGS[cleanName];
     }
@@ -214,15 +215,15 @@ export const cleanPokemonName = (pokemonName) => {
     // Convert to API-compatible format
     return cleanName
         .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9\-]/g, '')
-        .replace(/--+/g, '-')
-        .replace(/^-|-$/g, '');
+        .replace(/\s+/g, '-')           // Replace spaces with hyphens
+        .replace(/[^a-z0-9\-]/g, '')    // Remove special characters except hyphens
+        .replace(/--+/g, '-')           // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, '');         // Remove leading/trailing hyphens
 };
 
 /**
- * Parse Pokemon name from Showdown format
- * @param {string} showdownName - Pokemon name from Showdown
+ * Parse Pokemon name from Showdown format, handling special cases
+ * @param {string} showdownName - Pokemon name from Showdown (e.g., "Urshifu-*", "Calyrex-Shadow")
  * @returns {string} Normalized Pokemon name for API use
  */
 export const parseShowdownName = (showdownName) => {
@@ -230,6 +231,8 @@ export const parseShowdownName = (showdownName) => {
 
     // Handle special Showdown notation like "Urshifu-*"
     if (showdownName.includes('-*')) {
+        // This indicates an ambiguous form in team preview
+        // Default to the base form or most common variant
         const baseName = showdownName.replace('-*', '');
         return cleanPokemonName(baseName);
     }
@@ -238,31 +241,35 @@ export const parseShowdownName = (showdownName) => {
 };
 
 /**
- * Convert a display name to API format
+ * Convert a display name (from Pokepaste) to API format
+ * Handles the full parsing pipeline from team building tools
  * @param {string} displayName - Human-readable Pokemon name
  * @returns {string} API-compatible name
  */
 export const convertDisplayNameToApi = (displayName) => {
     if (!displayName) return '';
 
+    // Remove everything after @ (held item)
     let name = displayName;
-
-    // Remove held item
     if (name.includes('@')) {
         name = name.split('@')[0].trim();
     }
 
-    // Handle nickname vs species
+    // Remove nickname in parentheses
     if (name.includes('(') && name.includes(')')) {
+        // Handle cases like "Nickname (Species)" vs "Species (Form)"
         const parts = name.split('(');
         if (parts.length === 2) {
             const beforeParen = parts[0].trim();
             const inParen = parts[1].replace(')', '').trim();
 
+            // If what's in parentheses looks like a Pokemon name, use that
+            // Otherwise, use what's before the parentheses
             if (inParen.includes('-') || POKEMON_FORM_MAPPINGS[inParen] ||
                 ['M', 'F', 'Male', 'Female'].includes(inParen)) {
                 name = beforeParen;
             } else {
+                // Probably a nickname situation
                 name = inParen;
             }
         }
@@ -272,13 +279,14 @@ export const convertDisplayNameToApi = (displayName) => {
 };
 
 /**
- * Get display name from API name
+ * Get display name from API name (reverse operation)
  * @param {string} apiName - API-compatible Pokemon name
  * @returns {string} Human-readable display name
  */
 export const getDisplayName = (apiName) => {
     if (!apiName) return '';
 
+    // Convert API format back to readable format
     return apiName
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -286,9 +294,9 @@ export const getDisplayName = (apiName) => {
 };
 
 /**
- * Check if a Pokemon name is valid
+ * Check if a Pokemon name represents a valid Pokemon
  * @param {string} pokemonName - Pokemon name to validate
- * @returns {boolean} True if valid
+ * @returns {boolean} True if the name appears to be a valid Pokemon
  */
 export const isValidPokemonName = (pokemonName) => {
     if (!pokemonName || typeof pokemonName !== 'string') {
@@ -296,11 +304,13 @@ export const isValidPokemonName = (pokemonName) => {
     }
 
     const cleaned = cleanPokemonName(pokemonName);
+
+    // Basic validation: should be at least 3 characters and contain letters
     return cleaned.length >= 3 && /[a-z]/.test(cleaned);
 };
 
 /**
- * Extract Pokemon names from Pokepaste text
+ * Extract Pokemon names from a Pokepaste text block
  * @param {string} pokepasteText - Raw text from a Pokepaste
  * @returns {string[]} Array of cleaned Pokemon names
  */
@@ -326,6 +336,7 @@ export const extractPokemonFromPokepaste = (pokepasteText) => {
             continue;
         }
 
+        // This should be a Pokemon name line
         const pokemonName = convertDisplayNameToApi(trimmedLine);
 
         if (isValidPokemonName(pokemonName) && !pokemonNames.includes(pokemonName)) {

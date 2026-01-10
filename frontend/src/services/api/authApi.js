@@ -1,31 +1,51 @@
 import apiClient from './client';
 
 /**
- * Authentication API endpoints
+ * Authentication API service
+ * Handles login, registration, and user management
  */
 export const authApi = {
   /**
    * Register a new user
-   * @param {Object} data - Registration data
-   * @param {string} data.username - Username (3-50 chars)
-   * @param {string} data.email - Email address
-   * @param {string} data.password - Password (min 6 chars)
-   * @returns {Promise<Object>} Auth response with token and user info
+   * @param {Object} data - { username, email, password }
+   * @returns {Promise<Object>} User data with token
    */
   register: (data) => apiClient.post('/api/auth/register', data),
 
   /**
    * Login user
-   * @param {Object} credentials - Login credentials
-   * @param {string} credentials.username - Username
-   * @param {string} credentials.password - Password
-   * @returns {Promise<Object>} Auth response with token and user info
+   * @param {Object} credentials - { username, password }
+   * @returns {Promise<Object>} User data with token
    */
   login: (credentials) => apiClient.post('/api/auth/login', credentials),
 
   /**
-   * Get current authenticated user
-   * @returns {Promise<Object>} Current user info
+   * Get current user info
+   * @returns {Promise<Object>} Current user data
    */
   getCurrentUser: () => apiClient.get('/api/auth/me'),
+
+  /**
+   * Update user profile
+   * @param {Object} updates - User updates
+   * @returns {Promise<Object>} Updated user data
+   */
+  updateProfile: (updates) => apiClient.patch('/api/auth/me', updates),
+
+  /**
+   * Change password
+   * @param {Object} data - { currentPassword, newPassword }
+   * @returns {Promise<void>}
+   */
+  changePassword: (data) => apiClient.post('/api/auth/change-password', data),
+
+  /**
+   * Logout (client-side - clear token)
+   */
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  },
 };
+
+export default authApi;

@@ -15,6 +15,5 @@ export { default as MatchByMatchTab } from './MatchByMatchTab';
 export { default as UsageStatsTab } from './UsageStatsTab';
 export { default as MatchupStatsTab } from './MatchupStatsTab';
 export { default as MoveUsageTab } from './MoveUsageTab';
-export { default as GamePlannerTab } from './GamePlannerTab';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as PublicRoute } from './PublicRoute';

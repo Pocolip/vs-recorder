@@ -1,16 +1,20 @@
 import axios from 'axios';
-import { config } from '@/config/env';
 
-// Create axios instance with base configuration
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+
+/**
+ * Axios instance configured for VS Recorder backend
+ */
 const apiClient = axios.create({
-  baseURL: config.apiBaseUrl,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 second timeout
 });
 
-// Request interceptor - add JWT token to requests
+/**
+ * Request interceptor - add JWT token to all requests
+ */
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -24,35 +28,43 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle responses and errors
+/**
+ * Response interceptor - handle errors globally
+ */
 apiClient.interceptors.response.use(
   (response) => {
-    // Return just the data for successful responses
+    // Return just the data from successful responses
     return response.data;
   },
   (error) => {
     // Handle 401 Unauthorized - token expired or invalid
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      const requestUrl = error.config?.url || '';
+      const isAuthEndpoint = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+      const isOnLoginPage = window.location.pathname === '/login';
 
-      // Only redirect if not already on login page
-      if (window.location.pathname !== '/login') {
+      // Only redirect if this isn't a login/register attempt
+      // If user is trying to login and fails, let the error show instead of redirecting
+      if (!isAuthEndpoint && !isOnLoginPage) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = '/login';
+      } else {
+        // Clear token but don't redirect (let login page handle the error)
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
     }
 
     // Extract error message from response
-    const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
+    const errorMessage =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'An unexpected error occurred';
 
-    // Return a rejected promise with structured error
-    return Promise.reject({
-      status: error.response?.status,
-      message: errorMessage,
-      data: error.response?.data,
-      originalError: error,
-    });
+    // Reject with error message
+    return Promise.reject(new Error(errorMessage));
   }
 );
 

@@ -24,9 +24,9 @@ import {
     UsageStatsTab,
     MatchupStatsTab,
     MoveUsageTab,
-    GamePlannerTab,
     PokemonTeam
 } from '../components';
+import OpponentPlannerTab from '../components/tabs/OpponentPlannerTab';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
 import MatchService from "@/services/MatchService";
@@ -166,7 +166,7 @@ const TeamPage = () => {
         { id: 'usage-stats', label: 'Usage Stats', icon: TrendingUp },
         { id: 'matchup-stats', label: 'Matchup Stats', icon: Target },
         { id: 'move-usage', label: 'Move Usage', icon: Zap },
-        { id: 'game-planner', label: 'Game Planner', icon: Clipboard }
+        { id: 'opponent-planner', label: 'Opponent Planner', icon: Clipboard }
     ];
 
     return (
@@ -236,9 +236,10 @@ const TeamPage = () => {
                             team={team}
                         />
                     )}
-                    {activeTab === 'game-planner' && (
-                        <GamePlannerTab
+                    {activeTab === 'opponent-planner' && (
+                        <OpponentPlannerTab
                             team={team}
+                            teamId={teamId}
                         />
                     )}
                 </div>
