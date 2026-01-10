@@ -19,6 +19,35 @@ export const gamePlanApi = {
   getById: (id) => apiClient.get(`/api/game-plans/${id}`),
 
   /**
+   * Get game plan for a specific team (returns null if none exists)
+   * @param {number} teamId - Team ID
+   * @returns {Promise<Object|null>} Game plan or null
+   */
+  getForTeam: async (teamId) => {
+    try {
+      return await apiClient.get(`/api/game-plans/for-team/${teamId}`);
+    } catch (error) {
+      // Return null if no game plan exists (404)
+      if (error.message?.includes('not found') || error.message?.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
+  /**
+   * Get or create game plan for a specific team
+   * Creates a new game plan if one doesn't exist
+   * @param {number} teamId - Team ID
+   * @param {string} name - Optional name for the game plan
+   * @returns {Promise<Object>} Game plan with teams
+   */
+  getOrCreateForTeam: (teamId, name) => {
+    const params = name ? `?name=${encodeURIComponent(name)}` : '';
+    return apiClient.post(`/api/game-plans/for-team/${teamId}${params}`);
+  },
+
+  /**
    * Create a new game plan
    * @param {Object} data - { teamId, name, notes }
    * @returns {Promise<Object>} Created game plan

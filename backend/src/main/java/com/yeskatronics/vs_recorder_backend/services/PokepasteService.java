@@ -77,13 +77,19 @@ public class PokepasteService {
      */
     private PokepasteDTO.PasteData parsePaste(String rawText) {
         PokepasteDTO.PasteData pasteData = new PokepasteDTO.PasteData();
-        String[] sections = rawText.split("\n\n");
+
+        // Normalize line endings to Unix format to handle Windows/Mac line endings
+        String normalizedText = rawText.replace("\r\n", "\n").replace("\r", "\n");
+
+        String[] sections = normalizedText.split("\n\n");
+        log.debug("Split paste into {} sections", sections.length);
 
         for (String section : sections) {
             if (section.trim().isEmpty()) continue;
 
             PokepasteDTO.PokemonData pokemon = parsePokemonSection(section);
             if (pokemon != null && pokemon.getSpecies() != null) {
+                log.debug("Parsed Pokemon: {}", pokemon.getSpecies());
                 pasteData.getPokemon().add(pokemon);
             }
         }
@@ -97,6 +103,7 @@ public class PokepasteService {
     private PokepasteDTO.PasteData fetchPokepasteData(String originalUrl, String pasteId) {
         log.info("Fetching from Pokepaste: {}", pasteId);
         String rawUrl = POKEPASTE_BASE + "/" + pasteId + "/raw";
+        String jsonUrl = POKEPASTE_BASE + "/" + pasteId + "/json";
 
         try {
             // Fetch raw text from Pokepaste
@@ -110,6 +117,21 @@ public class PokepasteService {
             // Parse the paste
             PokepasteDTO.PasteData pasteData = parsePaste(rawText);
             pasteData.setRawText(rawText);
+            pasteData.setSource("pokepaste");
+
+            // Try to fetch title from JSON endpoint
+            try {
+                String jsonResponse = restTemplate.getForObject(jsonUrl, String.class);
+                if (jsonResponse != null) {
+                    JsonNode root = objectMapper.readTree(jsonResponse);
+                    String title = root.path("title").asText(null);
+                    if (title != null && !title.isEmpty()) {
+                        pasteData.setTitle(title);
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Could not fetch title from Pokepaste JSON endpoint: {}", e.getMessage());
+            }
 
             log.info("Successfully fetched Pokepaste with {} Pokemon", pasteData.getPokemon().size());
 
@@ -146,6 +168,7 @@ public class PokepasteService {
             }
 
             String content = dataNode.path("content").asText();
+            String title = dataNode.path("title").asText(null);
 
             if (content == null || content.trim().isEmpty()) {
                 throw new IllegalArgumentException("Pokebin paste is empty or missing 'content' field");
@@ -154,6 +177,10 @@ public class PokepasteService {
             // Parse the content (same format as Pokepaste)
             PokepasteDTO.PasteData pasteData = parsePaste(content);
             pasteData.setRawText(content);
+            pasteData.setSource("pokebin");
+            if (title != null && !title.isEmpty()) {
+                pasteData.setTitle(title);
+            }
 
             log.info("Successfully fetched Pokebin with {} Pokemon", pasteData.getPokemon().size());
 

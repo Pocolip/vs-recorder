@@ -31,7 +31,9 @@ public class PokepasteDTO {
     @Data
     @NoArgsConstructor
     public static class PasteData {
+        private String title;
         private List<PokemonData> pokemon = new ArrayList<>();
         private String rawText;
+        private String source; // "pokepaste" or "pokebin"
     }
 }

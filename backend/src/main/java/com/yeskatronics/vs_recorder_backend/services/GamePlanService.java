@@ -146,6 +146,54 @@ public class GamePlanService {
         return gamePlanRepository.countByUserId(userId);
     }
 
+    /**
+     * Get a game plan by team ID and user ID
+     *
+     * @param teamId the team ID
+     * @param userId the user ID
+     * @return Optional containing the game plan if found
+     */
+    @Transactional(readOnly = true)
+    public Optional<GamePlan> getGamePlanByTeamIdAndUserId(Long teamId, Long userId) {
+        log.debug("Fetching game plan for team ID: {} and user ID: {}", teamId, userId);
+        return gamePlanRepository.findByTeamIdAndUserId(teamId, userId);
+    }
+
+    /**
+     * Get or create a game plan for a specific team.
+     * If a game plan already exists for the team, return it.
+     * Otherwise, create a new one with a default name.
+     *
+     * @param teamId the team ID
+     * @param userId the user ID
+     * @param defaultName the name to use if creating a new game plan
+     * @return the existing or newly created game plan
+     */
+    public GamePlan getOrCreateGamePlanForTeam(Long teamId, Long userId, String defaultName) {
+        log.info("Getting or creating game plan for team ID: {} and user ID: {}", teamId, userId);
+
+        // Check if a game plan already exists for this team
+        Optional<GamePlan> existingPlan = gamePlanRepository.findByTeamIdAndUserId(teamId, userId);
+        if (existingPlan.isPresent()) {
+            log.info("Found existing game plan ID: {} for team ID: {}", existingPlan.get().getId(), teamId);
+            return existingPlan.get();
+        }
+
+        // Create a new game plan
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        GamePlan newPlan = new GamePlan();
+        newPlan.setUser(user);
+        newPlan.setTeamId(teamId);
+        newPlan.setName(defaultName != null ? defaultName : "Opponent Plans");
+
+        GamePlan savedPlan = gamePlanRepository.save(newPlan);
+        log.info("Created new game plan ID: {} for team ID: {}", savedPlan.getId(), teamId);
+
+        return savedPlan;
+    }
+
     // ==================== GamePlanTeam CRUD ====================
 
     /**

@@ -42,4 +42,20 @@ public interface GamePlanRepository extends JpaRepository<GamePlan, Long> {
      * @return number of game plans
      */
     long countByUserId(Long userId);
+
+    /**
+     * Find a game plan associated with a specific team and owned by user
+     * @param teamId the team ID
+     * @param userId the user ID
+     * @return Optional containing the game plan if found
+     */
+    Optional<GamePlan> findByTeamIdAndUserId(Long teamId, Long userId);
+
+    /**
+     * Check if a game plan already exists for a team and user
+     * @param teamId the team ID
+     * @param userId the user ID
+     * @return true if a game plan exists
+     */
+    boolean existsByTeamIdAndUserId(Long teamId, Long userId);
 }

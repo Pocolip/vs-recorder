@@ -30,6 +30,11 @@ public class GamePlanDTO {
         private String name;
 
         private String notes;
+
+        /**
+         * Optional team ID to associate this game plan with a specific team.
+         */
+        private Long teamId;
     }
 
     /**
@@ -54,6 +59,7 @@ public class GamePlanDTO {
     public static class GamePlanResponse {
         private Long id;
         private Long userId;
+        private Long teamId;
         private String name;
         private String notes;
         private List<GamePlanTeamResponse> teams;
@@ -70,6 +76,7 @@ public class GamePlanDTO {
     public static class GamePlanSummary {
         private Long id;
         private Long userId;
+        private Long teamId;
         private String name;
         private String notes;
         private int teamCount;

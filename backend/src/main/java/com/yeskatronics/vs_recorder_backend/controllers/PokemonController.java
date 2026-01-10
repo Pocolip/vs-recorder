@@ -93,6 +93,50 @@ public class PokemonController {
     }
 
     /**
+     * Fetch full paste data from a pokepaste or pokebin URL
+     * GET /api/pokemon/pokepaste/fetch?url=...
+     *
+     * This endpoint proxies requests to pokepaste/pokebin to avoid CORS issues.
+     *
+     * @param url the pokepaste or pokebin URL
+     * @return full paste data including title, pokemon details, and raw text
+     */
+    @GetMapping("/pokepaste/fetch")
+    @Operation(
+            summary = "Fetch full pokepaste data",
+            description = "Fetches and returns complete paste data from pokepaste or pokebin URL, including title and full Pokemon details. Use this endpoint to avoid CORS issues with Pokebin."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully fetched paste data",
+                    content = @Content(schema = @Schema(implementation = PokepasteDTO.PasteData.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid URL or failed to fetch/parse paste",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<PokepasteDTO.PasteData> fetchPokepaste(
+            @Parameter(description = "Pokepaste or Pokebin URL to fetch", required = true, example = "https://pokepast.es/abc123")
+            @RequestParam String url) {
+
+        log.info("Fetching full paste data from URL: {}", url);
+
+        try {
+            PokepasteDTO.PasteData pasteData = pokepasteService.fetchPasteData(url);
+            log.info("Successfully fetched paste with {} Pokemon, title: {}",
+                    pasteData.getPokemon().size(), pasteData.getTitle());
+            return ResponseEntity.ok(pasteData);
+
+        } catch (IllegalArgumentException e) {
+            log.error("Failed to fetch paste: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
      * Get sprite URL for a Pokemon by name
      * GET /api/pokemon/{name}/sprite
      *

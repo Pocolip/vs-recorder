@@ -116,7 +116,7 @@ public class GamePlanController {
         log.info("Updating game plan: {}", id);
 
         GamePlan updates = gamePlanMapper.toEntity(new GamePlanDTO.CreateGamePlanRequest(
-                request.getName(), request.getNotes()));
+                request.getName(), request.getNotes(), null));
         GamePlan updatedPlan = gamePlanService.updateGamePlan(id, userId, updates);
         GamePlanDTO.GamePlanResponse response = gamePlanMapper.toResponse(updatedPlan);
 
@@ -139,6 +139,52 @@ public class GamePlanController {
 
         gamePlanService.deleteGamePlan(id, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get or create game plan for team",
+               description = "Get existing game plan for a team or create a new one if none exists")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Game plan retrieved or created successfully",
+                    content = @Content(schema = @Schema(implementation = GamePlanDTO.GamePlanResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping("/for-team/{teamId}")
+    public ResponseEntity<GamePlanDTO.GamePlanResponse> getOrCreateForTeam(
+            @PathVariable Long teamId,
+            Authentication authentication,
+            @RequestParam(required = false) String name) {
+
+        Long userId = getCurrentUserId(authentication);
+        log.info("Getting or creating game plan for team: {} user: {}", teamId, userId);
+
+        String planName = name != null ? name : "Opponent Plans";
+        GamePlan gamePlan = gamePlanService.getOrCreateGamePlanForTeam(teamId, userId, planName);
+        GamePlanDTO.GamePlanResponse response = gamePlanMapper.toResponse(gamePlan);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get game plan for team",
+               description = "Get existing game plan for a specific team (returns 404 if none exists)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Game plan retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = GamePlanDTO.GamePlanResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No game plan found for this team"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/for-team/{teamId}")
+    public ResponseEntity<GamePlanDTO.GamePlanResponse> getForTeam(
+            @PathVariable Long teamId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
+        log.info("Getting game plan for team: {} user: {}", teamId, userId);
+
+        GamePlan gamePlan = gamePlanService.getGamePlanByTeamIdAndUserId(teamId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("No game plan found for this team"));
+        GamePlanDTO.GamePlanResponse response = gamePlanMapper.toResponse(gamePlan);
+
+        return ResponseEntity.ok(response);
     }
 
     // ==================== GamePlanTeam Endpoints ====================

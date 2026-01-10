@@ -32,6 +32,13 @@ public class GamePlan {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Optional reference to a Team - allows associating a game plan with a specific team.
+     * When set, this game plan contains opponent planning for that team.
+     */
+    @Column(name = "team_id")
+    private Long teamId;
+
     @NotBlank(message = "Game plan name is required")
     @Size(max = 100, message = "Name must not exceed 100 characters")
     @Column(nullable = false, length = 100)
