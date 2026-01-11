@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Dependencies (reinstalled in Docker)
+node_modules/
+
+# Build output (rebuilt in Docker)
+dist/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Environment files
+.env.local
+.env.*.local
+
+# Documentation
+*.md
+!README.md

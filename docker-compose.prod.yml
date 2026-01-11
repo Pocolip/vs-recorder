@@ -1,0 +1,65 @@
+# Docker Compose for production deployment on EC2
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+#
+# Required environment variables (set in .env or export before running):
+#   - DATABASE_URL: JDBC URL for RDS PostgreSQL
+#   - DB_USERNAME: Database username
+#   - DB_PASSWORD: Database password
+#   - JWT_SECRET: JWT signing secret (min 256 bits)
+#   - AWS_ACCOUNT_ID: AWS account ID for ECR
+#   - AWS_REGION: AWS region (e.g., us-east-1)
+
+services:
+  # Nginx reverse proxy with SSL termination
+  nginx:
+    image: nginx:alpine
+    container_name: vsrecorder-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl-params.conf:/etc/nginx/ssl-params.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    depends_on:
+      - frontend-prod
+      - frontend-beta
+      - backend
+    restart: unless-stopped
+
+  # Backend API (shared between prod and beta)
+  backend:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vsrecorder-backend:latest
+    container_name: vsrecorder-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    expose:
+      - "8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Production frontend - vsrecorder.app
+  frontend-prod:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vsrecorder-frontend:latest
+    container_name: vsrecorder-frontend-prod
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  # Beta frontend - beta.vsrecorder.app
+  frontend-beta:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vsrecorder-frontend:beta
+    container_name: vsrecorder-frontend-beta
+    expose:
+      - "80"
+    restart: unless-stopped

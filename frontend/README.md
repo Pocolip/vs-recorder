@@ -48,6 +48,54 @@ npm run clean
 
 The development server runs on `http://localhost:3000` and proxies API requests to the backend.
 
+## Docker
+
+### Build Image
+
+```bash
+docker build -t vsrecorder-frontend .
+```
+
+By default, the image is configured for production (`https://api.vsrecorder.app`). To build with a different API URL:
+
+```bash
+docker build -t vsrecorder-frontend \
+  --build-arg REACT_APP_API_BASE_URL=http://localhost:8080 .
+```
+
+### Run Container
+
+```bash
+docker run -d -p 3000:80 vsrecorder-frontend
+```
+
+The frontend will be available at `http://localhost:3000`.
+
+### Using Docker Compose
+
+From the project root:
+```bash
+# Development (with backend and PostgreSQL)
+docker-compose up frontend
+
+# Full stack
+docker-compose up
+```
+
+### Docker Files
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Multi-stage build: Node.js build → nginx serving |
+| `.dockerignore` | Excludes node_modules, dist, etc. from build context |
+| `nginx.conf` | nginx configuration for SPA routing |
+
+The production image uses nginx to serve the static build files with:
+- Gzip compression for JS/CSS
+- SPA routing (all routes → index.html)
+- Cache headers for static assets
+- Security headers (X-Frame-Options, etc.)
+
 ## Tech Stack
 
 - **React 18** - Frontend framework

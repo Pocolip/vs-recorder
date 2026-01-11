@@ -1,0 +1,20 @@
+# Copy this file to terraform.tfvars and fill in your values
+# terraform.tfvars is gitignored to prevent committing secrets
+
+aws_region   = "us-east-1"
+environment  = "production"
+project_name = "vsrecorder"
+
+# EC2 Configuration
+ec2_instance_type = "t3.small"
+ec2_key_name      = "your-ec2-key-pair-name"  # Create in AWS Console first
+allowed_ssh_cidr  = "YOUR_IP/32"              # Restrict SSH to your IP
+
+# RDS Configuration
+db_instance_class = "db.t3.micro"
+db_name           = "vsrecorder"
+db_username       = "vsrecorder_admin"
+db_password       = "CHANGE_THIS_SECURE_PASSWORD"  # Use a strong password!
+
+# Domain
+domain_name = "vsrecorder.app"

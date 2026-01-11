@@ -30,6 +30,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- PostgreSQL - Production database -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

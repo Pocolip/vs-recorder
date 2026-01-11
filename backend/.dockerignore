@@ -1,0 +1,22 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build artifacts (we build in Docker)
+target/
+
+# Logs
+logs/
+*.log
+
+# Local data
+data/
+
+# Documentation
+*.md
+!README.md

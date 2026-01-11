@@ -193,3 +193,9 @@ The backend/ directory contains phase*.md files documenting the development prog
 - phase4.md+ - Advanced features (analytics, game planner, import/export)
 
 Refer to these for implementation details and design decisions made during development.
+
+## Plans
+
+Implementation plans created during Claude Code sessions:
+
+- **[CI/CD & AWS Hosting](~/.claude/plans/gleaming-percolating-canyon.md)** - Single EC2 + Docker Compose architecture, GitHub Actions CI/CD, Terraform infrastructure, ~$32/month estimated cost. Includes Dockerfiles, nginx reverse proxy, RDS PostgreSQL setup.
