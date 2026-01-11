@@ -175,7 +175,7 @@ const AboutPage = () => {
                                         <DollarSign className="h-5 w-5 text-blue-400" />
                                         <div className="flex-1">
                                             <p className="text-gray-200 text-sm font-medium">PayPal</p>
-                                            <p className="text-gray-400 text-xs">support@vsrecorder.example.com</p>
+                                            <p className="text-gray-400 text-xs">luisfrik@gmail.com</p>
                                         </div>
                                     </div>
 
@@ -184,7 +184,7 @@ const AboutPage = () => {
                                         <Coins className="h-5 w-5 text-orange-400" />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-gray-200 text-sm font-medium">Bitcoin</p>
-                                            <p className="text-gray-400 text-xs truncate font-mono">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+                                            <p className="text-gray-400 text-xs truncate font-mono">3KMwSv6KCYiKuuR9N1GoZ9RX4bvsYcwtPt</p>
                                         </div>
                                     </div>
 
@@ -193,7 +193,7 @@ const AboutPage = () => {
                                         <Coins className="h-5 w-5 text-yellow-400" />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-gray-200 text-sm font-medium">Dogecoin</p>
-                                            <p className="text-gray-400 text-xs truncate font-mono">DKaHBAaKQtmjLmBBo5RgjceV7kLatJZXmS</p>
+                                            <p className="text-gray-400 text-xs truncate font-mono">D6smeLTJFrv6vM7npwWWzonXtBH9r1bRjh</p>
                                         </div>
                                     </div>
                                 </div>
