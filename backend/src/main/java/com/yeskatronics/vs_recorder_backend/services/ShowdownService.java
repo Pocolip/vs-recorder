@@ -54,8 +54,11 @@ public class ShowdownService {
 
         try {
             // Fetch JSON data from Showdown
+            long startTime = System.currentTimeMillis();
             log.debug("Fetching from: {}", jsonUrl);
             String jsonResponse = restTemplate.getForObject(jsonUrl, String.class);
+            long fetchDuration = System.currentTimeMillis() - startTime;
+            log.info("Fetched replay JSON from Showdown in {}ms", fetchDuration);
 
             if (jsonResponse == null || jsonResponse.isEmpty()) {
                 throw new IllegalArgumentException("Failed to fetch replay data");

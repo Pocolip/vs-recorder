@@ -12,7 +12,8 @@ import {
     BarChart3,
     Target,
     Zap,
-    Clipboard
+    Clipboard,
+    Share2
 } from 'lucide-react';
 import {
     ConfirmationModal,
@@ -26,6 +27,7 @@ import {
     MoveUsageTab,
     PokemonTeam
 } from '../components';
+import ExportTeamModal from '../components/modals/ExportTeamModal';
 import OpponentPlannerTab from '../components/tabs/OpponentPlannerTab';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
@@ -43,6 +45,7 @@ const TeamPage = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAddReplayModal, setShowAddReplayModal] = useState(false);
     const [showEditTeamModal, setShowEditTeamModal] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
     // Use the custom hook for team statistics
@@ -177,6 +180,7 @@ const TeamPage = () => {
                     team={team}
                     onAddReplay={() => setShowAddReplayModal(true)}
                     onEditTeam={() => setShowEditTeamModal(true)}
+                    onExportTeam={() => setShowExportModal(true)}
                     onDeleteTeam={() => setShowDeleteModal(true)}
                 />
 
@@ -272,6 +276,13 @@ const TeamPage = () => {
                         onTeamUpdated={handleTeamUpdated}
                     />
                 )}
+
+                {showExportModal && (
+                    <ExportTeamModal
+                        team={team}
+                        onClose={() => setShowExportModal(false)}
+                    />
+                )}
             </div>
         </div>
     );
@@ -303,7 +314,7 @@ const TeamNotFound = () => (
 );
 
 // Team Header Component
-const TeamHeader = ({ team, onAddReplay, onEditTeam, onDeleteTeam }) => (
+const TeamHeader = ({ team, onAddReplay, onEditTeam, onExportTeam, onDeleteTeam }) => (
     <div className="flex items-center justify-between mb-8">
         <div className="flex items-center">
             <Link
@@ -332,6 +343,13 @@ const TeamHeader = ({ team, onAddReplay, onEditTeam, onDeleteTeam }) => (
             >
                 <Edit3 className="h-4 w-4" />
                 Edit Team
+            </button>
+            <button
+                onClick={onExportTeam}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            >
+                <Share2 className="h-4 w-4" />
+                Export
             </button>
             <button
                 onClick={onDeleteTeam}

@@ -46,6 +46,14 @@ public interface ReplayRepository extends JpaRepository<Replay, Long> {
     boolean existsByUrl(String url);
 
     /**
+     * Check if a replay URL already exists within a specific team
+     * @param url the replay URL
+     * @param teamId the team ID
+     * @return true if exists, false otherwise
+     */
+    boolean existsByUrlAndTeamId(String url, Long teamId);
+
+    /**
      * Find replays by team and result (win/loss)
      * @param teamId the team ID
      * @param result the result ("win" or "loss")

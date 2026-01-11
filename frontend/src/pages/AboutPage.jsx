@@ -12,7 +12,9 @@ import {
     ExternalLink,
     MessageCircle,
     Target,
-    Cloud
+    Cloud,
+    DollarSign,
+    Coins
 } from 'lucide-react';
 import { Footer } from '../components';
 
@@ -154,6 +156,46 @@ const AboutPage = () => {
                                         Check out my other extension for automatically saving replays
                                         <ExternalLink className="h-3 w-3" />
                                     </a>
+                                </div>
+                            </div>
+
+                            {/* Financial Support */}
+                            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6">
+                                <h2 className="text-xl font-semibold text-gray-100 mb-4 flex items-center gap-2">
+                                    <Heart className="h-5 w-5 text-pink-400" />
+                                    Support Development
+                                </h2>
+                                <p className="text-gray-400 text-sm mb-4">
+                                    If VS Recorder has helped your VGC journey, consider supporting its development!
+                                </p>
+
+                                <div className="space-y-3">
+                                    {/* PayPal */}
+                                    <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+                                        <DollarSign className="h-5 w-5 text-blue-400" />
+                                        <div className="flex-1">
+                                            <p className="text-gray-200 text-sm font-medium">PayPal</p>
+                                            <p className="text-gray-400 text-xs">support@vsrecorder.example.com</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Bitcoin */}
+                                    <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+                                        <Coins className="h-5 w-5 text-orange-400" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-gray-200 text-sm font-medium">Bitcoin</p>
+                                            <p className="text-gray-400 text-xs truncate font-mono">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Dogecoin */}
+                                    <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+                                        <Coins className="h-5 w-5 text-yellow-400" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-gray-200 text-sm font-medium">Dogecoin</p>
+                                            <p className="text-gray-400 text-xs truncate font-mono">DKaHBAaKQtmjLmBBo5RgjceV7kLatJZXmS</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

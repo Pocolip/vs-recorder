@@ -1,8 +1,9 @@
 // src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Calendar, TrendingUp, Trophy, LogOut } from 'lucide-react';
+import { Plus, Calendar, TrendingUp, Trophy, LogOut, Download } from 'lucide-react';
 import { NewTeamModal, PokemonTeam, Footer } from '../components';
+import ImportTeamModal from '../components/modals/ImportTeamModal';
 import { useAuth } from '../contexts';
 import TeamService from '../services/TeamService';
 import { useMultipleTeamStats } from '@/hooks/useTeamStats';
@@ -13,6 +14,7 @@ const HomePage = () => {
   const { user, logout } = useAuth();
   const [teams, setTeams] = useState([]);
   const [showNewTeamModal, setShowNewTeamModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Get team IDs for the stats hook
@@ -51,6 +53,16 @@ const HomePage = () => {
     } catch (error) {
       console.error('Error creating team:', error);
       throw error;
+    }
+  };
+
+  const handleImportSuccess = async (teamId, teamName) => {
+    // Refresh teams list after import
+    await loadTeams();
+    setShowImportModal(false);
+    // Navigate to the newly imported team
+    if (teamId) {
+      navigate(`/team/${teamId}`);
     }
   };
 
@@ -156,13 +168,22 @@ const HomePage = () => {
             {/* Teams Section */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-100">Your Teams</h2>
-              <button
-                  onClick={() => setShowNewTeamModal(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                New Team
-              </button>
+              <div className="flex gap-2">
+                <button
+                    onClick={() => setShowImportModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <Download className="h-4 w-4" />
+                  Import Team
+                </button>
+                <button
+                    onClick={() => setShowNewTeamModal(true)}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Team
+                </button>
+              </div>
             </div>
 
             {/* Teams Grid */}
@@ -196,6 +217,14 @@ const HomePage = () => {
                 <NewTeamModal
                     onClose={() => setShowNewTeamModal(false)}
                     onCreateTeam={handleCreateTeam}
+                />
+            )}
+
+            {/* Import Team Modal */}
+            {showImportModal && (
+                <ImportTeamModal
+                    onClose={() => setShowImportModal(false)}
+                    onImportSuccess={handleImportSuccess}
                 />
             )}
           </div>

@@ -77,10 +77,9 @@ class PokemonService {
                 cacheImages: false // We'll handle image caching ourselves
             });
 
-            console.log('PokemonService initialized with PokeAPI wrapper');
             return true;
         } catch (error) {
-            console.warn('Failed to initialize PokeAPI wrapper, using fallback data only:', error);
+            // Fallback to static data - this is expected in some environments
             return false;
         }
     }
@@ -124,6 +123,20 @@ class PokemonService {
             const fallbackData = this.COMMON_VGC_POKEMON[normalizedName];
             if (fallbackData) {
                 const enrichedData = this.enrichFallbackData(fallbackData);
+                await this.cachePokemon(normalizedName, enrichedData);
+                return enrichedData;
+            }
+
+            // Final fallback: check if we have sprite info from the sprite map
+            // This handles Pokemon forms that aren't in COMMON_VGC_POKEMON but have sprites
+            const spriteInfo = this.getSpriteInfo(normalizedName);
+            if (spriteInfo) {
+                const spriteOnlyData = {
+                    id: spriteInfo.id,
+                    name: normalizedName,
+                    types: ['unknown']
+                };
+                const enrichedData = this.enrichFallbackData(spriteOnlyData);
                 await this.cachePokemon(normalizedName, enrichedData);
                 return enrichedData;
             }
@@ -428,7 +441,6 @@ class PokemonService {
         try {
             await StorageService.remove(this.STORAGE_KEY);
             await StorageService.remove(this.SPRITE_CACHE_KEY);
-            console.log('Pokemon cache cleared');
         } catch (error) {
             console.error('Failed to clear Pokemon cache:', error);
         }

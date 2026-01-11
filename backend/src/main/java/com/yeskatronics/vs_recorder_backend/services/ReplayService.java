@@ -49,9 +49,9 @@ public class ReplayService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
-        // Check for duplicate URL
-        if (replayRepository.existsByUrl(replay.getUrl())) {
-            throw new IllegalArgumentException("Replay URL already exists: " + replay.getUrl());
+        // Check for duplicate URL within the same team
+        if (replayRepository.existsByUrlAndTeamId(replay.getUrl(), teamId)) {
+            throw new IllegalArgumentException("Replay URL already exists in this team: " + replay.getUrl());
         }
 
         replay.setTeam(team);
@@ -88,9 +88,9 @@ public class ReplayService {
     public Replay createReplayFromUrl(Long teamId, String url) {
         log.info("Creating replay from URL for team ID: {}", teamId);
 
-        // Check for duplicate URL
-        if (replayRepository.existsByUrl(url)) {
-            throw new IllegalArgumentException("Replay URL already exists: " + url);
+        // Check for duplicate URL within the same team
+        if (replayRepository.existsByUrlAndTeamId(url, teamId)) {
+            throw new IllegalArgumentException("Replay URL already exists in this team: " + url);
         }
 
         Team team = teamRepository.findById(teamId)

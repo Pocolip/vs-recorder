@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -49,6 +50,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",        // OpenAPI docs
                                 "/swagger-ui.html"        // Swagger UI HTML
                         ).permitAll()
+                        // Public export code lookup (read-only, import still requires auth)
+                        .requestMatchers(HttpMethod.GET, "/api/export/{code}").permitAll()
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated()

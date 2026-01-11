@@ -17,7 +17,9 @@ import java.time.LocalDateTime;
  * Each replay belongs to a team and optionally to a match (Bo3 set).
  */
 @Entity
-@Table(name = "replays")
+@Table(name = "replays", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_replay_url_team", columnNames = {"url", "team_id"})
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,7 +38,7 @@ public class Replay {
     private Match match;
 
     @NotBlank(message = "Replay URL is required")
-    @Column(nullable = false, unique = true, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
 
     @Column(columnDefinition = "TEXT")

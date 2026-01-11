@@ -14,11 +14,7 @@ module.exports = {
 
   entry: {
     // Main React app
-    app: './src/index.jsx',
-    // Extension background script (not needed for web app but keeping for compatibility)
-    background: './src/background.js',
-    // Content script (not needed for web app but keeping for compatibility)
-    content: './src/content.js'
+    app: './src/index.jsx'
   },
 
   output: {

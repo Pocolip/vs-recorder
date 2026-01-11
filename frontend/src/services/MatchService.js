@@ -11,7 +11,6 @@ class MatchService {
    * @returns {Promise<Object>} Matches object
    */
   static async getAll() {
-    console.warn('MatchService.getAll() called - use getByTeamId instead');
     return {};
   }
 
@@ -329,14 +328,13 @@ class MatchService {
     }
   }
 
-  // Legacy methods kept for backward compatibility but not implemented
+  // Legacy methods kept for backward compatibility - backend handles these automatically
   static async initializeFromReplays(teamId) {
-    console.log('initializeFromReplays: Backend handles Bo3 match creation automatically');
     return [];
   }
 
   static async exportMatchData(teamId) {
-    console.warn('exportMatchData: Not implemented - use backend export API');
+    // Use backend export API instead
     return {
       exportedAt: new Date().toISOString(),
       teamId,
@@ -346,23 +344,21 @@ class MatchService {
   }
 
   static async importMatchData(teamId, exportData) {
-    console.warn('importMatchData: Not implemented - use backend import API');
+    // Use backend import API instead
     return { success: false, error: 'Not implemented', imported: 0 };
   }
 
   static async cleanupOrphanedMatches(teamId) {
-    console.log('cleanupOrphanedMatches: Backend handles orphaned matches automatically');
     return { cleaned: 0, orphanedMatches: [] };
   }
 
   static getOpponentPokemonFromMatch(match) {
-    // This would need battleLog parsing - backend handles this
-    console.warn('getOpponentPokemonFromMatch: Not implemented - backend parses battle logs');
+    // Backend parses battle logs
     return [];
   }
 
   static async getUniqueOpponentPokemon(teamId) {
-    console.warn('getUniqueOpponentPokemon: Not implemented - backend handles analytics');
+    // Backend handles analytics
     return [];
   }
 

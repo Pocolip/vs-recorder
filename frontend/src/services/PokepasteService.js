@@ -513,7 +513,6 @@ class PokepasteService {
     static async clearCache() {
         try {
             await StorageService.remove(this.CACHE_KEY);
-            console.log('Pokepaste cache cleared');
         } catch (error) {
             console.error('Failed to clear Pokepaste cache:', error);
         }

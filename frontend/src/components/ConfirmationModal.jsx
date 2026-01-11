@@ -1,5 +1,6 @@
 // src/components/ConfirmationModal.jsx
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, AlertTriangle } from 'lucide-react';
 
 const ConfirmationModal = ({
@@ -13,7 +14,7 @@ const ConfirmationModal = ({
                                confirmButtonClass = 'bg-red-600 hover:bg-red-700',
                                dangerous = true
                            }) => {
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-slate-800 border border-slate-700 rounded-lg w-full max-w-md">
                 {/* Header */}
@@ -71,7 +72,8 @@ const ConfirmationModal = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

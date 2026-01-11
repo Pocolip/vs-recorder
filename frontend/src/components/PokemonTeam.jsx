@@ -45,13 +45,6 @@ const PokemonTeam = ({
                 // Extract Pokemon names from the parsed data
                 pokemonToLoad = parsed.pokemon.map(p => p.name).filter(name => name);
                 setPokepasteMetadata(parsed.metadata);
-
-                // console.log('Pokepaste parsed successfully:', {
-                //     url: pokepaste,
-                //     pokemonCount: pokemonToLoad.length,
-                //     format: parsed.metadata.format,
-                //     pokemon: pokemonToLoad
-                // });
             }
             // Otherwise use the provided pokemon names
             else if (pokemonNames && pokemonNames.length > 0) {

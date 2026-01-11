@@ -5,8 +5,6 @@ import { AuthProvider } from '../contexts';
 import { ProtectedRoute, PublicRoute } from '../components';
 import HomePage from '../pages/HomePage';
 import TeamPage from '../pages/TeamPage';
-import ImportPage from '../pages/ImportPage';
-import ExportPage from '../pages/ExportPage';
 import AboutPage from '../pages/AboutPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
@@ -20,12 +18,7 @@ const App = () => {
   const initializeApp = async () => {
     try {
       // Initialize Pokemon service
-      const pokemonInitialized = await PokemonService.initialize();
-      if (pokemonInitialized) {
-        console.log('PokemonService initialized with API support');
-      } else {
-        console.log('PokemonService initialized with fallback data only');
-      }
+      await PokemonService.initialize();
     } catch (error) {
       console.error('Error initializing app:', error);
     }
@@ -71,22 +64,6 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <TeamPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/import"
-              element={
-                <ProtectedRoute>
-                  <ImportPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/export"
-              element={
-                <ProtectedRoute>
-                  <ExportPage />
                 </ProtectedRoute>
               }
             />

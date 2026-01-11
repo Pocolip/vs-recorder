@@ -61,7 +61,6 @@ const MoveUsageTab = ({ replays, team }) => {
                         }
                         return acc;
                     }, {});
-                    console.log('Loaded Pokepaste movesets:', pokepasteMovesets);
                 } catch (pokepasteError) {
                     console.warn('Failed to load Pokepaste movesets:', pokepasteError);
                     // Continue without Pokepaste data
@@ -70,7 +69,6 @@ const MoveUsageTab = ({ replays, team }) => {
 
             // Fetch move usage statistics from backend API
             const backendMoveData = await analyticsApi.getMoveUsage(team.id);
-            console.log('Backend move usage data:', backendMoveData);
 
             // Transform backend data format to match our internal format
             // Backend returns: { pokemonMoves: [{ pokemon: string, moves: [{ move: string, timesUsed: number, usageRate: number }] }] }
@@ -85,7 +83,6 @@ const MoveUsageTab = ({ replays, team }) => {
                     });
                 });
             }
-            console.log('Transformed move usage stats:', usageStats);
 
             setTeamMovesets(pokepasteMovesets);
             setMoveUsageStats(usageStats);

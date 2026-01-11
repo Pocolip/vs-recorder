@@ -107,15 +107,20 @@ public class PokepasteService {
 
         try {
             // Fetch raw text from Pokepaste
+            long startTime = System.currentTimeMillis();
             log.debug("Fetching from: {}", rawUrl);
             String rawText = restTemplate.getForObject(rawUrl, String.class);
+            long fetchDuration = System.currentTimeMillis() - startTime;
+            log.info("Fetched Pokepaste data in {}ms", fetchDuration);
 
             if (rawText == null || rawText.trim().isEmpty()) {
                 throw new IllegalArgumentException("Failed to fetch Pokepaste data or paste is empty");
             }
 
             // Parse the paste
+            long parseStart = System.currentTimeMillis();
             PokepasteDTO.PasteData pasteData = parsePaste(rawText);
+            log.debug("Parsed Pokepaste in {}ms", System.currentTimeMillis() - parseStart);
             pasteData.setRawText(rawText);
             pasteData.setSource("pokepaste");
 
@@ -152,8 +157,11 @@ public class PokepasteService {
 
         try {
             // Fetch JSON from Pokebin
+            long startTime = System.currentTimeMillis();
             log.debug("Fetching from: {}", jsonUrl);
             String jsonResponse = restTemplate.getForObject(jsonUrl, String.class);
+            long fetchDuration = System.currentTimeMillis() - startTime;
+            log.info("Fetched Pokebin data in {}ms", fetchDuration);
 
             if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
                 throw new IllegalArgumentException("Failed to fetch Pokebin data or paste is empty");
