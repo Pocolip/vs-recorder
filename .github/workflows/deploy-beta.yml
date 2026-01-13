@@ -101,6 +101,6 @@ jobs:
 
       - name: Health check
         run: |
-          sleep 30
+          sleep 60
           curl -f https://beta.vsrecorder.app || exit 1
           curl -f https://api.vsrecorder.app/actuator/health || exit 1
