@@ -10,18 +10,14 @@
 #   - AWS_REGION: AWS region (e.g., us-east-1)
 
 services:
-  # Nginx reverse proxy with SSL termination
+  # Nginx reverse proxy (SSL handled by Cloudflare)
   nginx:
     image: nginx:alpine
     container_name: vsrecorder-nginx
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx/ssl-params.conf:/etc/nginx/ssl-params.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - /var/www/certbot:/var/www/certbot:ro
     depends_on:
       - frontend-prod
       - frontend-beta

@@ -4,6 +4,7 @@ name: Deploy Production
 on:
   push:
     branches: [main]
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
