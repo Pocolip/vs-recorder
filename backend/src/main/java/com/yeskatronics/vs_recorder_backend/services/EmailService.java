@@ -1,21 +1,23 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.ses.SesClient;
-import software.amazon.awssdk.services.ses.model.*;
 
 /**
- * Service class for sending emails via AWS SES.
+ * Service class for sending emails via Resend.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EmailService {
 
-    private final SesClient sesClient;
+    private final Resend resend;
 
     @Value("${app.email.from:noreply@vsrecorder.app}")
     private String fromEmail;
@@ -31,11 +33,9 @@ public class EmailService {
      */
     public void sendPasswordResetEmail(String toEmail, String username, String resetUrl) {
         String subject = appName + " - Password Reset Request";
-
         String htmlBody = buildPasswordResetHtmlEmail(username, resetUrl);
-        String textBody = buildPasswordResetTextEmail(username, resetUrl);
 
-        sendEmail(toEmail, subject, htmlBody, textBody);
+        sendEmail(toEmail, subject, htmlBody);
         log.info("Password reset email sent to: {}***", maskEmail(toEmail));
     }
 
@@ -44,42 +44,25 @@ public class EmailService {
      */
     public void sendPasswordChangedConfirmation(String toEmail, String username) {
         String subject = appName + " - Password Changed";
-
         String htmlBody = buildPasswordChangedHtmlEmail(username);
-        String textBody = buildPasswordChangedTextEmail(username);
 
-        sendEmail(toEmail, subject, htmlBody, textBody);
+        sendEmail(toEmail, subject, htmlBody);
         log.info("Password changed confirmation sent to: {}***", maskEmail(toEmail));
     }
 
-    private void sendEmail(String toEmail, String subject, String htmlBody, String textBody) {
+    private void sendEmail(String toEmail, String subject, String htmlBody) {
         try {
-            SendEmailRequest request = SendEmailRequest.builder()
-                .source(fromName + " <" + fromEmail + ">")
-                .destination(Destination.builder()
-                    .toAddresses(toEmail)
-                    .build())
-                .message(Message.builder()
-                    .subject(Content.builder()
-                        .charset("UTF-8")
-                        .data(subject)
-                        .build())
-                    .body(Body.builder()
-                        .html(Content.builder()
-                            .charset("UTF-8")
-                            .data(htmlBody)
-                            .build())
-                        .text(Content.builder()
-                            .charset("UTF-8")
-                            .data(textBody)
-                            .build())
-                        .build())
-                    .build())
+            CreateEmailOptions options = CreateEmailOptions.builder()
+                .from(fromName + " <" + fromEmail + ">")
+                .to(toEmail)
+                .subject(subject)
+                .html(htmlBody)
                 .build();
 
-            sesClient.sendEmail(request);
-        } catch (SesException e) {
-            log.error("Failed to send email via SES: {}", e.getMessage());
+            CreateEmailResponse response = resend.emails().send(options);
+            log.debug("Email sent successfully. ID: {}", response.getId());
+        } catch (ResendException e) {
+            log.error("Failed to send email via Resend: {}", e.getMessage());
             throw new RuntimeException("Failed to send email", e);
         }
     }
@@ -88,7 +71,11 @@ public class EmailService {
         if (email == null || email.length() < 3) {
             return "***";
         }
-        return email.substring(0, Math.min(3, email.indexOf('@')));
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 0) {
+            return "***";
+        }
+        return email.substring(0, Math.min(3, atIndex));
     }
 
     private String buildPasswordResetHtmlEmail(String username, String resetUrl) {
@@ -140,27 +127,6 @@ public class EmailService {
             """.formatted(username, resetUrl, resetUrl, resetUrl);
     }
 
-    private String buildPasswordResetTextEmail(String username, String resetUrl) {
-        return """
-            VS Recorder - Password Reset Request
-           \s
-            Hi %s,
-           \s
-            We received a request to reset your password for your VS Recorder account.
-           \s
-            Click the link below to set a new password:
-            %s
-           \s
-            This link will expire in 1 hour.
-           \s
-            If you didn't request this password reset, you can safely ignore this email.\s
-            Your password will remain unchanged.
-           \s
-            ---
-            VS Recorder - Pokemon VGC Replay Analysis
-            """.formatted(username, resetUrl);
-    }
-
     private String buildPasswordChangedHtmlEmail(String username) {
         return """
             <!DOCTYPE html>
@@ -186,22 +152,6 @@ public class EmailService {
                 </div>
             </body>
             </html>
-            """.formatted(username);
-    }
-
-    private String buildPasswordChangedTextEmail(String username) {
-        return """
-            VS Recorder - Password Changed Successfully
-           \s
-            Hi %s,
-           \s
-            Your VS Recorder password has been successfully changed.
-           \s
-            If you did not make this change, please contact us immediately\s
-            and consider resetting your password again.
-           \s
-            ---
-            VS Recorder - Pokemon VGC Replay Analysis
             """.formatted(username);
     }
 }
