@@ -80,9 +80,7 @@ variable "db_password" {
   sensitive   = true
 }
 
-# Domain Configuration
-variable "domain_name" {
-  description = "Root domain name"
-  type        = string
-  default     = "vsrecorder.app"
-}
+# Domain is managed in Cloudflare - manually create A records pointing to EC2 Elastic IP:
+# - vsrecorder.app → EC2 Elastic IP
+# - api.vsrecorder.app → EC2 Elastic IP
+# - beta.vsrecorder.app → EC2 Elastic IP

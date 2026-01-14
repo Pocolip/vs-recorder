@@ -33,17 +33,6 @@ output "ecr_frontend_url" {
   value       = aws_ecr_repository.frontend.repository_url
 }
 
-# Route 53 Outputs
-output "route53_nameservers" {
-  description = "Route 53 nameservers (update your domain registrar with these)"
-  value       = aws_route53_zone.main.name_servers
-}
-
-output "route53_zone_id" {
-  description = "Route 53 hosted zone ID"
-  value       = aws_route53_zone.main.zone_id
-}
-
 # Useful connection strings
 output "database_url" {
   description = "JDBC connection URL for backend"

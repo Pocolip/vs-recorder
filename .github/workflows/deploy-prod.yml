@@ -1,9 +1,8 @@
-# Deploy to Production environment on push to main branch
+# Deploy to Production environment (manual trigger only)
 name: Deploy Production
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:  # Manual trigger only - promote from beta after testing
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -108,15 +107,15 @@ jobs:
             # Pull latest images
             docker-compose -f docker-compose.prod.yml pull frontend-prod backend
 
-            # Restart services
-            docker-compose -f docker-compose.prod.yml up -d frontend-prod backend nginx
+            # Restart services (force recreate to use new images)
+            docker-compose -f docker-compose.prod.yml up -d --force-recreate frontend-prod backend nginx
 
             # Clean up old images
             docker image prune -f
 
       - name: Health check
         run: |
-          sleep 30
+          sleep 60
           curl -f https://vsrecorder.app || exit 1
           curl -f https://api.vsrecorder.app/actuator/health || exit 1
 

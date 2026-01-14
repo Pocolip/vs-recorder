@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "/api/pokemon/**",        // Pokemon utility endpoints
                                 "/swagger-ui/**",         // Swagger UI
                                 "/v3/api-docs/**",        // OpenAPI docs
-                                "/swagger-ui.html"        // Swagger UI HTML
+                                "/swagger-ui.html",       // Swagger UI HTML
+                                "/actuator/**"            // Health checks and metrics
                         ).permitAll()
                         // Public export code lookup (read-only, import still requires auth)
                         .requestMatchers(HttpMethod.GET, "/api/export/{code}").permitAll()

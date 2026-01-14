@@ -3,9 +3,13 @@ package com.yeskatronics.vs_recorder_backend.controllers;
 import com.yeskatronics.vs_recorder_backend.dto.AuthDTO;
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.entities.User;
+import com.yeskatronics.vs_recorder_backend.exceptions.InvalidTokenException;
+import com.yeskatronics.vs_recorder_backend.exceptions.RateLimitExceededException;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.security.JwtUtil;
+import com.yeskatronics.vs_recorder_backend.services.PasswordResetService;
 import com.yeskatronics.vs_recorder_backend.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +46,7 @@ public class AuthController {
     private final UserService userService;
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final PasswordResetService passwordResetService;
 
     /**
      * Register a new user
@@ -217,6 +222,136 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Request a password reset link
+     * POST /api/auth/forgot-password
+     *
+     * @param request the forgot password request containing email
+     * @return success message (always returns success to prevent email enumeration)
+     */
+    @PostMapping("/forgot-password")
+    @Operation(
+            summary = "Request password reset",
+            description = "Request a password reset link. If the email exists, a reset link will be sent."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Request processed (check email if account exists)",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.PasswordResetResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many requests",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<AuthDTO.PasswordResetResponse> forgotPassword(
+            @Valid @RequestBody AuthDTO.ForgotPasswordRequest request,
+            HttpServletRequest httpRequest) {
+
+        log.info("Password reset requested for email: {}***",
+            request.getEmail().substring(0, Math.min(3, request.getEmail().indexOf('@'))));
+
+        String clientIp = getClientIp(httpRequest);
+
+        try {
+            passwordResetService.initiatePasswordReset(request.getEmail(), clientIp);
+        } catch (RateLimitExceededException e) {
+            log.warn("Rate limit exceeded for password reset from IP: {}", clientIp);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(AuthDTO.PasswordResetResponse.failure("Too many requests. Please try again later."));
+        }
+
+        // Always return success to prevent email enumeration
+        return ResponseEntity.ok(AuthDTO.PasswordResetResponse.success(
+            "If an account with that email exists, a password reset link has been sent."));
+    }
+
+    /**
+     * Validate a password reset token
+     * GET /api/auth/reset-password/validate
+     *
+     * @param token the reset token to validate
+     * @return whether the token is valid
+     */
+    @GetMapping("/reset-password/validate")
+    @Operation(
+            summary = "Validate reset token",
+            description = "Check if a password reset token is valid and not expired"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Token validation result",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.PasswordResetResponse.class))
+            )
+    })
+    public ResponseEntity<AuthDTO.PasswordResetResponse> validateResetToken(
+            @RequestParam("token") String token) {
+
+        boolean isValid = passwordResetService.validateToken(token);
+
+        if (isValid) {
+            return ResponseEntity.ok(AuthDTO.PasswordResetResponse.success("Token is valid"));
+        } else {
+            return ResponseEntity.ok(AuthDTO.PasswordResetResponse.failure(
+                "Token is invalid or has expired"));
+        }
+    }
+
+    /**
+     * Reset password using token
+     * POST /api/auth/reset-password
+     *
+     * @param request the reset password request
+     * @return success/failure response
+     */
+    @PostMapping("/reset-password")
+    @Operation(
+            summary = "Reset password",
+            description = "Reset password using a valid reset token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Password reset result",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.PasswordResetResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid or expired token",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<AuthDTO.PasswordResetResponse> resetPassword(
+            @Valid @RequestBody AuthDTO.ResetPasswordRequest request) {
+
+        log.info("Password reset attempt with token");
+
+        try {
+            passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+            return ResponseEntity.ok(AuthDTO.PasswordResetResponse.success(
+                "Password has been reset successfully. You can now log in with your new password."));
+        } catch (InvalidTokenException e) {
+            log.warn("Invalid token used for password reset");
+            return ResponseEntity.badRequest()
+                .body(AuthDTO.PasswordResetResponse.failure(
+                    "Invalid or expired reset token. Please request a new password reset."));
+        }
+    }
+
+    /**
+     * Helper method to extract client IP address
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     /**

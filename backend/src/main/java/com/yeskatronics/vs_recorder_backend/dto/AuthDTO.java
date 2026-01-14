@@ -67,4 +67,50 @@ public class AuthDTO {
             this.email = email;
         }
     }
+
+    /**
+     * Request DTO for forgot password (request reset link)
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ForgotPasswordRequest {
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email must be valid")
+        private String email;
+    }
+
+    /**
+     * Request DTO for resetting password with token
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResetPasswordRequest {
+        @NotBlank(message = "Token is required")
+        private String token;
+
+        @NotBlank(message = "New password is required")
+        @Size(min = 6, message = "Password must be at least 6 characters")
+        private String newPassword;
+    }
+
+    /**
+     * Response DTO for password reset operations
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PasswordResetResponse {
+        private boolean success;
+        private String message;
+
+        public static PasswordResetResponse success(String message) {
+            return new PasswordResetResponse(true, message);
+        }
+
+        public static PasswordResetResponse failure(String message) {
+            return new PasswordResetResponse(false, message);
+        }
+    }
 }

@@ -42,13 +42,13 @@ resource "aws_db_instance" "main" {
   # Disable public access
   publicly_accessible = false
 
-  # Backup configuration
-  backup_retention_period = 7
+  # Backup configuration (1 day for free tier compatibility)
+  backup_retention_period = 1
   backup_window           = "03:00-04:00"
   maintenance_window      = "sun:04:00-sun:05:00"
 
-  # Performance Insights (free tier)
-  performance_insights_enabled = true
+  # Performance Insights disabled for free tier
+  performance_insights_enabled = false
 
   # Skip final snapshot for cost savings (enable in production)
   skip_final_snapshot = true

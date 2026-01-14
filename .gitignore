@@ -31,3 +31,9 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/terraform.tfvars

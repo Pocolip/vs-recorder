@@ -25,6 +25,8 @@ public class CorsConfig {
                 "http://localhost:3000",      // React dev server
                 "http://localhost:5173",      // Vite dev server
                 "http://localhost:8080",      // Alternative frontend port
+                "https://vsrecorder.app",     // Production frontend
+                "https://beta.vsrecorder.app", // Beta frontend
                 "https://replay.pokemonshowdown.com",  // Pokemon Showdown replays
                 "https://pokepast.es",         // Pokepaste service
                 "https://pokebin.com"          // Pokebin service
