@@ -8,6 +8,8 @@ import TeamPage from '../pages/TeamPage';
 import AboutPage from '../pages/AboutPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
 import PokemonService from '../services/PokemonService';
 
 const App = () => {
@@ -43,6 +45,22 @@ const App = () => {
               element={
                 <PublicRoute>
                   <RegisterPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <ForgotPasswordPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <PublicRoute>
+                  <ResetPasswordPage />
                 </PublicRoute>
               }
             />

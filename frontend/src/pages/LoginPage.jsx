@@ -104,6 +104,14 @@ const LoginPage = () => {
                   autoComplete="current-password"
                   disabled={loading}
                 />
+                <div className="mt-2 text-right">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
 
               {/* Submit Button */}

@@ -46,6 +46,27 @@ export const authApi = {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   },
+
+  /**
+   * Request password reset email
+   * @param {string} email - User's email address
+   * @returns {Promise<Object>} Response with success message
+   */
+  forgotPassword: (email) => apiClient.post('/api/auth/forgot-password', { email }),
+
+  /**
+   * Validate password reset token
+   * @param {string} token - Reset token from email link
+   * @returns {Promise<Object>} Response with success/failure
+   */
+  validateResetToken: (token) => apiClient.get(`/api/auth/reset-password/validate?token=${token}`),
+
+  /**
+   * Reset password with token
+   * @param {Object} data - { token, newPassword }
+   * @returns {Promise<Object>} Response with success message
+   */
+  resetPassword: (data) => apiClient.post('/api/auth/reset-password', data),
 };
 
 export default authApi;
