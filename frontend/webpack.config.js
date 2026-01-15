@@ -61,7 +61,10 @@ module.exports = {
       'process.env.REACT_APP_API_BASE_URL': JSON.stringify(
         process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
       ),
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.REACT_APP_VERSION': JSON.stringify(
+        process.env.REACT_APP_VERSION || require('./package.json').version
+      )
     }),
 
     new CopyWebpackPlugin({

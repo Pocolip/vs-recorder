@@ -1,9 +1,13 @@
-# Deploy to Beta environment on push to main branch
-name: Deploy Beta
+# Deploy to Beta environment on push to feature branches
+# For testing new features before merging to develop
+name: Deploy Beta (Feature Branch)
 
 on:
   push:
-    branches: [main]
+    branches:
+      - 'feature/**'
+      - 'fix/**'
+      - 'bugfix/**'
   workflow_dispatch:  # Allow manual trigger from GitHub UI
 
 env:
@@ -38,7 +42,7 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/vsrecorder-backend:latest
+            ${{ steps.login-ecr.outputs.registry }}/vsrecorder-backend:beta
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-backend:beta-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -52,12 +56,12 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:beta
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:beta-${{ github.sha }}
           build-args: |
-            REACT_APP_API_BASE_URL=https://api.vsrecorder.app
+            REACT_APP_API_BASE_URL=https://api.beta.vsrecorder.app
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy to EC2
+    name: Deploy to EC2 (Beta)
     runs-on: ubuntu-latest
     needs: build-and-push
 
@@ -72,11 +76,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Get ECR login password
-        id: ecr-login
-        run: |
-          echo "ECR_PASSWORD=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})" >> $GITHUB_OUTPUT
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -90,11 +89,14 @@ jobs:
             # Navigate to app directory
             cd /opt/vsrecorder
 
-            # Pull latest images
-            docker-compose -f docker-compose.prod.yml pull frontend-beta backend
+            # Pull latest beta images
+            docker-compose -f docker-compose.prod.yml pull frontend-beta backend-beta
 
-            # Restart services (force recreate to use new images)
-            docker-compose -f docker-compose.prod.yml up -d --force-recreate frontend-beta backend nginx
+            # Restart beta services only (don't touch prod)
+            docker-compose -f docker-compose.prod.yml up -d --force-recreate frontend-beta backend-beta
+
+            # Reload nginx to pick up any config changes
+            docker-compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || true
 
             # Clean up old images
             docker image prune -f
@@ -103,4 +105,4 @@ jobs:
         run: |
           sleep 60
           curl -f https://beta.vsrecorder.app || exit 1
-          curl -f https://api.vsrecorder.app/actuator/health || exit 1
+          curl -f https://api.beta.vsrecorder.app/actuator/health || exit 1

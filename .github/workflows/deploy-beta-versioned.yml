@@ -1,0 +1,216 @@
+# Deploy to Beta environment on push to develop branch
+# Bumps version and deploys versioned release candidate
+name: Deploy Beta (Versioned)
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: false
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  version-bump:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.bump.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version bump type
+        id: bump-type
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "type=${{ github.event.inputs.version_bump }}" >> $GITHUB_OUTPUT
+          else
+            # Default to patch, check commits for override
+            BUMP_TYPE="patch"
+            COMMITS=$(git log --oneline HEAD~5..HEAD 2>/dev/null || echo "")
+            if echo "$COMMITS" | grep -qi "\[major\]"; then
+              BUMP_TYPE="major"
+            elif echo "$COMMITS" | grep -qi "\[minor\]"; then
+              BUMP_TYPE="minor"
+            fi
+            echo "type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Bump versions
+        id: bump
+        run: |
+          cd backend
+
+          # Get current version (remove -SNAPSHOT if present)
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')
+          echo "Current version: $CURRENT_VERSION"
+
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+          # Bump based on type
+          case "${{ steps.bump-type.outputs.type }}" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "New version: $NEW_VERSION"
+
+          # Update backend pom.xml
+          mvn versions:set -DnewVersion="${NEW_VERSION}" -DgenerateBackupPoms=false
+
+          # Update frontend package.json
+          cd ../frontend
+          npm version $NEW_VERSION --no-git-tag-version --allow-same-version
+
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        run: |
+          git add backend/pom.xml frontend/package.json frontend/package-lock.json
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }} [skip ci]" || echo "No changes to commit"
+          git push
+
+  build-and-push:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+    needs: version-bump
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Pull latest changes
+        run: git pull origin develop
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/vsrecorder-backend:beta
+            ${{ steps.login-ecr.outputs.registry }}/vsrecorder-backend:${{ needs.version-bump.outputs.new_version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:beta
+            ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:${{ needs.version-bump.outputs.new_version }}
+          build-args: |
+            REACT_APP_API_BASE_URL=https://api.beta.vsrecorder.app
+            REACT_APP_VERSION=${{ needs.version-bump.outputs.new_version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to EC2 (Beta)
+    runs-on: ubuntu-latest
+    needs: [version-bump, build-and-push]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Login to ECR
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+            # Navigate to app directory
+            cd /opt/vsrecorder
+
+            # Pull latest beta images
+            docker-compose -f docker-compose.prod.yml pull frontend-beta backend-beta
+
+            # Restart beta services only (don't touch prod)
+            docker-compose -f docker-compose.prod.yml up -d --force-recreate frontend-beta backend-beta
+
+            # Reload nginx to pick up any config changes
+            docker-compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || true
+
+            # Clean up old images
+            docker image prune -f
+
+      - name: Health check
+        run: |
+          sleep 60
+          curl -f https://beta.vsrecorder.app || exit 1
+          curl -f https://api.beta.vsrecorder.app/actuator/health || exit 1
+
+      - name: Summary
+        run: |
+          echo "## Beta Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.version-bump.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**URLs:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: https://beta.vsrecorder.app" >> $GITHUB_STEP_SUMMARY
+          echo "- API: https://api.beta.vsrecorder.app" >> $GITHUB_STEP_SUMMARY

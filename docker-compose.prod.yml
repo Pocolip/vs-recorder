@@ -2,10 +2,12 @@
 # Usage: docker-compose -f docker-compose.prod.yml up -d
 #
 # Required environment variables (set in .env or export before running):
-#   - DATABASE_URL: JDBC URL for RDS PostgreSQL
+#   - DATABASE_URL: JDBC URL for RDS PostgreSQL (production)
+#   - DATABASE_URL_BETA: JDBC URL for RDS PostgreSQL (beta - same RDS, different database)
 #   - DB_USERNAME: Database username
 #   - DB_PASSWORD: Database password
-#   - JWT_SECRET: JWT signing secret (min 256 bits)
+#   - JWT_SECRET: JWT signing secret for production (min 256 bits)
+#   - JWT_SECRET_BETA: JWT signing secret for beta (min 256 bits)
 #   - RESEND_API_KEY: Resend API key for password reset emails
 #   - AWS_ACCOUNT_ID: AWS account ID for ECR
 #   - AWS_REGION: AWS region (e.g., us-east-1)
@@ -23,9 +25,10 @@ services:
       - frontend-prod
       - frontend-beta
       - backend
+      - backend-beta
     restart: unless-stopped
 
-  # Backend API (shared between prod and beta)
+  # Production Backend API - api.vsrecorder.app
   backend:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vsrecorder-backend:latest
     container_name: vsrecorder-backend
@@ -35,6 +38,27 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+    expose:
+      - "8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Beta Backend API - api.beta.vsrecorder.app
+  backend-beta:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vsrecorder-backend:beta
+    container_name: vsrecorder-backend-beta
+    environment:
+      - SPRING_PROFILES_ACTIVE=beta
+      - DATABASE_URL=${DATABASE_URL_BETA}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET_BETA}
       - RESEND_API_KEY=${RESEND_API_KEY}
     expose:
       - "8080"

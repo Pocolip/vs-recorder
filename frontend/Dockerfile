@@ -10,9 +10,11 @@ RUN npm ci
 # Copy source and build
 COPY . .
 
-# Build argument for API URL (can be overridden at build time)
+# Build arguments (can be overridden at build time)
 ARG REACT_APP_API_BASE_URL=https://api.vsrecorder.app
+ARG REACT_APP_VERSION=0.0.0
 ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
+ENV REACT_APP_VERSION=$REACT_APP_VERSION
 
 RUN npm run build
 

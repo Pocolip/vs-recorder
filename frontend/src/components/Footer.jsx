@@ -44,7 +44,7 @@ const Footer = () => {
                         <p className="text-xs text-gray-400">
                             © 2025 Luis Medina
                         </p>
-                        <p className="text-xs text-gray-500">v1.0.0</p>
+                        <p className="text-xs text-gray-500">v{process.env.REACT_APP_VERSION}</p>
                     </div>
                 </div>
             </div>
