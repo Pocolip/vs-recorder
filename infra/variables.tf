@@ -49,6 +49,12 @@ variable "ec2_key_name" {
   type        = string
 }
 
+variable "ec2_private_key_path" {
+  description = "Path to the private key file for SSH access (for provisioners)"
+  type        = string
+  default     = ""
+}
+
 variable "allowed_ssh_cidr" {
   description = "CIDR block allowed for SSH access"
   type        = string
@@ -63,9 +69,15 @@ variable "db_instance_class" {
 }
 
 variable "db_name" {
-  description = "Name of the database"
+  description = "Name of the production database"
   type        = string
   default     = "vsrecorder"
+}
+
+variable "db_name_beta" {
+  description = "Name of the beta database"
+  type        = string
+  default     = "vsrecorder_beta"
 }
 
 variable "db_username" {
@@ -84,3 +96,4 @@ variable "db_password" {
 # - vsrecorder.app → EC2 Elastic IP
 # - api.vsrecorder.app → EC2 Elastic IP
 # - beta.vsrecorder.app → EC2 Elastic IP
+# - api.beta.vsrecorder.app → EC2 Elastic IP

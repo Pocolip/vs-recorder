@@ -143,6 +143,9 @@ resource "aws_instance" "main" {
     # Install certbot for Let's Encrypt
     dnf install -y certbot
 
+    # Install PostgreSQL client for database management
+    dnf install -y postgresql15
+
     # Create app directory
     mkdir -p /opt/vsrecorder
     chown ec2-user:ec2-user /opt/vsrecorder

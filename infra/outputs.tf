@@ -35,8 +35,14 @@ output "ecr_frontend_url" {
 
 # Useful connection strings
 output "database_url" {
-  description = "JDBC connection URL for backend"
+  description = "JDBC connection URL for production backend"
   value       = "jdbc:postgresql://${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}"
+  sensitive   = true
+}
+
+output "database_url_beta" {
+  description = "JDBC connection URL for beta backend"
+  value       = "jdbc:postgresql://${aws_db_instance.main.endpoint}/${var.db_name_beta}"
   sensitive   = true
 }
 

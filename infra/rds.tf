@@ -60,3 +60,33 @@ resource "aws_db_instance" "main" {
     Name = "${var.project_name}-db"
   }
 }
+
+# Create beta database via remote-exec on EC2
+# Only runs if ec2_private_key_path is provided
+resource "null_resource" "create_beta_db" {
+  count = var.ec2_private_key_path != "" ? 1 : 0
+
+  depends_on = [
+    aws_db_instance.main,
+    aws_instance.main,
+    aws_eip.main
+  ]
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file(var.ec2_private_key_path)
+    host        = aws_eip.main.public_ip
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 30",  # Wait for RDS to be fully available
+      "PGPASSWORD='${var.db_password}' psql \"host=${aws_db_instance.main.address} user=${var.db_username} dbname=postgres sslmode=require\" -c \"SELECT 1 FROM pg_database WHERE datname='${var.db_name_beta}'\" | grep -q 1 || PGPASSWORD='${var.db_password}' psql \"host=${aws_db_instance.main.address} user=${var.db_username} dbname=postgres sslmode=require\" -c \"CREATE DATABASE ${var.db_name_beta};\""
+    ]
+  }
+
+  triggers = {
+    db_name_beta = var.db_name_beta
+  }
+}
