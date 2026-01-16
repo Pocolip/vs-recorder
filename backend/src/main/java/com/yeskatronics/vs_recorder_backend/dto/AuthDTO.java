@@ -48,24 +48,39 @@ public class AuthDTO {
 
     /**
      * Response DTO for login/register operations
-     * Returns JWT token and user information
+     * Returns JWT tokens and user information
      */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AuthResponse {
         private String token;
+        private String refreshToken;
         private String type = "Bearer";
+        private Long expiresIn; // Access token expiration in seconds
         private Long userId;
         private String username;
         private String email;
 
-        public AuthResponse(String token, Long userId, String username, String email) {
+        public AuthResponse(String token, String refreshToken, Long expiresIn, Long userId, String username, String email) {
             this.token = token;
+            this.refreshToken = refreshToken;
+            this.expiresIn = expiresIn;
             this.userId = userId;
             this.username = username;
             this.email = email;
         }
+    }
+
+    /**
+     * Request DTO for token refresh
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RefreshRequest {
+        @NotBlank(message = "Refresh token is required")
+        private String refreshToken;
     }
 
     /**

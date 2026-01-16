@@ -26,8 +26,11 @@ public class JwtUtil {
     @Value("${jwt.secret:your-256-bit-secret-key-change-this-in-production-please-make-it-long-enough}")
     private String secret;
 
-    @Value("${jwt.expiration:86400000}") // 24 hours in milliseconds
-    private Long expiration;
+    @Value("${jwt.access-expiration:900000}") // 15 minutes in milliseconds
+    private Long accessExpiration;
+
+    @Value("${jwt.refresh-expiration:604800000}") // 7 days in milliseconds
+    private Long refreshExpiration;
 
     /**
      * Get the signing key from the secret
@@ -84,20 +87,57 @@ public class JwtUtil {
     }
 
     /**
-     * Generate token for user
+     * Generate access token for user (short-lived)
      */
     public String generateToken(UserDetails userDetails, Long userId) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        return createToken(claims, userDetails.getUsername());
+        return generateAccessToken(userDetails, userId);
     }
 
     /**
-     * Create token with claims and subject
+     * Generate access token for user (short-lived, 15 minutes default)
      */
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateAccessToken(UserDetails userDetails, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("type", "access");
+        return createToken(claims, userDetails.getUsername(), accessExpiration);
+    }
+
+    /**
+     * Generate refresh token for user (long-lived, 7 days default)
+     */
+    public String generateRefreshToken(UserDetails userDetails, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("type", "refresh");
+        return createToken(claims, userDetails.getUsername(), refreshExpiration);
+    }
+
+    /**
+     * Check if token is a refresh token
+     */
+    public boolean isRefreshToken(String token) {
+        try {
+            String type = extractClaim(token, claims -> claims.get("type", String.class));
+            return "refresh".equals(type);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get access token expiration in seconds
+     */
+    public long getAccessExpirationSeconds() {
+        return accessExpiration / 1000;
+    }
+
+    /**
+     * Create token with claims, subject, and expiration
+     */
+    private String createToken(Map<String, Object> claims, String subject, Long expirationMs) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
+        Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .claims(claims)
