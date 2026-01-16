@@ -153,7 +153,7 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:beta
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:${{ needs.version-bump.outputs.new_version }}
           build-args: |
-            REACT_APP_API_BASE_URL=https://api.beta.vsrecorder.app
+            REACT_APP_API_BASE_URL=https://beta-api.vsrecorder.app
             REACT_APP_VERSION=${{ needs.version-bump.outputs.new_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -203,7 +203,7 @@ jobs:
         run: |
           sleep 60
           curl -f https://beta.vsrecorder.app || exit 1
-          curl -f https://api.beta.vsrecorder.app/actuator/health || exit 1
+          curl -f https://beta-api.vsrecorder.app/actuator/health || exit 1
 
       - name: Summary
         run: |
