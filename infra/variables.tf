@@ -96,4 +96,4 @@ variable "db_password" {
 # - vsrecorder.app → EC2 Elastic IP
 # - api.vsrecorder.app → EC2 Elastic IP
 # - beta.vsrecorder.app → EC2 Elastic IP
-# - api.beta.vsrecorder.app → EC2 Elastic IP
+# - beta-api.vsrecorder.app → EC2 Elastic IP
