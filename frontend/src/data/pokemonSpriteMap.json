@@ -173,5 +173,26 @@
   "goodra-hisui": { "id": 706, "form": 1 },
 
   "sliggoo": { "id": 705, "form": 0 },
-  "sliggoo-hisui": { "id": 705, "form": 1 }
+  "sliggoo-hisui": { "id": 705, "form": 1 },
+
+  "vivillon": { "id": 666, "form": 6 },
+  "vivillon-icy-snow": { "id": 666, "form": 0 },
+  "vivillon-polar": { "id": 666, "form": 1 },
+  "vivillon-tundra": { "id": 666, "form": 2 },
+  "vivillon-continental": { "id": 666, "form": 3 },
+  "vivillon-garden": { "id": 666, "form": 4 },
+  "vivillon-elegant": { "id": 666, "form": 5 },
+  "vivillon-modern": { "id": 666, "form": 7 },
+  "vivillon-marine": { "id": 666, "form": 8 },
+  "vivillon-archipelago": { "id": 666, "form": 9 },
+  "vivillon-high-plains": { "id": 666, "form": 10 },
+  "vivillon-sandstorm": { "id": 666, "form": 11 },
+  "vivillon-river": { "id": 666, "form": 12 },
+  "vivillon-monsoon": { "id": 666, "form": 13 },
+  "vivillon-savanna": { "id": 666, "form": 14 },
+  "vivillon-sun": { "id": 666, "form": 15 },
+  "vivillon-ocean": { "id": 666, "form": 16 },
+  "vivillon-jungle": { "id": 666, "form": 17 },
+  "vivillon-fancy": { "id": 666, "form": 18 },
+  "vivillon-pokeball": { "id": 666, "form": 19 }
 }
