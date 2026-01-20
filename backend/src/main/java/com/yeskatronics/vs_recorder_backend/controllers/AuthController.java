@@ -85,16 +85,19 @@ public class AuthController {
             // Save user
             User savedUser = userService.createUser(user);
 
-            // Generate JWT token
+            // Generate JWT tokens
             UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getUsername());
-            String token = jwtUtil.generateToken(userDetails, savedUser.getId());
+            String accessToken = jwtUtil.generateAccessToken(userDetails, savedUser.getId());
+            String refreshToken = jwtUtil.generateRefreshToken(userDetails, savedUser.getId());
 
             // Update last login
             userService.updateLastLogin(savedUser.getId());
 
             // Build response
             AuthDTO.AuthResponse response = new AuthDTO.AuthResponse(
-                    token,
+                    accessToken,
+                    refreshToken,
+                    jwtUtil.getAccessExpirationSeconds(),
                     savedUser.getId(),
                     savedUser.getUsername(),
                     savedUser.getEmail()
@@ -154,15 +157,18 @@ public class AuthController {
             User user = userService.getUserById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            // Generate JWT token
-            String token = jwtUtil.generateToken(userDetails, userId);
+            // Generate JWT tokens
+            String accessToken = jwtUtil.generateAccessToken(userDetails, userId);
+            String refreshToken = jwtUtil.generateRefreshToken(userDetails, userId);
 
             // Update last login
             userService.updateLastLogin(userId);
 
             // Build response
             AuthDTO.AuthResponse response = new AuthDTO.AuthResponse(
-                    token,
+                    accessToken,
+                    refreshToken,
+                    jwtUtil.getAccessExpirationSeconds(),
                     user.getId(),
                     user.getUsername(),
                     user.getEmail()
@@ -174,6 +180,75 @@ public class AuthController {
         } catch (AuthenticationException e) {
             log.warn("Login failed for user: {}", request.getUsername());
             throw new IllegalArgumentException("Invalid username or password");
+        }
+    }
+
+    /**
+     * Refresh access token using refresh token
+     * POST /api/auth/refresh
+     *
+     * @param request the refresh token request
+     * @return new access token and user information
+     */
+    @PostMapping("/refresh")
+    @Operation(
+            summary = "Refresh access token",
+            description = "Use a valid refresh token to obtain a new access token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Token refreshed successfully",
+                    content = @Content(schema = @Schema(implementation = AuthDTO.AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid or expired refresh token",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+    })
+    public ResponseEntity<AuthDTO.AuthResponse> refresh(@Valid @RequestBody AuthDTO.RefreshRequest request) {
+        log.debug("Token refresh attempt");
+
+        String refreshToken = request.getRefreshToken();
+
+        // Validate the refresh token
+        if (!jwtUtil.validateToken(refreshToken) || !jwtUtil.isRefreshToken(refreshToken)) {
+            log.warn("Invalid refresh token provided");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            // Extract user info from refresh token
+            String username = jwtUtil.extractUsername(refreshToken);
+            Long userId = jwtUtil.extractUserId(refreshToken);
+
+            // Load user details to generate new token
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // Get user entity for response
+            User user = userService.getUserById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            // Generate new access token (keep same refresh token)
+            String newAccessToken = jwtUtil.generateAccessToken(userDetails, userId);
+
+            // Build response
+            AuthDTO.AuthResponse response = new AuthDTO.AuthResponse(
+                    newAccessToken,
+                    refreshToken, // Return the same refresh token
+                    jwtUtil.getAccessExpirationSeconds(),
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail()
+            );
+
+            log.debug("Token refreshed successfully for user: {}", username);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Token refresh failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -213,9 +288,11 @@ public class AuthController {
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Return user info without regenerating token
+        // Return user info without regenerating tokens
         AuthDTO.AuthResponse response = new AuthDTO.AuthResponse(
-                null, // No new token
+                null, // No new access token
+                null, // No new refresh token
+                null, // No expiration
                 user.getId(),
                 user.getUsername(),
                 user.getEmail()

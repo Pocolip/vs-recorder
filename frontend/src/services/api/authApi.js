@@ -40,10 +40,18 @@ export const authApi = {
   changePassword: (data) => apiClient.post('/api/auth/change-password', data),
 
   /**
-   * Logout (client-side - clear token)
+   * Refresh access token using refresh token
+   * @param {string} refreshToken - The refresh token
+   * @returns {Promise<Object>} New tokens and user data
+   */
+  refresh: (refreshToken) => apiClient.post('/api/auth/refresh', { refreshToken }),
+
+  /**
+   * Logout (client-side - clear tokens)
    */
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
   },
 
