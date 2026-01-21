@@ -449,8 +449,11 @@ public class BattleLogParser {
      */
     public static Map<String, Integer> getPokemonMoves(BattleData data, String pokemon, String player) {
         if ("p1".equalsIgnoreCase(player) || "1".equals(player)) {
+            log.debug("p1 {}", data.getP1MoveUsage().getOrDefault(pokemon, Collections.emptyMap()).toString());
             return data.getP1MoveUsage().getOrDefault(pokemon, Collections.emptyMap());
         } else {
+            log.debug("p2 {}", data.getP2MoveUsage().getOrDefault(pokemon, Collections.emptyMap()).toString());
+
             return data.getP2MoveUsage().getOrDefault(pokemon, Collections.emptyMap());
         }
     }
