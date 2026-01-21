@@ -1,6 +1,7 @@
 // src/components/NewTeamModal.jsx
 import React, { useState } from 'react';
 import { X, Users, Link as LinkIcon, User, AlertCircle } from 'lucide-react';
+import PokepasteService from '../services/PokepasteService';
 
 const NewTeamModal = ({ onClose, onCreateTeam }) => {
     const [formData, setFormData] = useState({
@@ -25,10 +26,9 @@ const NewTeamModal = ({ onClose, onCreateTeam }) => {
         'VGC 2025 Regulation J'
     ];
 
-    const validatePokepasteUrl = (url) => {
+    const validatePasteUrl = (url) => {
         if (!url.trim()) return true; // Optional field
-        const pokepastePattern = /^https?:\/\/(www\.)?pokepast\.es\/[a-zA-Z0-9]+\/?$/;
-        return pokepastePattern.test(url.trim());
+        return PokepasteService.isValidPokepasteUrl(url.trim());
     };
 
     const parseArrayField = (value) => {
@@ -59,8 +59,8 @@ const NewTeamModal = ({ onClose, onCreateTeam }) => {
             return;
         }
 
-        if (formData.pokepaste && !validatePokepasteUrl(formData.pokepaste)) {
-            setError('Please enter a valid Pokepaste URL (e.g., https://pokepast.es/abc123)');
+        if (formData.pokepaste && !validatePasteUrl(formData.pokepaste)) {
+            setError('Please enter a valid Pokepaste or Pokebin URL (e.g., https://pokepast.es/abc123 or https://pokebin.com/abc123)');
             return;
         }
 
@@ -127,18 +127,18 @@ const NewTeamModal = ({ onClose, onCreateTeam }) => {
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                             <LinkIcon className="h-4 w-4 inline mr-1" />
-                            Pokepaste URL
+                            Pokepaste / Pokebin URL
                         </label>
                         <input
                             type="url"
                             value={formData.pokepaste}
                             onChange={(e) => handleInputChange('pokepaste', e.target.value)}
-                            placeholder="https://pokepast.es/..."
+                            placeholder="https://pokepast.es/... or https://pokebin.com/..."
                             className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-400"
                             disabled={loading}
                         />
                         <p className="text-xs text-gray-400 mt-1">
-                            Optional: Link to your team on Pokepaste
+                            Optional: Link to your team on Pokepaste or Pokebin
                         </p>
                     </div>
 
