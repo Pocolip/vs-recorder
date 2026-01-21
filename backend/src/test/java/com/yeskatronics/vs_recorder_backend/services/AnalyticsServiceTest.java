@@ -62,7 +62,7 @@ class AnalyticsServiceTest {
         testTeam.setName("Test Team");
         testTeam.setPokepaste("https://pokepast.es/test");
         testTeam.setRegulation("Reg I");
-        testTeam.setShowdownUsernames(Arrays.asList("testuser", "platanera", "mofonguero", "larry ayuso"));
+        testTeam.setShowdownUsernames(Arrays.asList("testuser", "platanera", "mofonguero", "larry ayuso", "yomasi"));
         testTeam = teamRepository.save(testTeam);
     }
 
@@ -755,7 +755,13 @@ class AnalyticsServiceTest {
         assertEquals(33, getUseRate(urshi, "Surging Strikes"));
         assertEquals(33, getUseRate(urshi, "Detect"));
         assertEquals(33, getUseRate(urshi, "Close Combat"));
+    }
 
+    @Test
+    public void testUserRequest1() throws IOException {
+        createReplayFromJson(loadTestReplay("userrequest/yo.json"));
+        AnalyticsDTO.MoveUsageResponse response = analyticsService.getMoveUsageStats(testTeam.getId());
 
+        log.info(response.toString());
     }
 }

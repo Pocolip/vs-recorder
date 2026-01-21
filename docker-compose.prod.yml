@@ -39,9 +39,14 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - JAVA_TOOL_OPTIONS=-Xmx256m -Xms128m -XX:+UseG1GC -XX:MaxGCPauseMillis=100
     expose:
       - "8080"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -60,9 +65,14 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET_BETA}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - JAVA_TOOL_OPTIONS=-Xmx256m -Xms128m -XX:+UseG1GC -XX:MaxGCPauseMillis=100
     expose:
       - "8080"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
       interval: 30s
