@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
           // Token expired or invalid - clear storage
           console.error('Auth verification failed:', err);
           localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
           setUser(null);
         }
@@ -46,8 +47,11 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await authApi.register(credentials);
 
-      // Store token and user
+      // Store tokens and user
       localStorage.setItem('token', response.token);
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }
       localStorage.setItem('user', JSON.stringify(response));
 
       setUser(response);
@@ -67,8 +71,11 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await authApi.login(credentials);
 
-      // Store token and user
+      // Store tokens and user
       localStorage.setItem('token', response.token);
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }
       localStorage.setItem('user', JSON.stringify(response));
 
       setUser(response);
