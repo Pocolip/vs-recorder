@@ -16,6 +16,11 @@ on:
           - patch
           - minor
           - major
+      skip_version_bump:
+        description: 'Deploy without bumping version (manual trigger only)'
+        required: false
+        default: false
+        type: boolean
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -26,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.bump.outputs.version }}
+      bumped: ${{ steps.bump.outputs.bumped }}
 
     steps:
       - name: Checkout code
@@ -77,6 +83,16 @@ jobs:
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')
           echo "Current version: $CURRENT_VERSION"
 
+          # Check if we should skip version bump (manual trigger with skip flag)
+          SKIP_BUMP="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.skip_version_bump == 'true' }}"
+
+          if [ "$SKIP_BUMP" == "true" ]; then
+            echo "Skipping version bump - deploying current version"
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "bumped=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Parse version components
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
 
@@ -98,8 +114,10 @@ jobs:
           npm version $NEW_VERSION --no-git-tag-version --allow-same-version
 
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "bumped=true" >> $GITHUB_OUTPUT
 
       - name: Commit version bump
+        if: steps.bump.outputs.bumped == 'true'
         run: |
           git add backend/pom.xml frontend/package.json frontend/package-lock.json
           git commit -m "chore: bump version to ${{ steps.bump.outputs.version }} [skip ci]" || echo "No changes to commit"
