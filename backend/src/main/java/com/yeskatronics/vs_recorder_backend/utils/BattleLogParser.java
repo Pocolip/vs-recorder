@@ -103,6 +103,8 @@ public class BattleLogParser {
     private static void parseLogLines(String[] lines, BattleData data) {
         Set<String> p1Switched = new HashSet<>();
         Set<String> p2Switched = new HashSet<>();
+        Map<String, String> p1NicknameMap = new HashMap<>();
+        Map<String, String> p2NicknameMap = new HashMap<>();
         int leadCount1 = 0;
         int leadCount2 = 0;
 
@@ -153,6 +155,7 @@ public class BattleLogParser {
             Matcher switchMatcher = SWITCH_PATTERN.matcher(line);
             if (switchMatcher.find()) {
                 String player = switchMatcher.group(1);
+                String nickname = switchMatcher.group(3).trim();
                 String switchedPokemon = switchMatcher.group(4); // Full name from switch line
 
                 // Check if this reveals Urshifu forme
@@ -169,6 +172,14 @@ public class BattleLogParser {
                 // Map switch species to team entry
                 String baseSpecies = switchedPokemon.split(",")[0].trim().split("-")[0];
                 String fullTeamEntry = findTeamEntry(team, baseSpecies);
+
+                // Store nickname -> species mapping
+                String resolvedName = fullTeamEntry != null ? fullTeamEntry : switchedPokemon;
+                if ("1".equals(player)) {
+                    p1NicknameMap.put(nickname, resolvedName);
+                } else {
+                    p2NicknameMap.put(nickname, resolvedName);
+                }
 
                 if (fullTeamEntry != null) {
                     if ("1".equals(player)) {
@@ -202,8 +213,12 @@ public class BattleLogParser {
             Matcher moveMatcher = MOVE_PATTERN.matcher(line);
             if (moveMatcher.find()) {
                 String player = moveMatcher.group(1);
-                String moveSpecies = moveMatcher.group(3); // Base species name
+                String moveNickname = moveMatcher.group(3).trim();
                 String move = moveMatcher.group(4);
+
+                // Resolve nickname to species
+                Map<String, String> nicknameMap = "1".equals(player) ? p1NicknameMap : p2NicknameMap;
+                String moveSpecies = nicknameMap.getOrDefault(moveNickname, moveNickname);
 
                 // Map to full team entry
                 List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
@@ -228,7 +243,11 @@ public class BattleLogParser {
             Matcher teraMatcher = TERA_PATTERN.matcher(line);
             if (teraMatcher.find()) {
                 String player = teraMatcher.group(1);
-                String teraSpecies = teraMatcher.group(3);
+                String teraNickname = teraMatcher.group(3).trim();
+
+                // Resolve nickname to species
+                Map<String, String> nicknameMap = "1".equals(player) ? p1NicknameMap : p2NicknameMap;
+                String teraSpecies = nicknameMap.getOrDefault(teraNickname, teraNickname);
 
                 // Map to full team entry
                 List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
