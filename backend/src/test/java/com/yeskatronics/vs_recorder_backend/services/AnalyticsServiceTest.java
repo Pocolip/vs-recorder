@@ -763,5 +763,38 @@ class AnalyticsServiceTest {
         AnalyticsDTO.MoveUsageResponse response = analyticsService.getMoveUsageStats(testTeam.getId());
 
         log.info(response.toString());
+
+        // Verify nicknamed Pokemon have move usage stats
+        // Nicknames: Jade=Flutter Mane, Battle Beast=Incineroar, Chunky Kong=Rillaboom, Raging Boner=Raging Bolt
+        assertFalse(response.getPokemonMoves().isEmpty(), "Move usage should not be empty for nicknamed Pokemon");
+
+        AnalyticsDTO.PokemonMoveStats flutterMane = getMoveUsageStatsMon(response, "Flutter Mane");
+        assertFalse(flutterMane.getMoves().isEmpty(), "Flutter Mane (nicknamed Jade) should have moves");
+
+        AnalyticsDTO.PokemonMoveStats incineroar = getMoveUsageStatsMon(response, "Incineroar");
+        assertFalse(incineroar.getMoves().isEmpty(), "Incineroar (nicknamed Battle Beast) should have moves");
+
+        AnalyticsDTO.PokemonMoveStats rillaboom = getMoveUsageStatsMon(response, "Rillaboom");
+        assertFalse(rillaboom.getMoves().isEmpty(), "Rillaboom (nicknamed Chunky Kong) should have moves");
+
+        AnalyticsDTO.PokemonMoveStats ragingBolt = getMoveUsageStatsMon(response, "Raging Bolt");
+        assertFalse(ragingBolt.getMoves().isEmpty(), "Raging Bolt (nicknamed Raging Boner) should have moves");
+
+        // Verify specific moves
+        assertTrue(getUseCount(flutterMane, "Taunt") > 0);
+        assertTrue(getUseCount(flutterMane, "Thunder Wave") > 0);
+        assertTrue(getUseCount(incineroar, "Taunt") > 0);
+        assertTrue(getUseCount(incineroar, "Flare Blitz") > 0);
+        assertTrue(getUseCount(rillaboom, "Wood Hammer") > 0);
+        assertTrue(getUseCount(ragingBolt, "Dragon Pulse") > 0);
+
+        // Verify tera was tracked (Battle Beast/Incineroar teras to Ghost)
+        AnalyticsDTO.UsageStatsResponse usageResponse = analyticsService.getUsageStats(testTeam.getId());
+        AnalyticsDTO.PokemonUsageStats incineroarUsage = usageResponse
+                .getPokemonStats()
+                .stream()
+                .filter(stats -> stats.getPokemon().equals("Incineroar"))
+                .findFirst().get();
+        assertEquals(1, incineroarUsage.getTeraUsage(), "Incineroar (nicknamed Battle Beast) should have 1 tera usage");
     }
 }
