@@ -1,6 +1,7 @@
 // src/components/EditTeamModal.jsx
 import React, { useState, useEffect } from 'react';
 import { X, Users, Link as LinkIcon, User, AlertCircle } from 'lucide-react';
+import PokepasteService from '../services/PokepasteService';
 
 const EditTeamModal = ({ isOpen, teamData, onClose, onTeamUpdated }) => {
     const [formData, setFormData] = useState({
@@ -38,10 +39,9 @@ const EditTeamModal = ({ isOpen, teamData, onClose, onTeamUpdated }) => {
         }
     }, [teamData]);
 
-    const validatePokepasteUrl = (url) => {
+    const validatePasteUrl = (url) => {
         if (!url.trim()) return true; // Optional field
-        const pokepastePattern = /^https?:\/\/(www\.)?pokepast\.es\/[a-zA-Z0-9]+\/?$/;
-        return pokepastePattern.test(url.trim());
+        return PokepasteService.isValidPokepasteUrl(url.trim());
     };
 
     const parseArrayField = (value) => {
@@ -73,8 +73,8 @@ const EditTeamModal = ({ isOpen, teamData, onClose, onTeamUpdated }) => {
             newErrors.name = 'Team name is required';
         }
 
-        if (formData.pokepaste && !validatePokepasteUrl(formData.pokepaste)) {
-            newErrors.pokepaste = 'Please enter a valid Pokepaste URL (e.g., https://pokepast.es/abc123)';
+        if (formData.pokepaste && !validatePasteUrl(formData.pokepaste)) {
+            newErrors.pokepaste = 'Please enter a valid Pokepaste or Pokebin URL (e.g., https://pokepast.es/abc123 or https://pokebin.com/abc123)';
         }
 
         setErrors(newErrors);
@@ -158,13 +158,13 @@ const EditTeamModal = ({ isOpen, teamData, onClose, onTeamUpdated }) => {
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                             <LinkIcon className="h-4 w-4 inline mr-1" />
-                            Pokepaste URL
+                            Pokepaste / Pokebin URL
                         </label>
                         <input
                             type="url"
                             value={formData.pokepaste}
                             onChange={(e) => handleInputChange('pokepaste', e.target.value)}
-                            placeholder="https://pokepast.es/..."
+                            placeholder="https://pokepast.es/... or https://pokebin.com/..."
                             className={`w-full px-3 py-2 bg-slate-700 border rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                 errors.pokepaste ? 'border-red-500' : 'border-slate-600'
                             }`}
@@ -174,7 +174,7 @@ const EditTeamModal = ({ isOpen, teamData, onClose, onTeamUpdated }) => {
                             <p className="text-red-400 text-sm mt-1">{errors.pokepaste}</p>
                         )}
                         <p className="text-xs text-gray-400 mt-1">
-                            Link to your team on Pokepaste
+                            Link to your team on Pokepaste or Pokebin
                         </p>
                     </div>
 
