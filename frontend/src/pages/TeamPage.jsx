@@ -216,6 +216,7 @@ const TeamPage = () => {
                     {activeTab === 'game-by-game' && (
                         <GameByGameTab
                             replays={replays}
+                            onUpdateReplay={handleUpdateReplay}
                         />
                     )}
                     {activeTab === 'match-by-match' && (

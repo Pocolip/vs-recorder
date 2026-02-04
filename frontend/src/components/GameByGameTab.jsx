@@ -4,10 +4,46 @@ import { Calendar, Filter, SortAsc, SortDesc } from 'lucide-react';
 import GameCard from './GameCard';
 import {formatTimeAgo} from "@/utils/timeUtils";
 
-const GameByGameTab = ({ replays }) => {
+const GameByGameTab = ({ replays, onUpdateReplay }) => {
     const [sortBy, setSortBy] = useState('date');
     const [sortOrder, setSortOrder] = useState('desc');
     const [filterResult, setFilterResult] = useState('all');
+    const [editingNoteId, setEditingNoteId] = useState(null);
+    const [noteText, setNoteText] = useState('');
+    const [savingNoteId, setSavingNoteId] = useState(null);
+
+    const startEditingNote = (replay) => {
+        setEditingNoteId(replay.id);
+        setNoteText(replay.notes || '');
+    };
+
+    const cancelEditingNote = () => {
+        setEditingNoteId(null);
+        setNoteText('');
+    };
+
+    const saveNote = async (replayId) => {
+        try {
+            setSavingNoteId(replayId);
+            await onUpdateReplay(replayId, { notes: noteText.trim() });
+            setEditingNoteId(null);
+            setNoteText('');
+        } catch (error) {
+            console.error('Error updating replay note:', error);
+        } finally {
+            setSavingNoteId(null);
+        }
+    };
+
+    const handleKeyPress = (e, replayId) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            saveNote(replayId);
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEditingNote();
+        }
+    };
 
     // Null check
     if (!replays) {
@@ -145,6 +181,14 @@ const GameByGameTab = ({ replays }) => {
                             key={replay.id}
                             replay={replay}
                             formatTimeAgo={formatTimeAgo}
+                            isEditingNote={editingNoteId === replay.id}
+                            isSavingNote={savingNoteId === replay.id}
+                            noteText={noteText}
+                            onStartEditingNote={startEditingNote}
+                            onCancelEditingNote={cancelEditingNote}
+                            onSaveNote={saveNote}
+                            onNoteTextChange={setNoteText}
+                            onKeyPress={handleKeyPress}
                         />
                     ))}
                 </div>
