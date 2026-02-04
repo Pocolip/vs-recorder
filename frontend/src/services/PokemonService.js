@@ -11,8 +11,8 @@ class PokemonService {
     // Static fallback data for most common VGC Pokemon
     static COMMON_VGC_POKEMON = {
         // Generation 9 VGC 2025 common picks
-        'miraidon': { id: 1007, name: 'Miraidon', types: ['electric', 'dragon'] },
-        'koraidon': { id: 1008, name: 'Koraidon', types: ['fighting', 'dragon'] },
+        'miraidon': { id: 1008, name: 'Miraidon', types: ['electric', 'dragon'] },
+        'koraidon': { id: 1007, name: 'Koraidon', types: ['fighting', 'dragon'] },
         'calyrex-shadow': { id: 898, name: 'Calyrex-Shadow', types: ['psychic', 'ghost'] },
         'calyrex-ice': { id: 898, name: 'Calyrex-Ice', types: ['psychic', 'ice'] },
         'urshifu': { id: 892, name: 'Urshifu', types: ['fighting', 'dark'] },

@@ -325,15 +325,16 @@ export const extractPokemonFromPokepaste = (pokepasteText) => {
         const trimmedLine = line.trim();
 
         // Skip empty lines, comments, and stat/move lines
+        // ` @ ` only appears on Pokemon name lines (e.g. "Koraidon @ Ability Shield")
+        const hasItemSeparator = trimmedLine.includes(' @ ');
         if (!trimmedLine ||
             trimmedLine.startsWith('//') ||
-            trimmedLine.includes(':') ||
-            trimmedLine.startsWith('-') ||
-            trimmedLine.toLowerCase().includes('nature') ||
-            trimmedLine.toLowerCase().includes('ability') ||
-            trimmedLine.toLowerCase().includes('level') ||
-            trimmedLine.toLowerCase().includes('evs') ||
-            trimmedLine.toLowerCase().includes('ivs')) {
+            (!hasItemSeparator && (
+                trimmedLine.includes(':') ||
+                trimmedLine.startsWith('-') ||
+                trimmedLine.toLowerCase().includes('nature') ||
+                trimmedLine.toLowerCase().includes('level')
+            ))) {
             continue;
         }
 
