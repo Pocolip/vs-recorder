@@ -181,4 +181,37 @@ class PokepasteServiceTest {
 
         assertEquals("Chien-Pao", result.getPokemon().get(5).getSpecies());
     }
+
+    @Test
+    void testKoraidonAbilityShield(){
+        String pasteText = loadTestFile("koraidon.txt");
+        when(restTemplate.getForObject(anyString(), eq(String.class)))
+                .thenReturn(pasteText);
+
+        PokepasteDTO.PasteData result = pokepasteService.fetchPasteData(
+                "https://pokepast.es/abc123");
+
+        assertNotNull(result);
+        assertEquals(6, result.getPokemon().size());
+
+        assertEquals("Calyrex-Shadow", result.getPokemon().get(0).getSpecies());
+        assertEquals("Focus Sash", result.getPokemon().get(0).getItem());
+
+        assertEquals("Incineroar", result.getPokemon().get(1).getSpecies());
+        assertEquals("Safety Goggles", result.getPokemon().get(1).getItem());
+
+        assertEquals("Weezing-Galar", result.getPokemon().get(2).getSpecies());
+        assertEquals("Covert Cloak", result.getPokemon().get(2).getItem());
+
+        assertEquals("Chi-Yu", result.getPokemon().get(3).getSpecies());
+        assertEquals("Choice Scarf", result.getPokemon().get(3).getItem());
+
+        assertEquals("Walking Wake", result.getPokemon().get(4).getSpecies());
+        assertEquals("Assault Vest", result.getPokemon().get(4).getItem());
+
+        assertEquals("Koraidon", result.getPokemon().get(5).getSpecies());
+        assertEquals("Ability Shield", result.getPokemon().get(5).getItem());
+        assertEquals("Orichalcum Pulse", result.getPokemon().get(5).getAbility());
+        assertEquals("Fire", result.getPokemon().get(5).getTeraType());
+    }
 }

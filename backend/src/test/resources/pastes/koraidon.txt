@@ -1,0 +1,59 @@
+Calyrex-Shadow @ Focus Sash
+Ability: As One (Spectrier)
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Astral Barrage
+- Psychic
+- Encore
+- Protect
+
+Incineroar @ Safety Goggles
+Ability: Intimidate
+Tera Type: Bug
+EVs: 244 HP / 188 Def / 76 SpD
+Careful Nature
+- Knock Off
+- Fake Out
+- Parting Shot
+- Protect
+
+Weezing-Galar @ Covert Cloak
+Ability: Neutralizing Gas
+Tera Type: Water
+EVs: 252 HP / 236 SpD / 20 Spe
+Careful Nature
+- Play Rough
+- Taunt
+- Will-O-Wisp
+- Protect
+
+Chi-Yu @ Choice Scarf
+Ability: Beads of Ruin
+Tera Type: Ghost
+EVs: 52 HP / 4 Def / 196 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Heat Wave
+- Flamethrower
+- Dark Pulse
+- Snarl
+
+Walking Wake @ Assault Vest
+Ability: Protosynthesis
+Tera Type: Water
+EVs: 108 HP / 4 Def / 188 SpA / 4 SpD / 204 Spe
+Timid Nature
+- Hydro Steam
+- Draco Meteor
+- Snarl
+- Aqua Jet
+
+Koraidon @ Ability Shield
+Ability: Orichalcum Pulse
+Tera Type: Fire
+EVs: 252 HP / 156 Atk / 4 Def / 60 SpD / 36 Spe
+Adamant Nature
+- Flare Blitz
+- Flame Charge
+- Collision Course
+- Protect
