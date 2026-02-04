@@ -4,7 +4,7 @@ import { extractPokemonFromPokepaste, isValidPokemonName } from '../utils/pokemo
 import apiClient from './api/client';
 
 class PokepasteService {
-    static CACHE_KEY = 'pokepaste_cache';
+    static CACHE_KEY = 'pokepaste_cache_v2';
     static CACHE_EXPIRY_HOURS = 24; // Cache for 24 hours
 
     // URL patterns
@@ -260,13 +260,14 @@ class PokepasteService {
             }
 
             // Check if this line starts a new Pokemon (doesn't contain colons and isn't a move)
-            const looksLikePokemonName = !trimmed.includes(':') &&
+            // ` @ ` only appears on Pokemon name lines (e.g. "Koraidon @ Ability Shield")
+            const hasItemSeparator = trimmed.includes(' @ ');
+            const looksLikePokemonName = hasItemSeparator || (
+                !trimmed.includes(':') &&
                 !trimmed.startsWith('-') &&
                 !trimmed.toLowerCase().includes('nature') &&
-                !trimmed.toLowerCase().includes('ability') &&
-                !trimmed.toLowerCase().includes('level') &&
-                !trimmed.toLowerCase().includes('evs') &&
-                !trimmed.toLowerCase().includes('ivs');
+                !trimmed.toLowerCase().includes('level')
+            );
 
             if (looksLikePokemonName && currentBlock.length > 0) {
                 // Save previous block and start new one
