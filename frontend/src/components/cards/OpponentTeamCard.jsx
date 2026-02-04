@@ -111,8 +111,8 @@ const OpponentTeamCard = ({
           {/* Opponent Team Sprites - Left */}
           <div className="flex-shrink-0 w-fit">
             <div className="flex items-center gap-2 mb-2 max-w-[280px]">
-              <h3 className="text-sm font-semibold text-gray-100 truncate" title={pasteTitle || 'Opponent Team'}>
-                {loadingTitle ? 'Loading...' : (pasteTitle || 'Opponent Team')}
+              <h3 className="text-sm font-semibold text-gray-100 truncate" title={pasteTitle || 'Matchup Team'}>
+                {loadingTitle ? 'Loading...' : (pasteTitle || 'Matchup Team')}
               </h3>
               {opponentTeam.pokepaste && (
                 <a
@@ -169,7 +169,7 @@ const OpponentTeamCard = ({
                     onChange={(e) => setEditedNotes(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-400 text-sm"
                     rows={2}
-                    placeholder="Add notes about this opponent..."
+                    placeholder="Add notes about this matchup..."
                   />
                 </div>
                 <div className="flex gap-2">
@@ -190,7 +190,7 @@ const OpponentTeamCard = ({
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-400 whitespace-pre-wrap">
                 {opponentTeam.notes || 'No notes. Click Edit to add.'}
               </p>
             )}
@@ -200,7 +200,7 @@ const OpponentTeamCard = ({
           <button
             onClick={() => setShowDeleteTeamModal(true)}
             className="flex-shrink-0 p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-600/10 rounded transition-colors"
-            title="Delete opponent team"
+            title="Delete matchup team"
           >
             <Trash2 className="h-3 w-3" />
           </button>
@@ -268,11 +268,11 @@ const OpponentTeamCard = ({
 
       {showDeleteTeamModal && (
         <ConfirmationModal
-          title="Delete Opponent Team"
+          title="Delete Matchup Team"
           message={
             <div>
               <p className="mb-2">
-                Are you sure you want to delete this opponent team?
+                Are you sure you want to delete this matchup team?
               </p>
               <p className="text-sm text-gray-400">
                 This will delete {compositions.length} strategy{' '}
@@ -342,7 +342,7 @@ const PlanRow = ({ composition, index, myTeamPokemon, onUpdate, onDelete }) => {
   if (isEditing) {
     return (
       <div className="bg-slate-700/50 border border-emerald-500/40 rounded-lg p-3">
-        <div className="grid grid-cols-12 gap-2 items-start">
+        <div className="grid grid-cols-12 gap-2 items-stretch">
           {/* Plan Label */}
           <div className="col-span-1 pt-2">
             <span className="text-xs font-semibold text-emerald-400">Plan {index + 1}</span>
@@ -351,7 +351,7 @@ const PlanRow = ({ composition, index, myTeamPokemon, onUpdate, onDelete }) => {
           {/* Dropdowns - Grouped */}
           <div className="col-span-4 flex gap-2 justify-center">
             {/* Leads Group */}
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-xs text-emerald-400 mb-0.5 text-center">Leads</p>
               <div className="space-y-1">
                 <PokemonDropdown
@@ -372,7 +372,7 @@ const PlanRow = ({ composition, index, myTeamPokemon, onUpdate, onDelete }) => {
             </div>
 
             {/* Back Group */}
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-xs text-blue-400 mb-0.5 text-center">Back</p>
               <div className="space-y-1">
                 <PokemonDropdown
@@ -394,14 +394,13 @@ const PlanRow = ({ composition, index, myTeamPokemon, onUpdate, onDelete }) => {
           </div>
 
           {/* Notes */}
-          <div className="col-span-6">
+          <div className="col-span-6 flex flex-col">
             <p className="text-xs text-gray-400 mb-0.5">Notes</p>
-            <input
-              type="text"
+            <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Strategy notes..."
-              className="w-full px-2 py-1.5 bg-slate-600 border border-slate-500 rounded text-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-400"
+              className="w-full flex-1 px-2 py-1.5 bg-slate-600 border border-slate-500 rounded text-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-400 resize-none"
             />
           </div>
 
@@ -463,8 +462,12 @@ const PlanRow = ({ composition, index, myTeamPokemon, onUpdate, onDelete }) => {
         {/* Notes */}
         <div className="col-span-6">
           <p className="text-xs text-gray-400 mb-0.5">Notes</p>
-          <div className="text-sm text-gray-400 truncate">
-            {composition.notes || <span className="italic text-gray-500">No notes</span>}
+          <div className="bg-slate-700/30 rounded-lg p-2">
+            {composition.notes ? (
+              <p className="text-gray-300 text-sm whitespace-pre-wrap break-words">{composition.notes}</p>
+            ) : (
+              <p className="text-gray-500 text-sm italic">No notes</p>
+            )}
           </div>
         </div>
 
@@ -525,7 +528,7 @@ const AddPlanRow = ({ myTeamPokemon, onSave, onCancel }) => {
 
   return (
     <div className="bg-emerald-900/20 border border-emerald-500/40 rounded-lg p-3">
-      <div className="grid grid-cols-12 gap-2 items-start">
+      <div className="grid grid-cols-12 gap-2 items-stretch">
         {/* Label */}
         <div className="col-span-1 pt-2">
           <span className="text-xs font-semibold text-emerald-400">New</span>
@@ -534,7 +537,7 @@ const AddPlanRow = ({ myTeamPokemon, onSave, onCancel }) => {
         {/* Dropdowns - Grouped */}
         <div className="col-span-4 flex gap-2 justify-center">
           {/* Leads Group */}
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="text-xs text-emerald-400 mb-0.5 text-center">Leads</p>
             <div className="space-y-1">
               <PokemonDropdown
@@ -555,7 +558,7 @@ const AddPlanRow = ({ myTeamPokemon, onSave, onCancel }) => {
           </div>
 
           {/* Back Group */}
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="text-xs text-blue-400 mb-0.5 text-center">Back</p>
             <div className="space-y-1">
               <PokemonDropdown
@@ -577,14 +580,13 @@ const AddPlanRow = ({ myTeamPokemon, onSave, onCancel }) => {
         </div>
 
         {/* Notes */}
-        <div className="col-span-6">
+        <div className="col-span-6 flex flex-col">
           <p className="text-xs text-gray-400 mb-0.5">Notes</p>
-          <input
-            type="text"
+          <textarea
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             placeholder="Strategy notes..."
-            className="w-full px-2 py-1.5 bg-slate-700 border border-slate-600 rounded text-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-400"
+            className="w-full flex-1 px-2 py-1.5 bg-slate-700 border border-slate-600 rounded text-gray-100 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-400 resize-none"
           />
         </div>
 

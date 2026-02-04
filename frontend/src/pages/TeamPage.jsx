@@ -169,7 +169,7 @@ const TeamPage = () => {
         { id: 'usage-stats', label: 'Usage Stats', icon: TrendingUp },
         { id: 'matchup-stats', label: 'Matchup Stats', icon: Target },
         { id: 'move-usage', label: 'Move Usage', icon: Zap },
-        { id: 'opponent-planner', label: 'Opponent Planner', icon: Clipboard }
+        { id: 'opponent-planner', label: 'Matchup Planner', icon: Clipboard }
     ];
 
     return (
@@ -216,6 +216,7 @@ const TeamPage = () => {
                     {activeTab === 'game-by-game' && (
                         <GameByGameTab
                             replays={replays}
+                            onUpdateReplay={handleUpdateReplay}
                         />
                     )}
                     {activeTab === 'match-by-match' && (

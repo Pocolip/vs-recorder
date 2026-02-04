@@ -1,12 +1,23 @@
 // src/components/GameCard.jsx
-import React from 'react';
-import { ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { ExternalLink, ChevronDown, MessageSquare, Save } from 'lucide-react';
 import PokemonSprite from './PokemonSprite';
 import {formatTimeAgo} from "@/utils/timeUtils";
 import {cleanPokemonName} from "@/utils/pokemonNameUtils";
 import {getResultDisplay} from "@/utils/resultUtils";
 
-const GameCard = ({ replay }) => {
+const GameCard = ({
+    replay,
+    isEditingNote,
+    isSavingNote,
+    noteText,
+    onStartEditingNote,
+    onCancelEditingNote,
+    onSaveNote,
+    onNoteTextChange,
+    onKeyPress
+}) => {
+    const [isNoteExpanded, setIsNoteExpanded] = useState(false);
     // Type icon component for cleaner rendering
     const TypeIcon = ({ type, size = 'w-4 h-4' }) => {
         if (!type) return <span className="text-gray-500">?</span>;
@@ -318,11 +329,81 @@ const GameCard = ({ replay }) => {
                 </div>
             </div>
 
-            {/* Notes row (if present) */}
-            {replay.notes && (
+            {/* Notes row + Edit Button */}
+            {!isEditingNote && (
+                <div className="mt-3 pt-3 border-t border-slate-600/50 flex items-start gap-2">
+                    {replay.notes ? (
+                        <button
+                            type="button"
+                            onClick={() => setIsNoteExpanded(!isNoteExpanded)}
+                            className={`flex-1 min-w-0 flex items-start gap-1.5 text-left rounded ${isNoteExpanded ? 'bg-slate-800/50 p-2' : ''}`}
+                        >
+                            <ChevronDown
+                                className={`h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0 transition-transform ${isNoteExpanded ? 'rotate-180' : ''}`}
+                            />
+                            <p className={`text-xs ${isNoteExpanded ? 'whitespace-pre-wrap break-words text-gray-300' : 'truncate text-gray-400'}`}>
+                                {replay.notes}
+                            </p>
+                        </button>
+                    ) : (
+                        <div className="flex-1" />
+                    )}
+                    <button
+                        onClick={() => onStartEditingNote(replay)}
+                        className="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-600/10 rounded transition-colors flex-shrink-0"
+                        title="Edit notes"
+                    >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                    </button>
+                </div>
+            )}
+
+            {/* Inline Note Editor */}
+            {isEditingNote && (
                 <div className="mt-3 pt-3 border-t border-slate-600">
-                    <p className="text-xs text-gray-400 mb-1">Notes:</p>
-                    <p className="text-sm text-gray-300">{replay.notes}</p>
+                    <div className="space-y-2">
+                        <textarea
+                            value={noteText}
+                            onChange={(e) => onNoteTextChange(e.target.value)}
+                            onKeyDown={(e) => onKeyPress(e, replay.id)}
+                            placeholder="Add notes about this game..."
+                            rows={2}
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-500 rounded text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none text-sm"
+                            disabled={isSavingNote}
+                            autoFocus
+                        />
+                        <div className="flex justify-between items-center">
+                            <p className="text-xs text-gray-500">
+                                Ctrl+Enter to save, Escape to cancel
+                            </p>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => onSaveNote(replay.id)}
+                                    disabled={isSavingNote}
+                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs flex items-center gap-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isSavingNote ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-2 w-2 border border-white border-t-transparent"></div>
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="h-2 w-2" />
+                                            Save
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={onCancelEditingNote}
+                                    disabled={isSavingNote}
+                                    className="px-3 py-1 text-gray-300 hover:text-gray-100 transition-colors text-xs disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
