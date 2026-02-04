@@ -100,7 +100,7 @@ const OpponentPlannerTab = ({ team, teamId }) => {
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-400 mb-4">Error loading opponent teams: {error}</div>
+        <div className="text-red-400 mb-4">Error loading matchup teams: {error}</div>
         <button
           onClick={refresh}
           className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -118,10 +118,10 @@ const OpponentPlannerTab = ({ team, teamId }) => {
         <div>
           <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
             <Target className="h-6 w-6 text-emerald-400" />
-            Opponent Planning
+            Matchup Planning
           </h2>
           <p className="text-gray-400 text-sm mt-1">
-            Plan your strategies against specific opponent teams
+            Plan strategies for specific matchups
           </p>
         </div>
         <button
@@ -129,7 +129,7 @@ const OpponentPlannerTab = ({ team, teamId }) => {
           className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Add Opponent Team
+          Add Matchup Team
         </button>
       </div>
 
@@ -171,10 +171,10 @@ const OpponentPlannerTab = ({ team, teamId }) => {
         <div className="text-center py-16 bg-slate-700/30 rounded-lg border-2 border-dashed border-slate-600">
           <Target className="h-16 w-16 text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-300 mb-2">
-            No opponent teams yet
+            No matchup teams yet
           </h3>
           <p className="text-gray-400 mb-6 max-w-md mx-auto">
-            Add opponent teams to plan your strategies. You'll be able to define different
+            Add matchup teams to plan your strategies. You'll be able to define different
             compositions and notes for each matchup.
           </p>
           <button
@@ -182,7 +182,7 @@ const OpponentPlannerTab = ({ team, teamId }) => {
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors mx-auto"
           >
             <Plus className="h-5 w-5" />
-            Add Your First Opponent Team
+            Add Your First Matchup Team
           </button>
         </div>
       )}

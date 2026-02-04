@@ -64,7 +64,7 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
       await onSubmit(teamData);
       // Modal will be closed by parent component on success
     } catch (err) {
-      setError(err.message || 'Failed to add opponent team. Please try again.');
+      setError(err.message || 'Failed to add matchup team. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,7 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-slate-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-slate-700">
-          <h2 className="text-xl font-semibold text-gray-100">Add Opponent Team</h2>
+          <h2 className="text-xl font-semibold text-gray-100">Add Matchup Team</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-200"
@@ -109,7 +109,7 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
               required
             />
             <p className="text-xs text-gray-400 mt-1">
-              Link to the opponent's team on Pokepaste or Pokebin
+              Link to the matchup team on Pokepaste or Pokebin
             </p>
           </div>
 
@@ -121,7 +121,7 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
             <textarea
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Add opponent's name, team notes, or playstyle observations..."
+              placeholder="Add player name, team notes, or playstyle observations..."
               className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-emerald-400"
               rows={4}
               disabled={loading}
