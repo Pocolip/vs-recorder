@@ -1,6 +1,6 @@
 // src/components/CompactReplayCard.jsx
-import React from 'react';
-import { Trash2, Edit3, Save, X, MessageSquare, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { Trash2, Edit3, Save, X, MessageSquare, ExternalLink, ChevronDown } from 'lucide-react';
 import PokemonTeam from './PokemonTeam';
 import { cleanPokemonName } from '../utils/pokemonNameUtils';
 import {getResultDisplay} from "@/utils/resultUtils";
@@ -45,6 +45,7 @@ const CompactReplayCard = ({
         return opponentTeam.map(pokemon => cleanPokemonName(pokemon));
     };
 
+    const [isNoteExpanded, setIsNoteExpanded] = useState(false);
     const resultDisplay = getResultDisplay(replay.result);
     const opponentTeam = getOpponentTeam();
 
@@ -79,12 +80,6 @@ const CompactReplayCard = ({
                             </div>
                         )}
 
-                        {/* Notes Preview */}
-                        {replay.notes && !isEditingNote && (
-                            <p className="text-gray-400 text-xs mt-1 truncate">
-                                📝 {replay.notes}
-                            </p>
-                        )}
                     </div>
 
                     {/* Opponent Team Display - Horizontally positioned */}
@@ -138,6 +133,22 @@ const CompactReplayCard = ({
                     </button>
                 </div>
             </div>
+
+            {/* Collapsible Notes */}
+            {replay.notes && !isEditingNote && (
+                <button
+                    type="button"
+                    onClick={() => setIsNoteExpanded(!isNoteExpanded)}
+                    className={`w-full mt-2 pt-2 border-t border-slate-600/50 flex items-start gap-1.5 text-left group rounded-b-md ${isNoteExpanded ? 'bg-slate-800/50 p-2' : ''}`}
+                >
+                    <ChevronDown
+                        className={`h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0 transition-transform ${isNoteExpanded ? 'rotate-180' : ''}`}
+                    />
+                    <p className={`text-xs ${isNoteExpanded ? 'whitespace-pre-wrap break-words text-gray-300' : 'truncate text-gray-400'}`}>
+                        {replay.notes}
+                    </p>
+                </button>
+            )}
 
             {/* Inline Note Editor */}
             {isEditingNote && (

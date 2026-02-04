@@ -361,7 +361,7 @@ const BestOf3Card = ({ match, onUpdateNotes, onUpdateTags }) => {
                 ) : (
                     <div className="bg-slate-700/30 rounded-lg p-3 min-h-[60px]">
                         {match.notes ? (
-                            <p className="text-gray-300 text-sm leading-relaxed">{match.notes}</p>
+                            <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap break-words">{match.notes}</p>
                         ) : (
                             <p className="text-gray-500 text-sm italic">No notes added yet</p>
                         )}

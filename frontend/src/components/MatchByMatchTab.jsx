@@ -44,8 +44,8 @@ const MatchByMatchTab = ({ teamId }) => {
 
             // Update local state
             setMatches(prev => prev.map(match =>
-                match.matchId === matchId
-                    ? { ...match, notes, hasStoredData: true, lastNotesUpdate: new Date().toISOString() }
+                match.id === matchId
+                    ? { ...match, notes }
                     : match
             ));
         } catch (error) {
@@ -60,8 +60,8 @@ const MatchByMatchTab = ({ teamId }) => {
 
             // Update local state
             setMatches(prev => prev.map(match =>
-                match.matchId === matchId
-                    ? { ...match, tags, hasStoredData: true, lastNotesUpdate: new Date().toISOString() }
+                match.id === matchId
+                    ? { ...match, tags }
                     : match
             ));
         } catch (error) {
