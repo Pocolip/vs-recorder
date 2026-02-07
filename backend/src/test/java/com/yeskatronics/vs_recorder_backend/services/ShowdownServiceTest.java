@@ -16,8 +16,8 @@ import java.util.List;
 import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -45,7 +45,8 @@ class ShowdownServiceTest {
         String replayJson =
                 loadTestFile(
                         "bad/bad.json");
-        when(restTemplate.getForObject(anyString(), eq(String.class)))
+        when(restTemplate.getForObject(
+                eq("https://replay.pokemonshowdown.com/gen9vgc2025-12345.json"), eq(String.class)))
                 .thenReturn(replayJson);
 
         // When: Fetch replay data
@@ -63,5 +64,26 @@ class ShowdownServiceTest {
         assertNotNull(result.getDate());
     }
 
+    @Test
+    void testFetchReplayData_withQueryParams_shouldStripQueryParams() {
+        // Given: Load replay JSON and mock with the expected clean URL
+        String replayJson = loadTestFile("bad/bad.json");
+        when(restTemplate.getForObject(
+                eq("https://replay.pokemonshowdown.com/gen9vgc2025regg-12345.json"), eq(String.class)))
+                .thenReturn(replayJson);
+
+        // When: Fetch replay data using a URL with ?p2 query param
+        ShowdownDTO.ReplayData result = showdownService.fetchReplayData(
+                "https://replay.pokemonshowdown.com/gen9vgc2025regg-12345?p2",
+                List.of("mofonguero")
+        );
+
+        // Then: Verify the query param was stripped and JSON fetched from clean URL
+        assertNotNull(result);
+        verify(restTemplate).getForObject(
+                eq("https://replay.pokemonshowdown.com/gen9vgc2025regg-12345.json"), eq(String.class));
+        assertEquals("Kuronisa1332", result.getOpponent());
+        assertEquals("win", result.getResult());
+    }
 
 }

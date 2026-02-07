@@ -90,6 +90,9 @@ public class ReplayService {
     public Replay createReplayFromUrl(Long teamId, String url) {
         log.info("Creating replay from URL for team ID: {}", teamId);
 
+        // Strip query parameters to normalize the URL
+        url = url.split("\\?")[0];
+
         // Check for duplicate URL within the same team
         if (replayRepository.existsByUrlAndTeamId(url, teamId)) {
             throw new IllegalArgumentException("Replay URL already exists in this team: " + url);
