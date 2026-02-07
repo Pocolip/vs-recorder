@@ -32,7 +32,8 @@ const AddReplayModal = ({ onClose, onAddReplay }) => {
         try {
             setLoading(true);
             setError('');
-            await onAddReplay(trimmedUrl, notes.trim());
+            const cleanUrl = trimmedUrl.split('?')[0];
+            await onAddReplay(cleanUrl, notes.trim());
             // Modal will be closed by parent component on success
         } catch (err) {
             setError(err.message || 'Failed to add replay. Please try again.');
@@ -67,7 +68,8 @@ const AddReplayModal = ({ onClose, onAddReplay }) => {
             // For now, we'll add them one by one
             // In a real implementation, you might want to use ReplaysService.createManyFromUrls
             for (const url of urls) {
-                await onAddReplay(url, '');
+                const cleanUrl = url.split('?')[0];
+                await onAddReplay(cleanUrl, '');
             }
 
             // Modal will be closed by parent component on success

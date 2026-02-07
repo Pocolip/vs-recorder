@@ -29,7 +29,7 @@ public class ShowdownService {
 
     private static final String SHOWDOWN_REPLAY_BASE = "https://replay.pokemonshowdown.com";
     private static final Pattern REPLAY_URL_PATTERN = Pattern.compile(
-            "https://replay\\.pokemonshowdown\\.com/([^/]+)"
+            "https://replay\\.pokemonshowdown\\.com/([^/?]+)"
     );
 
     /**
