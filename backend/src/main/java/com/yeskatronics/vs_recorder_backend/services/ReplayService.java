@@ -1,5 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Match;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
@@ -14,8 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service class for Replay entity business logic.
@@ -33,6 +34,7 @@ public class ReplayService {
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
     private final ShowdownService showdownService;
+    private final ObjectMapper objectMapper;
 
     /**
      * Create a new replay
@@ -415,6 +417,100 @@ public class ReplayService {
     @Transactional(readOnly = true)
     public boolean replayUrlExists(String url) {
         return replayRepository.existsByUrl(url);
+    }
+
+    // ==================== Replay Reprocessing ====================
+
+    /**
+     * Reprocess all replays for a team using updated showdown usernames.
+     * Re-parses the stored battleLog JSON to determine the correct opponent and result.
+     * Also updates the opponent field on any affected Match entities.
+     *
+     * @param teamId the team ID
+     * @param newUsernames the updated list of showdown usernames
+     * @return the number of replays that were modified
+     */
+    public int reprocessReplaysForTeam(Long teamId, List<String> newUsernames) {
+        log.info("Reprocessing replays for team ID: {} with usernames: {}", teamId, newUsernames);
+
+        List<Replay> replays = replayRepository.findByTeamId(teamId);
+        int modifiedCount = 0;
+        Set<Long> affectedMatchIds = new HashSet<>();
+
+        for (Replay replay : replays) {
+            if (replay.getBattleLog() == null || replay.getBattleLog().isEmpty()) {
+                continue;
+            }
+
+            try {
+                JsonNode root = objectMapper.readTree(replay.getBattleLog());
+
+                String player1 = root.get("players").get(0).asText();
+                String player2 = root.get("players").get(1).asText();
+                String logText = root.path("log").asText();
+
+                // Match against usernames (same logic as ShowdownService)
+                String userPlayer = null;
+                String opponent = null;
+
+                for (String username : newUsernames) {
+                    if (player1.equalsIgnoreCase(username)) {
+                        userPlayer = player1;
+                        opponent = player2;
+                        break;
+                    } else if (player2.equalsIgnoreCase(username)) {
+                        userPlayer = player2;
+                        opponent = player1;
+                        break;
+                    }
+                }
+
+                // If no match found, default to player1
+                if (userPlayer == null) {
+                    userPlayer = player1;
+                    opponent = player2;
+                }
+
+                String winner = showdownService.extractWinner(logText);
+                String result = showdownService.determineResult(userPlayer, winner);
+
+                // Check if anything changed
+                boolean changed = !Objects.equals(replay.getOpponent(), opponent)
+                        || !Objects.equals(replay.getResult(), result);
+
+                if (changed) {
+                    replay.setOpponent(opponent);
+                    replay.setResult(result);
+                    replayRepository.save(replay);
+                    modifiedCount++;
+
+                    if (replay.getMatch() != null) {
+                        affectedMatchIds.add(replay.getMatch().getId());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to reprocess replay ID: {}, skipping: {}", replay.getId(), e.getMessage());
+            }
+        }
+
+        // Update opponent on affected matches from their first replay
+        for (Long matchId : affectedMatchIds) {
+            try {
+                List<Replay> matchReplays = replayRepository.findByMatchId(matchId);
+                if (!matchReplays.isEmpty()) {
+                    Match match = matchRepository.findById(matchId).orElse(null);
+                    if (match != null) {
+                        match.setOpponent(matchReplays.get(0).getOpponent());
+                        matchRepository.save(match);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to update match ID: {} opponent, skipping: {}", matchId, e.getMessage());
+            }
+        }
+
+        log.info("Reprocessed {} replays for team ID: {}, {} modified", replays.size(), teamId, modifiedCount);
+        return modifiedCount;
     }
 
     // ==================== Bo3 Match Handling ====================
