@@ -4,10 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-VS Recorder is a Pokemon VGC (Video Game Championships) replay analysis application consisting of three components:
-- **Extension**: Chrome extension for local replay analysis (React + Chrome Storage API)
+VS Recorder is a Pokemon VGC (Video Game Championships) replay analysis application consisting of two components:
 - **Backend**: REST API server (Spring Boot + H2/PostgreSQL)
-- **Frontend**: Web application (React - planned, see FRONTEND.md)
+- **Frontend**: Web application (React 18 + Tailwind CSS + Webpack 5)
 
 The application imports Pokemon Showdown replays, analyzes team performance, tracks matchup statistics, and provides game planning tools for competitive players.
 
@@ -40,14 +39,14 @@ mvn test -Dtest=ServiceNameTest#testMethodName
 
 **API Documentation**: http://localhost:8080/swagger-ui.html (when server is running)
 
-### Extension (Chrome Extension)
+### Frontend (React)
 ```bash
-cd extension
+cd frontend
 
 # Install dependencies
 npm install
 
-# Development build with watch mode
+# Start development server (port 3000, proxies to backend)
 npm run start
 
 # Production build
@@ -57,11 +56,11 @@ npm run build
 npm run clean
 ```
 
-**Load extension in Chrome**:
-1. Build the extension (`npm run build`)
-2. Navigate to `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the `extension/dist/` folder
+### Full Stack (Docker Compose)
+```bash
+# From project root - starts backend, frontend, and PostgreSQL
+docker-compose up
+```
 
 ## Architecture
 
@@ -108,26 +107,24 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 - Secret key configured in `application.properties` (change for production!)
 - Tokens expire after 24 hours (configurable via `jwt.expiration`)
 
-### Extension Architecture
+### Frontend Architecture
 
-**Directory Structure** (`extension/src`):
-- `pages/` - Main React page components (HomePage, TeamPage, ExportPage, etc.)
-- `components/` - Reusable UI components
-- `services/` - Data services (StorageService, ReplayService, TeamService, etc.)
-- `utils/` - Helper functions
+**Directory Structure** (`frontend/src`):
+- `pages/` - Page components (HomePage, TeamPage, ExportPage, etc.)
+- `components/` - Reusable UI components (cards/, modals/, tabs/)
+- `contexts/` - React Context providers (AuthContext)
+- `services/api/` - Backend API clients (Axios-based)
 - `hooks/` - Custom React hooks
-- `styles/` - Tailwind CSS configuration
+- `utils/` - Utility functions
+- `styles/` - CSS and Tailwind configuration
 
-**Data Storage**:
-- Uses Chrome Storage API (chrome.storage.local)
-- All data stored locally in browser - no backend dependency
-- StorageService provides async interface for CRUD operations
+**Tech Stack**:
+- React 18, React Router 6 (BrowserRouter), Tailwind CSS 3, Webpack 5, Axios
 
-**Key Concepts**:
-- Self-contained analytics engine - all calculations done client-side
-- Pokemon data fetched from PokeAPI (via pokeapi-js-wrapper)
-- Matches can be grouped into Bo3 sets for tournament tracking
-- Game planner allows creating opponent team compositions and notes
+**State Management & Auth**:
+- React Context API (AuthContext) for authentication state
+- JWT-based auth with automatic token refresh via Axios interceptors
+- API communication through centralized Axios instance with auth headers
 
 ## Development Workflow
 
@@ -138,12 +135,11 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 4. All DTOs use MapStruct for automatic mapping - processors run during compilation
 5. Lombok generates getters/setters/constructors - use annotations instead of boilerplate
 
-### Extension Development
-1. Run `npm run start` for watch mode during development
-2. Reload extension in Chrome after builds (click reload icon in chrome://extensions/)
+### Frontend Development
+1. Run `npm run start` for dev server with hot reload on port 3000
+2. Dev server proxies API requests to backend on port 8080
 3. Use React DevTools to inspect component state
-4. Check Chrome console for runtime errors
-5. Storage data can be inspected via Chrome DevTools → Application → Storage
+4. Environment config in `.env.development` / `.env.production` (`REACT_APP_API_BASE_URL`)
 
 ## Important Notes
 
@@ -154,11 +150,11 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 - **Battle Log Parsing**: Showdown replay URLs are fetched and parsed - ensure network access during development
 - **MapStruct + Lombok**: Both annotation processors must be configured in pom.xml for compatibility
 
-### Extension
-- **Chrome Storage Limits**: chrome.storage.local has ~5MB limit per extension
-- **Pokemon Sprites**: Fetched from PokeAPI - requires internet connection
-- **Replay Parsing**: Battle logs are parsed from Showdown HTML - format changes may break parsing
-- **Router**: Uses HashRouter for extension compatibility (not BrowserRouter)
+### Frontend
+- **Environment Variables**: Configured via `.env.development` and `.env.production` files
+- **Router**: Uses BrowserRouter for SPA routing (nginx handles fallback in production)
+- **Pokemon Sprites**: Served locally from `public/sprites/` directory
+- **Production Build**: nginx serves the static build with gzip, SPA routing, and security headers
 
 ## Testing
 
@@ -169,9 +165,9 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 - Services have comprehensive unit tests
 - Use Spring Boot test annotations for integration tests
 
-### Extension
+### Frontend
 - No automated tests currently configured
-- Manual testing via Chrome extension reload
+- Manual testing via dev server (`npm run start`)
 
 ## API Endpoints
 
