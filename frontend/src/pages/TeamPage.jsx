@@ -146,6 +146,7 @@ const TeamPage = () => {
 
             // Update local state with the saved team data
             setTeam(savedTeam);
+            refreshStats();
             setShowEditTeamModal(false);
         } catch (error) {
             console.error('Error updating team:', error);

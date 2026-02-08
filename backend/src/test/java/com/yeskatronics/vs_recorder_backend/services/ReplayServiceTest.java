@@ -350,4 +350,129 @@ class ReplayServiceTest {
         List<Replay> matchReplays = replayRepository.findByMatchId(game1.getMatch().getId());
         assertEquals(2, matchReplays.size(), "Partial Bo3 set should still create match with 2 replays");
     }
+
+    // ==================== Replay Reprocessing Tests ====================
+
+    @Test
+    void testReprocessReplays_WrongUsername_FixesToCorrect() throws IOException {
+        // bothtera.json has players "larry ayuso" and "surgevgc", winner is "surgevgc"
+        // Set team username to "larry ayuso" so opponent=surgevgc, result=loss
+        testTeam.addShowdownUsername("larry ayuso");
+        testTeam = teamRepository.save(testTeam);
+
+        Replay replay = createReplayFromJson("bo1/bothtera.json");
+        replay.setOpponent("surgevgc");
+        replay.setResult("loss");
+        replayRepository.save(replay);
+
+        assertEquals("surgevgc", replay.getOpponent());
+        assertEquals("loss", replay.getResult());
+
+        // Now reprocess with "surgevgc" as the user — should flip opponent and result
+        int modified = replayService.reprocessReplaysForTeam(
+                testTeam.getId(), List.of("surgevgc"));
+
+        assertEquals(1, modified, "Should have modified 1 replay");
+
+        Replay reloaded = replayRepository.findById(replay.getId()).orElseThrow();
+        assertEquals("larry ayuso", reloaded.getOpponent(), "Opponent should now be larry ayuso");
+        assertEquals("win", reloaded.getResult(), "Result should now be win");
+    }
+
+    @Test
+    void testReprocessReplays_AlreadyCorrect_NoChanges() throws IOException {
+        // Set username to "surgevgc" and set correct opponent/result
+        testTeam.addShowdownUsername("surgevgc");
+        testTeam = teamRepository.save(testTeam);
+
+        Replay replay = createReplayFromJson("bo1/bothtera.json");
+        replay.setOpponent("larry ayuso");
+        replay.setResult("win");
+        replayRepository.save(replay);
+
+        // Reprocess with the same username — nothing should change
+        int modified = replayService.reprocessReplaysForTeam(
+                testTeam.getId(), List.of("surgevgc"));
+
+        assertEquals(0, modified, "Should have modified 0 replays");
+    }
+
+    @Test
+    void testReprocessReplays_EmptyBattleLog_Skipped() {
+        // Create a replay with empty battleLog
+        Replay replay = new Replay();
+        replay.setUrl("file://empty-battlelog-test");
+        replay.setBattleLog("");
+        replay.setOpponent("someone");
+        replay.setResult("win");
+        replay.setDate(LocalDateTime.now());
+        replay.setTeam(testTeam);
+        replayRepository.save(replay);
+
+        int modified = replayService.reprocessReplaysForTeam(
+                testTeam.getId(), List.of("testuser"));
+
+        assertEquals(0, modified, "Should skip replays with empty battleLog");
+    }
+
+    @Test
+    void testReprocessReplays_EmptyTeam_ReturnsZero() {
+        int modified = replayService.reprocessReplaysForTeam(
+                testTeam.getId(), List.of("testuser"));
+
+        assertEquals(0, modified, "Empty team should return 0 modified");
+    }
+
+    @Test
+    void testReprocessReplays_MatchOpponentUpdated() throws IOException {
+        // Use Bo3 replays so a Match entity is created
+        testTeam.addShowdownUsername("raohed");
+        testTeam = teamRepository.save(testTeam);
+
+        Replay game1 = createReplayFromJson(
+                "raohed/gen9vgc2026regfbo3-2493790533-fl8jvhcfyt5ro0vlwdvpc9pq4iqxjmfpw.json");
+        Replay game2 = createReplayFromJson(
+                "raohed/gen9vgc2026regfbo3-2493792545-xmgmwjyed586p8xa20jmstvt8lh53frpw.json");
+
+        assertNotNull(game1.getMatch(), "Should have a match");
+        Long matchId = game1.getMatch().getId();
+
+        // Force wrong opponent/result on both replays
+        game1.setOpponent("WRONG_OPPONENT");
+        game1.setResult("win");
+        game2.setOpponent("WRONG_OPPONENT");
+        game2.setResult("win");
+        replayRepository.save(game1);
+        replayRepository.save(game2);
+
+        // Reprocess
+        int modified = replayService.reprocessReplaysForTeam(
+                testTeam.getId(), List.of("raohed"));
+
+        assertTrue(modified > 0, "Should have modified replays");
+
+        // Verify match opponent was updated
+        Match match = matchRepository.findById(matchId).orElseThrow();
+        assertNotEquals("WRONG_OPPONENT", match.getOpponent(),
+                "Match opponent should have been updated from WRONG_OPPONENT");
+    }
+
+    @Test
+    void testReprocessReplays_ViaAddShowdownUsername() throws IOException {
+        // bothtera.json: players "larry ayuso" and "surgevgc", winner "surgevgc"
+        // Start with no username — defaults to player1 ("larry ayuso")
+        Replay replay = createReplayFromJson("bo1/bothtera.json");
+        replay.setOpponent("surgevgc");
+        replay.setResult("loss");
+        replayRepository.save(replay);
+
+        // Add "surgevgc" via TeamService — should trigger reprocessing
+        teamService.addShowdownUsername(testTeam.getId(), testUser.getId(), "surgevgc");
+
+        Replay reloaded = replayRepository.findById(replay.getId()).orElseThrow();
+        assertEquals("larry ayuso", reloaded.getOpponent(),
+                "After adding surgevgc as username, opponent should be larry ayuso");
+        assertEquals("win", reloaded.getResult(),
+                "After adding surgevgc as username, result should be win");
+    }
 }

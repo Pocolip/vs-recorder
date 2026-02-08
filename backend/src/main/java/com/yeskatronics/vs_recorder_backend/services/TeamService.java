@@ -25,6 +25,7 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final ReplayService replayService;
 
     /**
      * Create a new team for a user
@@ -145,6 +146,12 @@ public class TeamService {
         }
 
         Team savedTeam = teamRepository.save(existingTeam);
+
+        // Reprocess replays if usernames were updated
+        if (updates.getShowdownUsernames() != null) {
+            replayService.reprocessReplaysForTeam(savedTeam.getId(), savedTeam.getShowdownUsernames());
+        }
+
         log.info("Team updated successfully: {}", savedTeam.getId());
 
         return savedTeam;
@@ -166,7 +173,9 @@ public class TeamService {
                         "Team not found with ID: " + teamId + " for user: " + userId));
 
         team.addShowdownUsername(username);
-        return teamRepository.save(team);
+        Team savedTeam = teamRepository.save(team);
+        replayService.reprocessReplaysForTeam(savedTeam.getId(), savedTeam.getShowdownUsernames());
+        return savedTeam;
     }
 
     /**
@@ -185,7 +194,9 @@ public class TeamService {
                         "Team not found with ID: " + teamId + " for user: " + userId));
 
         team.removeShowdownUsername(username);
-        return teamRepository.save(team);
+        Team savedTeam = teamRepository.save(team);
+        replayService.reprocessReplaysForTeam(savedTeam.getId(), savedTeam.getShowdownUsernames());
+        return savedTeam;
     }
 
     /**

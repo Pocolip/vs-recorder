@@ -121,7 +121,7 @@ public class ShowdownService {
     /**
      * Extract winner from battle log
      */
-    private String extractWinner(String logText) {
+    String extractWinner(String logText) {
         // Look for |win| line in log
         Pattern winPattern = Pattern.compile("\\|win\\|([^\\n]+)");
         Matcher matcher = winPattern.matcher(logText);
@@ -136,7 +136,7 @@ public class ShowdownService {
     /**
      * Determine if the user won or lost
      */
-    private String determineResult(String userPlayer, String winner) {
+    String determineResult(String userPlayer, String winner) {
         if (winner == null) {
             return "unknown";
         }
