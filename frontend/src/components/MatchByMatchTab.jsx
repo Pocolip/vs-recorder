@@ -1,14 +1,26 @@
 // src/components/MatchByMatchTab.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Users } from 'lucide-react';
 import BestOf3Card from './BestOf3Card';
+import TagInput from './TagInput';
 import MatchService from '../services/MatchService';
+import { matchesPokemonTags, getOpponentPokemonFromReplay } from '../utils/pokemonNameUtils';
 
 const MatchByMatchTab = ({ teamId }) => {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [stats, setStats] = useState(null);
+    const [searchTags, setSearchTags] = useState([]);
+
+    const filteredMatches = useMemo(() => {
+        if (searchTags.length === 0) return matches;
+        return matches.filter(match =>
+            match.replays && match.replays.some(replay =>
+                matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags)
+            )
+        );
+    }, [matches, searchTags]);
 
     useEffect(() => {
         loadMatches();
@@ -119,7 +131,21 @@ const MatchByMatchTab = ({ teamId }) => {
                 )}
 
                 {/* Title */}
-                <h3 className="text-xl font-semibold text-gray-100">Best-of-3 Matches</h3>
+                <div>
+                    <h3 className="text-xl font-semibold text-gray-100">Best-of-3 Matches</h3>
+                    {searchTags.length > 0 && (
+                        <p className="text-gray-400 text-sm mt-1">
+                            Showing {filteredMatches.length} of {matches.length} matches
+                        </p>
+                    )}
+                </div>
+
+                <TagInput
+                    tags={searchTags}
+                    onAddTag={(tag) => setSearchTags(prev => [...prev, tag])}
+                    onRemoveTag={(tag) => setSearchTags(prev => prev.filter(t => t !== tag))}
+                    placeholder="Filter by opponent pokemon..."
+                />
             </div>
 
             {/* Matches list */}
@@ -134,9 +160,19 @@ const MatchByMatchTab = ({ teamId }) => {
                         Add replays with Bo3 format to see match analysis and strategic notes.
                     </p>
                 </div>
+            ) : filteredMatches.length === 0 && searchTags.length > 0 ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-400">No matches match your filters</p>
+                    <button
+                        onClick={() => setSearchTags([])}
+                        className="mt-2 text-emerald-400 hover:text-emerald-300 text-sm"
+                    >
+                        Clear filters
+                    </button>
+                </div>
             ) : (
                 <div className="space-y-4">
-                    {matches.map((match) => (
+                    {filteredMatches.map((match) => (
                         <BestOf3Card
                             key={match.matchId}
                             match={match}

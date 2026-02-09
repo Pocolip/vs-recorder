@@ -1,8 +1,9 @@
 // src/components/ReplaysTab.jsx - Compact version focused on replay management
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Calendar, Trash2, Edit3, Save, X, MessageSquare, ExternalLink, Copy, Check } from 'lucide-react';
-import {CompactReplayCard} from "@/components/index";
+import {CompactReplayCard, TagInput} from "@/components/index";
 import { formatTimeAgo } from '../utils/timeUtils';
+import { matchesPokemonTags, getOpponentPokemonFromReplay } from '../utils/pokemonNameUtils';
 
 const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
     const [deletingReplayId, setDeletingReplayId] = useState(null);
@@ -11,6 +12,14 @@ const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
     const [savingNoteId, setSavingNoteId] = useState(null);
     const [copying, setCopying] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [searchTags, setSearchTags] = useState([]);
+
+    const filteredReplays = useMemo(() => {
+        if (searchTags.length === 0) return replays;
+        return replays.filter(replay =>
+            matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags)
+        );
+    }, [replays, searchTags]);
 
     const handleDeleteReplay = async (replayId) => {
         try {
@@ -60,8 +69,8 @@ const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
         try {
             setCopying(true);
 
-            // Extract all replay URLs
-            const replayUrls = replays.map(replay => replay.url).join('\n');
+            // Extract replay URLs (filtered if tags active)
+            const replayUrls = filteredReplays.map(replay => replay.url).join('\n');
 
             // Copy to clipboard
             await navigator.clipboard.writeText(replayUrls);
@@ -74,7 +83,7 @@ const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
             // Fallback for older browsers
             try {
                 const textArea = document.createElement('textarea');
-                textArea.value = replays.map(replay => replay.url).join('\n');
+                textArea.value = filteredReplays.map(replay => replay.url).join('\n');
                 document.body.appendChild(textArea);
                 textArea.select();
                 // TODO: execCommand is deprecated, we should use the Clipboard api
@@ -107,13 +116,17 @@ const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h3 className="text-xl font-semibold text-gray-100">Replay Collection</h3>
-                    <p className="text-gray-400">{replays.length} replays</p>
+                    <p className="text-gray-400">
+                        {searchTags.length > 0
+                            ? `${filteredReplays.length} of ${replays.length} replays`
+                            : `${replays.length} replays`}
+                    </p>
                 </div>
 
                 {/* Copy All Replays Button */}
                 <button
                     onClick={handleCopyAllReplays}
-                    disabled={copying || replays.length === 0}
+                    disabled={copying || filteredReplays.length === 0}
                     className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 text-gray-300 hover:text-white disabled:text-gray-500 rounded-lg text-sm transition-colors disabled:cursor-not-allowed"
                     title="Copy all replay URLs to clipboard"
                 >
@@ -130,31 +143,51 @@ const ReplaysTab = ({ replays, onDeleteReplay, onUpdateReplay }) => {
                     ) : (
                         <>
                             <Copy className="h-4 w-4" />
-                            Copy All URLs
+                            {searchTags.length > 0 ? 'Copy Filtered URLs' : 'Copy All URLs'}
                         </>
                     )}
                 </button>
             </div>
 
-            <div className="space-y-3">
-                {replays.map((replay) => (
-                    <CompactReplayCard
-                        key={replay.id}
-                        replay={replay}
-                        formatTimeAgo={formatTimeAgo}
-                        isDeleting={deletingReplayId === replay.id}
-                        isEditingNote={editingNoteId === replay.id}
-                        isSavingNote={savingNoteId === replay.id}
-                        noteText={noteText}
-                        onDeleteReplay={handleDeleteReplay}
-                        onStartEditingNote={startEditingNote}
-                        onCancelEditingNote={cancelEditingNote}
-                        onSaveNote={saveNote}
-                        onNoteTextChange={setNoteText}
-                        onKeyPress={handleKeyPress}
-                    />
-                ))}
-            </div>
+            <TagInput
+                tags={searchTags}
+                onAddTag={(tag) => setSearchTags(prev => [...prev, tag])}
+                onRemoveTag={(tag) => setSearchTags(prev => prev.filter(t => t !== tag))}
+                placeholder="Filter by opponent pokemon..."
+                className="mb-4"
+            />
+
+            {filteredReplays.length === 0 && searchTags.length > 0 ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-400">No replays match your filters</p>
+                    <button
+                        onClick={() => setSearchTags([])}
+                        className="mt-2 text-emerald-400 hover:text-emerald-300 text-sm"
+                    >
+                        Clear filters
+                    </button>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {filteredReplays.map((replay) => (
+                        <CompactReplayCard
+                            key={replay.id}
+                            replay={replay}
+                            formatTimeAgo={formatTimeAgo}
+                            isDeleting={deletingReplayId === replay.id}
+                            isEditingNote={editingNoteId === replay.id}
+                            isSavingNote={savingNoteId === replay.id}
+                            noteText={noteText}
+                            onDeleteReplay={handleDeleteReplay}
+                            onStartEditingNote={startEditingNote}
+                            onCancelEditingNote={cancelEditingNote}
+                            onSaveNote={saveNote}
+                            onNoteTextChange={setNoteText}
+                            onKeyPress={handleKeyPress}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

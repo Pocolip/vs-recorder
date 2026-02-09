@@ -1,10 +1,13 @@
 // src/components/tabs/OpponentPlannerTab.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Target, AlertTriangle } from 'lucide-react';
 import OpponentTeamCard from '../cards/OpponentTeamCard';
 import AddOpponentTeamModal from '../modals/AddOpponentTeamModal';
+import TagInput from '../TagInput';
 import useOpponentTeams from '../../hooks/useOpponentTeams';
+import { useTeamPokemon } from '../../hooks';
 import PokepasteService from '../../services/PokepasteService';
+import { matchesPokemonTags } from '../../utils/pokemonNameUtils';
 
 /**
  * Main tab for opponent team planning
@@ -16,6 +19,8 @@ const OpponentPlannerTab = ({ team, teamId }) => {
   const [parsingPokepaste, setParsingPokepaste] = useState(false);
   const [parseError, setParseError] = useState(null);
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+
+  const [searchTags, setSearchTags] = useState([]);
 
   const {
     opponentTeams,
@@ -30,6 +35,16 @@ const OpponentPlannerTab = ({ team, teamId }) => {
     refresh,
     isEmpty,
   } = useOpponentTeams(teamId);
+
+  const { teamPokemon } = useTeamPokemon(opponentTeams);
+
+  const filteredOpponentTeams = useMemo(() => {
+    if (searchTags.length === 0) return opponentTeams;
+    return opponentTeams.filter(ot => {
+      const pokemonNames = teamPokemon[ot.id] || [];
+      return matchesPokemonTags(pokemonNames, searchTags);
+    });
+  }, [opponentTeams, searchTags, teamPokemon]);
 
   // Parse my team's Pokemon from pokepaste
   useEffect(() => {
@@ -166,6 +181,23 @@ const OpponentPlannerTab = ({ team, teamId }) => {
         </div>
       )}
 
+      {/* Pokemon Tag Filter */}
+      {!isEmpty && !loading && (
+        <div>
+          <TagInput
+            tags={searchTags}
+            onAddTag={(tag) => setSearchTags(prev => [...prev, tag])}
+            onRemoveTag={(tag) => setSearchTags(prev => prev.filter(t => t !== tag))}
+            placeholder="Filter by opponent pokemon..."
+          />
+          {searchTags.length > 0 && (
+            <p className="text-gray-400 text-sm mt-2">
+              Showing {filteredOpponentTeams.length} of {opponentTeams.length} matchup teams
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Empty State */}
       {isEmpty && !loading && (
         <div className="text-center py-16 bg-slate-700/30 rounded-lg border-2 border-dashed border-slate-600">
@@ -188,9 +220,19 @@ const OpponentPlannerTab = ({ team, teamId }) => {
       )}
 
       {/* Opponent Teams List */}
-      {!isEmpty && (
+      {!isEmpty && filteredOpponentTeams.length === 0 && searchTags.length > 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-400">No matchup teams match your filters</p>
+          <button
+            onClick={() => setSearchTags([])}
+            className="mt-2 text-emerald-400 hover:text-emerald-300 text-sm"
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : !isEmpty && (
         <div className="space-y-6">
-          {opponentTeams.map((opponentTeam) => (
+          {filteredOpponentTeams.map((opponentTeam) => (
             <OpponentTeamCard
               key={opponentTeam.id}
               opponentTeam={opponentTeam}

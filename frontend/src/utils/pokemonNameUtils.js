@@ -311,6 +311,40 @@ export const isValidPokemonName = (pokemonName) => {
 };
 
 /**
+ * AND-logic tag matcher: returns true if every tag matches at least one pokemon name
+ * (case-insensitive substring, matching both API format "flutter-mane" and display format "flutter mane")
+ * @param {string[]} pokemonNames - Array of cleaned pokemon names
+ * @param {string[]} tags - Array of search tags
+ * @returns {boolean} True if all tags match
+ */
+export const matchesPokemonTags = (pokemonNames, tags) => {
+    if (!tags || tags.length === 0) return true;
+    if (!pokemonNames || pokemonNames.length === 0) return false;
+
+    return tags.every(tag => {
+        const lowerTag = tag.toLowerCase();
+        return pokemonNames.some(name => {
+            const lowerName = name.toLowerCase();
+            // Match against API format (e.g. "flutter-mane") and display format (e.g. "flutter mane")
+            return lowerName.includes(lowerTag) || lowerName.replace(/-/g, ' ').includes(lowerTag);
+        });
+    });
+};
+
+/**
+ * Extracts opponent pokemon names from a replay's battleData
+ * @param {Object} replay - Replay object with battleData
+ * @returns {string[]} Array of cleaned pokemon names
+ */
+export const getOpponentPokemonFromReplay = (replay) => {
+    if (!replay?.battleData?.teams || !replay.battleData.opponentPlayer) {
+        return [];
+    }
+    const opponentTeam = replay.battleData.teams[replay.battleData.opponentPlayer] || [];
+    return opponentTeam.map(name => cleanPokemonName(name));
+};
+
+/**
  * Extract Pokemon names from a Pokepaste text block
  * @param {string} pokepasteText - Raw text from a Pokepaste
  * @returns {string[]} Array of cleaned Pokemon names

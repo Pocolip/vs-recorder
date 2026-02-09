@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { Calendar, Filter, SortAsc, SortDesc } from 'lucide-react';
 import GameCard from './GameCard';
+import TagInput from './TagInput';
 import {formatTimeAgo} from "@/utils/timeUtils";
+import { matchesPokemonTags, getOpponentPokemonFromReplay } from '../utils/pokemonNameUtils';
 
 const GameByGameTab = ({ replays, onUpdateReplay }) => {
     const [sortBy, setSortBy] = useState('date');
@@ -11,6 +13,7 @@ const GameByGameTab = ({ replays, onUpdateReplay }) => {
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [noteText, setNoteText] = useState('');
     const [savingNoteId, setSavingNoteId] = useState(null);
+    const [searchTags, setSearchTags] = useState([]);
 
     const startEditingNote = (replay) => {
         setEditingNoteId(replay.id);
@@ -56,10 +59,15 @@ const GameByGameTab = ({ replays, onUpdateReplay }) => {
         );
     }
 
-    // Filter replays based on result
+    // Filter replays based on result and pokemon tags
     const filteredReplays = replays.filter(replay => {
-        if (filterResult === 'all') return true;
-        return replay.result === filterResult;
+        if (searchTags.length > 0 && !matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags)) {
+            return false;
+        }
+        if (filterResult !== 'all' && replay.result !== filterResult) {
+            return false;
+        }
+        return true;
     });
 
     // Sort replays
@@ -159,6 +167,14 @@ const GameByGameTab = ({ replays, onUpdateReplay }) => {
                 </div>
             </div>
 
+            <TagInput
+                tags={searchTags}
+                onAddTag={(tag) => setSearchTags(prev => [...prev, tag])}
+                onRemoveTag={(tag) => setSearchTags(prev => prev.filter(t => t !== tag))}
+                placeholder="Filter by opponent pokemon..."
+                className="mb-4"
+            />
+
             {/* Games List */}
             {sortedReplays.length === 0 ? (
                 <div className="text-center py-8">
@@ -168,6 +184,7 @@ const GameByGameTab = ({ replays, onUpdateReplay }) => {
                             setFilterResult('all');
                             setSortBy('date');
                             setSortOrder('desc');
+                            setSearchTags([]);
                         }}
                         className="mt-2 text-emerald-400 hover:text-emerald-300 text-sm"
                     >
