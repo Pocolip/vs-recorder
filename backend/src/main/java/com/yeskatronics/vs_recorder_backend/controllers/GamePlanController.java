@@ -254,7 +254,7 @@ public class GamePlanController {
         log.info("Updating team: {} in game plan: {}", teamId, gamePlanId);
 
         GamePlanTeam updates = gamePlanMapper.toEntity(new GamePlanDTO.AddTeamRequest(
-                request.getPokepaste(), request.getNotes()));
+                request.getPokepaste(), request.getNotes(), request.getColor()));
         GamePlanTeam updatedTeam = gamePlanService.updateGamePlanTeam(teamId, gamePlanId, userId, updates);
         GamePlanDTO.GamePlanTeamResponse response = gamePlanMapper.toResponse(updatedTeam);
 

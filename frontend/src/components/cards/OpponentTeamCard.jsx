@@ -7,8 +7,18 @@ import PokemonDropdown from '../PokemonDropdown';
 import ConfirmationModal from '../ConfirmationModal';
 import PokepasteService from '../../services/PokepasteService';
 
-// Consistent blue color for team cards
-const TEAM_COLOR = { border: 'border-l-blue-500', bg: 'bg-blue-500/10' };
+// Color options for team cards
+const COLOR_OPTIONS = {
+  blue:   { border: 'border-l-blue-500',   bg: 'bg-blue-500',   ring: 'ring-blue-400' },
+  red:    { border: 'border-l-red-500',    bg: 'bg-red-500',    ring: 'ring-red-400' },
+  green:  { border: 'border-l-green-500',  bg: 'bg-green-500',  ring: 'ring-green-400' },
+  yellow: { border: 'border-l-yellow-500', bg: 'bg-yellow-500', ring: 'ring-yellow-400' },
+  purple: { border: 'border-l-purple-500', bg: 'bg-purple-500', ring: 'ring-purple-400' },
+  pink:   { border: 'border-l-pink-500',   bg: 'bg-pink-500',   ring: 'ring-pink-400' },
+  orange: { border: 'border-l-orange-500', bg: 'bg-orange-500', ring: 'ring-orange-400' },
+  teal:   { border: 'border-l-teal-500',   bg: 'bg-teal-500',   ring: 'ring-teal-400' },
+  gray:   { border: 'border-l-gray-500',   bg: 'bg-gray-500',   ring: 'ring-gray-400' },
+};
 
 /**
  * Card component for displaying an opponent team and its strategies
@@ -38,6 +48,8 @@ const OpponentTeamCard = ({
   const [showDeletePlanModal, setShowDeletePlanModal] = useState(false);
   const [deletingPlanIndex, setDeletingPlanIndex] = useState(null);
   const [isAddingPlan, setIsAddingPlan] = useState(false);
+
+  const teamColor = COLOR_OPTIONS[opponentTeam.color] || COLOR_OPTIONS.blue;
 
   // Fetch paste title when pokepaste URL changes
   useEffect(() => {
@@ -104,7 +116,7 @@ const OpponentTeamCard = ({
   const compositions = opponentTeam.compositions || [];
 
   return (
-    <div className={`bg-slate-800/50 border border-slate-700 rounded-lg border-l-4 ${TEAM_COLOR.border}`}>
+    <div className={`bg-slate-800/50 border border-slate-700 rounded-lg border-l-4 ${teamColor.border}`}>
       {/* Header with Team Info and Notes */}
       <div className="p-4 bg-slate-700/30 border-b border-slate-700 rounded-t-lg">
         <div className="flex items-start gap-4">
@@ -171,6 +183,22 @@ const OpponentTeamCard = ({
                     rows={2}
                     placeholder="Add notes about this matchup..."
                   />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 mb-1 block">Card Color</label>
+                  <div className="flex gap-1.5">
+                    {Object.entries(COLOR_OPTIONS).map(([key, val]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => onUpdateNotes(opponentTeam.id, { color: key })}
+                        className={`w-5 h-5 rounded ${val.bg} hover:scale-110 transition-transform ${
+                          (opponentTeam.color || 'blue') === key ? 'ring-2 ring-white ring-offset-1 ring-offset-slate-700' : ''
+                        }`}
+                        title={key}
+                      />
+                    ))}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button

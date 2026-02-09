@@ -32,6 +32,7 @@ export const useOpponentTeams = (teamId, options = {}) => {
     gamePlanId: team.gamePlanId,
     pokepaste: team.pokepaste,
     notes: team.notes || '',
+    color: team.color || 'blue',
     compositions: team.compositions || [],
     createdAt: team.createdAt,
   });
@@ -90,6 +91,7 @@ export const useOpponentTeams = (teamId, options = {}) => {
       const newTeam = await gamePlanApi.addTeam(gamePlanId, {
         pokepaste: data.pokepaste,
         notes: data.notes || '',
+        color: data.color,
       });
 
       const transformedTeam = transformTeam(newTeam);
@@ -114,6 +116,7 @@ export const useOpponentTeams = (teamId, options = {}) => {
       const updatedTeam = await gamePlanApi.updateTeam(gamePlanId, opponentTeamId, {
         pokepaste: updates.pokepaste,
         notes: updates.notes,
+        color: updates.color,
       });
 
       const transformedTeam = transformTeam(updatedTeam);
