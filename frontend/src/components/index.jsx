@@ -17,3 +17,5 @@ export { default as MatchupStatsTab } from './MatchupStatsTab';
 export { default as MoveUsageTab } from './MoveUsageTab';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as PublicRoute } from './PublicRoute';
+export { default as TagInput } from './TagInput';
+export { default as RegulationFilter } from './RegulationFilter';

@@ -1,12 +1,13 @@
 // src/pages/HomePage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Calendar, TrendingUp, Trophy, LogOut, Download } from 'lucide-react';
-import { NewTeamModal, PokemonTeam, Footer } from '../components';
+import { NewTeamModal, PokemonTeam, Footer, TagInput, RegulationFilter } from '../components';
 import ImportTeamModal from '../components/modals/ImportTeamModal';
 import { useAuth } from '../contexts';
 import TeamService from '../services/TeamService';
 import { useMultipleTeamStats } from '@/hooks/useTeamStats';
+import { useTeamPokemon } from '@/hooks';
 import { formatTimeAgo } from '@/utils/timeUtils';
 
 const HomePage = () => {
@@ -16,6 +17,8 @@ const HomePage = () => {
   const [showNewTeamModal, setShowNewTeamModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedRegulation, setSelectedRegulation] = useState('');
+  const [searchTags, setSearchTags] = useState([]);
 
   // Get team IDs for the stats hook
   const teamIds = teams.map(team => team.id);
@@ -27,6 +30,50 @@ const HomePage = () => {
     loading: statsLoading,
     refreshAll: refreshAllStats
   } = useMultipleTeamStats(teamIds);
+
+  // Resolve pokemon names for all teams
+  const { teamPokemon } = useTeamPokemon(teams);
+
+  // Derive available regulations from teams
+  const availableRegulations = useMemo(() => {
+    const regs = [...new Set(teams.map(t => t.regulation).filter(Boolean))];
+    return regs.sort();
+  }, [teams]);
+
+  // Filter teams based on regulation and search tags
+  const filteredTeams = useMemo(() => {
+    return teams.filter((team) => {
+      // Regulation filter
+      if (selectedRegulation && team.regulation !== selectedRegulation) {
+        return false;
+      }
+
+      // Tag search filter (AND logic)
+      if (searchTags.length > 0) {
+        const pokemonNames = teamPokemon[team.id] || [];
+        return searchTags.every((tag) => {
+          const lowerTag = tag.toLowerCase();
+          // Match team name
+          if (team.name.toLowerCase().includes(lowerTag)) return true;
+          // Match pokemon names (API format like "flutter-mane" and display format like "Flutter Mane")
+          return pokemonNames.some((name) => {
+            const lower = name.toLowerCase();
+            const displayName = name.replace(/-/g, ' ').toLowerCase();
+            return lower.includes(lowerTag) || displayName.includes(lowerTag);
+          });
+        });
+      }
+
+      return true;
+    });
+  }, [teams, selectedRegulation, searchTags, teamPokemon]);
+
+  const hasActiveFilters = selectedRegulation || searchTags.length > 0;
+
+  const clearAllFilters = () => {
+    setSelectedRegulation('');
+    setSearchTags([]);
+  };
 
   useEffect(() => {
     loadTeams();
@@ -186,6 +233,31 @@ const HomePage = () => {
               </div>
             </div>
 
+            {/* Filter Bar */}
+            {teams.length > 0 && (
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <RegulationFilter
+                  regulations={availableRegulations}
+                  value={selectedRegulation}
+                  onChange={setSelectedRegulation}
+                />
+                <TagInput
+                  tags={searchTags}
+                  onAddTag={(tag) => setSearchTags((prev) => [...prev, tag])}
+                  onRemoveTag={(tag) => setSearchTags((prev) => prev.filter((t) => t !== tag))}
+                  placeholder="Filter by team name or pokemon..."
+                  className="flex-1"
+                />
+              </div>
+            )}
+
+            {/* Showing X of Y */}
+            {hasActiveFilters && teams.length > 0 && (
+              <p className="text-gray-400 text-sm mb-4">
+                Showing {filteredTeams.length} of {teams.length} teams
+              </p>
+            )}
+
             {/* Teams Grid */}
             {teams.length === 0 ? (
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-8 text-center">
@@ -199,9 +271,20 @@ const HomePage = () => {
                     Create Your First Team
                   </button>
                 </div>
+            ) : filteredTeams.length === 0 ? (
+                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-8 text-center">
+                  <h3 className="text-xl font-semibold text-gray-300 mb-2">No teams match your filters</h3>
+                  <p className="text-gray-400 mb-4">Try adjusting your search or regulation filter</p>
+                  <button
+                      onClick={clearAllFilters}
+                      className="bg-slate-600 hover:bg-slate-500 text-white px-6 py-3 rounded-lg transition-colors"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {teams.map((team) => (
+                  {filteredTeams.map((team) => (
                       <TeamCard
                           key={team.id}
                           team={team}

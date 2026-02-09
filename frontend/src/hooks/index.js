@@ -3,3 +3,4 @@
  */
 export { useTeamStats, useMultipleTeamStats, useTeamComparison } from './useTeamStats';
 export { default as useOpponentTeams } from './useOpponentTeams';
+export { default as useTeamPokemon } from './useTeamPokemon';
