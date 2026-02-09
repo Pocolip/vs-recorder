@@ -97,6 +97,8 @@ public class GamePlanDTO {
         private String pokepaste;
 
         private String notes;
+
+        private String color;
     }
 
     /**
@@ -108,6 +110,7 @@ public class GamePlanDTO {
     public static class UpdateTeamRequest {
         private String pokepaste;
         private String notes;
+        private String color;
     }
 
     /**
@@ -121,6 +124,7 @@ public class GamePlanDTO {
         private Long gamePlanId;
         private String pokepaste;
         private String notes;
+        private String color;
         private List<TeamCompositionDTO> compositions;
         private LocalDateTime createdAt;
     }

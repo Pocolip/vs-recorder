@@ -4,6 +4,18 @@ import { createPortal } from 'react-dom';
 import { X, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import PokepasteService from '../../services/PokepasteService';
 
+const COLOR_CHOICES = [
+  { key: 'blue',   bg: 'bg-blue-500' },
+  { key: 'red',    bg: 'bg-red-500' },
+  { key: 'green',  bg: 'bg-green-500' },
+  { key: 'yellow', bg: 'bg-yellow-500' },
+  { key: 'purple', bg: 'bg-purple-500' },
+  { key: 'pink',   bg: 'bg-pink-500' },
+  { key: 'orange', bg: 'bg-orange-500' },
+  { key: 'teal',   bg: 'bg-teal-500' },
+  { key: 'gray',   bg: 'bg-gray-500' },
+];
+
 /**
  * Modal for adding a new opponent team
  * @param {Function} onClose - Callback to close the modal
@@ -13,6 +25,7 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     pokepaste: '',
     notes: '',
+    color: 'blue',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,6 +72,7 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
       const teamData = {
         pokepaste: formData.pokepaste.trim(),
         notes: formData.notes.trim() || '',
+        color: formData.color,
       };
 
       await onSubmit(teamData);
@@ -129,6 +143,27 @@ const AddOpponentTeamModal = ({ onClose, onSubmit }) => {
             <p className="text-xs text-gray-400 mt-1">
               Tip: Start with the player's name for easy identification
             </p>
+          </div>
+
+          {/* Card Color */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Card Color
+            </label>
+            <div className="flex gap-2">
+              {COLOR_CHOICES.map(({ key, bg }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleInputChange('color', key)}
+                  className={`w-6 h-6 rounded ${bg} hover:scale-110 transition-transform ${
+                    formData.color === key ? 'ring-2 ring-white ring-offset-1 ring-offset-slate-800' : ''
+                  }`}
+                  title={key}
+                  disabled={loading}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Action Buttons */}

@@ -39,6 +39,9 @@ public class GamePlanTeam {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(length = 20)
+    private String color;
+
     /**
      * Team compositions stored as JSON array.
      * Each composition contains: lead1, lead2, back1, back2, notes

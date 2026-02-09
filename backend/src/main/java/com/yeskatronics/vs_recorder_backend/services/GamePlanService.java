@@ -271,6 +271,9 @@ public class GamePlanService {
         if (updates.getNotes() != null) {
             existingTeam.setNotes(updates.getNotes());
         }
+        if (updates.getColor() != null) {
+            existingTeam.setColor(updates.getColor());
+        }
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(existingTeam);
         log.info("Game plan team updated successfully: {}", id);
