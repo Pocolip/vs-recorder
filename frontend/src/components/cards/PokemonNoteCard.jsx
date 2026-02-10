@@ -13,7 +13,7 @@ const PokemonNoteCard = ({
     onNoteTextChange,
     onKeyPress
 }) => {
-    const [isNoteExpanded, setIsNoteExpanded] = useState(false);
+    const [isNoteExpanded, setIsNoteExpanded] = useState(true);
 
     return (
         <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:bg-slate-700/70 transition-colors">
@@ -58,7 +58,7 @@ const PokemonNoteCard = ({
                     <ChevronDown
                         className={`h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0 transition-transform ${isNoteExpanded ? 'rotate-180' : ''}`}
                     />
-                    <p className={`text-xs ${isNoteExpanded ? 'whitespace-pre-wrap break-words text-gray-300' : 'truncate text-gray-400'}`}>
+                    <p className={`text-sm ${isNoteExpanded ? 'whitespace-pre-wrap break-words text-gray-300' : 'truncate text-gray-400'}`}>
                         {member.notes}
                     </p>
                 </button>
@@ -73,8 +73,8 @@ const PokemonNoteCard = ({
                             onChange={(e) => onNoteTextChange(e.target.value)}
                             onKeyDown={(e) => onKeyPress(e, member.id)}
                             placeholder={`Add notes about ${member.pokemonName}...`}
-                            rows={3}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-500 rounded text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none text-sm"
+                            rows={6}
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-500 rounded text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none text-base"
                             disabled={isSavingNote}
                             autoFocus
                         />
