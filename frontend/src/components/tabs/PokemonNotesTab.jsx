@@ -9,6 +9,7 @@ const PokemonNotesTab = ({ teamId, team }) => {
         loading,
         error,
         updateMemberNotes,
+        updateMemberCalcs,
     } = useTeamMembers(teamId, team?.pokepaste);
 
     const [editingNoteId, setEditingNoteId] = useState(null);
@@ -36,6 +37,19 @@ const PokemonNotesTab = ({ teamId, team }) => {
         } finally {
             setSavingNoteId(null);
         }
+    };
+
+    const addCalc = async (memberId, calcText) => {
+        const member = teamMembers.find(m => m.id === memberId);
+        const currentCalcs = member?.calcs || [];
+        await updateMemberCalcs(memberId, [...currentCalcs, calcText]);
+    };
+
+    const removeCalc = async (memberId, index) => {
+        const member = teamMembers.find(m => m.id === memberId);
+        const currentCalcs = member?.calcs || [];
+        const newCalcs = currentCalcs.filter((_, i) => i !== index);
+        await updateMemberCalcs(memberId, newCalcs);
     };
 
     const handleKeyPress = (e, memberId) => {
@@ -94,6 +108,8 @@ const PokemonNotesTab = ({ teamId, team }) => {
                         onSaveNote={saveNote}
                         onNoteTextChange={setNoteText}
                         onKeyPress={handleKeyPress}
+                        onAddCalc={addCalc}
+                        onRemoveCalc={removeCalc}
                     />
                 ))}
             </div>

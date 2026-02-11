@@ -95,7 +95,11 @@ public class TeamMemberController {
 
         TeamMember updates = new TeamMember();
         teamMemberMapper.updateEntityFromDto(request, updates);
-        // Apply notes directly since updateEntityFromDto maps to a target
+        if (request.getCalcs() != null) {
+            updates.setCalcs(request.getCalcs());
+        } else {
+            updates.setCalcs(null);
+        }
         TeamMember updated = teamMemberService.updateTeamMember(id, updates);
 
         return ResponseEntity.ok(teamMemberMapper.toResponse(updated));

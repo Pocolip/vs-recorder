@@ -57,6 +57,9 @@ public class TeamMemberService {
         if (updates.getNotes() != null) {
             existing.setNotes(updates.getNotes());
         }
+        if (updates.getCalcs() != null) {
+            existing.setCalcs(updates.getCalcs());
+        }
 
         return teamMemberRepository.save(existing);
     }

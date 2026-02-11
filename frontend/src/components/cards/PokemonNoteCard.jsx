@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, MessageSquare, ChevronDown } from 'lucide-react';
+import { Save, MessageSquare, ChevronDown, X } from 'lucide-react';
 import PokemonSprite from '../PokemonSprite';
 
 const PokemonNoteCard = ({
@@ -11,9 +11,13 @@ const PokemonNoteCard = ({
     onCancelEditingNote,
     onSaveNote,
     onNoteTextChange,
-    onKeyPress
+    onKeyPress,
+    onAddCalc,
+    onRemoveCalc,
 }) => {
     const [isNoteExpanded, setIsNoteExpanded] = useState(true);
+    const [isCalcsExpanded, setIsCalcsExpanded] = useState(true);
+    const [calcInput, setCalcInput] = useState('');
 
     return (
         <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:bg-slate-700/70 transition-colors">
@@ -114,6 +118,64 @@ const PokemonNoteCard = ({
                     </div>
                 </div>
             )}
+
+            {/* Collapsible Calcs Section */}
+            <div className="mt-2 pt-2 border-t border-slate-600/50">
+                <button
+                    type="button"
+                    onClick={() => setIsCalcsExpanded(!isCalcsExpanded)}
+                    className="w-full flex items-center gap-1.5 text-left group"
+                >
+                    <ChevronDown
+                        className={`h-3 w-3 text-gray-500 flex-shrink-0 transition-transform ${isCalcsExpanded ? 'rotate-180' : ''}`}
+                    />
+                    <span className="text-xs font-medium text-gray-400 group-hover:text-gray-300 transition-colors">
+                        Calcs
+                    </span>
+                    {member.calcs?.length > 0 && (
+                        <span className="text-xs bg-slate-600 text-gray-300 px-1.5 rounded-full">
+                            {member.calcs.length}
+                        </span>
+                    )}
+                </button>
+
+                {isCalcsExpanded && (
+                    <div className="mt-2 space-y-1">
+                        {member.calcs?.map((calc, index) => (
+                            <div
+                                key={index}
+                                className="flex items-start gap-2 bg-slate-800/50 border border-slate-600 rounded px-2 py-1.5 group/calc"
+                            >
+                                <span className="text-sm text-gray-300 flex-1 break-words">
+                                    {calc}
+                                </span>
+                                <button
+                                    onClick={() => onRemoveCalc(member.id, index)}
+                                    className="p-0.5 text-gray-500 hover:text-red-400 opacity-0 group-hover/calc:opacity-100 transition-all flex-shrink-0"
+                                    title="Remove calc"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </div>
+                        ))}
+
+                        <input
+                            type="text"
+                            value={calcInput}
+                            onChange={(e) => setCalcInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && calcInput.trim()) {
+                                    e.preventDefault();
+                                    onAddCalc(member.id, calcInput.trim());
+                                    setCalcInput('');
+                                }
+                            }}
+                            placeholder="Paste a calc result and press Enter..."
+                            className="w-full px-2 py-1.5 bg-slate-800/50 border border-slate-600 rounded text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

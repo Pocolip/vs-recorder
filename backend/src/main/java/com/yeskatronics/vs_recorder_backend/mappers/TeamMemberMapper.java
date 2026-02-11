@@ -22,6 +22,7 @@ public interface TeamMemberMapper {
     @Mapping(target = "team", ignore = true)
     @Mapping(target = "pokemonName", ignore = true)
     @Mapping(target = "slot", ignore = true)
+    @Mapping(target = "calcs", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

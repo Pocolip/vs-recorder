@@ -58,6 +58,14 @@ const useTeamMembers = (teamId, pokepaste) => {
     return updated;
   }, []);
 
+  const updateMemberCalcs = useCallback(async (memberId, calcs) => {
+    const updated = await teamMemberApi.update(memberId, { calcs });
+    setTeamMembers(prev =>
+      prev.map(m => m.id === memberId ? updated : m)
+    );
+    return updated;
+  }, []);
+
   const refreshMembers = useCallback(() => {
     loadTeamMembers();
   }, [loadTeamMembers]);
@@ -67,6 +75,7 @@ const useTeamMembers = (teamId, pokepaste) => {
     loading,
     error,
     updateMemberNotes,
+    updateMemberCalcs,
     refreshMembers,
   };
 };

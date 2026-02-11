@@ -10,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TeamMember entity representing a single Pokemon on a team.
@@ -42,6 +44,11 @@ public class TeamMember {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @ElementCollection
+    @CollectionTable(name = "team_member_calcs", joinColumns = @JoinColumn(name = "team_member_id"))
+    @Column(name = "calc")
+    private List<String> calcs = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

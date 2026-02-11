@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTOs for TeamMember entity API operations.
@@ -24,6 +25,8 @@ public class TeamMemberDTO {
         private Integer slot;
 
         private String notes;
+
+        private List<String> calcs;
     }
 
     @Data
@@ -31,6 +34,7 @@ public class TeamMemberDTO {
     @AllArgsConstructor
     public static class UpdateRequest {
         private String notes;
+        private List<String> calcs;
     }
 
     @Data
@@ -42,6 +46,7 @@ public class TeamMemberDTO {
         private String pokemonName;
         private Integer slot;
         private String notes;
+        private List<String> calcs;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
     }
