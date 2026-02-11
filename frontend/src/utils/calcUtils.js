@@ -56,7 +56,7 @@ export function setdexToState(setdexEntry) {
     ivs,
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
-    moves: (setdexEntry.moves || []).map(name => ({ name, crit: false })),
+    moves: (setdexEntry.moves || []).map(name => ({ name, crit: false, bpOverride: null })),
   };
 }
 
@@ -204,10 +204,10 @@ export function createDefaultPokemonState(species = '') {
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
     moves: [
-      { name: '', crit: false },
-      { name: '', crit: false },
-      { name: '', crit: false },
-      { name: '', crit: false },
+      { name: '', crit: false, bpOverride: null },
+      { name: '', crit: false, bpOverride: null },
+      { name: '', crit: false, bpOverride: null },
+      { name: '', crit: false, bpOverride: null },
     ],
   };
 }

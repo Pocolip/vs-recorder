@@ -17,7 +17,7 @@ const MoveSlot = ({ move, index, onChange }) => {
       <div className="flex-1">
         <Select
           value={selectedOption}
-          onChange={opt => onChange({ ...move, name: opt ? opt.value : '' })}
+          onChange={opt => onChange({ ...move, name: opt ? opt.value : '', bpOverride: null })}
           options={moveOptions}
           styles={reactSelectCompactStyles}
           placeholder="Move..."
@@ -26,6 +26,16 @@ const MoveSlot = ({ move, index, onChange }) => {
           menuPlacement="auto"
         />
       </div>
+      <input
+        type="number"
+        min={0}
+        max={999}
+        value={move.bpOverride ?? ''}
+        onChange={e => onChange({ ...move, bpOverride: e.target.value ? parseInt(e.target.value) : null })}
+        placeholder="BP"
+        className="w-11 bg-slate-700 border border-slate-600 rounded text-gray-200 text-xs text-center py-0.5 focus:border-emerald-500 focus:outline-none placeholder-gray-600"
+        title="Base Power override"
+      />
       <label className="flex items-center gap-0.5 text-xs text-gray-400 cursor-pointer">
         <input
           type="checkbox"

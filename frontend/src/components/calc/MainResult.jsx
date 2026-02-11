@@ -2,6 +2,9 @@ import React from 'react';
 import { Save } from 'lucide-react';
 
 const MainResult = ({ result, onSave, saving }) => {
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+  };
   if (!result) {
     return (
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-center">
@@ -31,7 +34,13 @@ const MainResult = ({ result, onSave, saving }) => {
     <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
       {/* Main description + inline save */}
       <p className="text-gray-200 text-sm leading-relaxed mb-2">
-        {desc}
+        <span
+          onClick={() => handleCopy(desc)}
+          className="cursor-pointer hover:text-white transition-colors"
+          title="Click to copy"
+        >
+          {desc}
+        </span>
         {onSave && (
           <button
             onClick={() => onSave(desc)}

@@ -48,6 +48,40 @@ function buildField(fieldState) {
   });
 }
 
+// Moves whose BP doubles under certain conditions that the library doesn't handle
+const STATUS_DOUBLE_BP_MOVES = {
+  'Facade': 'attacker',  // doubles when attacker has status
+  'Hex': 'defender',      // doubles when defender has status
+};
+
+function buildMove(moveState, attackerStatus, defenderStatus) {
+  const opts = { isCrit: moveState.crit };
+
+  // Determine effective BP
+  let bpOverride = null;
+
+  if (moveState.bpOverride) {
+    // Manual BP override takes priority
+    bpOverride = moveState.bpOverride;
+  } else {
+    // Auto-double BP for Facade/Hex when status conditions apply
+    const doubleRule = STATUS_DOUBLE_BP_MOVES[moveState.name];
+    if (doubleRule === 'attacker' && attackerStatus) {
+      const base = new Move(gen, moveState.name);
+      bpOverride = base.bp * 2;
+    } else if (doubleRule === 'defender' && defenderStatus) {
+      const base = new Move(gen, moveState.name);
+      bpOverride = base.bp * 2;
+    }
+  }
+
+  if (bpOverride) {
+    opts.overrides = { basePower: bpOverride };
+  }
+
+  return new Move(gen, moveState.name, opts);
+}
+
 export function useDamageCalc(p1State, p2State, fieldState) {
   return useMemo(() => {
     if (!p1State.species || !p2State.species) return null;
@@ -69,7 +103,7 @@ export function useDamageCalc(p1State, p2State, fieldState) {
         .filter(m => m.name)
         .map(m => {
           try {
-            return calculate(gen, p1, p2, new Move(gen, m.name, { isCrit: m.crit }), field);
+            return calculate(gen, p1, p2, buildMove(m, p1State.status, p2State.status), field);
           } catch {
             return null;
           }
@@ -79,7 +113,7 @@ export function useDamageCalc(p1State, p2State, fieldState) {
         .filter(m => m.name)
         .map(m => {
           try {
-            return calculate(gen, p2, p1, new Move(gen, m.name, { isCrit: m.crit }), reverseField);
+            return calculate(gen, p2, p1, buildMove(m, p2State.status, p1State.status), reverseField);
           } catch {
             return null;
           }
