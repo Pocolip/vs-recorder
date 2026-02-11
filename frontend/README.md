@@ -113,10 +113,12 @@ frontend/
 │   └── index.html        # HTML template
 ├── src/
 │   ├── components/       # Reusable React components
+│   │   ├── calc/         # Damage calculator components
 │   │   ├── cards/        # Card components
 │   │   ├── modals/       # Modal dialogs
 │   │   └── tabs/         # Tab content components
 │   ├── contexts/         # React context providers (Auth)
+│   ├── data/             # Static data (setdex)
 │   ├── hooks/            # Custom React hooks
 │   ├── pages/            # Page components
 │   ├── services/         # API and data services
@@ -129,6 +131,49 @@ frontend/
 ├── webpack.config.js     # Webpack configuration
 └── tailwind.config.js    # Tailwind CSS configuration
 ```
+
+## Damage Calculator
+
+The Match Calc tab provides a native damage calculator powered by `@smogon/calc`, with VGC tournament sets from the [NCP VGC Damage Calculator](https://github.com/dotMr-P/NCP-VGC-Damage-Calculator).
+
+### Architecture
+
+- **Calculation engine**: `@smogon/calc` handles all damage math, stat lookups, type chart, and generation data
+- **Setdex data**: `src/data/setdex-gen9.js` contains NCP's curated VGC sets (named builds with EVs, nature, item, moves, tera type)
+- **State management**: All state lives in `DamageCalcTab` and flows down via props. The `useDamageCalc` hook wraps `@smogon/calc` and recalculates on any input change
+- **Team integration**: Player's team loads from their pokepaste into sidebar slots for quick switching. Calc results can be saved to Pokemon Notes via the existing `useTeamMembers` hook
+
+### Component overview
+
+| Component | Purpose |
+|-----------|---------|
+| `DamageCalcTab` | State owner, layout, team loading, save integration |
+| `PokemonPanel` | Species/set selector, nature/ability/item, tera, status, stats, moves |
+| `FieldPanel` | Format, terrain, weather, ruin abilities, per-side effects |
+| `MoveResults` | 4-move damage % list per side, click to show detailed result |
+| `MainResult` | Full calc description, damage bar, rolls, save button |
+| `StatTable` | Base/IV/EV/boost/total for all 6 stats, EV counter |
+| `MoveSlot` | Move selector with BP override and crit toggle |
+| `SidebarSlots` | Team quick-switch sprites (attacker side only) |
+| `GenerationPicker` | Gen selector (Gen 9 active, others stubbed) |
+
+### Updating the NCP setdex
+
+The setdex file is converted from NCP's `setdex_ncp-g9.js`. To update with newer sets:
+
+1. Get the latest file from the [NCP repo](https://github.com/dotMr-P/NCP-VGC-Damage-Calculator) (branch `main`, path `script_res/setdex_ncp-g9.js`)
+2. Replace the contents of `src/data/setdex-gen9.js`, changing the first line from `var SETDEX_GEN9 = {` to `export const SETDEX_GEN9 = {`
+3. The NCP stat keys (`at`, `df`, `sa`, `sd`, `sp`) are mapped to `@smogon/calc` keys (`atk`, `def`, `spa`, `spd`, `spe`) at runtime in `calcUtils.js`
+
+### Known quirks and workarounds
+
+**Status must use short-form IDs**: `@smogon/calc` internally checks status with short-form IDs (`brn`, `par`, `psn`, `tox`, `slp`, `frz`). Passing full names like `'Burned'` will set the status string but moves like Facade and Hex that check `hasStatus('brn')` won't match. The status dropdown values use short-form IDs to ensure the library handles Facade BP doubling, Hex BP doubling, Guts/Marvel Scale, etc. correctly.
+
+**BP override field**: Each move slot has a BP input for manually overriding base power via the `overrides: { basePower }` option. Direct `move.bp` assignment is ignored by the library — only `overrides` works. Useful for variable-power moves or "what if" scenarios.
+
+**curHP is absolute, not percentage**: The UI stores HP as a percentage (0-100), but `@smogon/calc` expects an absolute HP value via `pokemon.originalCurHP`. The hook converts percentage to absolute after constructing the Pokemon object.
+
+**Generation support**: Only Gen 9 (Scarlet/Violet) is currently functional. The generation picker renders all gens but disables everything except Gen 9. Adding a new generation requires importing its setdex data and passing the correct `Generations.get(n)` to the hook.
 
 ## Usage
 
