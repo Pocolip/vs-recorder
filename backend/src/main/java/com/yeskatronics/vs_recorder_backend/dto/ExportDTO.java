@@ -33,6 +33,8 @@ public class ExportDTO {
         private boolean includeMatchNotes = true;
         @Builder.Default
         private boolean includeOpponentPlans = true;
+        @Builder.Default
+        private boolean includeTeamMembers = false;
     }
 
     /**
@@ -69,6 +71,8 @@ public class ExportDTO {
         private String regulation;
         @Builder.Default
         private List<String> showdownUsernames = new ArrayList<>();
+        @Builder.Default
+        private List<TeamMemberData> teamMembers = new ArrayList<>();
     }
 
     /**
@@ -134,6 +138,21 @@ public class ExportDTO {
     }
 
     /**
+     * Team member (Pokemon) data for export
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TeamMemberData {
+        private String pokemonName;
+        private Integer slot;
+        private String notes;
+        @Builder.Default
+        private List<String> calcs = new ArrayList<>();
+    }
+
+    /**
      * Response when generating an export code
      */
     @Data
@@ -185,6 +204,7 @@ public class ExportDTO {
         private int replaysImported;
         private int matchesImported;
         private int opponentPlansImported;
+        private int teamMembersImported;
         @Builder.Default
         private List<String> errors = new ArrayList<>();
         @Builder.Default
