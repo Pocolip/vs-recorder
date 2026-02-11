@@ -180,6 +180,7 @@ const DamageCalcTab = ({ team, teamId }) => {
             state={p2}
             onChange={handleP2Change}
             teamPokemon={null}
+            hasOppositeSidebar={teamPokemon.length > 0}
             side="p2"
           />
         </div>

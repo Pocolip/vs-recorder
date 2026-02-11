@@ -20,6 +20,7 @@ const PokemonPanel = ({
   state,
   onChange,
   teamPokemon,
+  hasOppositeSidebar = false,
   side, // 'p1' or 'p2'
 }) => {
   // Build species + set options from setdex (grouped by Pokemon)
@@ -153,13 +154,16 @@ const PokemonPanel = ({
 
   return (
     <div className="space-y-2">
-      {/* Team sidebar slots */}
+      {/* Team sidebar slots (p1) or spacer (p2) to keep panels aligned */}
       {side === 'p1' && teamPokemon && (
         <SidebarSlots
           teamPokemon={teamPokemon}
           activeSpecies={state.species}
           onSelect={handleTeamSlotSelect}
         />
+      )}
+      {side === 'p2' && hasOppositeSidebar && (
+        <div className="h-8 mb-2" />
       )}
 
       {/* Pokemon selector (setdex grouped) */}
