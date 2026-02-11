@@ -4,6 +4,7 @@ import SidebarSlots from './SidebarSlots';
 import StatTable from './StatTable';
 import MoveSlot from './MoveSlot';
 import {
+  getSpeciesList,
   getSpeciesInfo,
   getAbilitiesForSpecies,
   getItemList,
@@ -23,9 +24,13 @@ const PokemonPanel = ({
   hasOppositeSidebar = false,
   side, // 'p1' or 'p2'
 }) => {
-  // Build species + set options from setdex (grouped by Pokemon)
+  // Build species + set options: setdex Pokemon with sets, then all remaining species
   const speciesOptions = useMemo(() => {
-    return Object.keys(SETDEX_GEN9)
+    const allSpecies = getSpeciesList();
+    const setdexNames = new Set(Object.keys(SETDEX_GEN9));
+
+    // Pokemon with setdex entries (grouped by Pokemon, each set is an option)
+    const withSets = Object.keys(SETDEX_GEN9)
       .sort()
       .map(name => ({
         label: name,
@@ -37,6 +42,20 @@ const PokemonPanel = ({
           set: SETDEX_GEN9[name][setName],
         })),
       }));
+
+    // All remaining species without setdex data
+    const withoutSets = allSpecies
+      .filter(name => !setdexNames.has(name))
+      .map(name => ({
+        value: name,
+        label: name,
+        pokemon: name,
+      }));
+
+    return [
+      ...withSets,
+      { label: 'Other Pokemon', options: withoutSets },
+    ];
   }, []);
 
   // Current selected value for species select
