@@ -34,6 +34,7 @@ public class TeamExportService {
     private final ReplayRepository replayRepository;
     private final MatchRepository matchRepository;
     private final GamePlanRepository gamePlanRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final ObjectMapper objectMapper;
 
     // Rate limiting: 10 codes per user per day
@@ -64,6 +65,20 @@ public class TeamExportService {
                 .regulation(team.getRegulation())
                 .showdownUsernames(new ArrayList<>(team.getShowdownUsernames()))
                 .build();
+
+        // Build team member data
+        if (options.isIncludeTeamMembers()) {
+            List<TeamMember> members = teamMemberRepository.findByTeamIdOrderBySlotAsc(teamId);
+            List<ExportDTO.TeamMemberData> teamMembers = members.stream()
+                    .map(m -> ExportDTO.TeamMemberData.builder()
+                            .pokemonName(m.getPokemonName())
+                            .slot(m.getSlot())
+                            .notes(m.getNotes())
+                            .calcs(new ArrayList<>(m.getCalcs()))
+                            .build())
+                    .collect(Collectors.toList());
+            teamData.setTeamMembers(teamMembers);
+        }
 
         // Build replay data
         List<ExportDTO.ReplayData> replays = new ArrayList<>();

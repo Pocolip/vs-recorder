@@ -142,6 +142,7 @@ const ImportTeamModal = ({ onClose, onImportSuccess }) => {
       replays: previewData.replays?.length || 0,
       matches: previewData.matches?.length || 0,
       opponentPlans: previewData.opponentPlans?.length || 0,
+      teamMembers: previewData.team?.teamMembers?.length || 0,
     };
   };
 
@@ -284,7 +285,7 @@ const ImportTeamModal = ({ onClose, onImportSuccess }) => {
               <div className="text-lg font-semibold text-gray-100 mb-3">
                 {summary.teamName}
               </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-4 gap-4 text-center">
                 <div>
                   <div className="text-xl font-bold text-emerald-400">{summary.replays}</div>
                   <div className="text-xs text-gray-400">Replays</div>
@@ -296,6 +297,10 @@ const ImportTeamModal = ({ onClose, onImportSuccess }) => {
                 <div>
                   <div className="text-xl font-bold text-purple-400">{summary.opponentPlans}</div>
                   <div className="text-xs text-gray-400">Opponent Plans</div>
+                </div>
+                <div>
+                  <div className="text-xl font-bold text-amber-400">{summary.teamMembers}</div>
+                  <div className="text-xs text-gray-400">Pokemon Notes</div>
                 </div>
               </div>
             </div>

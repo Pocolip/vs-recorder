@@ -15,6 +15,7 @@ const ExportTeamModal = ({ team, onClose }) => {
     includeReplayNotes: true,
     includeMatchNotes: true,
     includeOpponentPlans: true,
+    includeTeamMembers: true,
   });
   const [exportData, setExportData] = useState(null);
   const [shareCode, setShareCode] = useState(null);
@@ -133,6 +134,7 @@ const ExportTeamModal = ({ team, onClose }) => {
       replays: exportData.replays?.length || 0,
       matches: exportData.matches?.length || 0,
       opponentPlans: exportData.opponentPlans?.length || 0,
+      teamMembers: exportData.team?.teamMembers?.length || 0,
     };
   };
 
@@ -210,6 +212,15 @@ const ExportTeamModal = ({ team, onClose }) => {
                 />
                 <span className="text-gray-300">Include Opponent Plans</span>
               </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.includeTeamMembers}
+                  onChange={() => handleOptionChange('includeTeamMembers')}
+                  className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-emerald-500 focus:ring-emerald-500"
+                />
+                <span className="text-gray-300">Include Pokemon Notes & Calcs</span>
+              </label>
             </div>
           </div>
 
@@ -217,7 +228,7 @@ const ExportTeamModal = ({ team, onClose }) => {
           {summary && !loading && (
             <div className="bg-slate-700/50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-300 mb-2">Export Summary</h3>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-4 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-emerald-400">{summary.replays}</div>
                   <div className="text-xs text-gray-400">Replays</div>
@@ -229,6 +240,10 @@ const ExportTeamModal = ({ team, onClose }) => {
                 <div>
                   <div className="text-2xl font-bold text-purple-400">{summary.opponentPlans}</div>
                   <div className="text-xs text-gray-400">Opponent Plans</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-amber-400">{summary.teamMembers}</div>
+                  <div className="text-xs text-gray-400">Pokemon Notes</div>
                 </div>
               </div>
             </div>
