@@ -9,3 +9,4 @@ export { matchApi } from './matchApi';
 export { analyticsApi } from './analyticsApi';
 export { gamePlanApi } from './gamePlanApi';
 export { exportApi } from './exportApi';
+export { teamMemberApi } from './teamMemberApi';

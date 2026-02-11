@@ -13,7 +13,9 @@ import {
     Target,
     Zap,
     Clipboard,
-    Share2
+    Share2,
+    FileText,
+    Calculator
 } from 'lucide-react';
 import {
     ConfirmationModal,
@@ -29,6 +31,8 @@ import {
 } from '../components';
 import ExportTeamModal from '../components/modals/ExportTeamModal';
 import OpponentPlannerTab from '../components/tabs/OpponentPlannerTab';
+import PokemonNotesTab from '../components/tabs/PokemonNotesTab';
+import DamageCalcTab from '../components/tabs/DamageCalcTab';
 import TeamService from '../services/TeamService';
 import ReplayService from '../services/ReplayService';
 import MatchService from "@/services/MatchService";
@@ -170,7 +174,9 @@ const TeamPage = () => {
         { id: 'usage-stats', label: 'Usage Stats', icon: TrendingUp },
         { id: 'matchup-stats', label: 'Matchup Stats', icon: Target },
         { id: 'move-usage', label: 'Move Usage', icon: Zap },
-        { id: 'opponent-planner', label: 'Matchup Planner', icon: Clipboard }
+        { id: 'opponent-planner', label: 'Matchup Planner', icon: Clipboard },
+        { id: 'pokemon-notes', label: 'Pokemon Notes', icon: FileText },
+        // { id: 'match-calc', label: 'Match Calc', icon: Calculator }
     ];
 
     return (
@@ -247,6 +253,15 @@ const TeamPage = () => {
                             team={team}
                             teamId={teamId}
                         />
+                    )}
+                    {activeTab === 'pokemon-notes' && (
+                        <PokemonNotesTab
+                            teamId={teamId}
+                            team={team}
+                        />
+                    )}
+                    {activeTab === 'match-calc' && (
+                        <DamageCalcTab />
                     )}
                 </div>
 
