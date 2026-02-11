@@ -406,13 +406,21 @@ class PokepasteService {
         const statPart = line.split(':')[1];
         if (!statPart) return stats;
 
-        const statPairs = statPart.split('/');
-        const statNames = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
+        const STAT_NAME_MAP = {
+            'hp': 'hp', 'atk': 'atk', 'def': 'def',
+            'spa': 'spa', 'spd': 'spd', 'spe': 'spe',
+        };
 
-        statPairs.forEach((pair, index) => {
-            const value = parseInt(pair.trim());
-            if (!isNaN(value) && statNames[index]) {
-                stats[statNames[index]] = value;
+        const statPairs = statPart.split('/');
+        statPairs.forEach(pair => {
+            const trimmed = pair.trim();
+            const match = trimmed.match(/^(\d+)\s+(\w+)$/);
+            if (match) {
+                const value = parseInt(match[1]);
+                const key = STAT_NAME_MAP[match[2].toLowerCase()];
+                if (!isNaN(value) && key) {
+                    stats[key] = value;
+                }
             }
         });
 
