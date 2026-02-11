@@ -167,9 +167,9 @@ The setdex file is converted from NCP's `setdex_ncp-g9.js`. To update with newer
 
 ### Known quirks and workarounds
 
-**Facade / Hex BP doubling**: `@smogon/calc` does not automatically double the base power of Facade (attacker has status) or Hex (defender has status). The `useDamageCalc` hook detects these moves and applies the doubling via the `overrides: { basePower }` option. Direct `move.bp` assignment is ignored by the library's calculation — only `overrides` works.
+**Status must use short-form IDs**: `@smogon/calc` internally checks status with short-form IDs (`brn`, `par`, `psn`, `tox`, `slp`, `frz`). Passing full names like `'Burned'` will set the status string but moves like Facade and Hex that check `hasStatus('brn')` won't match. The status dropdown values use short-form IDs to ensure the library handles Facade BP doubling, Hex BP doubling, Guts/Marvel Scale, etc. correctly.
 
-**BP override field**: Each move slot has a BP input for manually overriding base power. This is useful for variable-power moves the library may not handle, or for testing "what if" scenarios. A manual override takes priority over auto-doubling.
+**BP override field**: Each move slot has a BP input for manually overriding base power via the `overrides: { basePower }` option. Direct `move.bp` assignment is ignored by the library — only `overrides` works. Useful for variable-power moves or "what if" scenarios.
 
 **curHP is absolute, not percentage**: The UI stores HP as a percentage (0-100), but `@smogon/calc` expects an absolute HP value via `pokemon.originalCurHP`. The hook converts percentage to absolute after constructing the Pokemon object.
 

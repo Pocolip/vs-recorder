@@ -17,12 +17,12 @@ export const NATURES_LIST = Object.keys(NATURES).sort();
 
 export const STATUS_OPTIONS = [
   { value: '', label: 'Healthy' },
-  { value: 'Burned', label: 'Burned' },
-  { value: 'Paralyzed', label: 'Paralyzed' },
-  { value: 'Poisoned', label: 'Poisoned' },
-  { value: 'Badly Poisoned', label: 'Badly Poisoned' },
-  { value: 'Asleep', label: 'Asleep' },
-  { value: 'Frozen', label: 'Frozen' },
+  { value: 'brn', label: 'Burned' },
+  { value: 'par', label: 'Paralyzed' },
+  { value: 'psn', label: 'Poisoned' },
+  { value: 'tox', label: 'Badly Poisoned' },
+  { value: 'slp', label: 'Asleep' },
+  { value: 'frz', label: 'Frozen' },
 ];
 
 // Convert NCP setdex entry to our Pokemon state shape
