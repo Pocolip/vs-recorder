@@ -30,6 +30,7 @@ public class TeamImportService {
     private final MatchRepository matchRepository;
     private final GamePlanRepository gamePlanRepository;
     private final GamePlanTeamRepository gamePlanTeamRepository;
+    private final TeamMemberRepository teamMemberRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
@@ -146,8 +147,19 @@ public class TeamImportService {
             }
         }
 
-        log.info("Import complete: {} replays, {} matches, {} opponent plans",
-                replaysImported, matchesImported, opponentPlansImported);
+        // Import team members (Pokemon notes & calcs)
+        int teamMembersImported = 0;
+        if (exportData.getTeam().getTeamMembers() != null && !exportData.getTeam().getTeamMembers().isEmpty()) {
+            try {
+                teamMembersImported = importTeamMembers(exportData.getTeam().getTeamMembers(), team);
+            } catch (Exception e) {
+                warnings.add("Failed to import team members: " + e.getMessage());
+                log.warn("Failed to import team members: {}", e.getMessage());
+            }
+        }
+
+        log.info("Import complete: {} replays, {} matches, {} opponent plans, {} team members",
+                replaysImported, matchesImported, opponentPlansImported, teamMembersImported);
 
         return ExportDTO.ImportResult.builder()
                 .teamId(team.getId())
@@ -155,6 +167,7 @@ public class TeamImportService {
                 .replaysImported(replaysImported)
                 .matchesImported(matchesImported)
                 .opponentPlansImported(opponentPlansImported)
+                .teamMembersImported(teamMembersImported)
                 .errors(errors)
                 .warnings(warnings)
                 .build();
@@ -314,6 +327,26 @@ public class TeamImportService {
         }
 
         return imported;
+    }
+
+    private int importTeamMembers(List<ExportDTO.TeamMemberData> teamMembersData, Team team) {
+        List<TeamMember> members = new ArrayList<>();
+        for (ExportDTO.TeamMemberData data : teamMembersData) {
+            TeamMember member = new TeamMember();
+            member.setTeam(team);
+            member.setPokemonName(sanitizeString(data.getPokemonName(), MAX_NAME_LENGTH));
+            member.setSlot(data.getSlot());
+            member.setNotes(sanitizeString(data.getNotes(), MAX_NOTES_LENGTH));
+            if (data.getCalcs() != null) {
+                member.setCalcs(data.getCalcs().stream()
+                        .map(c -> sanitizeString(c, MAX_STRING_LENGTH))
+                        .filter(c -> c != null)
+                        .collect(Collectors.toList()));
+            }
+            members.add(member);
+        }
+        teamMemberRepository.saveAll(members);
+        return members.size();
     }
 
     /**

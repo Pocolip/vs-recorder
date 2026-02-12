@@ -176,7 +176,7 @@ const TeamPage = () => {
         { id: 'move-usage', label: 'Move Usage', icon: Zap },
         { id: 'opponent-planner', label: 'Matchup Planner', icon: Clipboard },
         { id: 'pokemon-notes', label: 'Pokemon Notes', icon: FileText },
-        // { id: 'match-calc', label: 'Match Calc', icon: Calculator }
+        { id: 'match-calc', label: 'Match Calc', icon: Calculator }
     ];
 
     return (
@@ -261,7 +261,7 @@ const TeamPage = () => {
                         />
                     )}
                     {activeTab === 'match-calc' && (
-                        <DamageCalcTab />
+                        <DamageCalcTab team={team} teamId={teamId} />
                     )}
                 </div>
 
