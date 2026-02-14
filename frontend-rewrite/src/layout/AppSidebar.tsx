@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useLocation } from "react-router";
-import { Home, Info, Swords, Pencil, Share2 } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { Home, Info, Swords, Pencil, Share2, Trash2 } from "lucide-react";
 
 import { HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { useActiveTeam } from "../context/ActiveTeamContext";
 import EditTeamModal from "../components/modals/EditTeamModal";
 import ExportTeamModal from "../components/modals/ExportTeamModal";
+import ConfirmationModal from "../components/modals/ConfirmationModal";
+import * as teamService from "../services/teamService";
 import type { Team } from "../types";
 
 type SubItem = {
@@ -28,9 +30,12 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
   const { team, setTeam } = useActiveTeam();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const navItems: NavItem[] = useMemo(() => {
     const items: NavItem[] = [
@@ -57,6 +62,7 @@ const AppSidebar: React.FC = () => {
           { name: "Calculator", path: `/team/${team.id}/calculator`, dividerAfter: true },
           { name: "Edit Team", onClick: () => setShowEditModal(true), icon: <Pencil className="h-3 w-3" /> },
           { name: "Export Team", onClick: () => setShowExportModal(true), icon: <Share2 className="h-3 w-3" /> },
+          { name: "Delete Team", onClick: () => setShowDeleteModal(true), icon: <Trash2 className="h-3 w-3" /> },
         ],
       });
     }
@@ -91,6 +97,21 @@ const AppSidebar: React.FC = () => {
 
   const handleTeamUpdated = (updatedTeam: Team) => {
     setTeam(updatedTeam);
+  };
+
+  const handleDeleteTeam = async () => {
+    if (!team) return;
+    try {
+      setDeleting(true);
+      await teamService.deleteTeam(team.id);
+      setTeam(null);
+      setShowDeleteModal(false);
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Error deleting team:", error);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const renderMenuItems = (items: NavItem[]) => (
@@ -252,6 +273,26 @@ const AppSidebar: React.FC = () => {
             isOpen={showExportModal}
             team={team}
             onClose={() => setShowExportModal(false)}
+          />
+          <ConfirmationModal
+            isOpen={showDeleteModal}
+            title="Delete Team"
+            message={
+              <div>
+                <p>
+                  Are you sure you want to delete <strong>{team.name}</strong>?
+                </p>
+                <p className="mt-2">
+                  This will permanently delete the team, all its replays, matches, and analysis data.
+                  This action cannot be undone.
+                </p>
+              </div>
+            }
+            onConfirm={handleDeleteTeam}
+            onCancel={() => setShowDeleteModal(false)}
+            loading={deleting}
+            confirmText="Delete Team"
+            variant="danger"
           />
         </>
       )}
