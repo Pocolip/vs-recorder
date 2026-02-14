@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useParams, Navigate } from "react-router";
 import { useActiveTeam } from "../context/ActiveTeamContext";
 import { teamApi } from "../services/api/teamApi";
+import TeamHeader from "../components/team/TeamHeader";
 
 export default function TeamLayout() {
   const { teamId } = useParams<{ teamId: string }>();
@@ -50,5 +51,10 @@ export default function TeamLayout() {
     );
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <TeamHeader />
+      <Outlet />
+    </>
+  );
 }
