@@ -1,0 +1,366 @@
+import { Generations, calcStat, NATURES } from "@smogon/calc";
+import type { StatsTable } from "@smogon/calc";
+import type { StylesConfig } from "react-select";
+import type { PokemonState, FieldState, SideState, MoveState, StatSpread, BoostSpread } from "../types";
+
+const gen = Generations.get(9);
+
+const NCP_STAT_MAP: Record<string, keyof StatSpread> = {
+  hp: "hp",
+  at: "atk",
+  df: "def",
+  sa: "spa",
+  sd: "spd",
+  sp: "spe",
+};
+
+export const STAT_NAMES: (keyof StatSpread)[] = ["hp", "atk", "def", "spa", "spd", "spe"];
+export const STAT_LABELS: Record<keyof StatSpread, string> = {
+  hp: "HP",
+  atk: "Atk",
+  def: "Def",
+  spa: "SpA",
+  spd: "SpD",
+  spe: "Spe",
+};
+
+export const DEFAULT_EVS: StatSpread = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+export const DEFAULT_IVS: StatSpread = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
+export const DEFAULT_BOOSTS: BoostSpread = { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+
+export const NATURES_LIST: string[] = Object.keys(NATURES).sort();
+
+export const STATUS_OPTIONS = [
+  { value: "", label: "Healthy" },
+  { value: "brn", label: "Burned" },
+  { value: "par", label: "Paralyzed" },
+  { value: "psn", label: "Poisoned" },
+  { value: "tox", label: "Badly Poisoned" },
+  { value: "slp", label: "Asleep" },
+  { value: "frz", label: "Frozen" },
+] as const;
+
+interface SetdexEntry {
+  level?: number;
+  nature?: string;
+  ability?: string;
+  item?: string;
+  tera_type?: string;
+  evs?: Record<string, number>;
+  ivs?: Record<string, number>;
+  moves?: string[];
+}
+
+export function setdexToState(setdexEntry: SetdexEntry): PokemonState {
+  const evs: StatSpread = { ...DEFAULT_EVS };
+  const ivs: StatSpread = { ...DEFAULT_IVS };
+
+  if (setdexEntry.evs) {
+    for (const [ncpKey, val] of Object.entries(setdexEntry.evs)) {
+      const ourKey = NCP_STAT_MAP[ncpKey];
+      if (ourKey) evs[ourKey] = val;
+    }
+  }
+
+  if (setdexEntry.ivs) {
+    for (const [ncpKey, val] of Object.entries(setdexEntry.ivs)) {
+      const ourKey = NCP_STAT_MAP[ncpKey];
+      if (ourKey) ivs[ourKey] = val;
+    }
+  }
+
+  return {
+    species: "",
+    level: setdexEntry.level || 50,
+    nature: setdexEntry.nature || "Hardy",
+    ability: setdexEntry.ability || "",
+    item: setdexEntry.item || "",
+    teraType: setdexEntry.tera_type || null,
+    isTera: false,
+    status: "",
+    evs,
+    ivs,
+    boosts: { ...DEFAULT_BOOSTS },
+    curHP: 100,
+    moves: (setdexEntry.moves || []).map((name) => ({ name, crit: false, bpOverride: null })),
+  };
+}
+
+export function getBaseStats(species: string): StatsTable | null {
+  if (!species) return null;
+  for (const s of gen.species) {
+    if (s.name === species) return s.baseStats;
+  }
+  return null;
+}
+
+export function getSpeciesInfo(species: string) {
+  if (!species) return null;
+  for (const s of gen.species) {
+    if (s.name === species) return s;
+  }
+  return null;
+}
+
+export function calcFinalStat(
+  statName: string,
+  base: number,
+  iv: number,
+  ev: number,
+  level: number,
+  nature: string,
+): number {
+  if (!base) return 0;
+  return calcStat(gen, statName as keyof StatsTable, base, iv, ev, level, nature);
+}
+
+let _speciesListCache: string[] | null = null;
+export function getSpeciesList(): string[] {
+  if (_speciesListCache) return _speciesListCache;
+  const list: string[] = [];
+  for (const s of gen.species) {
+    list.push(s.name);
+  }
+  _speciesListCache = list.sort();
+  return _speciesListCache;
+}
+
+let _moveListCache: string[] | null = null;
+export function getMoveList(): string[] {
+  if (_moveListCache) return _moveListCache;
+  const list: string[] = [];
+  for (const m of gen.moves) {
+    list.push(m.name);
+  }
+  _moveListCache = list.sort();
+  return _moveListCache;
+}
+
+let _itemListCache: string[] | null = null;
+export function getItemList(): string[] {
+  if (_itemListCache) return _itemListCache;
+  const list: string[] = [];
+  for (const i of gen.items) {
+    list.push(i.name);
+  }
+  _itemListCache = list.sort();
+  return _itemListCache;
+}
+
+export function getAbilitiesForSpecies(species: string): string[] {
+  const info = getSpeciesInfo(species);
+  if (!info || !info.abilities) return [];
+  return Object.values(info.abilities).filter(Boolean) as string[];
+}
+
+export function getTypeList(): string[] {
+  const list: string[] = [];
+  for (const t of gen.types) {
+    list.push(t.name);
+  }
+  return list.sort();
+}
+
+export function getNatureInfo(natureName: string): { plus: string | null; minus: string | null } {
+  const nature = NATURES[natureName];
+  if (!nature) return { plus: null, minus: null };
+  return { plus: nature[0] as string | null, minus: nature[1] as string | null };
+}
+
+export function formatDamageRange(result: { range: () => [number, number]; defender: { maxHP: () => number } } | null): string {
+  if (!result) return "";
+  try {
+    const [min, max] = result.range();
+    const defenderHP = result.defender.maxHP();
+    if (defenderHP === 0) return "0 - 0%";
+    const minPct = ((min / defenderHP) * 100).toFixed(1);
+    const maxPct = ((max / defenderHP) * 100).toFixed(1);
+    return `${minPct} - ${maxPct}%`;
+  } catch {
+    return "";
+  }
+}
+
+export function getKOChance(result: { desc: () => string } | null): string {
+  if (!result) return "";
+  try {
+    const desc = result.desc();
+    const match = desc.match(/--\s*(.+)$/);
+    return match ? match[1] : "";
+  } catch {
+    return "";
+  }
+}
+
+export function getDamageColor(result: { range: () => [number, number]; defender: { maxHP: () => number } } | null): string {
+  if (!result) return "text-gray-400";
+  try {
+    const [, max] = result.range();
+    const defenderHP = result.defender.maxHP();
+    const pct = (max / defenderHP) * 100;
+    if (pct >= 100) return "text-red-400";
+    if (pct >= 75) return "text-orange-400";
+    if (pct >= 50) return "text-yellow-400";
+    if (pct >= 25) return "text-blue-400";
+    return "text-green-400";
+  } catch {
+    return "text-gray-400";
+  }
+}
+
+export function createDefaultPokemonState(species = ""): PokemonState {
+  return {
+    species,
+    level: 50,
+    nature: "Hardy",
+    ability: "",
+    item: "",
+    teraType: null,
+    isTera: false,
+    status: "",
+    evs: { ...DEFAULT_EVS },
+    ivs: { ...DEFAULT_IVS },
+    boosts: { ...DEFAULT_BOOSTS },
+    curHP: 100,
+    moves: [
+      { name: "", crit: false, bpOverride: null },
+      { name: "", crit: false, bpOverride: null },
+      { name: "", crit: false, bpOverride: null },
+      { name: "", crit: false, bpOverride: null },
+    ],
+  };
+}
+
+export function createDefaultSide(): SideState {
+  return {
+    isReflect: false,
+    isLightScreen: false,
+    isAuroraVeil: false,
+    isHelpingHand: false,
+    isTailwind: false,
+    isFriendGuard: false,
+    isSteelySpiritAlly: false,
+    isPowerSpot: false,
+    isBattery: false,
+    steelsurge: 0,
+    spikes: 0,
+    isSR: false,
+  };
+}
+
+export function createDefaultFieldState(): FieldState {
+  return {
+    gameType: "Doubles",
+    terrain: "",
+    weather: "",
+    isGravity: false,
+    isNeutralizingGas: false,
+    attackerSide: createDefaultSide(),
+    defenderSide: createDefaultSide(),
+    isTabletsOfRuin: false,
+    isVesselOfRuin: false,
+    isSwordOfRuin: false,
+    isBeadsOfRuin: false,
+  };
+}
+
+// Suppress unused imports warning — these types are re-exported for consumers
+export type { PokemonState, FieldState, SideState, MoveState, StatSpread, BoostSpread };
+
+export const reactSelectDarkStyles: StylesConfig = {
+  control: (base, state) => ({
+    ...base,
+    backgroundColor: "rgb(51, 65, 85)",
+    borderColor: state.isFocused ? "rgb(16, 185, 129)" : "rgb(71, 85, 105)",
+    "&:hover": { borderColor: "rgb(16, 185, 129)" },
+    boxShadow: state.isFocused ? "0 0 0 1px rgb(16, 185, 129)" : "none",
+    minHeight: "32px",
+    fontSize: "0.875rem",
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: "rgb(30, 41, 59)",
+    border: "1px solid rgb(71, 85, 105)",
+    zIndex: 50,
+  }),
+  menuList: (base) => ({
+    ...base,
+    maxHeight: "200px",
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isSelected
+      ? "rgb(16, 185, 129)"
+      : state.isFocused
+        ? "rgb(51, 65, 85)"
+        : "transparent",
+    color: state.isSelected ? "white" : "rgb(209, 213, 219)",
+    fontSize: "0.875rem",
+    padding: "4px 8px",
+    "&:active": { backgroundColor: "rgb(5, 150, 105)" },
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: "rgb(229, 231, 235)",
+  }),
+  input: (base) => ({
+    ...base,
+    color: "rgb(229, 231, 235)",
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: "rgb(107, 114, 128)",
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: "rgb(71, 85, 105)",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "rgb(156, 163, 175)",
+    padding: "4px",
+    "&:hover": { color: "rgb(229, 231, 235)" },
+  }),
+  clearIndicator: (base) => ({
+    ...base,
+    color: "rgb(156, 163, 175)",
+    padding: "4px",
+    "&:hover": { color: "rgb(229, 231, 235)" },
+  }),
+  group: (base) => ({
+    ...base,
+    paddingTop: 4,
+    paddingBottom: 4,
+  }),
+  groupHeading: (base) => ({
+    ...base,
+    color: "rgb(156, 163, 175)",
+    fontSize: "0.75rem",
+    fontWeight: 600,
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.05em",
+  }),
+  noOptionsMessage: (base) => ({
+    ...base,
+    color: "rgb(107, 114, 128)",
+  }),
+};
+
+export const reactSelectCompactStyles: StylesConfig = {
+  ...reactSelectDarkStyles,
+  control: (base, state) => ({
+    ...(reactSelectDarkStyles.control as (base: object, state: object) => object)(base, state),
+    minHeight: "28px",
+    fontSize: "0.8rem",
+  }),
+  valueContainer: (base) => ({
+    ...base,
+    padding: "0 4px",
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    padding: "2px",
+    color: "rgb(156, 163, 175)",
+    "&:hover": { color: "rgb(229, 231, 235)" },
+  }),
+};
