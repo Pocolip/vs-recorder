@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import type { TeamMember } from "../../types";
+import type { TeamMember, TeamMemberSyncResponse } from "../../types";
 
 export const teamMemberApi = {
   getByTeamId: (teamId: number) =>
@@ -13,6 +13,9 @@ export const teamMemberApi = {
 
   delete: (id: number) =>
     apiClient.delete(`/api/team-members/${id}`) as Promise<void>,
+
+  sync: (teamId: number) =>
+    apiClient.post(`/api/team-members/sync?teamId=${teamId}`) as Promise<TeamMemberSyncResponse>,
 };
 
 export default teamMemberApi;

@@ -12,6 +12,7 @@ export interface GamePlanTeam {
   pokepaste: string;
   playerName: string;
   notes: string;
+  color?: string;
   compositions: Composition[];
   createdAt: string;
   updatedAt: string;

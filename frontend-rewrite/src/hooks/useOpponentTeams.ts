@@ -37,7 +37,7 @@ export const useOpponentTeams = (
     gamePlanId: team.gamePlanId,
     pokepaste: team.pokepaste,
     notes: team.notes || "",
-    color: (team as GamePlanTeam & { color?: string }).color || "blue",
+    color: team.color || "blue",
     compositions: team.compositions || [],
     createdAt: team.createdAt,
   });
