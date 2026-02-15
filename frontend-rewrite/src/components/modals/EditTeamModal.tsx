@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
 import { Modal } from "../ui/modal";
 import Label from "../form/Label";
 import TagInput from "../form/TagInput";
@@ -25,10 +26,7 @@ const REGULATIONS = [
   "VGC 2025 Regulation A",
 ];
 
-function shortRegulation(reg: string): string {
-  const match = reg.match(/Regulation\s+([A-Z])$/);
-  return match ? `Reg ${match[1]}` : reg;
-}
+
 
 const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, onUpdated }) => {
   const [name, setName] = useState("");
@@ -39,7 +37,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Populate form when modal opens or team changes
   useEffect(() => {
@@ -152,21 +150,24 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
         {/* Regulation */}
         <div>
           <Label htmlFor="edit-regulation">Regulation</Label>
-          <select
-            id="edit-regulation"
-            value={regulation}
-            onChange={(e) => setRegulation(e.target.value)}
-            className={`h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-800 ${
-              regulation ? "text-gray-800 dark:text-white/90" : "text-gray-400 dark:text-gray-400"
-            }`}
-          >
-            <option value="">Select regulation (optional)</option>
-            {REGULATIONS.map((reg) => (
-              <option key={reg} value={reg} className="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                {shortRegulation(reg)}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="edit-regulation"
+              value={regulation}
+              onChange={(e) => setRegulation(e.target.value)}
+              className={`h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-800 ${
+                regulation ? "text-gray-800 dark:text-white/90" : "text-gray-400 dark:text-gray-400"
+              }`}
+            >
+              <option value="">Select regulation (optional)</option>
+              {REGULATIONS.map((reg) => (
+                <option key={reg} value={reg} className="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                  {reg}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
 
         {/* Showdown Usernames */}
@@ -177,6 +178,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
             onTagsChange={setShowdownUsernames}
             placeholder="Type a username and press Enter..."
           />
+          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Press Enter after each username to add it.</p>
         </div>
 
         {/* Error */}

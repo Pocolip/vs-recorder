@@ -2,6 +2,10 @@ export interface BattleData {
   raw?: string;
   teams?: Record<string, string[]>;
   opponentPlayer?: string;
+  userPlayer?: string;
+  actualPicks?: Record<string, string[]>;
+  teraEvents?: Record<string, { pokemon: string; type: string }[]>;
+  eloChanges?: Record<string, { before: number; after: number; change: number }>;
   bestOf3?: {
     gameNumber: number;
   };

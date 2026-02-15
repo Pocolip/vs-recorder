@@ -125,7 +125,7 @@ const ImportTeamModal: React.FC<ImportTeamModalProps> = ({ isOpen, onClose, onIm
 
     try {
       const result = await exportApi.importFromCode(code.trim());
-      if (result.success) {
+      if (result.teamId) {
         onImported();
         onClose();
       } else {
@@ -182,7 +182,7 @@ const ImportTeamModal: React.FC<ImportTeamModalProps> = ({ isOpen, onClose, onIm
 
     try {
       const result = await exportApi.importFromJson(jsonText.trim());
-      if (result.success) {
+      if (result.teamId) {
         onImported();
         onClose();
       } else {
