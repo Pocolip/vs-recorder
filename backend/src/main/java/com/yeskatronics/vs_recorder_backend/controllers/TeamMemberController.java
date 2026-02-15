@@ -106,6 +106,30 @@ public class TeamMemberController {
     }
 
     /**
+     * Sync team members from pokepaste
+     * POST /api/team-members/sync?teamId={teamId}
+     */
+    @PostMapping("/sync")
+    public ResponseEntity<TeamMemberDTO.SyncResponse> syncTeamMembers(
+            @RequestParam Long teamId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
+        verifyTeamOwnership(teamId, userId);
+
+        TeamService.SyncResult result = teamService.syncTeamMembersFromPokepaste(teamId, userId);
+
+        TeamMemberDTO.SyncResponse response = new TeamMemberDTO.SyncResponse(
+                teamMemberMapper.toResponseList(result.members()),
+                result.kept(),
+                result.added(),
+                result.removed()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Delete a team member
      * DELETE /api/team-members/{id}
      */

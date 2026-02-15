@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, AlertTriangle } from "lucide-react";
 import { Modal } from "../ui/modal";
 import Label from "../form/Label";
 import TagInput from "../form/TagInput";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import { teamApi } from "../../services/api/teamApi";
+import { teamMemberApi } from "../../services/api/teamMemberApi";
 import * as pokepasteService from "../../services/pokepasteService";
+import { cleanPokemonName } from "../../utils/pokemonNameUtils";
 import type { Team } from "../../types";
 
 interface EditTeamModalProps {
@@ -13,6 +15,11 @@ interface EditTeamModalProps {
   team: Team;
   onClose: () => void;
   onUpdated: (updatedTeam: Team) => void;
+}
+
+interface PendingWarning {
+  added: string[];
+  removed: string[];
 }
 
 const REGULATIONS = [
@@ -26,8 +33,6 @@ const REGULATIONS = [
   "VGC 2025 Regulation A",
 ];
 
-
-
 const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, onUpdated }) => {
   const [name, setName] = useState("");
   const [pokepaste, setPokepaste] = useState("");
@@ -36,6 +41,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
   const [previewNames, setPreviewNames] = useState<string[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingWarning, setPendingWarning] = useState<PendingWarning | null>(null);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -48,6 +54,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
       setShowdownUsernames(team.showdownUsernames || []);
       setPreviewNames(null);
       setError(null);
+      setPendingWarning(null);
     }
   }, [isOpen, team]);
 
@@ -76,11 +83,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
 
   const isValidUrl = pokepaste === "" || pokepasteService.isValidPokepasteUrl(pokepaste);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    if (pokepaste && !pokepasteService.isValidPokepasteUrl(pokepaste)) return;
-
+  const saveAndSync = async () => {
     setSubmitting(true);
     setError(null);
 
@@ -91,6 +94,12 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
         regulation,
         showdownUsernames,
       });
+
+      // Sync members if pokepaste changed
+      if (pokepaste.trim() !== (team.pokepaste || "")) {
+        await teamMemberApi.sync(team.id);
+      }
+
       onUpdated(updated);
       onClose();
     } catch (err) {
@@ -100,7 +109,160 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    if (pokepaste && !pokepasteService.isValidPokepasteUrl(pokepaste)) return;
+
+    const pokepasteChanged = pokepaste.trim() !== (team.pokepaste || "");
+
+    if (!pokepasteChanged) {
+      // No pokepaste change — save normally without sync
+      setSubmitting(true);
+      setError(null);
+      try {
+        const updated = await teamApi.update(team.id, {
+          name: name.trim(),
+          pokepaste: pokepaste.trim(),
+          regulation,
+          showdownUsernames,
+        });
+        onUpdated(updated);
+        onClose();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to update team");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    // Pokepaste changed — check for roster mismatch
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const [currentMembers, newNames] = await Promise.all([
+        teamMemberApi.getByTeamId(team.id),
+        pokepasteService.getPokemonNames(pokepaste.trim(), 6),
+      ]);
+
+      // If no existing members (backfill scenario), skip warning
+      if (currentMembers.length === 0) {
+        await saveAndSync();
+        return;
+      }
+
+      // Normalize both sets for comparison
+      const currentSet = new Set(currentMembers.map((m) => cleanPokemonName(m.pokemonName)));
+      const newSet = new Set(newNames.map((n) => cleanPokemonName(n)));
+
+      const added = newNames.filter((n) => !currentSet.has(cleanPokemonName(n)));
+      const removed = currentMembers
+        .map((m) => m.pokemonName)
+        .filter((n) => !newSet.has(cleanPokemonName(n)));
+
+      if (added.length === 0 && removed.length === 0) {
+        // Same Pokemon (possibly different order/moves) — save + sync without warning
+        await saveAndSync();
+        return;
+      }
+
+      // Show warning
+      setPendingWarning({ added, removed });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to check pokepaste changes");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleConfirmSync = async () => {
+    await saveAndSync();
+    setPendingWarning(null);
+  };
+
+  const handleCancelWarning = () => {
+    setPendingWarning(null);
+  };
+
   const canSubmit = name.trim() && !submitting && isValidUrl;
+
+  // Warning step
+  if (pendingWarning) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 sm:p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20">
+            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+            Team Roster Changed
+          </h2>
+        </div>
+
+        <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          The new pokepaste has different Pokemon. Syncing will update your team members:
+        </p>
+
+        <div className="space-y-3 mb-6">
+          {pendingWarning.removed.length > 0 && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-500/30 dark:bg-red-500/10">
+              <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">
+                Removed — notes & calcs will be deleted
+              </p>
+              {pendingWarning.removed.map((name) => (
+                <span
+                  key={name}
+                  className="mr-2 inline-block rounded bg-red-100 px-2 py-0.5 text-sm text-red-800 dark:bg-red-500/20 dark:text-red-300"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          )}
+          {pendingWarning.added.length > 0 && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-500/30 dark:bg-green-500/10">
+              <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-1">
+                Added
+              </p>
+              {pendingWarning.added.map((name) => (
+                <span
+                  key={name}
+                  className="mr-2 inline-block rounded bg-green-100 px-2 py-0.5 text-sm text-green-800 dark:bg-green-500/20 dark:text-green-300"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <p className="mb-4 text-sm text-red-500">{error}</p>
+        )}
+
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleCancelWarning}
+            disabled={submitting}
+            className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirmSync}
+            disabled={submitting}
+            className="rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? "Saving..." : "Confirm & Save"}
+          </button>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 sm:p-8">

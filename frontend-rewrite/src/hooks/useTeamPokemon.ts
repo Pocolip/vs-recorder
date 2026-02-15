@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import * as pokepasteService from "../services/pokepasteService";
-import type { Team } from "../types";
 
-const useTeamPokemon = (teams: Team[]) => {
+type TeamLike = { id: number; pokepaste?: string | null };
+
+const useTeamPokemon = (teams: TeamLike[]) => {
   const [teamPokemon, setTeamPokemon] = useState<Record<number, string[]>>({});
   const [loading, setLoading] = useState(false);
 

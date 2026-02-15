@@ -104,7 +104,7 @@ export async function getPokemon(identifier: string | number): Promise<PokemonDa
   // Fallback to static data
   const staticKey = typeof identifier === "string" ? identifier.toLowerCase() : String(identifier);
   if (COMMON_VGC_POKEMON[staticKey]) {
-    const fallbackData = enrichFallbackData(COMMON_VGC_POKEMON[staticKey]);
+    const fallbackData = enrichFallbackData(COMMON_VGC_POKEMON[staticKey], staticKey);
     return fallbackData;
   }
 
@@ -174,9 +174,13 @@ function processPokemonData(apiData: any): PokemonData {
 
 /**
  * Enrich fallback data with sprite info
+ * @param nameKey - normalized name for sprite map lookup (e.g. "ogerpon-hearthflame")
  */
-function enrichFallbackData(fallbackData: { id: number; name: string; types: string[] }): PokemonData {
-  const spriteUrls = generateSpriteUrls(fallbackData.id);
+function enrichFallbackData(
+  fallbackData: { id: number; name: string; types: string[] },
+  nameKey?: string,
+): PokemonData {
+  const spriteUrls = generateSpriteUrls(nameKey || fallbackData.id);
   return {
     ...fallbackData,
     sprite: spriteUrls.normal,

@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { teamMemberApi } from "../services/api";
-import * as pokepasteService from "../services/pokepasteService";
 import type { TeamMember } from "../types";
 
-const useTeamMembers = (teamId: number | null, pokepaste: string | null) => {
+const useTeamMembers = (teamId: number | null, pokepaste?: string | null) => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,26 +14,20 @@ const useTeamMembers = (teamId: number | null, pokepaste: string | null) => {
       setLoading(true);
       setError(null);
 
-      let members = await teamMemberApi.getByTeamId(teamId);
+      const members = await teamMemberApi.getByTeamId(teamId);
 
-      // If no members exist but we have a pokepaste, auto-create them
+      // Backfill: if no members exist but pokepaste is set, sync to create them
       if (members.length === 0 && pokepaste) {
-        const pokemonNames = await pokepasteService.getPokemonNames(pokepaste, 6);
-
-        if (pokemonNames.length > 0) {
-          const createPromises = pokemonNames.map((name, index) =>
-            teamMemberApi.create(teamId, {
-              pokemonName: name,
-              slot: index + 1,
-              notes: "",
-            }),
-          );
-
-          members = await Promise.all(createPromises);
+        try {
+          const syncResult = await teamMemberApi.sync(teamId);
+          setTeamMembers(syncResult.members);
+        } catch {
+          // Sync failed (e.g. pokepaste fetch error) — show empty state
+          setTeamMembers([]);
         }
+      } else {
+        setTeamMembers(members);
       }
-
-      setTeamMembers(members);
     } catch (err) {
       console.error("Error loading team members:", err);
       setError(err instanceof Error ? err.message : "Failed to load team members");

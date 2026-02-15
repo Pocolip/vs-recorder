@@ -50,4 +50,14 @@ public class TeamMemberDTO {
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SyncResponse {
+        private List<Response> members;
+        private List<String> kept;
+        private List<String> added;
+        private List<String> removed;
+    }
 }

@@ -8,3 +8,10 @@ export interface TeamMember {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TeamMemberSyncResponse {
+  members: TeamMember[];
+  kept: string[];
+  added: string[];
+  removed: string[];
+}
