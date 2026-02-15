@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router";
-import { Plus, Download } from "lucide-react";
+import { Plus, Download, X } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import PokemonTeam from "../../components/pokemon/PokemonTeam";
-import SearchInput from "../../components/form/SearchInput";
+import TagInput from "../../components/form/TagInput";
 import RegulationFilter from "../../components/form/RegulationFilter";
 import NewTeamModal from "../../components/modals/NewTeamModal";
 import ImportTeamModal from "../../components/modals/ImportTeamModal";
@@ -24,7 +24,7 @@ export default function HomePage() {
   const { teamStats, overallStats, loading: statsLoading } = useMultipleTeamStats(teamIds);
   const { teamPokemon, loading: pokemonLoading } = useTeamPokemon(teams);
 
-  const [search, setSearch] = useState("");
+  const [searchTags, setSearchTags] = useState<string[]>([]);
   const [regulationFilter, setRegulationFilter] = useState("");
   const [showNewTeam, setShowNewTeam] = useState(false);
   const [showImport, setShowImport] = useState(false);
@@ -37,10 +37,27 @@ export default function HomePage() {
   const filteredTeams = useMemo(() => {
     return teams.filter((team) => {
       if (regulationFilter && team.regulation !== regulationFilter) return false;
-      if (search && !team.name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (searchTags.length > 0) {
+        const pokemonNames = teamPokemon[team.id] || [];
+        return searchTags.every((tag) => {
+          const lowerTag = tag.toLowerCase();
+          if (team.name.toLowerCase().includes(lowerTag)) return true;
+          return pokemonNames.some((name) => {
+            const lower = name.toLowerCase();
+            return lower.includes(lowerTag) || lower.replace(/-/g, " ").includes(lowerTag);
+          });
+        });
+      }
       return true;
     });
-  }, [teams, regulationFilter, search]);
+  }, [teams, regulationFilter, searchTags, teamPokemon]);
+
+  const hasActiveFilters = searchTags.length > 0 || regulationFilter !== "";
+
+  const clearFilters = () => {
+    setSearchTags([]);
+    setRegulationFilter("");
+  };
 
   return (
     <div>
@@ -107,12 +124,28 @@ export default function HomePage() {
               />
             </div>
             <div className="flex-1">
-              <SearchInput
-                value={search}
-                onChange={setSearch}
-                placeholder="Search teams..."
+              <TagInput
+                tags={searchTags}
+                onTagsChange={setSearchTags}
+                placeholder="Search by team or Pokemon name..."
               />
             </div>
+          </div>
+        )}
+
+        {/* Filter Status */}
+        {!loading && teams.length > 0 && hasActiveFilters && (
+          <div className="mb-6 flex items-center justify-between">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Showing {filteredTeams.length} of {teams.length} {teams.length === 1 ? "team" : "teams"}
+            </p>
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear filters
+            </button>
           </div>
         )}
 
