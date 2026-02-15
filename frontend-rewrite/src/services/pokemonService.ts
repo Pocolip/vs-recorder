@@ -80,7 +80,7 @@ export async function initialize(): Promise<void> {
  * Get Pokemon data by name or ID
  */
 export async function getPokemon(identifier: string | number): Promise<PokemonData> {
-  const normalizedId = typeof identifier === "string" ? identifier.toLowerCase() : identifier;
+  const normalizedId = typeof identifier === "string" ? identifier.toLowerCase().replace(/\s+/g, "-") : identifier;
 
   // Check cache first
   const cached = await getCachedPokemon(normalizedId);
@@ -157,12 +157,13 @@ export function getSpriteUrl(identifier: string | number, variant?: "shiny"): st
  * Process raw API data into PokemonData
  */
 function processPokemonData(apiData: any): PokemonData {
+  const spriteUrls = generateSpriteUrls(apiData.name, undefined, apiData.id);
   return {
     id: apiData.id,
     name: formatDisplayName(apiData.name),
     types: apiData.types.map((t: any) => formatDisplayName(t.type.name)),
-    sprite: apiData.sprites?.front_default || undefined,
-    spriteShiny: apiData.sprites?.front_shiny || undefined,
+    sprite: spriteUrls.normal,
+    spriteShiny: spriteUrls.shiny,
     abilities: apiData.abilities?.map((a: any) => formatDisplayName(a.ability.name)),
     stats: apiData.stats?.reduce((acc: Record<string, number>, s: any) => {
       acc[s.stat.name] = s.base_stat;
@@ -222,10 +223,12 @@ export function generateSpriteUrls(
     };
   }
 
-  // Fallback to ID-based sprites
-  const id = typeof idOrName === "number" ? idOrName : idFallback || 0;
+  // Fallback: check COMMON_VGC_POKEMON, then idFallback, then numeric idOrName
+  const normalized = String(idOrName).toLowerCase().replace(/\s+/g, "-");
+  const fallback = COMMON_VGC_POKEMON[normalized];
+  const id = typeof idOrName === "number" ? idOrName : (fallback?.id ?? idFallback ?? 0);
   if (id > 0) {
-    const form = formOverride || 0;
+    const form = formOverride ?? 0;
     return {
       normal: getLocalSpritePath(id, form, false),
       shiny: getLocalSpritePath(id, form, true),

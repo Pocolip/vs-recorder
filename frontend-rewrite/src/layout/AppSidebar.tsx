@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { Home, Info, Swords, Pencil, Share2, Trash2 } from "lucide-react";
+import { Home, Swords, Pencil, Share2, Trash2 } from "lucide-react";
 
 import { HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
@@ -28,7 +28,7 @@ type NavItem = {
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
-  const { team, setTeam } = useActiveTeam();
+  const { team, setTeam, bumpStatsVersion } = useActiveTeam();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -67,12 +67,6 @@ const AppSidebar: React.FC = () => {
       });
     }
 
-    items.push({
-      icon: <Info className="h-5 w-5" />,
-      name: "About",
-      path: "/about",
-    });
-
     return items;
   }, [team]);
 
@@ -97,6 +91,7 @@ const AppSidebar: React.FC = () => {
 
   const handleTeamUpdated = (updatedTeam: Team) => {
     setTeam(updatedTeam);
+    bumpStatsVersion();
   };
 
   const handleDeleteTeam = async () => {

@@ -36,6 +36,12 @@ const TagInput: React.FC<TagInputProps> = ({
     }
   };
 
+  const handleBlur = () => {
+    if (input.trim()) {
+      addTag(input);
+    }
+  };
+
   return (
     <div
       className="flex min-h-[44px] flex-wrap items-center gap-1.5 rounded-lg border border-gray-300 bg-transparent px-3 py-2 shadow-theme-xs focus-within:border-brand-300 focus-within:ring-3 focus-within:ring-brand-500/10 dark:border-gray-700 dark:bg-white/[0.03] dark:focus-within:border-brand-800"
@@ -65,6 +71,7 @@ const TagInput: React.FC<TagInputProps> = ({
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         placeholder={tags.length === 0 ? placeholder : ""}
         className="min-w-[120px] flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none dark:text-white/90 dark:placeholder:text-white/30"
       />

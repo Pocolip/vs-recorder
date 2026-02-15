@@ -14,9 +14,14 @@ export interface ExportResult {
 }
 
 export interface ImportResult {
-  success: boolean;
   teamId?: number;
   teamName?: string;
+  replaysImported?: number;
+  matchesImported?: number;
+  opponentPlansImported?: number;
+  teamMembersImported?: number;
+  errors?: string[];
+  warnings?: string[];
   error?: string;
 }
 
