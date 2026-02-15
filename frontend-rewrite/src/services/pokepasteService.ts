@@ -9,8 +9,8 @@ import { apiClient } from "./api";
 const POKEPASTE_PATTERN = /^https?:\/\/(www\.)?pokepast\.es\/([a-zA-Z0-9]+)/;
 const POKEBIN_PATTERN = /^https?:\/\/(www\.)?pokebin\.com\/([a-zA-Z0-9]+)/;
 
-// Cache configuration
-const CACHE_KEY = "pokepaste_cache_v2";
+// Cache configuration — v3 to invalidate old-format entries from original frontend
+const CACHE_KEY = "pokepaste_cache_v3";
 const CACHE_EXPIRY_HOURS = 24;
 
 interface PasteServiceType {
@@ -23,7 +23,7 @@ interface ParseOptions {
   validateFormat?: boolean;
 }
 
-interface PokemonData {
+export interface PokemonData {
   name: string;
   species: string;
   nickname?: string;
@@ -72,7 +72,7 @@ export async function fetchAndParse(
 ): Promise<PokemonData[]> {
   // Check cache first
   const cached = await getCachedPokepaste(pasteUrl);
-  if (cached && !isCacheExpired(cached.timestamp)) {
+  if (cached && Array.isArray(cached.data) && !isCacheExpired(cached.timestamp)) {
     return cached.data;
   }
 
@@ -199,12 +199,20 @@ function parsePokemonBlock(block: string): PokemonData {
     moves: [],
   };
 
-  // Parse first line (name/species)
+  // Parse first line (name/species + item)
   const nameLine = parseNameLine(lines[0]);
   pokemon.name = nameLine.name;
   pokemon.species = nameLine.species;
   pokemon.nickname = nameLine.nickname;
   pokemon.gender = nameLine.gender;
+
+  // Extract item from first line (format: "Pokemon @ Item")
+  if (lines[0].includes(" @ ")) {
+    const parts = lines[0].split(" @ ");
+    if (parts[1]) {
+      pokemon.item = parts[1].trim();
+    }
+  }
 
   // Parse remaining lines
   for (let i = 1; i < lines.length; i++) {
@@ -344,6 +352,7 @@ async function getCachedPokepaste(url: string): Promise<CachedPaste | null> {
  * Check if cache is expired
  */
 function isCacheExpired(timestamp: number): boolean {
+  if (!timestamp || typeof timestamp !== "number") return true;
   const expiryMs = CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
   return Date.now() - timestamp > expiryMs;
 }

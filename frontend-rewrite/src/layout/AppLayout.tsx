@@ -1,5 +1,6 @@
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { ActiveTeamProvider } from "../context/ActiveTeamContext";
+import { CalcStateProvider } from "../context/CalcStateContext";
 import { Outlet } from "react-router";
 import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
@@ -33,9 +34,11 @@ const LayoutContent: React.FC = () => {
 const AppLayout: React.FC = () => {
   return (
     <ActiveTeamProvider>
-      <SidebarProvider>
-        <LayoutContent />
-      </SidebarProvider>
+      <CalcStateProvider>
+        <SidebarProvider>
+          <LayoutContent />
+        </SidebarProvider>
+      </CalcStateProvider>
     </ActiveTeamProvider>
   );
 };
