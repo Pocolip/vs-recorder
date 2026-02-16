@@ -293,7 +293,7 @@ public class TeamImportService {
 
     private int importOpponentPlans(List<ExportDTO.OpponentPlanData> opponentPlans, Long teamId, User user) {
         // Create or get game plan for this team
-        GamePlan gamePlan = gamePlanRepository.findByTeamIdAndUserId(teamId, user.getId())
+        GamePlan gamePlan = gamePlanRepository.findFirstByTeamIdAndUserId(teamId, user.getId())
                 .orElseGet(() -> {
                     GamePlan newPlan = new GamePlan();
                     newPlan.setUser(user);

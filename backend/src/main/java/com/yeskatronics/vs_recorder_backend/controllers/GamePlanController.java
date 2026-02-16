@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -158,7 +159,15 @@ public class GamePlanController {
         log.info("Getting or creating game plan for team: {} user: {}", teamId, userId);
 
         String planName = name != null ? name : "Opponent Plans";
-        GamePlan gamePlan = gamePlanService.getOrCreateGamePlanForTeam(teamId, userId, planName);
+        GamePlan gamePlan;
+        try {
+            gamePlan = gamePlanService.getOrCreateGamePlanForTeam(teamId, userId, planName);
+        } catch (DataIntegrityViolationException e) {
+            // Concurrent request already created it (e.g. React StrictMode double-fire)
+            log.debug("Concurrent game plan creation for team: {}, returning existing", teamId);
+            gamePlan = gamePlanService.getGamePlanByTeamIdAndUserId(teamId, userId)
+                    .orElseThrow(() -> new IllegalStateException("GamePlan creation failed"));
+        }
         GamePlanDTO.GamePlanResponse response = gamePlanMapper.toResponse(gamePlan);
 
         return ResponseEntity.ok(response);

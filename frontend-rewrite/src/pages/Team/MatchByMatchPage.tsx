@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Users } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import BestOf3Card from "../../components/team/BestOf3Card";
 import TagInput from "../../components/form/TagInput";
@@ -90,7 +91,9 @@ export default function MatchByMatchPage() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <>
+      <PageMeta title="Match by Match | VS Recorder" description="Match by match analysis" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       {/* Stats row */}
       {stats && (
         <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -163,5 +166,6 @@ export default function MatchByMatchPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

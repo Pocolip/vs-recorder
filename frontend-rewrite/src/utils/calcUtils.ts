@@ -267,100 +267,105 @@ export function createDefaultFieldState(): FieldState {
 // Suppress unused imports warning — these types are re-exported for consumers
 export type { PokemonState, FieldState, SideState, MoveState, StatSpread, BoostSpread };
 
-export const reactSelectDarkStyles: StylesConfig = {
-  control: (base, state) => ({
-    ...base,
-    backgroundColor: "rgb(51, 65, 85)",
-    borderColor: state.isFocused ? "rgb(16, 185, 129)" : "rgb(71, 85, 105)",
-    "&:hover": { borderColor: "rgb(16, 185, 129)" },
-    boxShadow: state.isFocused ? "0 0 0 1px rgb(16, 185, 129)" : "none",
-    minHeight: "32px",
-    fontSize: "0.875rem",
-  }),
-  menu: (base) => ({
-    ...base,
-    backgroundColor: "rgb(30, 41, 59)",
-    border: "1px solid rgb(71, 85, 105)",
-    zIndex: 50,
-  }),
-  menuList: (base) => ({
-    ...base,
-    maxHeight: "200px",
-  }),
-  option: (base, state) => ({
-    ...base,
-    backgroundColor: state.isSelected
-      ? "rgb(16, 185, 129)"
-      : state.isFocused
-        ? "rgb(51, 65, 85)"
-        : "transparent",
-    color: state.isSelected ? "white" : "rgb(209, 213, 219)",
-    fontSize: "0.875rem",
-    padding: "4px 8px",
-    "&:active": { backgroundColor: "rgb(5, 150, 105)" },
-  }),
-  singleValue: (base) => ({
-    ...base,
-    color: "rgb(229, 231, 235)",
-  }),
-  input: (base) => ({
-    ...base,
-    color: "rgb(229, 231, 235)",
-  }),
-  placeholder: (base) => ({
-    ...base,
-    color: "rgb(107, 114, 128)",
-  }),
-  indicatorSeparator: (base) => ({
-    ...base,
-    backgroundColor: "rgb(71, 85, 105)",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    color: "rgb(156, 163, 175)",
-    padding: "4px",
-    "&:hover": { color: "rgb(229, 231, 235)" },
-  }),
-  clearIndicator: (base) => ({
-    ...base,
-    color: "rgb(156, 163, 175)",
-    padding: "4px",
-    "&:hover": { color: "rgb(229, 231, 235)" },
-  }),
-  group: (base) => ({
-    ...base,
-    paddingTop: 4,
-    paddingBottom: 4,
-  }),
-  groupHeading: (base) => ({
-    ...base,
-    color: "rgb(156, 163, 175)",
-    fontSize: "0.75rem",
-    fontWeight: 600,
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.05em",
-  }),
-  noOptionsMessage: (base) => ({
-    ...base,
-    color: "rgb(107, 114, 128)",
-  }),
-};
+export function getSelectStyles(dark: boolean): StylesConfig {
+  return {
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: dark ? "rgb(51, 65, 85)" : "rgb(255, 255, 255)",
+      borderColor: state.isFocused ? "rgb(16, 185, 129)" : dark ? "rgb(71, 85, 105)" : "rgb(209, 213, 219)",
+      "&:hover": { borderColor: "rgb(16, 185, 129)" },
+      boxShadow: state.isFocused ? "0 0 0 1px rgb(16, 185, 129)" : "none",
+      minHeight: "32px",
+      fontSize: "0.875rem",
+    }),
+    menu: (base) => ({
+      ...base,
+      backgroundColor: dark ? "rgb(30, 41, 59)" : "rgb(255, 255, 255)",
+      border: `1px solid ${dark ? "rgb(71, 85, 105)" : "rgb(229, 231, 235)"}`,
+      zIndex: 50,
+    }),
+    menuList: (base) => ({
+      ...base,
+      maxHeight: "200px",
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected
+        ? "rgb(16, 185, 129)"
+        : state.isFocused
+          ? dark ? "rgb(51, 65, 85)" : "rgb(243, 244, 246)"
+          : "transparent",
+      color: state.isSelected ? "white" : dark ? "rgb(209, 213, 219)" : "rgb(55, 65, 81)",
+      fontSize: "0.875rem",
+      padding: "4px 8px",
+      "&:active": { backgroundColor: "rgb(5, 150, 105)" },
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: dark ? "rgb(229, 231, 235)" : "rgb(31, 41, 55)",
+    }),
+    input: (base) => ({
+      ...base,
+      color: dark ? "rgb(229, 231, 235)" : "rgb(31, 41, 55)",
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: "rgb(107, 114, 128)",
+    }),
+    indicatorSeparator: (base) => ({
+      ...base,
+      backgroundColor: dark ? "rgb(71, 85, 105)" : "rgb(209, 213, 219)",
+    }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      color: "rgb(156, 163, 175)",
+      padding: "4px",
+      "&:hover": { color: dark ? "rgb(229, 231, 235)" : "rgb(55, 65, 81)" },
+    }),
+    clearIndicator: (base) => ({
+      ...base,
+      color: "rgb(156, 163, 175)",
+      padding: "4px",
+      "&:hover": { color: dark ? "rgb(229, 231, 235)" : "rgb(55, 65, 81)" },
+    }),
+    group: (base) => ({
+      ...base,
+      paddingTop: 4,
+      paddingBottom: 4,
+    }),
+    groupHeading: (base) => ({
+      ...base,
+      color: dark ? "rgb(156, 163, 175)" : "rgb(107, 114, 128)",
+      fontSize: "0.75rem",
+      fontWeight: 600,
+      textTransform: "uppercase" as const,
+      letterSpacing: "0.05em",
+    }),
+    noOptionsMessage: (base) => ({
+      ...base,
+      color: "rgb(107, 114, 128)",
+    }),
+  };
+}
 
-export const reactSelectCompactStyles: StylesConfig = {
-  ...reactSelectDarkStyles,
-  control: (base, state) => ({
-    ...(reactSelectDarkStyles.control as (base: object, state: object) => object)(base, state),
-    minHeight: "28px",
-    fontSize: "0.8rem",
-  }),
-  valueContainer: (base) => ({
+export function getCompactSelectStyles(dark: boolean): StylesConfig {
+  const base = getSelectStyles(dark);
+  return {
     ...base,
-    padding: "0 4px",
-  }),
-  dropdownIndicator: (base) => ({
-    ...base,
-    padding: "2px",
-    color: "rgb(156, 163, 175)",
-    "&:hover": { color: "rgb(229, 231, 235)" },
-  }),
-};
+    control: (b, state) => ({
+      ...(base.control as (b: object, state: object) => object)(b, state),
+      minHeight: "28px",
+      fontSize: "0.8rem",
+    }),
+    valueContainer: (b) => ({
+      ...b,
+      padding: "0 4px",
+    }),
+    dropdownIndicator: (b) => ({
+      ...b,
+      padding: "2px",
+      color: "rgb(156, 163, 175)",
+      "&:hover": { color: dark ? "rgb(229, 231, 235)" : "rgb(55, 65, 81)" },
+    }),
+  };
+}

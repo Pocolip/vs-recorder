@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Plus, Target, AlertTriangle } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import OpponentTeamCard from "../../components/team/OpponentTeamCard";
 import AddOpponentTeamModal from "../../components/modals/AddOpponentTeamModal";
 import TagInput from "../../components/form/TagInput";
@@ -112,7 +113,9 @@ export default function MatchupPlannerPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <PageMeta title="Matchup Planner | VS Recorder" description="Plan matchup strategies" />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -251,5 +254,6 @@ export default function MatchupPlannerPage() {
         onSubmit={handleAddOpponentTeam}
       />
     </div>
+    </>
   );
 }

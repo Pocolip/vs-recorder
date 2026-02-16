@@ -49,7 +49,7 @@ public interface GamePlanRepository extends JpaRepository<GamePlan, Long> {
      * @param userId the user ID
      * @return Optional containing the game plan if found
      */
-    Optional<GamePlan> findByTeamIdAndUserId(Long teamId, Long userId);
+    Optional<GamePlan> findFirstByTeamIdAndUserId(Long teamId, Long userId);
 
     /**
      * Check if a game plan already exists for a team and user

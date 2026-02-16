@@ -22,7 +22,7 @@ const SidebarSlots: React.FC<SidebarSlotsProps> = ({ teamPokemon, activeSpecies,
             className={`rounded border transition-all ${
               isActive
                 ? "border-emerald-500 bg-emerald-500/20"
-                : "border-slate-600 bg-slate-700/50 hover:border-slate-500 hover:bg-slate-700"
+                : "border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-700/50 dark:hover:border-slate-500 dark:hover:bg-slate-700"
             }`}
             title={mon.name || `Slot ${i + 1}`}
           >

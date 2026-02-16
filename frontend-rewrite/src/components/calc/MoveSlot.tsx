@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import Select, { type SingleValue } from "react-select";
-import { getMoveList, reactSelectCompactStyles } from "../../utils/calcUtils";
+import { getMoveList, getCompactSelectStyles } from "../../utils/calcUtils";
+import { useTheme } from "../../context/ThemeContext";
 import type { MoveState } from "../../types";
 
 interface SelectOption {
@@ -15,6 +16,10 @@ interface MoveSlotProps {
 }
 
 const MoveSlot: React.FC<MoveSlotProps> = ({ move, index, onChange }) => {
+  const { theme } = useTheme();
+  const dark = theme === "dark";
+  const compactStyles = useMemo(() => getCompactSelectStyles(dark), [dark]);
+
   const moveOptions = useMemo(() => {
     return getMoveList().map((name) => ({ value: name, label: name }));
   }, []);
@@ -29,7 +34,7 @@ const MoveSlot: React.FC<MoveSlotProps> = ({ move, index, onChange }) => {
           value={selectedOption}
           onChange={(opt: SingleValue<SelectOption>) => onChange({ ...move, name: opt ? opt.value : "", bpOverride: null })}
           options={moveOptions}
-          styles={reactSelectCompactStyles as any}
+          styles={compactStyles as any}
           placeholder="Move..."
           isClearable
           isSearchable
@@ -45,15 +50,15 @@ const MoveSlot: React.FC<MoveSlotProps> = ({ move, index, onChange }) => {
           onChange({ ...move, bpOverride: e.target.value ? parseInt(e.target.value) : null })
         }
         placeholder="BP"
-        className="w-11 bg-slate-700 border border-slate-600 rounded text-gray-200 text-xs text-center py-0.5 focus:border-emerald-500 focus:outline-none placeholder-gray-600"
+        className="w-11 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-200 dark:placeholder-gray-600 rounded text-xs text-center py-0.5 focus:border-emerald-500 focus:outline-none"
         title="Base Power override"
       />
-      <label className="flex items-center gap-0.5 text-xs text-gray-400 cursor-pointer">
+      <label className="flex items-center gap-0.5 text-xs text-gray-500 dark:text-gray-400 cursor-pointer">
         <input
           type="checkbox"
           checked={move.crit}
           onChange={(e) => onChange({ ...move, crit: e.target.checked })}
-          className="rounded border-slate-600 bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
+          className="rounded border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
         />
         Crit
       </label>

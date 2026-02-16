@@ -14,6 +14,8 @@ interface NewTeamModalProps {
 }
 
 const REGULATIONS = [
+  "VGC 2025 Regulation J",
+  "VGC 2025 Regulation I",
   "VGC 2025 Regulation H",
   "VGC 2025 Regulation G",
   "VGC 2025 Regulation F",

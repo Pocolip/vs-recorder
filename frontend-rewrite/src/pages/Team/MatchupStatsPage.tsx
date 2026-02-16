@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { Target, TrendingUp, TrendingDown, Users, UserCheck, Search, X } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
@@ -205,7 +206,9 @@ export default function MatchupStatsPage() {
   const validGameCount = replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <>
+      <PageMeta title="Matchup Stats | VS Recorder" description="Matchup statistics" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Matchup Analysis</h3>
@@ -336,6 +339,7 @@ export default function MatchupStatsPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }
 

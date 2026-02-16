@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FileText } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import PokemonNoteCard from "../../components/team/PokemonNoteCard";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import useTeamMembers from "../../hooks/useTeamMembers";
@@ -95,7 +96,9 @@ export default function PokemonNotesPage() {
   }
 
   return (
-    <div>
+    <>
+      <PageMeta title="Pokemon Notes | VS Recorder" description="Pokemon notes and calcs" />
+      <div>
       <div className="mb-6">
         <h3 className="text-xl font-semibold text-gray-800 dark:text-white/90">
           Pokemon Notes
@@ -124,5 +127,6 @@ export default function PokemonNotesPage() {
         ))}
       </div>
     </div>
+    </>
   );
 }

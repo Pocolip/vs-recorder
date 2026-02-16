@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Zap } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
 import { getDisplayName } from "../../utils/pokemonNameUtils";
@@ -179,7 +180,9 @@ export default function MoveUsagePage() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <>
+      <PageMeta title="Move Usage | VS Recorder" description="Move usage analysis" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -207,6 +210,7 @@ export default function MoveUsagePage() {
         ))}
       </div>
     </div>
+    </>
   );
 }
 

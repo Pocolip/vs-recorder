@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { BarChart3, Users, Star } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
@@ -196,7 +197,9 @@ export default function UsageStatsPage() {
   const { individualStats, leadPairStats, bestLeadStats } = usageStats;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <>
+      <PageMeta title="Usage Stats | VS Recorder" description="Pokemon usage statistics" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Usage Statistics</h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">Based on {validGameCount} games</span>
@@ -283,6 +286,7 @@ export default function UsageStatsPage() {
         />
       </div>
     </div>
+    </>
   );
 }
 

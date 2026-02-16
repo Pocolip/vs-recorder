@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ExternalLink } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { PokemonPanel, FieldPanel, MoveResults, MainResult, GenerationPicker } from "../../components/calc";
 import { useDamageCalc } from "../../hooks/useDamageCalc";
 import useTeamMembers from "../../hooks/useTeamMembers";
@@ -122,7 +123,9 @@ export default function CalculatorPage() {
   };
 
   return (
-    <div className="space-y-3">
+    <>
+      <PageMeta title="Calculator | VS Recorder" description="Damage calculator" />
+      <div className="space-y-3">
       {/* Header row */}
       <div className="flex items-center justify-between">
         <GenerationPicker value={9} onChange={() => {}} />
@@ -130,7 +133,7 @@ export default function CalculatorPage() {
           href="https://nerd-of-now.github.io/NCP-VGC-Damage-Calculator/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-400 transition-colors"
+          className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 transition-colors"
         >
           Sets via NCP Calc
           <ExternalLink className="w-3 h-3" />
@@ -152,7 +155,7 @@ export default function CalculatorPage() {
 
       {/* Move pickers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
+        <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/30 dark:border-slate-700/50 rounded-lg p-3">
           <div className="text-xs text-blue-400 font-medium mb-1">Attacker &rarr; Defender</div>
           <MoveResults
             results={calcResults?.p1Results}
@@ -164,7 +167,7 @@ export default function CalculatorPage() {
           />
         </div>
 
-        <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
+        <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/30 dark:border-slate-700/50 rounded-lg p-3">
           <div className="text-xs text-red-400 font-medium mb-1">Defender &rarr; Attacker</div>
           <MoveResults
             results={calcResults?.p2Results}
@@ -187,7 +190,7 @@ export default function CalculatorPage() {
       {/* Pokemon editors + field (bottom) */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px_1fr] gap-4">
         {/* P1 Panel */}
-        <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
+        <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/30 dark:border-slate-700/50 rounded-lg p-3">
           <div className="text-xs text-blue-400 font-medium mb-2">Attacker</div>
           <PokemonPanel
             state={p1}
@@ -198,13 +201,13 @@ export default function CalculatorPage() {
         </div>
 
         {/* Field Panel (center) */}
-        <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
+        <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/30 dark:border-slate-700/50 rounded-lg p-3">
           <div className="text-xs text-gray-400 font-medium mb-2">Field</div>
           <FieldPanel fieldState={field} onChange={setField} />
         </div>
 
         {/* P2 Panel */}
-        <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
+        <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/30 dark:border-slate-700/50 rounded-lg p-3">
           <div className="text-xs text-red-400 font-medium mb-2">Defender</div>
           <PokemonPanel
             state={p2}
@@ -216,5 +219,6 @@ export default function CalculatorPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
