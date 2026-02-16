@@ -1,6 +1,6 @@
 {
   "name": "vs-recorder-frontend",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "VS Recorder - Pokemon VGC Analytics Web Application",
   "scripts": {
     "dev": "webpack serve --mode development --open",
