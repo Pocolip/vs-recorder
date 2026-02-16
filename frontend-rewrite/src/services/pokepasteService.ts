@@ -129,15 +129,26 @@ async function fetchPokebin(
   maxPokemon?: number
 ): Promise<PokemonData[]> {
   try {
-    const response = await apiClient.get("/api/pokemon/pokepaste/fetch", {
+    // apiClient interceptor unwraps response.data, so this is already the payload
+    const data = await apiClient.get("/api/pokemon/pokepaste/fetch", {
       params: { url: originalUrl },
-    });
-    
-    // The backend should return parsed data or raw text
-    if (response.data.pokemon) {
-      return response.data.pokemon.slice(0, maxPokemon);
-    } else if (response.data.raw) {
-      return parsePokepasteText(response.data.raw, { maxPokemon });
+    }) as Record<string, unknown>;
+
+    const pokemon = data.pokemon as Record<string, unknown>[] | undefined;
+    if (pokemon && pokemon.length > 0) {
+      // Backend returns { species, nickname, item, ability, teraType, moves }
+      // Transform to frontend PokemonData format
+      return pokemon.slice(0, maxPokemon).map((p) => ({
+        name: p.species as string,
+        species: p.species as string,
+        nickname: (p.nickname as string) || undefined,
+        item: (p.item as string) || undefined,
+        ability: (p.ability as string) || undefined,
+        tera_type: (p.teraType as string) || undefined,
+        moves: (p.moves as string[]) || [],
+      }));
+    } else if (data.rawText) {
+      return parsePokepasteText(data.rawText as string, { maxPokemon });
     } else {
       throw new Error("Invalid response from pokebin API");
     }

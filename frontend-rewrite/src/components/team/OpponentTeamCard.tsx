@@ -15,15 +15,15 @@ import * as pokepasteService from "../../services/pokepasteService";
 import type { Composition } from "../../types";
 
 const COLOR_OPTIONS: Record<string, { border: string; bg: string }> = {
-  blue: { border: "border-l-blue-500", bg: "bg-blue-500" },
-  red: { border: "border-l-red-500", bg: "bg-red-500" },
-  green: { border: "border-l-green-500", bg: "bg-green-500" },
-  yellow: { border: "border-l-yellow-500", bg: "bg-yellow-500" },
-  purple: { border: "border-l-purple-500", bg: "bg-purple-500" },
-  pink: { border: "border-l-pink-500", bg: "bg-pink-500" },
-  orange: { border: "border-l-orange-500", bg: "bg-orange-500" },
-  teal: { border: "border-l-teal-500", bg: "bg-teal-500" },
-  gray: { border: "border-l-gray-500", bg: "bg-gray-500" },
+  blue: { border: "#3b82f6", bg: "bg-blue-500" },
+  red: { border: "#ef4444", bg: "bg-red-500" },
+  green: { border: "#22c55e", bg: "bg-green-500" },
+  yellow: { border: "#eab308", bg: "bg-yellow-500" },
+  purple: { border: "#a855f7", bg: "bg-purple-500" },
+  pink: { border: "#ec4899", bg: "bg-pink-500" },
+  orange: { border: "#f97316", bg: "bg-orange-500" },
+  teal: { border: "#14b8a6", bg: "bg-teal-500" },
+  gray: { border: "#6b7280", bg: "bg-gray-500" },
 };
 
 export interface OpponentTeam {
@@ -150,7 +150,8 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
 
   return (
     <div
-      className={`rounded-lg border border-l-4 border-gray-200 dark:border-gray-700 ${teamColor.border}`}
+      className="rounded-lg border border-l-4 border-gray-200 dark:border-gray-700"
+      style={{ borderLeftColor: teamColor.border }}
     >
       {/* Header */}
       <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-white/[0.02]">

@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Calendar, Filter, SortAsc, SortDesc } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import GameCard from "../../components/team/GameCard";
@@ -132,7 +133,9 @@ export default function GameByGamePage() {
   const winRate = filteredReplays.length > 0 ? Math.round((wins / filteredReplays.length) * 100) : 0;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <>
+      <PageMeta title="Game by Game | VS Recorder" description="Game by game analysis" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       {/* Header */}
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -244,5 +247,6 @@ export default function GameByGamePage() {
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -16,8 +16,8 @@ const MainResult: React.FC<MainResultProps> = ({ result, onSave, saving }) => {
 
   if (!result) {
     return (
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-center">
-        <p className="text-gray-500 text-sm">Select Pokemon and moves to see damage calculations</p>
+      <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/50 dark:border-slate-700 rounded-lg p-3 text-center">
+        <p className="text-gray-400 dark:text-gray-500 text-sm">Select Pokemon and moves to see damage calculations</p>
       </div>
     );
   }
@@ -30,8 +30,8 @@ const MainResult: React.FC<MainResultProps> = ({ result, onSave, saving }) => {
     range = result.range();
   } catch {
     return (
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-center">
-        <p className="text-gray-500 text-sm">Error calculating damage</p>
+      <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/50 dark:border-slate-700 rounded-lg p-3 text-center">
+        <p className="text-gray-400 dark:text-gray-500 text-sm">Error calculating damage</p>
       </div>
     );
   }
@@ -41,12 +41,12 @@ const MainResult: React.FC<MainResultProps> = ({ result, onSave, saving }) => {
   const maxPct = defenderHP > 0 ? ((range[1] / defenderHP) * 100).toFixed(1) : "0";
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
+    <div className="bg-gray-50 border border-gray-200 dark:bg-slate-800/50 dark:border-slate-700 rounded-lg p-3">
       {/* Main description + inline save */}
-      <p className="text-gray-200 text-sm leading-relaxed mb-2">
+      <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed mb-2">
         <span
           onClick={() => handleCopy(desc)}
-          className="cursor-pointer hover:text-white transition-colors"
+          className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors"
           title="Click to copy"
         >
           {desc}
@@ -65,13 +65,13 @@ const MainResult: React.FC<MainResultProps> = ({ result, onSave, saving }) => {
 
       {/* Damage range bar */}
       <div className="mb-2">
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
           <span>
             {range[0]}-{range[1]} HP ({minPct}-{maxPct}%)
           </span>
           <span>/ {defenderHP} HP</span>
         </div>
-        <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all bg-gradient-to-r from-green-500 via-yellow-500 to-red-500"
             style={{ width: `${Math.min(100, parseFloat(maxPct))}%` }}
@@ -82,8 +82,8 @@ const MainResult: React.FC<MainResultProps> = ({ result, onSave, saving }) => {
       {/* Damage rolls */}
       {Array.isArray(damage) && (
         <div>
-          <div className="text-xs text-gray-500 mb-1">Rolls:</div>
-          <div className="text-xs text-gray-400 font-mono break-all leading-relaxed">
+          <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">Rolls:</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 font-mono break-all leading-relaxed">
             {damage.join(", ")}
           </div>
         </div>

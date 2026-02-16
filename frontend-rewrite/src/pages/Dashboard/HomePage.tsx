@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router";
-import { Plus, Download, X } from "lucide-react";
+import { Plus, Download, X, Trophy, Calendar, TrendingUp } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import PokemonTeam from "../../components/pokemon/PokemonTeam";
 import TagInput from "../../components/form/TagInput";
@@ -90,26 +90,51 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Stats Bar */}
+        {/* Stats Cards */}
         {!loading && teams.length > 0 && (
-          <div className="mb-6 flex flex-wrap gap-4 rounded-lg border border-gray-200 bg-gray-50 px-5 py-3.5 dark:border-gray-700 dark:bg-gray-800/50">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold text-gray-800 dark:text-white/90">{teams.length}</span>{" "}
-              {teams.length === 1 ? "team" : "teams"}
-            </div>
-            {!statsLoading && overallStats.totalGames > 0 && (
-              <>
-                <div className="text-sm text-gray-400 dark:text-gray-600">|</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">{overallStats.totalWins}W</span>
-                  {" / "}
-                  <span className="font-semibold text-red-500 dark:text-red-400">{overallStats.totalLosses}L</span>
-                  {" / "}
-                  <span className="font-semibold text-gray-800 dark:text-white/90">{overallStats.overallWinRate}%</span>
-                  {" win rate"}
+          <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+              <div className="flex items-center">
+                <Trophy className="mr-3 h-8 w-8 text-brand-500 dark:text-brand-400" />
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white/90">{teams.length}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Teams</p>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+              <div className="flex items-center">
+                <Calendar className="mr-3 h-8 w-8 text-blue-500 dark:text-blue-400" />
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white/90">
+                    {statsLoading ? "..." : overallStats.totalGames}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Games Played</p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+              <div className="flex items-center">
+                <TrendingUp className="mr-3 h-8 w-8 text-emerald-500 dark:text-emerald-400" />
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white/90">
+                    {statsLoading ? "..." : overallStats.totalWins}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Wins</p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+              <div className="flex items-center">
+                <Trophy className="mr-3 h-8 w-8 text-yellow-500 dark:text-yellow-400" />
+                <div>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white/90">
+                    {statsLoading ? "..." : `${overallStats.overallWinRate}%`}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Win Rate</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

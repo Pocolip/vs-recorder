@@ -12,9 +12,10 @@ import {
   NATURES_LIST,
   STATUS_OPTIONS,
   setdexToState,
-  reactSelectDarkStyles,
-  reactSelectCompactStyles,
+  getSelectStyles,
+  getCompactSelectStyles,
 } from "../../utils/calcUtils";
+import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
 import type { PokemonState, MoveState } from "../../types";
 import type { PokemonData as PokemonFromPaste } from "../../services/pokepasteService";
@@ -52,6 +53,11 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   hasOppositeSidebar = false,
   side,
 }) => {
+  const { theme } = useTheme();
+  const dark = theme === "dark";
+  const selectStyles = useMemo(() => getSelectStyles(dark), [dark]);
+  const compactStyles = useMemo(() => getCompactSelectStyles(dark), [dark]);
+
   // Build species + set options: setdex Pokemon with sets, then all remaining species
   const speciesOptions = useMemo((): SetdexGroup[] => {
     const allSpecies = getSpeciesList();
@@ -206,7 +212,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         value={selectedSpeciesOption as SetdexOption | null}
         onChange={handleSpeciesSelect}
         options={speciesOptions}
-        styles={reactSelectDarkStyles as any}
+        styles={selectStyles as any}
         placeholder="Search Pokemon / Set..."
         isClearable
         isSearchable
@@ -242,7 +248,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
             value={state.nature ? { value: state.nature, label: state.nature } : null}
             onChange={(opt: SingleValue<SelectOption>) => onChange({ nature: opt ? opt.value : "Hardy" })}
             options={natureOptions}
-            styles={reactSelectCompactStyles as any}
+            styles={compactStyles as any}
             placeholder="Nature"
             isSearchable
             menuPlacement="auto"
@@ -254,7 +260,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
             value={state.ability ? { value: state.ability, label: state.ability } : null}
             onChange={(opt: SingleValue<SelectOption>) => onChange({ ability: opt ? opt.value : "" })}
             options={abilityOptions}
-            styles={reactSelectCompactStyles as any}
+            styles={compactStyles as any}
             placeholder="Ability"
             isSearchable
             menuPlacement="auto"
@@ -266,7 +272,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
             value={state.item ? { value: state.item, label: state.item } : null}
             onChange={(opt: SingleValue<SelectOption>) => onChange({ item: opt ? opt.value : "" })}
             options={itemOptions}
-            styles={reactSelectCompactStyles as any}
+            styles={compactStyles as any}
             placeholder="Item"
             isClearable
             isSearchable
@@ -283,16 +289,16 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
               type="checkbox"
               checked={state.isTera}
               onChange={(e) => onChange({ isTera: e.target.checked })}
-              className="rounded border-slate-600 bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
+              className="rounded border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
             />
-            <span className="text-xs text-gray-400">Tera</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Tera</span>
           </label>
           <div className="flex-1">
             <Select<SelectOption>
               value={state.teraType ? { value: state.teraType, label: state.teraType } : null}
               onChange={(opt: SingleValue<SelectOption>) => onChange({ teraType: opt ? opt.value : null })}
               options={typeOptions}
-              styles={reactSelectCompactStyles as any}
+              styles={compactStyles as any}
               placeholder="Type"
               isClearable
               isSearchable
@@ -306,7 +312,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
             value={STATUS_OPTIONS.find((o) => o.value === state.status) || { ...STATUS_OPTIONS[0] }}
             onChange={(opt: SingleValue<SelectOption>) => onChange({ status: opt ? opt.value : "" })}
             options={[...STATUS_OPTIONS]}
-            styles={reactSelectCompactStyles as any}
+            styles={compactStyles as any}
             isSearchable={false}
             menuPlacement="auto"
           />
@@ -332,7 +338,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
           onChange={(e) =>
             onChange({ curHP: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })
           }
-          className="w-12 bg-slate-700 border border-slate-600 rounded text-gray-200 text-xs text-center py-0.5 focus:border-emerald-500 focus:outline-none"
+          className="w-12 bg-white border border-gray-300 text-gray-800 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-200 rounded text-xs text-center py-0.5 focus:border-emerald-500 focus:outline-none"
         />
       </div>
 

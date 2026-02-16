@@ -116,7 +116,7 @@ public class TeamExportService {
         // Build opponent plan data
         List<ExportDTO.OpponentPlanData> opponentPlans = new ArrayList<>();
         if (options.isIncludeOpponentPlans()) {
-            Optional<GamePlan> gamePlan = gamePlanRepository.findByTeamIdAndUserId(teamId, userId);
+            Optional<GamePlan> gamePlan = gamePlanRepository.findFirstByTeamIdAndUserId(teamId, userId);
             if (gamePlan.isPresent()) {
                 opponentPlans = gamePlan.get().getTeams().stream()
                         .map(gpt -> ExportDTO.OpponentPlanData.builder()

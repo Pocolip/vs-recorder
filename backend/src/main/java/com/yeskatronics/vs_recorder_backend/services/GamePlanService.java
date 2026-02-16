@@ -156,7 +156,7 @@ public class GamePlanService {
     @Transactional(readOnly = true)
     public Optional<GamePlan> getGamePlanByTeamIdAndUserId(Long teamId, Long userId) {
         log.debug("Fetching game plan for team ID: {} and user ID: {}", teamId, userId);
-        return gamePlanRepository.findByTeamIdAndUserId(teamId, userId);
+        return gamePlanRepository.findFirstByTeamIdAndUserId(teamId, userId);
     }
 
     /**
@@ -173,7 +173,7 @@ public class GamePlanService {
         log.info("Getting or creating game plan for team ID: {} and user ID: {}", teamId, userId);
 
         // Check if a game plan already exists for this team
-        Optional<GamePlan> existingPlan = gamePlanRepository.findByTeamIdAndUserId(teamId, userId);
+        Optional<GamePlan> existingPlan = gamePlanRepository.findFirstByTeamIdAndUserId(teamId, userId);
         if (existingPlan.isPresent()) {
             log.info("Found existing game plan ID: {} for team ID: {}", existingPlan.get().getId(), teamId);
             return existingPlan.get();
@@ -190,7 +190,6 @@ public class GamePlanService {
 
         GamePlan savedPlan = gamePlanRepository.save(newPlan);
         log.info("Created new game plan ID: {} for team ID: {}", savedPlan.getId(), teamId);
-
         return savedPlan;
     }
 

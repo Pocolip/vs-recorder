@@ -70,7 +70,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
             {/* Stat label */}
             <div
               className={`flex items-center font-medium ${
-                isNaturePlus ? "text-red-400" : isNatureMinus ? "text-blue-400" : "text-gray-300"
+                isNaturePlus ? "text-red-400" : isNatureMinus ? "text-blue-400" : "text-gray-700 dark:text-gray-300"
               }`}
             >
               {STAT_LABELS[stat]}
@@ -79,7 +79,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
             </div>
 
             {/* Base */}
-            <div className="text-gray-400 text-center flex items-center justify-center">
+            <div className="text-gray-500 dark:text-gray-400 text-center flex items-center justify-center">
               {base || "-"}
             </div>
 
@@ -90,7 +90,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
               max={31}
               value={ivs[stat]}
               onChange={(e) => handleIvChange(stat, e.target.value)}
-              className="bg-slate-700 border border-slate-600 rounded text-gray-200 text-center w-full px-0.5 py-0.5 focus:border-emerald-500 focus:outline-none"
+              className="bg-white border border-gray-300 text-gray-800 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-200 rounded text-center w-full px-0.5 py-0.5 focus:border-emerald-500 focus:outline-none"
             />
 
             {/* EV */}
@@ -101,7 +101,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
               step={4}
               value={evs[stat]}
               onChange={(e) => handleEvChange(stat, e.target.value)}
-              className="bg-slate-700 border border-slate-600 rounded text-gray-200 text-center w-full px-0.5 py-0.5 focus:border-emerald-500 focus:outline-none"
+              className="bg-white border border-gray-300 text-gray-800 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-200 rounded text-center w-full px-0.5 py-0.5 focus:border-emerald-500 focus:outline-none"
             />
 
             {/* Boost */}
@@ -109,7 +109,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
               <select
                 value={boosts[stat as keyof BoostSpread] || 0}
                 onChange={(e) => handleBoostChange(stat as keyof BoostSpread, e.target.value)}
-                className="bg-slate-700 border border-slate-600 rounded text-gray-200 text-center text-xs py-0.5 focus:border-emerald-500 focus:outline-none"
+                className="bg-white border border-gray-300 text-gray-800 dark:bg-slate-700 dark:border-slate-600 dark:text-gray-200 rounded text-center text-xs py-0.5 focus:border-emerald-500 focus:outline-none"
               >
                 {BOOST_OPTIONS.map((b) => (
                   <option key={b} value={b}>
@@ -122,7 +122,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
             )}
 
             {/* Total */}
-            <div className="text-emerald-400 font-mono text-center flex items-center justify-center">
+            <div className="text-emerald-600 dark:text-emerald-400 font-mono text-center flex items-center justify-center">
               {finalStat || "-"}
             </div>
           </div>
@@ -130,9 +130,9 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
       })}
 
       {/* EV total */}
-      <div className="flex justify-between mt-1 pt-1 border-t border-slate-700">
+      <div className="flex justify-between mt-1 pt-1 border-t border-gray-200 dark:border-slate-700">
         <span className="text-gray-500">EVs:</span>
-        <span className={evTotal > 510 ? "text-red-400" : "text-gray-400"}>
+        <span className={evTotal > 510 ? "text-red-400" : "text-gray-500 dark:text-gray-400"}>
           {evTotal}/510 ({evRemaining >= 0 ? evRemaining : 0} left)
         </span>
       </div>

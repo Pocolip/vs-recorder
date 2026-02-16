@@ -44,7 +44,7 @@ const toggleBtnClass = (active: boolean) =>
   `px-1.5 py-0.5 text-xs rounded transition-colors ${
     active
       ? "bg-emerald-600 text-white"
-      : "bg-slate-700 text-gray-400 hover:bg-slate-600"
+      : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-400 dark:hover:bg-slate-600"
   }`;
 
 const FieldPanel: React.FC<FieldPanelProps> = ({ fieldState, onChange }) => {
@@ -179,7 +179,7 @@ const SideEffectsBlock: React.FC<SideEffectsBlockProps> = ({ label, side, onSide
             className={`w-full text-left px-1.5 py-0.5 text-xs rounded transition-colors ${
               active
                 ? "bg-emerald-600 text-white"
-                : "bg-slate-700 text-gray-400 hover:bg-slate-600"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-400 dark:hover:bg-slate-600"
             }`}
           >
             {effect.label}

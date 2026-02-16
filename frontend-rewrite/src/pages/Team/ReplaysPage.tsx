@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Calendar, Copy, Check } from "lucide-react";
+import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import CompactReplayCard from "../../components/team/CompactReplayCard";
@@ -119,8 +120,10 @@ export default function ReplaysPage() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-      {/* Section header */}
+    <>
+      <PageMeta title="Replays | VS Recorder" description="View team replays" />
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        {/* Section header */}
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
@@ -197,5 +200,6 @@ export default function ReplaysPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
