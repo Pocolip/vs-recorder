@@ -205,5 +205,13 @@
   "tatsugiri-stretchy": { "id": 978, "form": 2 },
 
   "polteageist": { "id": 855, "form": 0 },
-  "polteageist-antique": { "id": 855, "form": 0 }
+  "polteageist-antique": { "id": 855, "form": 0 },
+
+  "palafin": { "id": 964, "form": 0 },
+  "palafin-zero": { "id": 964, "form": 0 },
+  "palafin-hero": { "id": 964, "form": 1 },
+
+  "maushold": { "id": 925, "form": 0 },
+  "maushold-family-of-three": { "id": 925, "form": 0 },
+  "maushold-family-of-four": { "id": 925, "form": 1 }
 }
