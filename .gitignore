@@ -9,6 +9,7 @@ build/
 # H2
 data/
 !frontend/src/data/
+!frontend-rewrite/src/data/
 
 # Environment files
 .env
