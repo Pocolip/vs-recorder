@@ -18,7 +18,9 @@ import java.util.List;
  * Contains multiple opponent teams and planned compositions.
  */
 @Entity
-@Table(name = "game_plans")
+@Table(name = "game_plans", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"team_id", "user_id"}, name = "uk_game_plan_team_user")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
