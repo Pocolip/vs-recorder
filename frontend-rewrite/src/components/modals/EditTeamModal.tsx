@@ -44,6 +44,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingWarning, setPendingWarning] = useState<PendingWarning | null>(null);
+  const [usernameWarning, setUsernameWarning] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -57,6 +58,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
       setPreviewNames(null);
       setError(null);
       setPendingWarning(null);
+      setUsernameWarning(false);
     }
   }, [isOpen, team]);
 
@@ -82,6 +84,15 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [pokepaste]);
+
+  const handleUsernamesChange = (newTags: string[]) => {
+    if (newTags.length === 0) {
+      setUsernameWarning(true);
+      return;
+    }
+    setUsernameWarning(false);
+    setShowdownUsernames(newTags);
+  };
 
   const isValidUrl = pokepaste === "" || pokepasteService.isValidPokepasteUrl(pokepaste);
 
@@ -339,10 +350,16 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
           <Label>Showdown Usernames</Label>
           <TagInput
             tags={showdownUsernames}
-            onTagsChange={setShowdownUsernames}
+            onTagsChange={handleUsernamesChange}
             placeholder="Type a username and press Enter..."
           />
-          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Press Enter after each username to add it.</p>
+          {usernameWarning ? (
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              At least one Showdown username is required — we use these to identify your side in replays.
+            </p>
+          ) : (
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Press Enter after each username to add it.</p>
+          )}
         </div>
 
         {/* Error */}

@@ -39,6 +39,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsMobile(mobile);
       if (!mobile) {
         setIsMobileOpen(false);
+        document.body.style.overflow = "";
       }
     };
 
@@ -55,7 +56,11 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const toggleMobileSidebar = () => {
-    setIsMobileOpen((prev) => !prev);
+    setIsMobileOpen((prev) => {
+      const next = !prev;
+      document.body.style.overflow = next ? "hidden" : "";
+      return next;
+    });
   };
 
   const toggleSubmenu = (item: string) => {
