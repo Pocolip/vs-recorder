@@ -141,9 +141,9 @@ const POKEMON_FORM_MAPPINGS: Record<string, string> = {
   // Misc
   "Palafin": "palafin-hero",
   "Mimikyu": "mimikyu-disguised",
-  "Tauros-Paldea-Aqua": "tauros-paldea-aqua-breed",
-  "Tauros-Paldea-Blaze": "tauros-paldea-blaze-breed",
-  "Tauros-Paldea-Combat": "tauros-paldea-combat-breed",
+  "Tauros-Paldea-Aqua": "tauros-paldea-aqua",
+  "Tauros-Paldea-Blaze": "tauros-paldea-blaze",
+  "Tauros-Paldea-Combat": "tauros-paldea-combat",
   "Vivillon-Pokeball": "vivillon",
   "Eiscue": "eiscue-ice",
   "Lycanroc": "lycanroc-midday",

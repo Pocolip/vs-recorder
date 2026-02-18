@@ -2,12 +2,23 @@ package com.yeskatronics.vs_recorder_backend.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test ReplayMatcher with real Bo3 battle logs
  */
 class ReplayMatcherTest {
+
+    private String loadTestFile(String filename) throws IOException {
+        Path path = Paths.get("src/test/resources/replays", filename);
+        return Files.readString(path);
+    }
 
     // Sample from actual Bo3 - Game 1
     private static final String GAME1_LOG = """
@@ -131,5 +142,72 @@ class ReplayMatcherTest {
 
         assertFalse(info.isBo3());
         assertNull(info.getMatchId());
+    }
+
+    // ==========================================================================
+    // extractBattleData tests
+    // ==========================================================================
+
+    /**
+     * Real replay where both players have Ogerpon-Hearthflame and both terastallize.
+     * After tera, subsequent |switch| lines show "Ogerpon-Hearthflame-Tera" which
+     * must NOT be counted as a separate pick from "Ogerpon-Hearthflame".
+     *
+     * Source: gen9vgc2026regfbo3-2523396202
+     */
+    @Test
+    void testExtractBattleData_ogerponTeraFormNotDuplicatedInPicks() throws IOException {
+        String log = loadTestFile("bo1/ogerpon-tera.json");
+        ReplayMatcher.BattleData data = ReplayMatcher.extractBattleData(log, List.of("jonnybeblood"));
+
+        // p1 picks: Ogerpon-Hearthflame, Regidrago, Urshifu-Rapid-Strike, Rillaboom
+        List<String> p1Picks = data.getActualPicks().get("p1");
+        assertEquals(4, p1Picks.size(), "p1 should have exactly 4 picks");
+        assertTrue(p1Picks.contains("Ogerpon-Hearthflame"),
+                "p1 picks should contain Ogerpon-Hearthflame (not -Tera variant)");
+        assertFalse(p1Picks.contains("Ogerpon-Hearthflame-Tera"),
+                "p1 picks must NOT contain Ogerpon-Hearthflame-Tera as a separate entry");
+        assertTrue(p1Picks.contains("Regidrago"));
+        assertTrue(p1Picks.contains("Urshifu-Rapid-Strike"));
+        assertTrue(p1Picks.contains("Rillaboom"));
+
+        // p2 picks: Flutter Mane, Ogerpon-Hearthflame, Incineroar, Raging Bolt
+        List<String> p2Picks = data.getActualPicks().get("p2");
+        assertEquals(4, p2Picks.size(), "p2 should have exactly 4 picks");
+        assertTrue(p2Picks.contains("Ogerpon-Hearthflame"),
+                "p2 picks should contain Ogerpon-Hearthflame (not -Tera variant)");
+        assertFalse(p2Picks.contains("Ogerpon-Hearthflame-Tera"),
+                "p2 picks must NOT contain Ogerpon-Hearthflame-Tera as a separate entry");
+    }
+
+    @Test
+    void testExtractBattleData_ogerponTeraPositionMappingResolved() throws IOException {
+        String log = loadTestFile("bo1/ogerpon-tera.json");
+        ReplayMatcher.BattleData data = ReplayMatcher.extractBattleData(log, List.of("jonnybeblood"));
+
+        // Tera events should reference the team roster name, not the -Tera variant
+        List<ReplayMatcher.TeraEvent> p1Tera = data.getTeraEvents().get("p1");
+        assertEquals(1, p1Tera.size());
+        assertEquals("Ogerpon-Hearthflame", p1Tera.get(0).getPokemon(),
+                "Tera event should reference team roster name");
+        assertEquals("fire", p1Tera.get(0).getType());
+
+        List<ReplayMatcher.TeraEvent> p2Tera = data.getTeraEvents().get("p2");
+        assertEquals(1, p2Tera.size());
+        assertEquals("Ogerpon-Hearthflame", p2Tera.get(0).getPokemon(),
+                "Tera event should reference team roster name");
+    }
+
+    @Test
+    void testExtractBattleData_moveUsageUsesResolvedName() throws IOException {
+        String log = loadTestFile("bo1/ogerpon-tera.json");
+        ReplayMatcher.BattleData data = ReplayMatcher.extractBattleData(log, List.of("jonnybeblood"));
+
+        // Moves used after tera should be tracked under "Ogerpon-Hearthflame", not "-Tera"
+        var p1Moves = data.getMoveUsage().get("p1");
+        assertTrue(p1Moves.containsKey("Ogerpon-Hearthflame"),
+                "Move usage should be keyed by team roster name");
+        assertFalse(p1Moves.containsKey("Ogerpon-Hearthflame-Tera"),
+                "Move usage must NOT have a separate -Tera key");
     }
 }

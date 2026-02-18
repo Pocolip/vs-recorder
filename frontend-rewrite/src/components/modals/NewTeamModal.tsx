@@ -78,7 +78,7 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({ isOpen, onClose, onCreated 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !pokepaste.trim() || !pokepasteService.isValidPokepasteUrl(pokepaste)) return;
+    if (!name.trim() || !pokepaste.trim() || !pokepasteService.isValidPokepasteUrl(pokepaste) || showdownUsernames.length === 0) return;
 
     setSubmitting(true);
     setError(null);
@@ -99,7 +99,7 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({ isOpen, onClose, onCreated 
     }
   };
 
-  const canSubmit = name.trim() && pokepaste.trim() && pokepasteService.isValidPokepasteUrl(pokepaste) && !submitting;
+  const canSubmit = name.trim() && pokepaste.trim() && pokepasteService.isValidPokepasteUrl(pokepaste) && showdownUsernames.length > 0 && !submitting;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg p-6 sm:p-8">
@@ -171,13 +171,17 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({ isOpen, onClose, onCreated 
 
         {/* Showdown Usernames */}
         <div>
-          <Label>Showdown Usernames</Label>
+          <Label>
+            Showdown Usernames <span className="text-red-500">*</span>
+          </Label>
           <TagInput
             tags={showdownUsernames}
             onTagsChange={setShowdownUsernames}
             placeholder="Type a username and press Enter..."
           />
-          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Press Enter after each username to add it.</p>
+          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+            Required — we use these to identify your side in replays. Press Enter after each username.
+          </p>
         </div>
 
         {/* Error */}
