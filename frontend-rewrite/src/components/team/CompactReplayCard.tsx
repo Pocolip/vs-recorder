@@ -53,7 +53,7 @@ const CompactReplayCard: React.FC<CompactReplayCardProps> = ({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]">
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center gap-3 min-w-0">
           {/* Result Badge */}
@@ -148,7 +148,7 @@ const CompactReplayCard: React.FC<CompactReplayCardProps> = ({
         <button
           type="button"
           onClick={() => setIsNoteExpanded(!isNoteExpanded)}
-          className={`mt-3 flex w-full items-start gap-1.5 border-t border-gray-100 pt-2 text-left dark:border-gray-800 ${
+          className={`mt-3 flex w-full min-w-0 items-start gap-1.5 border-t border-gray-100 pt-2 text-left dark:border-gray-800 ${
             isNoteExpanded ? "rounded-b-lg bg-gray-50 p-2 dark:bg-white/[0.02]" : ""
           }`}
         >
@@ -158,7 +158,7 @@ const CompactReplayCard: React.FC<CompactReplayCardProps> = ({
             }`}
           />
           <p
-            className={`text-xs ${
+            className={`min-w-0 text-xs ${
               isNoteExpanded
                 ? "whitespace-pre-wrap break-words text-gray-600 dark:text-gray-300"
                 : "truncate text-gray-400 dark:text-gray-500"

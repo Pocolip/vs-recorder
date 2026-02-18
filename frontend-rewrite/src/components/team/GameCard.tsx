@@ -123,7 +123,7 @@ export default function GameCard({
   const eloData = getEloData();
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
       {/* Main row with all data */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-center">
         {/* Result + Opponent + Time + Replay Link */}
@@ -152,7 +152,7 @@ export default function GameCard({
         <div className="lg:col-span-4">
           <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">Opposing Team</p>
           <div className="rounded border border-gray-200 bg-white/50 px-1.5 py-1 dark:border-gray-600 dark:bg-gray-700/30">
-            <div className="flex justify-evenly">
+            <div className="grid grid-cols-3 place-items-center sm:flex sm:justify-evenly">
               {teamData.opponentTeam.map((pokemon, index) => (
                 <PokemonSprite key={index} name={cleanPokemonName(pokemon)} size="md" />
               ))}
@@ -275,7 +275,7 @@ export default function GameCard({
               <ChevronDown
                 className={`mt-0.5 h-3 w-3 shrink-0 text-gray-400 transition-transform ${isNoteExpanded ? "rotate-180" : ""}`}
               />
-              <p className={`text-xs ${isNoteExpanded ? "whitespace-pre-wrap break-words text-gray-700 dark:text-gray-300" : "truncate text-gray-500 dark:text-gray-400"}`}>
+              <p className={`min-w-0 text-xs ${isNoteExpanded ? "whitespace-pre-wrap break-words text-gray-700 dark:text-gray-300" : "truncate text-gray-500 dark:text-gray-400"}`}>
                 {replay.notes}
               </p>
             </button>

@@ -311,16 +311,16 @@ function LeadPairSection({
       {stats.length > 0 ? (
         <div className="space-y-3">
           {stats.map((stat, index) => (
-            <div key={stat.pair} className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-gray-700/50">
-              <div className="flex items-center gap-3">
-                <span className={`w-4 text-sm ${rankColor}`}>#{index + 1}</span>
-                <div className="flex items-center gap-2">
+            <div key={stat.pair} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white p-3 dark:bg-gray-700/50">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className={`w-4 shrink-0 text-sm ${rankColor}`}>#{index + 1}</span>
+                <div className="flex shrink-0 items-center gap-2">
                   <PokemonSprite name={stat.pokemon1} size="sm" />
                   <span className="text-gray-400">+</span>
                   <PokemonSprite name={stat.pokemon2} size="sm" />
                 </div>
-                <div>
-                  <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                <div className="min-w-0">
+                  <div className="hidden text-sm font-medium text-gray-800 sm:block dark:text-gray-100">
                     {getDisplayName(stat.pokemon1)} + {getDisplayName(stat.pokemon2)}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
