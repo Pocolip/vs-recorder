@@ -108,14 +108,6 @@
   "oinkologne-female": { "id": 916, "form": 1 },
   "oinkologne-f": { "id": 916, "form": 1 },
 
-  "palafin": { "id": 964, "form": 0 },
-  "palafin-zero": { "id": 964, "form": 0 },
-  "palafin-hero": { "id": 964, "form": 1 },
-
-  "maushold": { "id": 925, "form": 0 },
-  "maushold-family-of-three": { "id": 925, "form": 0 },
-  "maushold-family-of-four": { "id": 925, "form": 1 },
-
   "ninetales": { "id": 38, "form": 0 },
   "ninetales-alola": { "id": 38, "form": 1 },
 
@@ -138,11 +130,17 @@
   "tauros": { "id": 128, "form": 0 },
   "tauros-paldea": { "id": 128, "form": 1 },
   "tauros-paldea-combat": { "id": 128, "form": 1 },
+  "tauros-paldea-combat-breed": { "id": 128, "form": 1 },
   "tauros-paldea-blaze": { "id": 128, "form": 2 },
+  "tauros-paldea-blaze-breed": { "id": 128, "form": 2 },
   "tauros-paldea-aqua": { "id": 128, "form": 3 },
+  "tauros-paldea-aqua-breed": { "id": 128, "form": 3 },
 
   "wooper": { "id": 194, "form": 0 },
   "wooper-paldea": { "id": 194, "form": 1 },
+
+  "weezing": { "id": 110, "form": 0 },
+  "weezing-galar": { "id": 110, "form": 1 },
 
   "slowbro": { "id": 80, "form": 0 },
   "slowbro-galar": { "id": 80, "form": 2 },
@@ -202,5 +200,40 @@
   "vivillon-ocean": { "id": 666, "form": 16 },
   "vivillon-jungle": { "id": 666, "form": 17 },
   "vivillon-fancy": { "id": 666, "form": 18 },
-  "vivillon-pokeball": { "id": 666, "form": 19 }
+  "vivillon-pokeball": { "id": 666, "form": 19 },
+
+  "tatsugiri": { "id": 978, "form": 0 },
+  "tatsugiri-curly": { "id": 978, "form": 0 },
+  "tatsugiri-droopy": { "id": 978, "form": 1 },
+  "tatsugiri-stretchy": { "id": 978, "form": 2 },
+
+  "palafin": { "id": 964, "form": 0 },
+  "palafin-zero": { "id": 964, "form": 0 },
+  "palafin-hero": { "id": 964, "form": 1 },
+
+  "maushold": { "id": 925, "form": 0 },
+  "maushold-family-of-three": { "id": 925, "form": 0 },
+  "maushold-family-of-four": { "id": 925, "form": 1 },
+
+  "dudunsparce": { "id": 982, "form": 0 },
+  "dudunsparce-two-segment": { "id": 982, "form": 0 },
+  "dudunsparce-three-segment": { "id": 982, "form": 1 },
+
+  "polteageist": { "id": 855, "form": 0 },
+  "polteageist-antique": { "id": 855, "form": 0 },
+
+  "toxtricity": {"id": 849, "form": 0},
+  "toxtricity-amped": {"id": 849, "form": 0},
+  "toxtricity-low-key": {"id": 849, "form": 1},
+
+  "persian": {"id": 53, "form": 0},
+  "persian-alola": {"id": 53, "form": 1},
+
+  "palafin": { "id": 964, "form": 0 },
+  "palafin-zero": { "id": 964, "form": 0 },
+  "palafin-hero": { "id": 964, "form": 1 },
+
+  "maushold": { "id": 925, "form": 0 },
+  "maushold-family-of-three": { "id": 925, "form": 0 },
+  "maushold-family-of-four": { "id": 925, "form": 1 }
 }
