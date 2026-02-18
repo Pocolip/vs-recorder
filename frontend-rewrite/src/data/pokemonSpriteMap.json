@@ -227,6 +227,13 @@
   "toxtricity-low-key": {"id": 849, "form": 1},
 
   "persian": {"id": 53, "form": 0},
-  "persian-alola": {"id": 53, "form": 1}
+  "persian-alola": {"id": 53, "form": 1},
 
+  "palafin": { "id": 964, "form": 0 },
+  "palafin-zero": { "id": 964, "form": 0 },
+  "palafin-hero": { "id": 964, "form": 1 },
+
+  "maushold": { "id": 925, "form": 0 },
+  "maushold-family-of-three": { "id": 925, "form": 0 },
+  "maushold-family-of-four": { "id": 925, "form": 1 }
 }

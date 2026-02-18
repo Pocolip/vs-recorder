@@ -108,6 +108,14 @@
   "oinkologne-female": { "id": 916, "form": 1 },
   "oinkologne-f": { "id": 916, "form": 1 },
 
+  "palafin": { "id": 964, "form": 0 },
+  "palafin-zero": { "id": 964, "form": 0 },
+  "palafin-hero": { "id": 964, "form": 1 },
+
+  "maushold": { "id": 925, "form": 0 },
+  "maushold-family-of-three": { "id": 925, "form": 0 },
+  "maushold-family-of-four": { "id": 925, "form": 1 },
+
   "ninetales": { "id": 38, "form": 0 },
   "ninetales-alola": { "id": 38, "form": 1 },
 
