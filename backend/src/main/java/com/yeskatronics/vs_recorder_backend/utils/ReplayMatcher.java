@@ -287,13 +287,17 @@ public class ReplayMatcher {
                         String speciesData = parts[3]; // "Species, L50, F" or "Species"
                         String pokemonName = speciesData.split(",")[0].trim(); // Extract species name
 
+                        // Resolve to team roster entry to handle form changes
+                        // (e.g., "Ogerpon-Hearthflame-Tera" → "Ogerpon-Hearthflame")
+                        String resolvedName = resolveToTeamEntry(data.getTeams().get(player), pokemonName);
+
                         // Store position -> species mapping for tera event lookups
-                        positionToSpecies.put(position, pokemonName);
+                        positionToSpecies.put(position, resolvedName);
 
                         // Add to actualPicks if not already there
-                        if (!switchedIn.get(player).contains(pokemonName)) {
-                            switchedIn.get(player).add(pokemonName);
-                            data.getActualPicks().get(player).add(pokemonName);
+                        if (!switchedIn.get(player).contains(resolvedName)) {
+                            switchedIn.get(player).add(resolvedName);
+                            data.getActualPicks().get(player).add(resolvedName);
                         }
                     }
                 }
@@ -368,5 +372,33 @@ public class ReplayMatcher {
         }
 
         return data;
+    }
+
+    /**
+     * Resolve a switch species name to its matching team roster entry.
+     * Handles in-battle form changes where a suffix is appended to the team entry name
+     * (e.g., "Ogerpon-Hearthflame-Tera" → "Ogerpon-Hearthflame",
+     *  future: "Charizard-Mega-Y" → "Charizard").
+     *
+     * Does NOT resolve when the switch name is a different form than the team entry
+     * (e.g., "Urshifu-Rapid-Strike" stays as-is when team has "Urshifu-*").
+     */
+    private static String resolveToTeamEntry(List<String> team, String pokemonName) {
+        if (team == null) return pokemonName;
+
+        // Exact match
+        if (team.contains(pokemonName)) {
+            return pokemonName;
+        }
+
+        // Check if any team entry is a prefix of the switch name (handles added suffixes
+        // like -Tera, -Mega-X, etc.)
+        for (String entry : team) {
+            if (pokemonName.startsWith(entry + "-")) {
+                return entry;
+            }
+        }
+
+        return pokemonName;
     }
 }
