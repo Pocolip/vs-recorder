@@ -29,6 +29,7 @@ jobs:
   version-bump:
     name: Bump Version
     runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'Merge branch ''main''')"
     outputs:
       new_version: ${{ steps.bump.outputs.version }}
       bumped: ${{ steps.bump.outputs.bumped }}
