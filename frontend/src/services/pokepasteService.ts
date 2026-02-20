@@ -395,6 +395,29 @@ export async function getCacheStats(): Promise<{
 }
 
 /**
+ * Fetch the paste title from a pokepaste or pokebin URL.
+ * Both services expose a /json endpoint with a title field.
+ */
+export async function fetchPasteTitle(pasteUrl: string): Promise<string | null> {
+  const detected = detectPasteService(pasteUrl);
+  if (!detected) return null;
+
+  const jsonUrl =
+    detected.type === "pokepaste"
+      ? `https://pokepast.es/${detected.pasteId}/json`
+      : `https://pokebin.com/${detected.pasteId}/json`;
+
+  try {
+    const res = await fetch(jsonUrl);
+    if (!res.ok) return null;
+    const json = await res.json() as { title?: string | null };
+    return json.title || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Get Pokemon names from a paste URL (simplified interface)
  */
 export async function getPokemonNames(
