@@ -88,11 +88,10 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
 
       setLoadingTitle(true);
       try {
-        const parsed = await pokepasteService.fetchAndParse(
+        const title = await pokepasteService.fetchPasteTitle(
           opponentTeam.pokepaste,
         );
-        const firstMon = parsed[0];
-        setPasteTitle(firstMon?.name || null);
+        setPasteTitle(title);
       } catch {
         setPasteTitle(null);
       } finally {

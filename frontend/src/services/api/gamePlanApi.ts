@@ -38,7 +38,7 @@ export const gamePlanApi = {
   getTeams: (gamePlanId: number) =>
     apiClient.get(`/api/game-plans/${gamePlanId}/teams`) as Promise<GamePlanTeam[]>,
 
-  addTeam: (gamePlanId: number, data: { pokepaste: string; playerName: string; notes?: string }) =>
+  addTeam: (gamePlanId: number, data: { pokepaste: string; playerName: string; notes?: string; color?: string }) =>
     apiClient.post(`/api/game-plans/${gamePlanId}/teams`, data) as Promise<GamePlanTeam>,
 
   updateTeam: (gamePlanId: number, teamId: number, updates: Partial<GamePlanTeam>) =>
