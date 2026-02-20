@@ -91,6 +91,7 @@ export const useOpponentTeams = (
       pokepaste: data.pokepaste,
       playerName: "",
       notes: data.notes || "",
+      color: data.color,
     });
 
     const transformedTeam = transformTeam(newTeam);
