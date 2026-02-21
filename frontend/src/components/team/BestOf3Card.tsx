@@ -170,30 +170,27 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
   return (
     <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50">
       {/* Header row */}
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
           <span className={matchSummary.className}>{matchSummary.text}</span>
-          <div className="text-center sm:text-left">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-              vs {match.opponent || "Unknown Opponent"}
-            </h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <span>{formatTimeAgo(match.updatedAt || match.createdAt)}</span>
-              {isComplete ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              ) : (
-                <>
-                  <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                  <span>Incomplete</span>
-                </>
-              )}
-            </div>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            vs {match.opponent || "Unknown Opponent"}
+          </h3>
         </div>
-
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <Trophy className="h-4 w-4" />
-          <span>{replayCount} games</span>
+        <div className="flex items-center justify-center gap-3 text-sm text-gray-500 sm:justify-end dark:text-gray-400">
+          <div className="flex items-center gap-1">
+            <Trophy className="h-4 w-4" />
+            <span>{replayCount} games</span>
+          </div>
+          <span>{formatTimeAgo(match.updatedAt || match.createdAt)}</span>
+          {isComplete ? (
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+          ) : (
+            <div className="flex items-center gap-1">
+              <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <span>Incomplete</span>
+            </div>
+          )}
         </div>
       </div>
 
