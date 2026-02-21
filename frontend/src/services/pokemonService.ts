@@ -88,6 +88,12 @@ export async function getPokemon(identifier: string | number): Promise<PokemonDa
     return cached.data;
   }
 
+  // Check static fallback before hitting API (avoids 404s for form-Pokemon like landorus, urshifu)
+  const staticKey = typeof normalizedId === "string" ? normalizedId : String(normalizedId);
+  if (COMMON_VGC_POKEMON[staticKey]) {
+    return enrichFallbackData(COMMON_VGC_POKEMON[staticKey], staticKey);
+  }
+
   // Try to fetch from API
   try {
     await initialize();
@@ -101,11 +107,9 @@ export async function getPokemon(identifier: string | number): Promise<PokemonDa
     console.warn(`Failed to fetch Pokemon from API: ${identifier}`, error);
   }
 
-  // Fallback to static data
-  const staticKey = typeof identifier === "string" ? identifier.toLowerCase() : String(identifier);
+  // Fallback to static data (for any not caught above)
   if (COMMON_VGC_POKEMON[staticKey]) {
-    const fallbackData = enrichFallbackData(COMMON_VGC_POKEMON[staticKey], staticKey);
-    return fallbackData;
+    return enrichFallbackData(COMMON_VGC_POKEMON[staticKey], staticKey);
   }
 
   // Fallback to sprite map
