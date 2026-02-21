@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.yeskatronics</groupId>
     <artifactId>vs-recorder-backend</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <name>vs-recorder-backend</name>
     <description>Backend API for VS Recorder</description>
     <properties>
