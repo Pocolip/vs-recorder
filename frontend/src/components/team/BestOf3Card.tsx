@@ -171,9 +171,9 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
     <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50">
       {/* Header row */}
       <div className="mb-4 flex items-start justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
           <span className={matchSummary.className}>{matchSummary.text}</span>
-          <div>
+          <div className="text-center sm:text-left">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               vs {match.opponent || "Unknown Opponent"}
             </h3>
