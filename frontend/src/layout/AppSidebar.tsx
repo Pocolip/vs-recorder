@@ -13,6 +13,8 @@ import {
   X,
 } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import { HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
@@ -32,8 +34,8 @@ type SubItem = {
   dividerAfter?: boolean;
 };
 
-/* ── Droppable sidebar folder item ── */
-function DroppableFolderItem({
+/* ── Sortable + droppable sidebar folder item ── */
+function SortableFolderItem({
   folder,
   isActive,
   isVisible,
@@ -46,7 +48,22 @@ function DroppableFolderItem({
   onRename: (id: number, name: string) => void;
   onDelete: (id: number) => void;
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `folder-${folder.id}`, data: { folderId: folder.id } });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+  } = useSortable({ id: `folder-${folder.id}`, data: { folderId: folder.id } });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(folder.name);
@@ -74,7 +91,7 @@ function DroppableFolderItem({
 
   if (editing && isVisible) {
     return (
-      <div className="flex items-center gap-1 px-2">
+      <div ref={setNodeRef} style={style} className="flex items-center gap-1 px-2">
         <input
           ref={inputRef}
           value={editName}
@@ -96,12 +113,14 @@ function DroppableFolderItem({
   }
 
   return (
-    <div ref={setNodeRef} className="relative group">
+    <div ref={setNodeRef} style={style} className="relative group">
       <Link
         to={`/?folder=${folder.id}`}
         className={`menu-item group ${
           isActive ? "menu-item-active" : "menu-item-inactive"
         } ${isOver ? "ring-2 ring-brand-400 ring-inset" : ""}`}
+        {...attributes}
+        {...listeners}
       >
         <span
           className={`menu-item-icon-size ${
@@ -119,7 +138,7 @@ function DroppableFolderItem({
 
       {/* ⋯ menu */}
       {isVisible && (
-        <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" ref={menuRef}>
+        <div className={`absolute right-1 top-1/2 -translate-y-1/2 transition-opacity z-50 ${showMenu ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} ref={menuRef}>
           <button
             onClick={(e) => { e.preventDefault(); setShowMenu((v) => !v); }}
             className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -196,6 +215,7 @@ const AppSidebar: React.FC = () => {
   const isVisible = isExpanded || isHovered || isMobileOpen;
   const activeFolderId = searchParams.get("folder") ? Number(searchParams.get("folder")) : null;
   const isHomePage = location.pathname === "/" && !activeFolderId;
+  const isDashboard = location.pathname === "/";
 
   useEffect(() => {
     if (creatingFolder && newFolderRef.current) newFolderRef.current.focus();
@@ -343,30 +363,35 @@ const AppSidebar: React.FC = () => {
                     <DroppableHomeItem isActive={isHomePage} isVisible={isVisible} />
                   </li>
 
-                  {/* Folders section */}
-                  {folders.length > 0 && (
+                  {/* Folders section (dashboard only) */}
+                  {isDashboard && folders.length > 0 && (
                     <li>
                       {isVisible && (
                         <hr className="mb-3 border-gray-200 dark:border-gray-700" />
                       )}
-                      <ul className="flex flex-col gap-1">
-                        {folders.map((folder) => (
-                          <li key={folder.id}>
-                            <DroppableFolderItem
-                              folder={folder}
-                              isActive={activeFolderId === folder.id}
-                              isVisible={isVisible}
-                              onRename={handleRenameFolder}
-                              onDelete={(id) => setFolderToDelete(folders.find((f) => f.id === id) || null)}
-                            />
-                          </li>
-                        ))}
-                      </ul>
+                      <SortableContext
+                        items={folders.map((f) => `folder-${f.id}`)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <ul className="flex flex-col gap-1">
+                          {folders.map((folder) => (
+                            <li key={folder.id}>
+                              <SortableFolderItem
+                                folder={folder}
+                                isActive={activeFolderId === folder.id}
+                                isVisible={isVisible}
+                                onRename={handleRenameFolder}
+                                onDelete={(id) => setFolderToDelete(folders.find((f) => f.id === id) || null)}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </SortableContext>
                     </li>
                   )}
 
-                  {/* New folder inline input */}
-                  {isVisible && (
+                  {/* New folder inline input (dashboard only) */}
+                  {isDashboard && isVisible && (
                     <li>
                       {creatingFolder ? (
                         <div className="flex items-center gap-1 px-2">

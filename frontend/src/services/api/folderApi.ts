@@ -13,6 +13,9 @@ export const folderApi = {
 
   delete: (id: number) =>
     apiClient.delete(`/api/folders/${id}`) as Promise<void>,
+
+  reorder: (folderIds: number[]) =>
+    apiClient.put("/api/folders/reorder", { folderIds }) as Promise<void>,
 };
 
 export default folderApi;

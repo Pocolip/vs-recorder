@@ -9,6 +9,7 @@ interface FolderContextType {
   createFolder: (name: string) => Promise<Folder>;
   renameFolder: (id: number, name: string) => Promise<Folder>;
   deleteFolder: (id: number) => Promise<void>;
+  reorderFolders: (orderedIds: number[]) => Promise<void>;
   /** Bumped when teams are added/removed from folders so both sidebar and homepage can react */
   dataVersion: number;
   bumpDataVersion: () => void;
@@ -37,15 +38,13 @@ export const FolderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const createFolder = useCallback(async (name: string) => {
     const folder = await folderApi.create(name);
-    setFolders((prev) => [...prev, folder].sort((a, b) => a.name.localeCompare(b.name)));
+    setFolders((prev) => [...prev, folder]);
     return folder;
   }, []);
 
   const renameFolder = useCallback(async (id: number, name: string) => {
     const updated = await folderApi.update(id, name);
-    setFolders((prev) =>
-      prev.map((f) => (f.id === id ? updated : f)).sort((a, b) => a.name.localeCompare(b.name))
-    );
+    setFolders((prev) => prev.map((f) => (f.id === id ? updated : f)));
     return updated;
   }, []);
 
@@ -53,6 +52,27 @@ export const FolderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     await folderApi.delete(id);
     setFolders((prev) => prev.filter((f) => f.id !== id));
   }, []);
+
+  const reorderFolders = useCallback(async (orderedIds: number[]) => {
+    // Optimistically reorder local state
+    setFolders((prev) => {
+      const folderMap = new Map(prev.map((f) => [f.id, f]));
+      return orderedIds
+        .map((id, i) => {
+          const folder = folderMap.get(id);
+          return folder ? { ...folder, position: i } : null;
+        })
+        .filter((f): f is Folder => f !== null);
+    });
+
+    try {
+      await folderApi.reorder(orderedIds);
+    } catch (err) {
+      console.error("Failed to reorder folders:", err);
+      // Refresh from server on error
+      await refreshFolders();
+    }
+  }, [refreshFolders]);
 
   const bumpDataVersion = useCallback(() => {
     setDataVersion((v) => v + 1);
@@ -67,6 +87,7 @@ export const FolderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         createFolder,
         renameFolder,
         deleteFolder,
+        reorderFolders,
         dataVersion,
         bumpDataVersion,
       }}

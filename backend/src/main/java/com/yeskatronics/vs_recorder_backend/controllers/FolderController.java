@@ -72,6 +72,16 @@ public class FolderController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/reorder")
+    public ResponseEntity<Void> reorderFolders(
+            Authentication authentication,
+            @Valid @RequestBody FolderDTO.ReorderRequest request) {
+
+        Long userId = getCurrentUserId(authentication);
+        folderService.reorderFolders(userId, request.getFolderIds());
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFolder(
             @PathVariable Long id,

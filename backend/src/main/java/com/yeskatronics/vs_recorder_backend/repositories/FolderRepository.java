@@ -10,7 +10,9 @@ import java.util.Optional;
 @Repository
 public interface FolderRepository extends JpaRepository<Folder, Long> {
 
-    List<Folder> findByUserIdOrderByNameAsc(Long userId);
+    List<Folder> findByUserIdOrderByPositionAsc(Long userId);
 
     Optional<Folder> findByIdAndUserId(Long id, Long userId);
+
+    int countByUserId(Long userId);
 }

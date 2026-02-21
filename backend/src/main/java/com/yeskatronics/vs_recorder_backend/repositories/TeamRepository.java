@@ -62,4 +62,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     @Query("SELECT COUNT(t) FROM Team t JOIN t.folders f WHERE f.id = :folderId")
     int countByFolderId(Long folderId);
+
+    @Query("SELECT t FROM Team t JOIN t.folders f WHERE f.id = :folderId")
+    List<Team> findByFolderId(Long folderId);
 }
