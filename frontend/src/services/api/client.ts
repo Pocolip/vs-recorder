@@ -24,6 +24,18 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
+const getTokenExpiryMs = (token: string): number | null => {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+    if (typeof payload.exp !== "number") return null;
+    return payload.exp * 1000;
+  } catch {
+    return null;
+  }
+};
+
 const refreshAccessToken = async (): Promise<string> => {
   const refreshToken = localStorage.getItem("refreshToken");
   if (!refreshToken) {
@@ -50,25 +62,65 @@ const clearAuthAndRedirect = () => {
   window.location.href = "/signin";
 };
 
-// Request interceptor — attach JWT
+const REFRESH_BUFFER_MS = 5 * 60 * 1000; // 5 minutes
+
+// Request interceptor — proactively refresh near-expiry tokens before sending
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
+    const requestUrl: string = config.url || "";
+    const isAuthEndpoint =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register") ||
+      requestUrl.includes("/auth/refresh");
+    if (isAuthEndpoint) return config;
+
     const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (!token) return config;
+
+    const expiryMs = getTokenExpiryMs(token);
+    const isExpiredOrNearExpiry = expiryMs === null || Date.now() >= expiryMs - REFRESH_BUFFER_MS;
+
+    if (isExpiredOrNearExpiry) {
+      if (isRefreshing) {
+        // Another request is already refreshing — queue this one
+        const newToken = await new Promise<string>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        });
+        config.headers.Authorization = `Bearer ${newToken}`;
+        return config;
+      }
+
+      isRefreshing = true;
+      try {
+        const newToken = await refreshAccessToken();
+        processQueue(null, newToken);
+        config.headers.Authorization = `Bearer ${newToken}`;
+        return config;
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        clearAuthAndRedirect();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
+    config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// Response interceptor — unwrap data, handle 401 with refresh
+// Response interceptor — unwrap data, handle 401/403 with refresh as safety net
 apiClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      (error.response?.status === 401 || error.response?.status === 403) &&
+      !originalRequest._retry
+    ) {
       const requestUrl: string = originalRequest?.url || "";
       const isAuthEndpoint =
         requestUrl.includes("/auth/login") ||
