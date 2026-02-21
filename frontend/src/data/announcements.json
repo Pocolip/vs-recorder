@@ -1,0 +1,14 @@
+[
+  {
+    "id": "2026-02-21-new-features",
+    "date": "2026-02-21",
+    "title": "New Enhancements: Announcement Alerts, Team Folders, Match by Match tweaks",
+    "message": "Welcome to VS Recorder! I've added this announcement alert so that you don't have to follow socials to get new info. Feel free to check the footer for a link to past announcements (this is the real first one though). As for new features: Team Folders! You can create/delete folders, drag teams into folders to organize them (drag them out to Home or simply hit that X button on the team to remove them), and you should also see the latest modified team as the first one listed. You can also order folders by dragging them around. I've also updated the Match by Match page: picks for you and your opponent will be displayed, the filter has been enhanced to find tags and users, and it should also be a bit more mobile friendly."
+  },
+  {
+    "id": "2026-01-01-announcements-page",
+    "date": "2026-01-01",
+    "title": "Announcements Page",
+    "message": "You can now stay up to date with VS Recorder news right from the app. Check the Announcements link in the footer to see past and future updates."
+  }
+]

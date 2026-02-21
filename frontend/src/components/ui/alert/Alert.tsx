@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { X } from "lucide-react";
 
 interface AlertProps {
   variant: "success" | "error" | "warning" | "info"; // Alert type
@@ -7,6 +8,7 @@ interface AlertProps {
   showLink?: boolean; // Whether to show the "Learn More" link
   linkHref?: string; // Link URL
   linkText?: string; // Link text
+  onClose?: () => void; // Optional close handler
 }
 
 const Alert: React.FC<AlertProps> = ({
@@ -16,6 +18,7 @@ const Alert: React.FC<AlertProps> = ({
   showLink = false,
   linkHref = "#",
   linkText = "Learn more",
+  onClose,
 }) => {
   // Tailwind classes for each variant
   const variantClasses = {
@@ -113,14 +116,22 @@ const Alert: React.FC<AlertProps> = ({
 
   return (
     <div
-      className={`rounded-xl border p-4 ${variantClasses[variant].container}`}
+      className={`relative rounded-xl border p-4 ${variantClasses[variant].container}`}
     >
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 rounded-md p-1 text-gray-400 transition-colors hover:bg-black/5 hover:text-gray-600 dark:hover:bg-white/10 dark:hover:text-gray-200"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
       <div className="flex items-start gap-3">
         <div className={`-mt-0.5 ${variantClasses[variant].icon}`}>
           {icons[variant]}
         </div>
 
-        <div>
+        <div className={onClose ? "pr-6" : ""}>
           <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
             {title}
           </h4>
