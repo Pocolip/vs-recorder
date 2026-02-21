@@ -28,6 +28,12 @@ export const teamApi = {
 
   removeShowdownUsername: (id: number, username: string) =>
     apiClient.delete(`/api/teams/${id}/showdown-usernames/${username}`) as Promise<Team>,
+
+  addToFolder: (teamId: number, folderId: number) =>
+    apiClient.post(`/api/teams/${teamId}/folders/${folderId}`) as Promise<void>,
+
+  removeFromFolder: (teamId: number, folderId: number) =>
+    apiClient.delete(`/api/teams/${teamId}/folders/${folderId}`) as Promise<void>,
 };
 
 export default teamApi;

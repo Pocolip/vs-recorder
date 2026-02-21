@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { ExternalLink, Edit3, Save, Tag, Trophy, CheckCircle2, AlertCircle, MessageSquare } from "lucide-react";
 import PokemonTeam from "../pokemon/PokemonTeam";
+import PokemonSprite from "../pokemon/PokemonSprite";
+import TagInput from "../form/TagInput";
 import { cleanPokemonName } from "../../utils/pokemonNameUtils";
 import { formatTimeAgo } from "../../utils/timeUtils";
-import type { Match } from "../../types";
+import type { Match, Replay } from "../../types";
 
 interface BestOf3CardProps {
   match: Match;
@@ -16,6 +18,8 @@ interface GameResult {
   displayResult: string;
   resultClass: string;
   replayUrl: string;
+  userPicks: string[];
+  opponentPicks: string[];
 }
 
 function getMatchSummary(match: Match): { text: string; className: string } {
@@ -69,6 +73,7 @@ function getGameByGameResults(match: Match): GameResult[] {
 
   return sorted.map((replay) => {
     const isWin = replay.result === "win";
+    const picks = getPicksForReplay(replay);
     return {
       gameNumber: replay.gameNumber || 1,
       displayResult: isWin ? "Win" : "Loss",
@@ -76,8 +81,18 @@ function getGameByGameResults(match: Match): GameResult[] {
         ? "text-green-700 dark:text-green-400"
         : "text-red-700 dark:text-red-400",
       replayUrl: replay.url,
+      userPicks: picks.userPicks,
+      opponentPicks: picks.opponentPicks,
     };
   });
+}
+
+function getPicksForReplay(replay: Replay): { userPicks: string[]; opponentPicks: string[] } {
+  if (!replay.battleData?.actualPicks) return { userPicks: [], opponentPicks: [] };
+  const { userPlayer, opponentPlayer, actualPicks } = replay.battleData;
+  const userPicks = userPlayer && actualPicks[userPlayer]?.length ? actualPicks[userPlayer] : [];
+  const opponentPicks = opponentPlayer && actualPicks[opponentPlayer]?.length ? actualPicks[opponentPlayer] : [];
+  return { userPicks, opponentPicks };
 }
 
 function getOpponentTeam(match: Match): string[] {
@@ -94,7 +109,7 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [notesText, setNotesText] = useState(match.notes || "");
-  const [tagsText, setTagsText] = useState((match.tags || []).join(", "));
+  const [editTags, setEditTags] = useState<string[]>(match.tags || []);
   const [savingNotes, setSavingNotes] = useState(false);
   const [savingTags, setSavingTags] = useState(false);
 
@@ -113,11 +128,7 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
   const handleSaveTags = async () => {
     try {
       setSavingTags(true);
-      const tags = tagsText
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag);
-      await onUpdateTags(match.id, tags);
+      await onUpdateTags(match.id, editTags);
       setIsEditingTags(false);
     } catch (error) {
       console.error("Error saving tags:", error);
@@ -132,7 +143,7 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
   };
 
   const handleCancelTags = () => {
-    setTagsText((match.tags || []).join(", "));
+    setEditTags(match.tags || []);
     setIsEditingTags(false);
   };
 
@@ -159,30 +170,27 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
   return (
     <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50">
       {/* Header row */}
-      <div className="mb-4 flex items-start justify-between">
-        <div className="flex items-center gap-4">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
           <span className={matchSummary.className}>{matchSummary.text}</span>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-              vs {match.opponent || "Unknown Opponent"}
-            </h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <span>{formatTimeAgo(match.updatedAt || match.createdAt)}</span>
-              {isComplete ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              ) : (
-                <>
-                  <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                  <span>Incomplete</span>
-                </>
-              )}
-            </div>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            vs {match.opponent || "Unknown Opponent"}
+          </h3>
         </div>
-
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <Trophy className="h-4 w-4" />
-          <span>{replayCount} games</span>
+        <div className="flex items-center justify-center gap-3 text-sm text-gray-500 sm:justify-end dark:text-gray-400">
+          <div className="flex items-center gap-1">
+            <Trophy className="h-4 w-4" />
+            <span>{replayCount} games</span>
+          </div>
+          <span>{formatTimeAgo(match.updatedAt || match.createdAt)}</span>
+          {isComplete ? (
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+          ) : (
+            <div className="flex items-center gap-1">
+              <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <span>Incomplete</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -193,20 +201,58 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
           <h4 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">Game Results</h4>
           <div className="space-y-2">
             {gameResults.map((game) => (
-              <div key={game.gameNumber} className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-gray-700/50">
-                <div className="flex items-center gap-3">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">Game {game.gameNumber}</span>
-                  <span className={`font-bold ${game.resultClass}`}>{game.displayResult}</span>
+              <div key={game.gameNumber} className="rounded-lg bg-white dark:bg-gray-700/50">
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Game {game.gameNumber}</span>
+                    <span className={`font-bold ${game.resultClass}`}>{game.displayResult}</span>
+                  </div>
+                  <a
+                    href={game.replayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-sm text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Replay
+                  </a>
                 </div>
-                <a
-                  href={game.replayUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-sm text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-                >
-                  <ExternalLink className="h-3 w-3" />
-                  Replay
-                </a>
+                {(game.userPicks.length > 0 || game.opponentPicks.length > 0) && (
+                  <div className="flex flex-col gap-2 border-t border-gray-100 px-3 pb-2 pt-1.5 sm:flex-row sm:gap-4 dark:border-gray-600/50">
+                    <div className="flex-1">
+                      <p className="mb-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">Your Picks</p>
+                      <div className="flex gap-0.5">
+                        {game.userPicks.map((pokemon, index) => (
+                          <PokemonSprite key={index} name={cleanPokemonName(pokemon)} size="sm" />
+                        ))}
+                        {Array.from({ length: Math.max(0, 4 - game.userPicks.length) }).map((_, index) => (
+                          <div
+                            key={`empty-${index}`}
+                            className="flex h-8 w-8 items-center justify-center text-gray-300 dark:text-gray-600"
+                          >
+                            &mdash;
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="mb-0.5 text-[10px] font-medium text-red-600 dark:text-red-400">Their Picks</p>
+                      <div className="flex gap-0.5">
+                        {game.opponentPicks.map((pokemon, index) => (
+                          <PokemonSprite key={index} name={cleanPokemonName(pokemon)} size="sm" />
+                        ))}
+                        {Array.from({ length: Math.max(0, 4 - game.opponentPicks.length) }).map((_, index) => (
+                          <div
+                            key={`empty-${index}`}
+                            className="flex h-8 w-8 items-center justify-center text-gray-300 dark:text-gray-600"
+                          >
+                            &mdash;
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
 
@@ -260,17 +306,8 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
         </div>
 
         {isEditingTags ? (
-          <div className="space-y-2">
-            <input
-              type="text"
-              value={tagsText}
-              onChange={(e) => setTagsText(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, handleSaveTags, handleCancelTags)}
-              placeholder="Enter tags separated by commas (e.g., tournament, close-match)"
-              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
-              disabled={savingTags}
-              autoFocus
-            />
+          <div className="space-y-2" onKeyDown={(e) => handleKeyDown(e, handleSaveTags, handleCancelTags)}>
+            <TagInput tags={editTags} onTagsChange={setEditTags} placeholder="Type a tag and press Enter..." />
             <div className="flex items-center justify-between">
               <p className="text-xs text-gray-400">Ctrl+Enter to save, Escape to cancel</p>
               <div className="flex gap-2">

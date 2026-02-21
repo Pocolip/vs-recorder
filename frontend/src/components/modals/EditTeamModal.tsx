@@ -6,6 +6,7 @@ import TagInput from "../form/TagInput";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import { teamApi } from "../../services/api/teamApi";
 import { teamMemberApi } from "../../services/api/teamMemberApi";
+import { useFolderContext } from "../../context/FolderContext";
 import * as pokepasteService from "../../services/pokepasteService";
 import { cleanPokemonName } from "../../utils/pokemonNameUtils";
 import type { Team } from "../../types";
@@ -40,12 +41,14 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
   const [pokepaste, setPokepaste] = useState("");
   const [regulation, setRegulation] = useState("");
   const [showdownUsernames, setShowdownUsernames] = useState<string[]>([]);
+  const [selectedFolderIds, setSelectedFolderIds] = useState<number[]>([]);
   const [previewNames, setPreviewNames] = useState<string[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingWarning, setPendingWarning] = useState<PendingWarning | null>(null);
   const [usernameWarning, setUsernameWarning] = useState(false);
 
+  const { folders, refreshFolders, bumpDataVersion } = useFolderContext();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Populate form when modal opens or team changes
@@ -55,6 +58,7 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
       setPokepaste(team.pokepaste || "");
       setRegulation(team.regulation || "");
       setShowdownUsernames(team.showdownUsernames || []);
+      setSelectedFolderIds(team.folderIds || []);
       setPreviewNames(null);
       setError(null);
       setPendingWarning(null);
@@ -96,6 +100,24 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
 
   const isValidUrl = pokepaste === "" || pokepasteService.isValidPokepasteUrl(pokepaste);
 
+  const syncFolders = async () => {
+    const currentIds = new Set(team.folderIds || []);
+    const newIds = new Set(selectedFolderIds);
+
+    const toAdd = selectedFolderIds.filter((id) => !currentIds.has(id));
+    const toRemove = (team.folderIds || []).filter((id) => !newIds.has(id));
+
+    await Promise.all([
+      ...toAdd.map((fid) => teamApi.addToFolder(team.id, fid)),
+      ...toRemove.map((fid) => teamApi.removeFromFolder(team.id, fid)),
+    ]);
+
+    if (toAdd.length > 0 || toRemove.length > 0) {
+      await refreshFolders();
+      bumpDataVersion();
+    }
+  };
+
   const saveAndSync = async () => {
     setSubmitting(true);
     setError(null);
@@ -113,7 +135,9 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
         await teamMemberApi.sync(team.id);
       }
 
-      onUpdated(updated);
+      await syncFolders();
+
+      onUpdated({ ...updated, folderIds: selectedFolderIds });
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update team");
@@ -140,7 +164,8 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
           regulation,
           showdownUsernames,
         });
-        onUpdated(updated);
+        await syncFolders();
+        onUpdated({ ...updated, folderIds: selectedFolderIds });
         onClose();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to update team");
@@ -344,6 +369,40 @@ const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, team, onClose, on
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           </div>
         </div>
+
+        {/* Folders */}
+        {folders.length > 0 && (
+          <div>
+            <Label>Folders</Label>
+            <div className="flex flex-wrap gap-2">
+              {folders.map((folder) => {
+                const checked = selectedFolderIds.includes(folder.id);
+                return (
+                  <label
+                    key={folder.id}
+                    className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${
+                      checked
+                        ? "border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-700 dark:bg-brand-500/10 dark:text-brand-400"
+                        : "border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={checked}
+                      onChange={() =>
+                        setSelectedFolderIds((prev) =>
+                          checked ? prev.filter((id) => id !== folder.id) : [...prev, folder.id]
+                        )
+                      }
+                    />
+                    {folder.name}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Showdown Usernames */}
         <div>

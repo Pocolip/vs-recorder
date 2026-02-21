@@ -1,9 +1,15 @@
 package com.yeskatronics.vs_recorder_backend.mappers;
 
 import com.yeskatronics.vs_recorder_backend.dto.TeamDTO;
+import com.yeskatronics.vs_recorder_backend.entities.Folder;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.services.TeamService;
 import org.mapstruct.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * MapStruct mapper for Team entity and DTOs.
@@ -20,6 +26,8 @@ public interface TeamMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "replays", ignore = true)
     @Mapping(target = "matches", ignore = true)
+    @Mapping(target = "folders", ignore = true)
+    @Mapping(target = "teamMembers", ignore = true)
     Team toEntity(TeamDTO.CreateRequest dto);
 
     /**
@@ -31,6 +39,8 @@ public interface TeamMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "replays", ignore = true)
     @Mapping(target = "matches", ignore = true)
+    @Mapping(target = "folders", ignore = true)
+    @Mapping(target = "teamMembers", ignore = true)
     Team toEntity(TeamDTO.UpdateRequest dto);
 
     /**
@@ -38,6 +48,7 @@ public interface TeamMapper {
      * Stats will be set via @AfterMapping
      */
     @Mapping(target = "stats", ignore = true)
+    @Mapping(target = "folderIds", expression = "java(mapFolderIds(team.getFolders()))")
     TeamDTO.Response toDTO(Team team, @org.mapstruct.Context TeamService.TeamStats stats);
 
     /**
@@ -53,9 +64,11 @@ public interface TeamMapper {
     @Mapping(source = "team.pokepaste", target = "pokepaste")
     @Mapping(source = "team.regulation", target = "regulation")
     @Mapping(source = "team.createdAt", target = "createdAt")
+    @Mapping(source = "team.updatedAt", target = "updatedAt")
     @Mapping(source = "replayCount", target = "replayCount")
     @Mapping(source = "matchCount", target = "matchCount")
     @Mapping(source = "winRate", target = "winRate")
+    @Mapping(target = "folderIds", expression = "java(mapFolderIds(team.getFolders()))")
     TeamDTO.Summary toSummaryDTO(Team team, int replayCount, int matchCount, Double winRate);
 
     /**
@@ -66,5 +79,15 @@ public interface TeamMapper {
         if (stats != null) {
             response.setStats(toStatsDTO(stats));
         }
+    }
+
+    /**
+     * Map folder set to list of IDs
+     */
+    default List<Long> mapFolderIds(Set<Folder> folders) {
+        if (folders == null) return Collections.emptyList();
+        return folders.stream()
+                .map(Folder::getId)
+                .collect(Collectors.toList());
     }
 }

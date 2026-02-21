@@ -59,4 +59,10 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      */
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.replays WHERE t.user.id = :userId")
     List<Team> findByUserIdWithReplays(Long userId);
+
+    @Query("SELECT COUNT(t) FROM Team t JOIN t.folders f WHERE f.id = :folderId")
+    int countByFolderId(Long folderId);
+
+    @Query("SELECT t FROM Team t JOIN t.folders f WHERE f.id = :folderId")
+    List<Team> findByFolderId(Long folderId);
 }

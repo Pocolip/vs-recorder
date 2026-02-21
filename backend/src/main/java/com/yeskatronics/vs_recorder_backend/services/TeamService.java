@@ -1,10 +1,12 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
 import com.yeskatronics.vs_recorder_backend.dto.PokepasteDTO;
+import com.yeskatronics.vs_recorder_backend.entities.Folder;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.entities.TeamMember;
 import com.yeskatronics.vs_recorder_backend.entities.User;
+import com.yeskatronics.vs_recorder_backend.repositories.FolderRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamMemberRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.UserRepository;
@@ -29,6 +31,7 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final FolderRepository folderRepository;
     private final UserRepository userRepository;
     private final ReplayService replayService;
     private final PokepasteService pokepasteService;
@@ -390,6 +393,42 @@ public class TeamService {
 
         log.info("Sync complete for team {}: kept={}, added={}, removed={}", teamId, kept, added, removed);
         return new SyncResult(resultMembers, kept, added, removed);
+    }
+
+    /**
+     * Add a team to a folder
+     */
+    public Team addTeamToFolder(Long teamId, Long folderId, Long userId) {
+        log.info("Adding team {} to folder {} for user {}", teamId, folderId, userId);
+
+        Team team = teamRepository.findByIdAndUserId(teamId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Team not found with ID: " + teamId + " for user: " + userId));
+
+        Folder folder = folderRepository.findByIdAndUserId(folderId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Folder not found with ID: " + folderId + " for user: " + userId));
+
+        team.addFolder(folder);
+        return teamRepository.save(team);
+    }
+
+    /**
+     * Remove a team from a folder
+     */
+    public Team removeTeamFromFolder(Long teamId, Long folderId, Long userId) {
+        log.info("Removing team {} from folder {} for user {}", teamId, folderId, userId);
+
+        Team team = teamRepository.findByIdAndUserId(teamId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Team not found with ID: " + teamId + " for user: " + userId));
+
+        Folder folder = folderRepository.findByIdAndUserId(folderId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Folder not found with ID: " + folderId + " for user: " + userId));
+
+        team.removeFolder(folder);
+        return teamRepository.save(team);
     }
 
     /**

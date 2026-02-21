@@ -10,6 +10,7 @@ import TeamLayout from "./layout/TeamLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import HomePage from "./pages/Dashboard/HomePage";
 import AboutPage from "./pages/AboutPage";
+import AnnouncementsPage from "./pages/Announcements/AnnouncementsPage";
 import ReplaysPage from "./pages/Team/ReplaysPage";
 import GameByGamePage from "./pages/Team/GameByGamePage";
 import MatchByMatchPage from "./pages/Team/MatchByMatchPage";
@@ -76,6 +77,7 @@ export default function App() {
         >
           <Route index path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route path="/team/:teamId" element={<TeamLayout />}>
             <Route index element={<Navigate to="replays" replace />} />
             <Route path="replays" element={<ReplaysPage />} />

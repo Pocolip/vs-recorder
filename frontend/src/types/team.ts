@@ -4,6 +4,7 @@ export interface Team {
   pokepaste: string;
   regulation: string;
   showdownUsernames: string[];
+  folderIds: number[];
   createdAt: string;
   updatedAt: string;
 }

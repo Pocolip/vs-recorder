@@ -1,15 +1,30 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
-import { Home, Swords, Pencil, Share2, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
+import {
+  Home,
+  Swords,
+  Pencil,
+  Share2,
+  Trash2,
+  FolderOpen,
+  Plus,
+  MoreHorizontal,
+  Check,
+  X,
+} from "lucide-react";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import { HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { useActiveTeam } from "../context/ActiveTeamContext";
+import { useFolderContext } from "../context/FolderContext";
 import EditTeamModal from "../components/modals/EditTeamModal";
 import ExportTeamModal from "../components/modals/ExportTeamModal";
 import ConfirmationModal from "../components/modals/ConfirmationModal";
 import * as teamService from "../services/teamService";
-import type { Team } from "../types";
+import type { Team, Folder } from "../types";
 
 type SubItem = {
   name: string;
@@ -19,56 +34,192 @@ type SubItem = {
   dividerAfter?: boolean;
 };
 
-type NavItem = {
-  name: string;
-  icon: React.ReactNode;
-  path?: string;
-  subItems?: SubItem[];
-};
+/* ── Sortable + droppable sidebar folder item ── */
+function SortableFolderItem({
+  folder,
+  isActive,
+  isVisible,
+  onRename,
+  onDelete,
+}: {
+  folder: Folder;
+  isActive: boolean;
+  isVisible: boolean;
+  onRename: (id: number, name: string) => void;
+  onDelete: (id: number) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+  } = useSortable({ id: `folder-${folder.id}`, data: { folderId: folder.id } });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
+  const [showMenu, setShowMenu] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState(folder.name);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing && inputRef.current) inputRef.current.focus();
+  }, [editing]);
+
+  useEffect(() => {
+    if (!showMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setShowMenu(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showMenu]);
+
+  const handleRenameSubmit = () => {
+    const trimmed = editName.trim();
+    if (trimmed && trimmed !== folder.name) onRename(folder.id, trimmed);
+    setEditing(false);
+  };
+
+  if (editing && isVisible) {
+    return (
+      <div ref={setNodeRef} style={style} className="flex items-center gap-1 px-2">
+        <input
+          ref={inputRef}
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleRenameSubmit();
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className="h-8 flex-1 min-w-0 rounded border border-brand-300 bg-transparent px-2 text-sm text-gray-800 dark:text-white/90 dark:border-brand-700 focus:outline-none"
+        />
+        <button onClick={handleRenameSubmit} className="p-0.5 text-emerald-500 hover:text-emerald-600">
+          <Check className="h-3.5 w-3.5" />
+        </button>
+        <button onClick={() => setEditing(false)} className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <Link
+        to={`/?folder=${folder.id}`}
+        className={`menu-item group ${
+          isActive ? "menu-item-active" : "menu-item-inactive"
+        } ${isOver ? "ring-2 ring-brand-400 ring-inset" : ""}`}
+        {...attributes}
+        {...listeners}
+      >
+        <span
+          className={`menu-item-icon-size ${
+            isActive ? "menu-item-icon-active" : "menu-item-icon-inactive"
+          }`}
+        >
+          <FolderOpen className="h-5 w-5" />
+        </span>
+        {isVisible && (
+          <span className="menu-item-text flex-1 truncate">
+            {folder.name} <span className="text-xs text-gray-400 dark:text-gray-500">({folder.teamCount})</span>
+          </span>
+        )}
+      </Link>
+
+      {/* ⋯ menu */}
+      {isVisible && (
+        <div className={`absolute right-1 top-1/2 -translate-y-1/2 transition-opacity z-50 ${showMenu ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} ref={menuRef}>
+          <button
+            onClick={(e) => { e.preventDefault(); setShowMenu((v) => !v); }}
+            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            <MoreHorizontal className="h-3.5 w-3.5 text-gray-400" />
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 top-full mt-1 w-32 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800 z-50">
+              <button
+                onClick={() => { setShowMenu(false); setEditName(folder.name); setEditing(true); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                Rename
+              </button>
+              <button
+                onClick={() => { setShowMenu(false); onDelete(folder.id); }}
+                className="w-full px-3 py-1.5 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Droppable Home item ── */
+function DroppableHomeItem({ isActive, isVisible }: { isActive: boolean; isVisible: boolean }) {
+  const { setNodeRef, isOver } = useDroppable({ id: "home", data: { home: true } });
+
+  return (
+    <Link
+      ref={setNodeRef}
+      to="/"
+      className={`menu-item group ${
+        isActive ? "menu-item-active" : "menu-item-inactive"
+      } ${isOver ? "ring-2 ring-brand-400 ring-inset" : ""}`}
+    >
+      <span
+        className={`menu-item-icon-size ${
+          isActive ? "menu-item-icon-active" : "menu-item-icon-inactive"
+        }`}
+      >
+        <Home className="h-5 w-5" />
+      </span>
+      {isVisible && <span className="menu-item-text">Home</span>}
+    </Link>
+  );
+}
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
   const { team, setTeam, bumpStatsVersion } = useActiveTeam();
+  const { folders, createFolder, renameFolder, deleteFolder } = useFolderContext();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const navItems: NavItem[] = useMemo(() => {
-    const items: NavItem[] = [
-      {
-        icon: <Home className="h-5 w-5" />,
-        name: "Home",
-        path: "/",
-      },
-    ];
+  // New folder inline input
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const newFolderRef = useRef<HTMLInputElement>(null);
 
-    if (team) {
-      items.push({
-        icon: <Swords className="h-5 w-5" />,
-        name: team.name,
-        subItems: [
-          { name: "Replays", path: `/team/${team.id}/replays` },
-          { name: "Game by Game", path: `/team/${team.id}/game-by-game` },
-          { name: "Match by Match", path: `/team/${team.id}/match-by-match` },
-          { name: "Usage Stats", path: `/team/${team.id}/usage-stats` },
-          { name: "Matchup Stats", path: `/team/${team.id}/matchup-stats` },
-          { name: "Move Usage", path: `/team/${team.id}/move-usage` },
-          { name: "Matchup Planner", path: `/team/${team.id}/matchup-planner` },
-          { name: "Pokemon Notes", path: `/team/${team.id}/pokemon-notes` },
-          { name: "Calculator", path: `/team/${team.id}/calculator`, dividerAfter: true },
-          { name: "Edit Team", onClick: () => setShowEditModal(true), icon: <Pencil className="h-3 w-3" /> },
-          { name: "Export Team", onClick: () => setShowExportModal(true), icon: <Share2 className="h-3 w-3" /> },
-          { name: "Delete Team", onClick: () => setShowDeleteModal(true), icon: <Trash2 className="h-3 w-3" /> },
-        ],
-      });
-    }
+  // Folder delete confirmation
+  const [folderToDelete, setFolderToDelete] = useState<Folder | null>(null);
 
-    return items;
-  }, [team]);
+  const isVisible = isExpanded || isHovered || isMobileOpen;
+  const activeFolderId = searchParams.get("folder") ? Number(searchParams.get("folder")) : null;
+  const isHomePage = location.pathname === "/" && !activeFolderId;
+  const isDashboard = location.pathname === "/";
+
+  useEffect(() => {
+    if (creatingFolder && newFolderRef.current) newFolderRef.current.focus();
+  }, [creatingFolder]);
 
   const isActive = useCallback(
     (path: string) => location.pathname === path,
@@ -85,9 +236,8 @@ const AppSidebar: React.FC = () => {
     if (isMobileOpen) {
       toggleMobileSidebar();
     }
-    // Only run when pathname changes, not when isMobileOpen changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   const handleTeamUpdated = (updatedTeam: Team) => {
     setTeam(updatedTeam);
@@ -109,95 +259,56 @@ const AppSidebar: React.FC = () => {
     }
   };
 
-  const renderMenuItems = (items: NavItem[]) => (
-    <ul className="flex flex-col gap-4">
-      {items.map((nav) => (
-        <li key={nav.name}>
-          {nav.subItems ? (
-            // Team section — always expanded, no toggle
-            <>
-              <div
-                className={`menu-item group ${
-                  isTeamSectionActive ? "menu-item-active" : "menu-item-inactive"
-                } ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "lg:justify-start"
-                }`}
-              >
-                <span
-                  className={`menu-item-icon-size ${
-                    isTeamSectionActive
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
-                  }`}
-                >
-                  {nav.icon}
-                </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className="menu-item-text">{nav.name}</span>
-                )}
-              </div>
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ul className="mt-2 space-y-1 ml-9">
-                  {nav.subItems.map((subItem) => (
-                    <li key={subItem.name}>
-                      {subItem.onClick ? (
-                        <button
-                          type="button"
-                          onClick={subItem.onClick}
-                          className="menu-dropdown-item menu-dropdown-item-inactive flex items-center gap-1.5 w-full text-left"
-                        >
-                          {subItem.icon}
-                          {subItem.name}
-                        </button>
-                      ) : subItem.path ? (
-                        <Link
-                          to={subItem.path}
-                          className={`menu-dropdown-item ${
-                            isActive(subItem.path)
-                              ? "menu-dropdown-item-active"
-                              : "menu-dropdown-item-inactive"
-                          }`}
-                        >
-                          {subItem.name}
-                        </Link>
-                      ) : null}
-                      {subItem.dividerAfter && (
-                        <hr className="my-1.5 border-gray-200 dark:border-gray-700" />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </>
-          ) : (
-            nav.path && (
-              <Link
-                to={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
-              >
-                <span
-                  className={`menu-item-icon-size ${
-                    isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
-                  }`}
-                >
-                  {nav.icon}
-                </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className="menu-item-text">{nav.name}</span>
-                )}
-              </Link>
-            )
-          )}
-        </li>
-      ))}
-    </ul>
-  );
+  const handleCreateFolder = async () => {
+    const trimmed = newFolderName.trim();
+    if (!trimmed) { setCreatingFolder(false); return; }
+    try {
+      await createFolder(trimmed);
+    } catch (err) {
+      console.error("Failed to create folder:", err);
+    }
+    setNewFolderName("");
+    setCreatingFolder(false);
+  };
+
+  const handleRenameFolder = async (id: number, name: string) => {
+    try {
+      await renameFolder(id, name);
+    } catch (err) {
+      console.error("Failed to rename folder:", err);
+    }
+  };
+
+  const handleConfirmDeleteFolder = async () => {
+    if (!folderToDelete) return;
+    try {
+      await deleteFolder(folderToDelete.id);
+      // If currently viewing deleted folder, go home
+      if (activeFolderId === folderToDelete.id) {
+        navigate("/", { replace: true });
+      }
+    } catch (err) {
+      console.error("Failed to delete folder:", err);
+    }
+    setFolderToDelete(null);
+  };
+
+  const teamSubItems: SubItem[] = team
+    ? [
+        { name: "Replays", path: `/team/${team.id}/replays` },
+        { name: "Game by Game", path: `/team/${team.id}/game-by-game` },
+        { name: "Match by Match", path: `/team/${team.id}/match-by-match` },
+        { name: "Usage Stats", path: `/team/${team.id}/usage-stats` },
+        { name: "Matchup Stats", path: `/team/${team.id}/matchup-stats` },
+        { name: "Move Usage", path: `/team/${team.id}/move-usage` },
+        { name: "Matchup Planner", path: `/team/${team.id}/matchup-planner` },
+        { name: "Pokemon Notes", path: `/team/${team.id}/pokemon-notes` },
+        { name: "Calculator", path: `/team/${team.id}/calculator`, dividerAfter: true },
+        { name: "Edit Team", onClick: () => setShowEditModal(true), icon: <Pencil className="h-3 w-3" /> },
+        { name: "Export Team", onClick: () => setShowExportModal(true), icon: <Share2 className="h-3 w-3" /> },
+        { name: "Delete Team", onClick: () => setShowDeleteModal(true), icon: <Trash2 className="h-3 w-3" /> },
+      ]
+    : [];
 
   return (
     <>
@@ -221,7 +332,7 @@ const AppSidebar: React.FC = () => {
           }`}
         >
           <Link to="/">
-            {isExpanded || isHovered || isMobileOpen ? (
+            {isVisible ? (
               <span className="text-xl font-bold text-gray-800 dark:text-white/90">
                 VS Recorder
               </span>
@@ -243,13 +354,135 @@ const AppSidebar: React.FC = () => {
                       : "justify-start"
                   }`}
                 >
-                  {isExpanded || isHovered || isMobileOpen ? (
-                    "Menu"
-                  ) : (
-                    <HorizontaLDots className="size-6" />
-                  )}
+                  {isVisible ? "Menu" : <HorizontaLDots className="size-6" />}
                 </h2>
-                {renderMenuItems(navItems)}
+
+                <ul className="flex flex-col gap-4">
+                  {/* Home (droppable) */}
+                  <li>
+                    <DroppableHomeItem isActive={isHomePage} isVisible={isVisible} />
+                  </li>
+
+                  {/* Folders section (dashboard only) */}
+                  {isDashboard && folders.length > 0 && (
+                    <li>
+                      {isVisible && (
+                        <hr className="mb-3 border-gray-200 dark:border-gray-700" />
+                      )}
+                      <SortableContext
+                        items={folders.map((f) => `folder-${f.id}`)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <ul className="flex flex-col gap-1">
+                          {folders.map((folder) => (
+                            <li key={folder.id}>
+                              <SortableFolderItem
+                                folder={folder}
+                                isActive={activeFolderId === folder.id}
+                                isVisible={isVisible}
+                                onRename={handleRenameFolder}
+                                onDelete={(id) => setFolderToDelete(folders.find((f) => f.id === id) || null)}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </SortableContext>
+                    </li>
+                  )}
+
+                  {/* New folder inline input (dashboard only) */}
+                  {isDashboard && isVisible && (
+                    <li>
+                      {creatingFolder ? (
+                        <div className="flex items-center gap-1 px-2">
+                          <input
+                            ref={newFolderRef}
+                            value={newFolderName}
+                            onChange={(e) => setNewFolderName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleCreateFolder();
+                              if (e.key === "Escape") { setCreatingFolder(false); setNewFolderName(""); }
+                            }}
+                            onBlur={handleCreateFolder}
+                            placeholder="Folder name..."
+                            className="h-8 flex-1 min-w-0 rounded border border-brand-300 bg-transparent px-2 text-sm text-gray-800 dark:text-white/90 dark:border-brand-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none"
+                          />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setCreatingFolder(true)}
+                          className="menu-item group menu-item-inactive w-full"
+                        >
+                          <span className="menu-item-icon-size menu-item-icon-inactive">
+                            <Plus className="h-5 w-5" />
+                          </span>
+                          <span className="menu-item-text">New Folder</span>
+                        </button>
+                      )}
+                    </li>
+                  )}
+
+                  {/* Team section divider + items */}
+                  {team && (
+                    <li>
+                      {isVisible && (
+                        <hr className="mb-3 border-gray-200 dark:border-gray-700" />
+                      )}
+                      <div
+                        className={`menu-item group ${
+                          isTeamSectionActive ? "menu-item-active" : "menu-item-inactive"
+                        } ${
+                          !isVisible ? "lg:justify-center" : "lg:justify-start"
+                        }`}
+                      >
+                        <span
+                          className={`menu-item-icon-size ${
+                            isTeamSectionActive
+                              ? "menu-item-icon-active"
+                              : "menu-item-icon-inactive"
+                          }`}
+                        >
+                          <Swords className="h-5 w-5" />
+                        </span>
+                        {isVisible && (
+                          <span className="menu-item-text">{team.name}</span>
+                        )}
+                      </div>
+                      {isVisible && (
+                        <ul className="mt-2 space-y-1 ml-9">
+                          {teamSubItems.map((subItem) => (
+                            <li key={subItem.name}>
+                              {subItem.onClick ? (
+                                <button
+                                  type="button"
+                                  onClick={subItem.onClick}
+                                  className="menu-dropdown-item menu-dropdown-item-inactive flex items-center gap-1.5 w-full text-left"
+                                >
+                                  {subItem.icon}
+                                  {subItem.name}
+                                </button>
+                              ) : subItem.path ? (
+                                <Link
+                                  to={subItem.path}
+                                  className={`menu-dropdown-item ${
+                                    isActive(subItem.path)
+                                      ? "menu-dropdown-item-active"
+                                      : "menu-dropdown-item-inactive"
+                                  }`}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              ) : null}
+                              {subItem.dividerAfter && (
+                                <hr className="my-1.5 border-gray-200 dark:border-gray-700" />
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  )}
+                </ul>
               </div>
             </div>
           </nav>
@@ -291,6 +524,26 @@ const AppSidebar: React.FC = () => {
           />
         </>
       )}
+
+      {/* Folder delete confirmation */}
+      <ConfirmationModal
+        isOpen={!!folderToDelete}
+        title="Delete Folder"
+        message={
+          <div>
+            <p>
+              Are you sure you want to delete <strong>{folderToDelete?.name}</strong>?
+            </p>
+            <p className="mt-2">
+              Teams in this folder will not be deleted — they will just be ungrouped.
+            </p>
+          </div>
+        }
+        onConfirm={handleConfirmDeleteFolder}
+        onCancel={() => setFolderToDelete(null)}
+        confirmText="Delete Folder"
+        variant="danger"
+      />
     </>
   );
 };
