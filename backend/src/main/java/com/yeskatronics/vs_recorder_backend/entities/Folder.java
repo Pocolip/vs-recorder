@@ -34,7 +34,7 @@ public class Folder {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer position;
 
     @CreationTimestamp
