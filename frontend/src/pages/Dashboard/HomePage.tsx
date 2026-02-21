@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useSearchParams } from "react-router";
 import { Plus, Download, X, Trophy, Calendar, TrendingUp } from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
@@ -8,6 +8,9 @@ import TagInput from "../../components/form/TagInput";
 import RegulationFilter from "../../components/form/RegulationFilter";
 import NewTeamModal from "../../components/modals/NewTeamModal";
 import ImportTeamModal from "../../components/modals/ImportTeamModal";
+import Alert from "../../components/ui/alert/Alert";
+import Toast from "../../components/ui/toast/Toast";
+import announcements from "../../data/announcements.json";
 import { useTeams } from "../../hooks/useTeams";
 import { useMultipleTeamStats } from "../../hooks/useTeamStats";
 import useTeamPokemon from "../../hooks/useTeamPokemon";
@@ -36,6 +39,24 @@ export default function HomePage() {
   const [regulationFilter, setRegulationFilter] = useState("");
   const [showNewTeam, setShowNewTeam] = useState(false);
   const [showImport, setShowImport] = useState(false);
+
+  // Announcements
+  const latestAnnouncement = announcements[0];
+  const [showBanner, setShowBanner] = useState(() => {
+    const viewed: string[] = JSON.parse(localStorage.getItem("viewedAnnouncements") || "[]");
+    return !viewed.includes(latestAnnouncement.id);
+  });
+  const [showToast, setShowToast] = useState(false);
+
+  const dismissBanner = useCallback(() => {
+    const viewed: string[] = JSON.parse(localStorage.getItem("viewedAnnouncements") || "[]");
+    if (!viewed.includes(latestAnnouncement.id)) {
+      viewed.push(latestAnnouncement.id);
+      localStorage.setItem("viewedAnnouncements", JSON.stringify(viewed));
+    }
+    setShowBanner(false);
+    setShowToast(true);
+  }, [latestAnnouncement.id]);
 
   // Re-fetch teams when dataVersion changes (folder assignments changed)
   useEffect(() => { if (dataVersion > 0) refresh(); }, [dataVersion]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,6 +127,18 @@ export default function HomePage() {
       />
 
       <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
+        {/* Announcement Banner */}
+        {showBanner && (
+          <div className="mb-6">
+            <Alert
+              variant="info"
+              title={latestAnnouncement.title}
+              message={latestAnnouncement.message}
+              onClose={dismissBanner}
+            />
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 sm:text-2xl">
@@ -294,6 +327,13 @@ export default function HomePage() {
         onClose={() => setShowImport(false)}
         onImported={refresh}
       />
+
+      {showToast && (
+        <Toast
+          message="Check the Announcements page in the footer to review past announcements."
+          onDismiss={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }
