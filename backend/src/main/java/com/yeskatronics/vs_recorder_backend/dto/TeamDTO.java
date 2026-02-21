@@ -65,6 +65,7 @@ public class TeamDTO {
         private String pokepaste;
         private String regulation;
         private List<String> showdownUsernames;
+        private List<Long> folderIds;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private TeamStats stats;
@@ -82,6 +83,8 @@ public class TeamDTO {
         private String pokepaste;
         private String regulation;
         private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+        private List<Long> folderIds;
         private int replayCount;
         private int matchCount;
         private Double winRate;

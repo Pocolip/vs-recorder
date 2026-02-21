@@ -11,7 +11,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Team entity representing a Pokemon VGC team.
@@ -73,6 +75,14 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> teamMembers = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+        name = "team_folders",
+        joinColumns = @JoinColumn(name = "team_id"),
+        inverseJoinColumns = @JoinColumn(name = "folder_id")
+    )
+    private Set<Folder> folders = new HashSet<>();
+
     /**
      * Helper method to add a replay to this team
      */
@@ -119,5 +129,13 @@ public class Team {
      */
     public void removeShowdownUsername(String username) {
         showdownUsernames.remove(username);
+    }
+
+    public void addFolder(Folder folder) {
+        folders.add(folder);
+    }
+
+    public void removeFolder(Folder folder) {
+        folders.remove(folder);
     }
 }

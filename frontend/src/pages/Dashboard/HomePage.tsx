@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router";
+import { useState, useEffect, useMemo } from "react";
+import { Link, useSearchParams } from "react-router";
 import { Plus, Download, X, Trophy, Calendar, TrendingUp } from "lucide-react";
+import { useDraggable } from "@dnd-kit/core";
 import PageMeta from "../../components/common/PageMeta";
 import PokemonTeam from "../../components/pokemon/PokemonTeam";
 import TagInput from "../../components/form/TagInput";
@@ -10,6 +11,8 @@ import ImportTeamModal from "../../components/modals/ImportTeamModal";
 import { useTeams } from "../../hooks/useTeams";
 import { useMultipleTeamStats } from "../../hooks/useTeamStats";
 import useTeamPokemon from "../../hooks/useTeamPokemon";
+import { useFolderContext } from "../../context/FolderContext";
+import { teamApi } from "../../services/api/teamApi";
 import { formatTimeAgo } from "../../utils/timeUtils";
 import type { Team } from "../../types";
 
@@ -20,6 +23,11 @@ function shortRegulation(reg: string): string {
 
 export default function HomePage() {
   const { teams, loading, refresh } = useTeams();
+  const { folders, dataVersion, refreshFolders, bumpDataVersion } = useFolderContext();
+  const [searchParams] = useSearchParams();
+  const activeFolderId = searchParams.get("folder") ? Number(searchParams.get("folder")) : null;
+  const activeFolder = activeFolderId ? folders.find((f) => f.id === activeFolderId) : null;
+
   const teamIds = useMemo(() => teams.map((t) => t.id), [teams]);
   const { teamStats, overallStats, loading: statsLoading } = useMultipleTeamStats(teamIds);
   const { teamPokemon, loading: pokemonLoading } = useTeamPokemon(teams);
@@ -29,13 +37,24 @@ export default function HomePage() {
   const [showNewTeam, setShowNewTeam] = useState(false);
   const [showImport, setShowImport] = useState(false);
 
+  // Re-fetch teams when dataVersion changes (folder assignments changed)
+  useEffect(() => { if (dataVersion > 0) refresh(); }, [dataVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const regulations = useMemo(() => {
     const regs = new Set(teams.map((t) => t.regulation).filter(Boolean));
     return Array.from(regs).sort();
   }, [teams]);
 
   const filteredTeams = useMemo(() => {
-    return teams.filter((team) => {
+    let filtered = teams;
+
+    // Folder filter
+    if (activeFolderId) {
+      filtered = filtered.filter((team) => team.folderIds?.includes(activeFolderId));
+    }
+
+    // Other filters
+    filtered = filtered.filter((team) => {
       if (regulationFilter && team.regulation !== regulationFilter) return false;
       if (searchTags.length > 0) {
         const pokemonNames = teamPokemon[team.id] || [];
@@ -50,7 +69,14 @@ export default function HomePage() {
       }
       return true;
     });
-  }, [teams, regulationFilter, searchTags, teamPokemon]);
+
+    // Sort by updatedAt descending
+    return [...filtered].sort((a, b) => {
+      const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return bTime - aTime;
+    });
+  }, [teams, activeFolderId, regulationFilter, searchTags, teamPokemon]);
 
   const hasActiveFilters = searchTags.length > 0 || regulationFilter !== "";
 
@@ -58,6 +84,19 @@ export default function HomePage() {
     setSearchTags([]);
     setRegulationFilter("");
   };
+
+  const handleRemoveFromFolder = async (teamId: number) => {
+    if (!activeFolderId) return;
+    try {
+      await teamApi.removeFromFolder(teamId, activeFolderId);
+      await Promise.all([refresh(), refreshFolders()]);
+      bumpDataVersion();
+    } catch (err) {
+      console.error("Failed to remove team from folder:", err);
+    }
+  };
+
+  const heading = activeFolder ? activeFolder.name : "Your Teams";
 
   return (
     <div>
@@ -70,7 +109,7 @@ export default function HomePage() {
         {/* Header */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 sm:text-2xl">
-            Your Teams
+            {heading}
           </h2>
           <div className="flex gap-2">
             <button
@@ -91,7 +130,7 @@ export default function HomePage() {
         </div>
 
         {/* Stats Cards */}
-        {!loading && teams.length > 0 && (
+        {!loading && teams.length > 0 && !activeFolderId && (
           <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
               <div className="flex items-center">
@@ -220,7 +259,7 @@ export default function HomePage() {
         {!loading && teams.length > 0 && filteredTeams.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              No teams match your filters.
+              {activeFolderId ? "No teams in this folder." : "No teams match your filters."}
             </p>
           </div>
         )}
@@ -229,13 +268,15 @@ export default function HomePage() {
         {!loading && filteredTeams.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filteredTeams.map((team) => (
-              <TeamCard
+              <DraggableTeamCard
                 key={team.id}
                 team={team}
                 pokemonNames={teamPokemon[team.id]}
                 pokemonLoading={pokemonLoading}
                 stats={teamStats[team.id]}
                 statsLoading={statsLoading}
+                activeFolderId={activeFolderId}
+                onRemoveFromFolder={handleRemoveFromFolder}
               />
             ))}
           </div>
@@ -268,58 +309,98 @@ interface TeamCardProps {
     winRate: number;
   };
   statsLoading: boolean;
+  activeFolderId: number | null;
+  onRemoveFromFolder: (teamId: number) => void;
 }
 
-function TeamCard({ team, pokemonNames, pokemonLoading, stats, statsLoading }: TeamCardProps) {
+function DraggableTeamCard({
+  team,
+  pokemonNames,
+  pokemonLoading,
+  stats,
+  statsLoading,
+  activeFolderId,
+  onRemoveFromFolder,
+}: TeamCardProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `team-${team.id}`,
+    data: { teamId: team.id, teamName: team.name },
+  });
+
   return (
-    <Link
-      to={`/team/${team.id}/replays`}
-      className="group block rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-brand-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-800"
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`relative ${isDragging ? "opacity-50" : ""}`}
     >
-      {/* Team Name & Regulation */}
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-gray-800 group-hover:text-brand-600 dark:text-white/90 dark:group-hover:text-brand-400">
-          {team.name}
-        </h3>
-        {team.regulation && (
-          <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
-            {shortRegulation(team.regulation)}
+      <Link
+        to={`/team/${team.id}/replays`}
+        className="group block rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-brand-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-800"
+        onClick={(e) => { if (isDragging) e.preventDefault(); }}
+      >
+        {/* Team Name & Regulation */}
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-gray-800 group-hover:text-brand-600 dark:text-white/90 dark:group-hover:text-brand-400">
+            {team.name}
+          </h3>
+          <div className="flex items-center gap-1.5">
+            {team.regulation && (
+              <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
+                {shortRegulation(team.regulation)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Pokemon Sprites */}
+        <div className="mb-4">
+          {pokemonLoading ? (
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+              ))}
+            </div>
+          ) : (
+            <PokemonTeam pokemonNames={pokemonNames || []} size="sm" />
+          )}
+        </div>
+
+        {/* Stats & Time */}
+        <div className="flex items-center justify-between text-sm">
+          {statsLoading ? (
+            <div className="h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+          ) : stats && stats.total > 0 ? (
+            <div className="text-gray-600 dark:text-gray-400">
+              <span className="font-medium text-emerald-600 dark:text-emerald-400">{stats.wins}W</span>
+              {" / "}
+              <span className="font-medium text-red-500 dark:text-red-400">{stats.losses}L</span>
+              {" / "}
+              <span className="font-medium text-gray-800 dark:text-white/90">{stats.winRate}%</span>
+            </div>
+          ) : (
+            <span className="text-gray-400 dark:text-gray-500">No games</span>
+          )}
+          <span className="text-xs text-gray-400 dark:text-gray-500">
+            {formatTimeAgo(team.updatedAt)}
           </span>
-        )}
-      </div>
+        </div>
+      </Link>
 
-      {/* Pokemon Sprites */}
-      <div className="mb-4">
-        {pokemonLoading ? (
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-            ))}
-          </div>
-        ) : (
-          <PokemonTeam pokemonNames={pokemonNames || []} size="sm" />
-        )}
-      </div>
-
-      {/* Stats & Time */}
-      <div className="flex items-center justify-between text-sm">
-        {statsLoading ? (
-          <div className="h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-        ) : stats && stats.total > 0 ? (
-          <div className="text-gray-600 dark:text-gray-400">
-            <span className="font-medium text-emerald-600 dark:text-emerald-400">{stats.wins}W</span>
-            {" / "}
-            <span className="font-medium text-red-500 dark:text-red-400">{stats.losses}L</span>
-            {" / "}
-            <span className="font-medium text-gray-800 dark:text-white/90">{stats.winRate}%</span>
-          </div>
-        ) : (
-          <span className="text-gray-400 dark:text-gray-500">No games</span>
-        )}
-        <span className="text-xs text-gray-400 dark:text-gray-500">
-          {formatTimeAgo(team.updatedAt)}
-        </span>
-      </div>
-    </Link>
+      {/* Remove from folder button */}
+      {activeFolderId && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onRemoveFromFolder(team.id);
+          }}
+          className="absolute top-2 right-2 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+          title="Remove from folder"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+    </div>
   );
 }

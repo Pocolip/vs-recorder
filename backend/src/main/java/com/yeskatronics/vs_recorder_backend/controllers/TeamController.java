@@ -270,6 +270,38 @@ public class TeamController {
     }
 
     /**
+     * Add team to folder
+     * POST /api/teams/{id}/folders/{folderId}
+     */
+    @PostMapping("/{id}/folders/{folderId}")
+    public ResponseEntity<Void> addTeamToFolder(
+            @PathVariable Long id,
+            @PathVariable Long folderId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
+        log.info("Adding team {} to folder {}", id, folderId);
+        teamService.addTeamToFolder(id, folderId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Remove team from folder
+     * DELETE /api/teams/{id}/folders/{folderId}
+     */
+    @DeleteMapping("/{id}/folders/{folderId}")
+    public ResponseEntity<Void> removeTeamFromFolder(
+            @PathVariable Long id,
+            @PathVariable Long folderId,
+            Authentication authentication) {
+
+        Long userId = getCurrentUserId(authentication);
+        log.info("Removing team {} from folder {}", id, folderId);
+        teamService.removeTeamFromFolder(id, folderId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Exception handler for IllegalArgumentException
      */
     @ExceptionHandler(IllegalArgumentException.class)
