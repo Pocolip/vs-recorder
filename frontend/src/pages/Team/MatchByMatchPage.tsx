@@ -21,7 +21,22 @@ export default function MatchByMatchPage() {
   const filteredMatches = useMemo(() => {
     if (searchTags.length === 0) return matches;
     return matches.filter((match) =>
-      match.replays?.some((replay) => matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags))
+      searchTags.every((searchTag) => {
+        const lower = searchTag.toLowerCase();
+        if (lower.startsWith("tag:")) {
+          const value = lower.slice(4);
+          return match.tags?.some((tag) => tag.toLowerCase().includes(value)) ?? false;
+        }
+        if (lower.startsWith("user:")) {
+          const value = lower.slice(5);
+          return match.opponent?.toLowerCase().includes(value) ?? false;
+        }
+        // Plain text — Pokemon names only
+        return match.replays?.some((replay) => {
+          const opponentPokemon = getOpponentPokemonFromReplay(replay);
+          return opponentPokemon.some((name) => name.toLowerCase().includes(lower));
+        }) ?? false;
+      })
     );
   }, [matches, searchTags]);
 
@@ -128,7 +143,7 @@ export default function MatchByMatchPage() {
 
       {/* Tag filter */}
       <div className="mb-4">
-        <TagInput tags={searchTags} onTagsChange={setSearchTags} placeholder="Filter by opponent Pokemon..." />
+        <TagInput tags={searchTags} onTagsChange={setSearchTags} placeholder="Pokemon, user:name, or tag:label..." />
       </div>
 
       {/* Matches list */}
