@@ -33,7 +33,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (err) {
           console.error("Auth verification failed:", err);
           localStorage.removeItem("token");
-          localStorage.removeItem("refreshToken");
+          // Do NOT remove refreshToken — client.ts interceptor handles cleanup
+          // if the refresh also fails. Removing it here prevents silent recovery.
           localStorage.removeItem("user");
           setUser(null);
         }
