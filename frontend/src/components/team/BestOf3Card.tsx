@@ -221,7 +221,7 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
                   </a>
                 </div>
                 {(game.userPicks.length > 0 || game.opponentPicks.length > 0) && (
-                  <div className="flex gap-4 border-t border-gray-100 px-3 pb-2 pt-1.5 dark:border-gray-600/50">
+                  <div className="flex flex-col gap-2 border-t border-gray-100 px-3 pb-2 pt-1.5 sm:flex-row sm:gap-4 dark:border-gray-600/50">
                     <div className="flex-1">
                       <p className="mb-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">Your Picks</p>
                       <div className="flex gap-0.5">
