@@ -5,7 +5,7 @@ import { useActiveTeam } from "../../context/ActiveTeamContext";
 import BestOf3Card from "../../components/team/BestOf3Card";
 import TagInput from "../../components/form/TagInput";
 import * as matchService from "../../services/matchService";
-import { matchesPokemonTags, getOpponentPokemonFromReplay } from "../../utils/pokemonNameUtils";
+import { getOpponentPokemonFromReplay } from "../../utils/pokemonNameUtils";
 import type { Match } from "../../types";
 
 export default function MatchByMatchPage() {
