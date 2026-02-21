@@ -56,7 +56,7 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:beta
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:beta-${{ github.sha }}
           build-args: |
-            REACT_APP_API_BASE_URL=https://beta-api.vsrecorder.app
+            VITE_API_BASE_URL=https://beta-api.vsrecorder.app
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

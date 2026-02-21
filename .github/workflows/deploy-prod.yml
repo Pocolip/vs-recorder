@@ -132,8 +132,8 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:latest
             ${{ steps.login-ecr.outputs.registry }}/vsrecorder-frontend:${{ needs.get-version.outputs.version }}
           build-args: |
-            REACT_APP_API_BASE_URL=https://api.vsrecorder.app
-            REACT_APP_VERSION=${{ needs.get-version.outputs.version }}
+            VITE_API_BASE_URL=https://api.vsrecorder.app
+            VITE_APP_VERSION=${{ needs.get-version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
