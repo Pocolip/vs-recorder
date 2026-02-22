@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-02-22-type-chart",
+    "date": "2026-02-22",
+    "title": "New Page: Type Chart",
+    "message": "A new page has been added to the Team sidebar: Type Chart! This page will allow you to see at a glance weaknesses and resistances for your team, while accounting for Abilities as well."
+  },
+  {
     "id": "2026-02-21-new-features",
     "date": "2026-02-21",
     "title": "New Enhancements: Announcement Alerts, Team Folders, Match by Match tweaks",
