@@ -154,120 +154,27 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
     >
       {/* Header */}
       <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-white/[0.02]">
-        <div className="flex items-start gap-4">
-          {/* Opponent Team Sprites */}
-          <div className="w-fit flex-shrink-0">
-            <div className="mb-2 flex max-w-[280px] items-center gap-2">
-              <h3
-                className="truncate text-sm font-semibold text-gray-800 dark:text-white/90"
-                title={pasteTitle || "Matchup Team"}
-              >
-                {loadingTitle
-                  ? "Loading..."
-                  : pasteTitle || "Matchup Team"}
-              </h3>
-              {opponentTeam.pokepaste && (
-                <a
-                  href={opponentTeam.pokepaste}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 text-gray-400 transition-colors hover:text-brand-500"
-                  title="View Pokepaste"
-                >
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
-            </div>
+        {/* Top row: Team name + delete button */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <h3
+              className="truncate text-sm font-semibold text-gray-800 dark:text-white/90"
+              title={pasteTitle || "Matchup Team"}
+            >
+              {loadingTitle
+                ? "Loading..."
+                : pasteTitle || "Matchup Team"}
+            </h3>
             {opponentTeam.pokepaste && (
-              <PokemonTeam pokepasteUrl={opponentTeam.pokepaste} size="md" />
-            )}
-          </div>
-
-          {/* Notes */}
-          <div className="min-w-0 flex-1">
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-gray-800 dark:text-white/90">
-                Notes
-              </h4>
-              {!isEditingNotes && (
-                <button
-                  onClick={() => setIsEditingNotes(true)}
-                  className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
-                >
-                  <Edit3 className="h-3 w-3" />
-                  Edit
-                </button>
-              )}
-            </div>
-            {isEditingNotes ? (
-              <div className="space-y-2">
-                <div>
-                  <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
-                    Pokepaste URL
-                  </label>
-                  <input
-                    type="text"
-                    value={editedPokepaste}
-                    onChange={(e) => setEditedPokepaste(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
-                    placeholder="https://pokepast.es/..."
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
-                    Notes
-                  </label>
-                  <textarea
-                    value={editedNotes}
-                    onChange={(e) => setEditedNotes(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
-                    rows={2}
-                    placeholder="Add notes about this matchup..."
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
-                    Card Color
-                  </label>
-                  <div className="flex gap-1.5">
-                    {Object.entries(COLOR_OPTIONS).map(([key, val]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() =>
-                          onUpdateNotes(opponentTeam.id, { color: key })
-                        }
-                        className={`h-5 w-5 rounded ${val.bg} transition-transform hover:scale-110 ${
-                          (opponentTeam.color || "blue") === key
-                            ? "ring-2 ring-white ring-offset-1 ring-offset-white dark:ring-offset-gray-900"
-                            : ""
-                        }`}
-                        title={key}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSaveNotes}
-                    className="flex items-center gap-1 rounded bg-brand-500 px-3 py-1 text-xs text-white transition-colors hover:bg-brand-600"
-                  >
-                    <Save className="h-3 w-3" />
-                    Save
-                  </button>
-                  <button
-                    onClick={handleCancelEditNotes}
-                    className="flex items-center gap-1 rounded border border-gray-300 px-3 py-1 text-xs text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                  >
-                    <XIcon className="h-3 w-3" />
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p className="whitespace-pre-wrap text-sm text-gray-500 dark:text-gray-400">
-                {opponentTeam.notes || "No notes. Click Edit to add."}
-              </p>
+              <a
+                href={opponentTeam.pokepaste}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 text-gray-400 transition-colors hover:text-brand-500"
+                title="View Pokepaste"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
             )}
           </div>
 
@@ -279,6 +186,101 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
           >
             <Trash2 className="h-3 w-3" />
           </button>
+        </div>
+
+        {/* Sprites row */}
+        {opponentTeam.pokepaste && (
+          <div className="mt-2">
+            <PokemonTeam pokepasteUrl={opponentTeam.pokepaste} size="md" />
+          </div>
+        )}
+
+        {/* Bottom row: Notes */}
+        <div className="mt-3">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-white/90">
+              Notes
+            </h4>
+            {!isEditingNotes && (
+              <button
+                onClick={() => setIsEditingNotes(true)}
+                className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
+              >
+                <Edit3 className="h-3 w-3" />
+                Edit
+              </button>
+            )}
+          </div>
+          {isEditingNotes ? (
+            <div className="space-y-2">
+              <div>
+                <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
+                  Pokepaste URL
+                </label>
+                <input
+                  type="text"
+                  value={editedPokepaste}
+                  onChange={(e) => setEditedPokepaste(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
+                  placeholder="https://pokepast.es/..."
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
+                  Notes
+                </label>
+                <textarea
+                  value={editedNotes}
+                  onChange={(e) => setEditedNotes(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
+                  rows={2}
+                  placeholder="Add notes about this matchup..."
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
+                  Card Color
+                </label>
+                <div className="flex gap-1.5">
+                  {Object.entries(COLOR_OPTIONS).map(([key, val]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() =>
+                        onUpdateNotes(opponentTeam.id, { color: key })
+                      }
+                      className={`h-5 w-5 rounded ${val.bg} transition-transform hover:scale-110 ${
+                        (opponentTeam.color || "blue") === key
+                          ? "ring-2 ring-white ring-offset-1 ring-offset-white dark:ring-offset-gray-900"
+                          : ""
+                      }`}
+                      title={key}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveNotes}
+                  className="flex items-center gap-1 rounded bg-brand-500 px-3 py-1 text-xs text-white transition-colors hover:bg-brand-600"
+                >
+                  <Save className="h-3 w-3" />
+                  Save
+                </button>
+                <button
+                  onClick={handleCancelEditNotes}
+                  className="flex items-center gap-1 rounded border border-gray-300 px-3 py-1 text-xs text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                  <XIcon className="h-3 w-3" />
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="whitespace-pre-wrap text-sm text-gray-500 dark:text-gray-400">
+              {opponentTeam.notes || "No notes. Click Edit to add."}
+            </p>
+          )}
         </div>
       </div>
 
@@ -436,82 +438,12 @@ const PlanRow: React.FC<PlanRowProps> = ({
             {validationError}
           </p>
         )}
-        <div className="grid grid-cols-12 items-stretch gap-2">
-          <div className="col-span-1 pt-2">
-            <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
-              Plan {index + 1}
-            </span>
-          </div>
-
-          <div className="col-span-4 flex justify-center gap-2">
-            <div className="min-w-0 flex-1">
-              <p className="mb-0.5 text-center text-xs text-brand-600 dark:text-brand-400">
-                Leads
-              </p>
-              <div className="space-y-1">
-                <PokemonDropdown
-                  options={myTeamPokemon}
-                  value={formData.lead1}
-                  onChange={(value) =>
-                    setFormData({ ...formData, lead1: value })
-                  }
-                  placeholder="Lead 1"
-                  showSprite={false}
-                />
-                <PokemonDropdown
-                  options={myTeamPokemon}
-                  value={formData.lead2}
-                  onChange={(value) =>
-                    setFormData({ ...formData, lead2: value })
-                  }
-                  placeholder="Lead 2"
-                  showSprite={false}
-                />
-              </div>
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <p className="mb-0.5 text-center text-xs text-blue-600 dark:text-blue-400">
-                Back
-              </p>
-              <div className="space-y-1">
-                <PokemonDropdown
-                  options={myTeamPokemon}
-                  value={formData.back1}
-                  onChange={(value) =>
-                    setFormData({ ...formData, back1: value })
-                  }
-                  placeholder="Back 1"
-                  showSprite={false}
-                />
-                <PokemonDropdown
-                  options={myTeamPokemon}
-                  value={formData.back2}
-                  onChange={(value) =>
-                    setFormData({ ...formData, back2: value })
-                  }
-                  placeholder="Back 2"
-                  showSprite={false}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="col-span-6 flex flex-col">
-            <p className="mb-0.5 text-xs text-gray-500 dark:text-gray-400">
-              Notes
-            </p>
-            <textarea
-              value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              placeholder="Strategy notes..."
-              className="w-full flex-1 resize-none rounded border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-600 dark:text-white/90 dark:placeholder-gray-500"
-            />
-          </div>
-
-          <div className="col-span-1 flex justify-end gap-1 pt-2">
+        {/* Row 1: Plan label + action buttons */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
+            Plan {index + 1}
+          </span>
+          <div className="flex gap-1">
             <button
               onClick={handleSave}
               className="rounded p-1.5 text-gray-400 transition-colors hover:bg-brand-50 hover:text-brand-500 dark:hover:bg-brand-500/10 dark:hover:text-brand-400"
@@ -528,79 +460,89 @@ const PlanRow: React.FC<PlanRowProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Row 2: Dropdowns */}
+        <div className="mt-2 flex gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="mb-0.5 text-center text-xs text-brand-600 dark:text-brand-400">
+              Leads
+            </p>
+            <div className="space-y-1">
+              <PokemonDropdown
+                options={myTeamPokemon}
+                value={formData.lead1}
+                onChange={(value) =>
+                  setFormData({ ...formData, lead1: value })
+                }
+                placeholder="Lead 1"
+                showSprite={false}
+              />
+              <PokemonDropdown
+                options={myTeamPokemon}
+                value={formData.lead2}
+                onChange={(value) =>
+                  setFormData({ ...formData, lead2: value })
+                }
+                placeholder="Lead 2"
+                showSprite={false}
+              />
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="mb-0.5 text-center text-xs text-blue-600 dark:text-blue-400">
+              Back
+            </p>
+            <div className="space-y-1">
+              <PokemonDropdown
+                options={myTeamPokemon}
+                value={formData.back1}
+                onChange={(value) =>
+                  setFormData({ ...formData, back1: value })
+                }
+                placeholder="Back 1"
+                showSprite={false}
+              />
+              <PokemonDropdown
+                options={myTeamPokemon}
+                value={formData.back2}
+                onChange={(value) =>
+                  setFormData({ ...formData, back2: value })
+                }
+                placeholder="Back 2"
+                showSprite={false}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Notes */}
+        <div className="mt-2">
+          <p className="mb-0.5 text-xs text-gray-500 dark:text-gray-400">
+            Notes
+          </p>
+          <textarea
+            value={formData.notes}
+            onChange={(e) =>
+              setFormData({ ...formData, notes: e.target.value })
+            }
+            placeholder="Strategy notes..."
+            className="w-full resize-none rounded border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-600 dark:text-white/90 dark:placeholder-gray-500"
+            rows={2}
+          />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-white/[0.02] dark:hover:border-gray-600">
-      <div className="grid grid-cols-12 items-start gap-2">
-        <div className="col-span-1 pt-2">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            Plan {index + 1}
-          </span>
-        </div>
-
-        <div className="col-span-4 flex justify-center gap-2">
-          <div>
-            <p className="mb-0.5 text-center text-xs text-brand-600 dark:text-brand-400">
-              Leads
-            </p>
-            <div className="rounded-lg border border-brand-200 bg-brand-50/50 p-1 dark:border-brand-400/30 dark:bg-brand-200/10">
-              <div className="flex gap-0.5">
-                <PokemonSprite
-                  name={composition.lead1}
-                  size="md"
-                  showTooltip={true}
-                />
-                <PokemonSprite
-                  name={composition.lead2}
-                  size="md"
-                  showTooltip={true}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-0.5 text-center text-xs text-blue-600 dark:text-blue-400">
-              Back
-            </p>
-            <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-1 dark:border-blue-400/30 dark:bg-blue-200/10">
-              <div className="flex gap-0.5">
-                <PokemonSprite
-                  name={composition.back1}
-                  size="md"
-                  showTooltip={true}
-                />
-                <PokemonSprite
-                  name={composition.back2}
-                  size="md"
-                  showTooltip={true}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-6">
-          <p className="mb-0.5 text-xs text-gray-500 dark:text-gray-400">
-            Notes
-          </p>
-          <div className="rounded-lg bg-gray-50 p-2 dark:bg-white/[0.03]">
-            {composition.notes ? (
-              <p className="break-words whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
-                {composition.notes}
-              </p>
-            ) : (
-              <p className="text-sm italic text-gray-400 dark:text-gray-500">
-                No notes
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="col-span-1 flex justify-end gap-1 pt-2">
+      {/* Row 1: Plan label + action buttons */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          Plan {index + 1}
+        </span>
+        <div className="flex gap-1">
           <button
             onClick={() => setIsEditing(true)}
             className="rounded p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
@@ -615,6 +557,67 @@ const PlanRow: React.FC<PlanRowProps> = ({
           >
             <Trash2 className="h-3 w-3" />
           </button>
+        </div>
+      </div>
+
+      {/* Row 2: Picks */}
+      <div className="mt-2 flex gap-2">
+        <div>
+          <p className="mb-0.5 text-center text-xs text-brand-600 dark:text-brand-400">
+            Leads
+          </p>
+          <div className="rounded-lg border border-brand-200 bg-brand-50/50 p-1 dark:border-brand-400/30 dark:bg-brand-200/10">
+            <div className="flex gap-0.5">
+              <PokemonSprite
+                name={composition.lead1}
+                size="md"
+                showTooltip={true}
+              />
+              <PokemonSprite
+                name={composition.lead2}
+                size="md"
+                showTooltip={true}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-0.5 text-center text-xs text-blue-600 dark:text-blue-400">
+            Back
+          </p>
+          <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-1 dark:border-blue-400/30 dark:bg-blue-200/10">
+            <div className="flex gap-0.5">
+              <PokemonSprite
+                name={composition.back1}
+                size="md"
+                showTooltip={true}
+              />
+              <PokemonSprite
+                name={composition.back2}
+                size="md"
+                showTooltip={true}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Notes */}
+      <div className="mt-2">
+        <p className="mb-0.5 text-xs text-gray-500 dark:text-gray-400">
+          Notes
+        </p>
+        <div className="rounded-lg bg-gray-50 p-2 dark:bg-white/[0.03]">
+          {composition.notes ? (
+            <p className="break-words whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+              {composition.notes}
+            </p>
+          ) : (
+            <p className="text-sm italic text-gray-400 dark:text-gray-500">
+              No notes
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -670,82 +673,12 @@ const AddPlanRow: React.FC<AddPlanRowProps> = ({
           {validationError}
         </p>
       )}
-      <div className="grid grid-cols-12 items-stretch gap-2">
-        <div className="col-span-1 pt-2">
-          <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
-            New
-          </span>
-        </div>
-
-        <div className="col-span-4 flex justify-center gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="mb-0.5 text-center text-xs text-brand-600 dark:text-brand-400">
-              Leads
-            </p>
-            <div className="space-y-1">
-              <PokemonDropdown
-                options={myTeamPokemon}
-                value={formData.lead1}
-                onChange={(value) =>
-                  setFormData({ ...formData, lead1: value })
-                }
-                placeholder="Lead 1"
-                showSprite={false}
-              />
-              <PokemonDropdown
-                options={myTeamPokemon}
-                value={formData.lead2}
-                onChange={(value) =>
-                  setFormData({ ...formData, lead2: value })
-                }
-                placeholder="Lead 2"
-                showSprite={false}
-              />
-            </div>
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="mb-0.5 text-center text-xs text-blue-600 dark:text-blue-400">
-              Back
-            </p>
-            <div className="space-y-1">
-              <PokemonDropdown
-                options={myTeamPokemon}
-                value={formData.back1}
-                onChange={(value) =>
-                  setFormData({ ...formData, back1: value })
-                }
-                placeholder="Back 1"
-                showSprite={false}
-              />
-              <PokemonDropdown
-                options={myTeamPokemon}
-                value={formData.back2}
-                onChange={(value) =>
-                  setFormData({ ...formData, back2: value })
-                }
-                placeholder="Back 2"
-                showSprite={false}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-6 flex flex-col">
-          <p className="mb-0.5 text-xs text-gray-500 dark:text-gray-400">
-            Notes
-          </p>
-          <textarea
-            value={formData.notes}
-            onChange={(e) =>
-              setFormData({ ...formData, notes: e.target.value })
-            }
-            placeholder="Strategy notes..."
-            className="w-full flex-1 resize-none rounded border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-600 dark:text-white/90 dark:placeholder-gray-500"
-          />
-        </div>
-
-        <div className="col-span-1 flex justify-end gap-1 pt-2">
+      {/* Row 1: Label + action buttons */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
+          New
+        </span>
+        <div className="flex gap-1">
           <button
             onClick={handleSave}
             className="rounded p-1.5 text-gray-400 transition-colors hover:bg-brand-50 hover:text-brand-500 dark:hover:bg-brand-500/10 dark:hover:text-brand-400"
@@ -761,6 +694,77 @@ const AddPlanRow: React.FC<AddPlanRowProps> = ({
             <XIcon className="h-3 w-3" />
           </button>
         </div>
+      </div>
+
+      {/* Row 2: Dropdowns */}
+      <div className="mt-2 flex gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="mb-0.5 text-center text-xs text-brand-600 dark:text-brand-400">
+            Leads
+          </p>
+          <div className="space-y-1">
+            <PokemonDropdown
+              options={myTeamPokemon}
+              value={formData.lead1}
+              onChange={(value) =>
+                setFormData({ ...formData, lead1: value })
+              }
+              placeholder="Lead 1"
+              showSprite={false}
+            />
+            <PokemonDropdown
+              options={myTeamPokemon}
+              value={formData.lead2}
+              onChange={(value) =>
+                setFormData({ ...formData, lead2: value })
+              }
+              placeholder="Lead 2"
+              showSprite={false}
+            />
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="mb-0.5 text-center text-xs text-blue-600 dark:text-blue-400">
+            Back
+          </p>
+          <div className="space-y-1">
+            <PokemonDropdown
+              options={myTeamPokemon}
+              value={formData.back1}
+              onChange={(value) =>
+                setFormData({ ...formData, back1: value })
+              }
+              placeholder="Back 1"
+              showSprite={false}
+            />
+            <PokemonDropdown
+              options={myTeamPokemon}
+              value={formData.back2}
+              onChange={(value) =>
+                setFormData({ ...formData, back2: value })
+              }
+              placeholder="Back 2"
+              showSprite={false}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Notes */}
+      <div className="mt-2">
+        <p className="mb-0.5 text-xs text-gray-500 dark:text-gray-400">
+          Notes
+        </p>
+        <textarea
+          value={formData.notes}
+          onChange={(e) =>
+            setFormData({ ...formData, notes: e.target.value })
+          }
+          placeholder="Strategy notes..."
+          className="w-full resize-none rounded border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-600 dark:text-white/90 dark:placeholder-gray-500"
+          rows={2}
+        />
       </div>
     </div>
   );
