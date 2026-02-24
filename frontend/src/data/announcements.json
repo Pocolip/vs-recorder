@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-02-23-clear-cache",
+    "date": "2026-02-23",
+    "title": "Sprite Loading Issue",
+    "message": "As there's been a lot of churn with the frequent releases, it's likely that the image cache in your browser has been invalidated. If you don't see sprites loading, try clearing your browser cache. In Chrome: Settings > Privacy and security > Delete browsing data > Cached images and files (select all time). In Safari: Settings > Privacy > Manage Website Data... > Find vsrecorder.app and remove it. In both cases be careful NOT to delete cookies browserwide, or say goodbye to your Showdown teams... (Not needed for this, but you can save off all of your sd teams at the very end of the team builder, simply copy paste to a text file and save it off periodically somewhere safe (like a Google Drive). Sprites should work from now on."
+  },
+  {
     "id": "2026-02-22-type-chart",
     "date": "2026-02-22",
     "title": "New Page: Type Chart",
