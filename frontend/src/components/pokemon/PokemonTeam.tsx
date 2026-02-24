@@ -57,7 +57,7 @@ const PokemonTeam: React.FC<PokemonTeamProps> = ({
   const slots = Array.from({ length: TEAM_SIZE }, (_, i) => resolvedNames[i] || null);
 
   return (
-    <div className="grid grid-cols-3 place-items-center sm:flex sm:flex-row sm:items-center sm:justify-evenly">
+    <div className="flex flex-row items-center gap-1">
       {slots.map((name, i) =>
         loading ? (
           <div
