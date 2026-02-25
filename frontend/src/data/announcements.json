@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-02-24-matchup-fixes",
+    "date": "2026-02-24",
+    "title": "Matchup Planner Fixes",
+    "message": "The Matchup Planner page has been refactored a bit, should be more usable in mobile now. As a reminder, details on sprites not loading can be seen in the previous announcement, link in the footer."
+  },
+  {
     "id": "2026-02-23-clear-cache",
     "date": "2026-02-23",
     "title": "Sprite Loading Issue",
