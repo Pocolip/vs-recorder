@@ -42,6 +42,8 @@ const COMMON_VGC_POKEMON: Record<string, { id: number; name: string; types: stri
   "tauros-paldea-aqua": { id: 128, name: "Tauros", types: ["Fighting", "Water"] },
   "pecharunt": { id: 1025, name: "Pecharunt", types: ["Poison", "Ghost"] },
   "kingambit": { id: 983, name: "Kingambit", types: ["Dark", "Steel"] },
+  "indeedee-f": { id: 876, name: "Indeedee Female", types: ["Psychic", "Normal"] },
+  "tatsugiri": { id: 978, name: "Tatsugiri Curly", types: ["Water", "Dragon"] },
 };
 
 interface PokemonData {
