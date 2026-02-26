@@ -14,6 +14,7 @@ import {
   setdexToState,
   getSelectStyles,
   getCompactSelectStyles,
+  normalizeSpeciesName,
 } from "../../utils/calcUtils";
 import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
@@ -120,6 +121,12 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
 
   const speciesInfo = getSpeciesInfo(state.species);
 
+  const statusForItem = (item: string | undefined): string => {
+    if (item === "Flame Orb") return "brn";
+    if (item === "Toxic Orb") return "tox";
+    return "";
+  };
+
   const handleSpeciesSelect = (option: SingleValue<SetdexOption>) => {
     if (!option) {
       onChange({ species: "", ability: "", item: "", nature: "Hardy", teraType: null });
@@ -129,9 +136,18 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
     // If it's a setdex entry (has set data)
     if (option.set) {
       const setData = setdexToState(option.set as Parameters<typeof setdexToState>[0]);
+      const species = normalizeSpeciesName(option.pokemon);
+      // Default to first ability if setdex doesn't specify one
+      if (!setData.ability) {
+        const abilities = getAbilitiesForSpecies(species);
+        setData.ability = abilities[0] || "";
+      }
+      if (!setData.status) {
+        setData.status = statusForItem(setData.item);
+      }
       onChange({
         ...setData,
-        species: option.pokemon,
+        species,
       });
     } else {
       // Plain species selection
@@ -151,6 +167,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       item: mon.item || "",
       nature: mon.nature || "Hardy",
       teraType: mon.tera_type || null,
+      status: statusForItem(mon.item),
       level: mon.level || 50,
       moves: (mon.moves || []).slice(0, 4).map((name) => ({
         name: typeof name === "string" ? name : "",
@@ -164,27 +181,23 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       changes.moves!.push({ name: "", crit: false, bpOverride: null });
     }
 
-    if (mon.evs && Object.keys(mon.evs).length > 0) {
-      changes.evs = {
-        hp: mon.evs.HP ?? mon.evs.hp ?? 0,
-        atk: mon.evs.Atk ?? mon.evs.atk ?? 0,
-        def: mon.evs.Def ?? mon.evs.def ?? 0,
-        spa: mon.evs.SpA ?? mon.evs.spa ?? 0,
-        spd: mon.evs.SpD ?? mon.evs.spd ?? 0,
-        spe: mon.evs.Spe ?? mon.evs.spe ?? 0,
-      };
-    }
+    changes.evs = {
+      hp: mon.evs?.HP ?? mon.evs?.hp ?? 0,
+      atk: mon.evs?.Atk ?? mon.evs?.atk ?? 0,
+      def: mon.evs?.Def ?? mon.evs?.def ?? 0,
+      spa: mon.evs?.SpA ?? mon.evs?.spa ?? 0,
+      spd: mon.evs?.SpD ?? mon.evs?.spd ?? 0,
+      spe: mon.evs?.Spe ?? mon.evs?.spe ?? 0,
+    };
 
-    if (mon.ivs && Object.keys(mon.ivs).length > 0) {
-      changes.ivs = {
-        hp: mon.ivs.HP ?? mon.ivs.hp ?? 31,
-        atk: mon.ivs.Atk ?? mon.ivs.atk ?? 31,
-        def: mon.ivs.Def ?? mon.ivs.def ?? 31,
-        spa: mon.ivs.SpA ?? mon.ivs.spa ?? 31,
-        spd: mon.ivs.SpD ?? mon.ivs.spd ?? 31,
-        spe: mon.ivs.Spe ?? mon.ivs.spe ?? 31,
-      };
-    }
+    changes.ivs = {
+      hp: mon.ivs?.HP ?? mon.ivs?.hp ?? 31,
+      atk: mon.ivs?.Atk ?? mon.ivs?.atk ?? 31,
+      def: mon.ivs?.Def ?? mon.ivs?.def ?? 31,
+      spa: mon.ivs?.SpA ?? mon.ivs?.spa ?? 31,
+      spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
+      spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
+    };
 
     onChange(changes);
   };
@@ -302,7 +315,6 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
               placeholder="Type"
               isClearable
               isSearchable
-              isDisabled={!state.isTera}
               menuPlacement="auto"
             />
           </div>

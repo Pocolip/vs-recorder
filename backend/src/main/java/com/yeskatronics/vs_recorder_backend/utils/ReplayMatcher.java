@@ -277,6 +277,35 @@ public class ReplayMatcher {
                         }
                     }
                 }
+                // Parse open team sheet (|showteam|) to resolve hidden formes (e.g., Urshifu-*)
+                else if (line.startsWith("|showteam|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 4) {
+                        String player = parts[2];
+                        String teamData = parts[3];
+
+                        // Parse team data: Pokemon||Item|Ability|Moves...
+                        String[] pokemons = teamData.split("\\]");
+                        List<String> team = data.getTeams().get(player);
+                        if (team != null) {
+                            for (String pokeData : pokemons) {
+                                String otsName = pokeData.split("\\|")[0].trim();
+                                if (otsName.isEmpty()) continue;
+
+                                // Replace wildcard entries (e.g., "Urshifu-*") with resolved forme
+                                for (int i = 0; i < team.size(); i++) {
+                                    if (team.get(i).contains("-*")) {
+                                        String baseName = team.get(i).replace("-*", "");
+                                        if (otsName.startsWith(baseName)) {
+                                            team.set(i, otsName);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 // Extract switch-ins to determine actual picks: |switch|p1a: Nickname|Species, L50, F
                 else if (line.startsWith("|switch|") || line.startsWith("|drag|")) {
                     String[] parts = line.split("\\|");
@@ -286,6 +315,20 @@ public class ReplayMatcher {
                         String player = position.substring(0, 2); // "p1" or "p2"
                         String speciesData = parts[3]; // "Species, L50, F" or "Species"
                         String pokemonName = speciesData.split(",")[0].trim(); // Extract species name
+
+                        // Resolve wildcard team entries (e.g., "Urshifu-*" → "Urshifu-Rapid-Strike")
+                        List<String> team = data.getTeams().get(player);
+                        if (team != null) {
+                            for (int i = 0; i < team.size(); i++) {
+                                if (team.get(i).contains("-*")) {
+                                    String baseName = team.get(i).replace("-*", "");
+                                    if (pokemonName.startsWith(baseName)) {
+                                        team.set(i, pokemonName);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
                         // Resolve to team roster entry to handle form changes
                         // (e.g., "Ogerpon-Hearthflame-Tera" → "Ogerpon-Hearthflame")
@@ -396,6 +439,16 @@ public class ReplayMatcher {
         for (String entry : team) {
             if (pokemonName.startsWith(entry + "-")) {
                 return entry;
+            }
+        }
+
+        // Check for wildcard entries (e.g., "Urshifu-*")
+        for (String entry : team) {
+            if (entry.contains("-*")) {
+                String baseName = entry.replace("-*", "");
+                if (pokemonName.startsWith(baseName)) {
+                    return pokemonName; // Return the specific forme
+                }
             }
         }
 
