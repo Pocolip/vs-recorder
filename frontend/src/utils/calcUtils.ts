@@ -86,6 +86,18 @@ export function setdexToState(setdexEntry: SetdexEntry): PokemonState {
   };
 }
 
+const SPECIES_NAME_MAP: Record<string, string> = {
+  "Urshifu-Single Strike": "Urshifu",
+  "Urshifu-Rapid Strike": "Urshifu-Rapid-Strike",
+  "Calyrex-Ice Rider": "Calyrex-Ice",
+  "Calyrex-Shadow Rider": "Calyrex-Shadow",
+  "Lycanroc-Midday": "Lycanroc",
+};
+
+export function normalizeSpeciesName(name: string): string {
+  return SPECIES_NAME_MAP[name] || name;
+}
+
 export function getBaseStats(species: string): StatsTable | null {
   if (!species) return null;
   for (const s of gen.species) {

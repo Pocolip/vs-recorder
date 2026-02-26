@@ -63,11 +63,15 @@ function buildField(fieldState: FieldState): Field {
   });
 }
 
-function buildMove(moveState: MoveState): Move {
+function buildMove(moveState: MoveState, isStellarTera = false): Move {
   const opts: Record<string, unknown> = { isCrit: moveState.crit };
 
   if (moveState.bpOverride) {
     opts.overrides = { basePower: moveState.bpOverride };
+  }
+
+  if (isStellarTera) {
+    opts.isStellarFirstUse = true;
   }
 
   return new Move(gen, moveState.name, opts);
@@ -102,7 +106,7 @@ export function useDamageCalc(
         .filter((m) => m.name)
         .map((m) => {
           try {
-            return calculate(gen, p1, p2, buildMove(m), field);
+            return calculate(gen, p1, p2, buildMove(m, p1State.isTera && p1State.teraType === "Stellar"), field);
           } catch {
             return null;
           }
@@ -112,7 +116,7 @@ export function useDamageCalc(
         .filter((m) => m.name)
         .map((m) => {
           try {
-            return calculate(gen, p2, p1, buildMove(m), reverseField);
+            return calculate(gen, p2, p1, buildMove(m, p2State.isTera && p2State.teraType === "Stellar"), reverseField);
           } catch {
             return null;
           }
