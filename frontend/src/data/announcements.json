@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-02-26-calc-matchup-stats",
+    "date": "2026-02-26",
+    "title": "Calc and Matchup Stat Fixes",
+    "message": "A couple of fixes went out on the calculator (proper Stellar handling, formes had missing stats, IVs would persist among slots). The Matchup Stats page also now accepts formes in the custom analysis (very overdue). As a reminder, details on sprites not loading can be seen in the previous announcements, link in the footer."
+  },
+  {
     "id": "2026-02-24-matchup-fixes",
     "date": "2026-02-24",
     "title": "Matchup Planner Fixes",
