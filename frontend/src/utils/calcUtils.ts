@@ -83,6 +83,7 @@ export function setdexToState(setdexEntry: SetdexEntry): PokemonState {
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
     moves: (setdexEntry.moves || []).map((name) => ({ name, crit: false, bpOverride: null })),
+    boostedStat: null,
   };
 }
 
@@ -240,6 +241,7 @@ export function createDefaultPokemonState(species = ""): PokemonState {
       { name: "", crit: false, bpOverride: null },
       { name: "", crit: false, bpOverride: null },
     ],
+    boostedStat: null,
   };
 }
 
@@ -274,6 +276,32 @@ export function createDefaultFieldState(): FieldState {
     isSwordOfRuin: false,
     isBeadsOfRuin: false,
   };
+}
+
+export type BoostedStat = 'atk' | 'def' | 'spa' | 'spd' | 'spe';
+
+const BOOSTABLE_STATS: BoostedStat[] = ['atk', 'def', 'spa', 'spd', 'spe'];
+
+export function computeHighestStat(
+  species: string,
+  evs: StatSpread,
+  ivs: StatSpread,
+  level: number,
+  nature: string,
+): BoostedStat | null {
+  const baseStats = getBaseStats(species);
+  if (!baseStats) return null;
+
+  let best: BoostedStat = 'atk';
+  let bestVal = 0;
+  for (const stat of BOOSTABLE_STATS) {
+    const val = calcFinalStat(stat, baseStats[stat], ivs[stat], evs[stat], level, nature);
+    if (val > bestVal) {
+      bestVal = val;
+      best = stat;
+    }
+  }
+  return best;
 }
 
 // Suppress unused imports warning — these types are re-exported for consumers

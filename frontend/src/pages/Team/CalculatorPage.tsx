@@ -197,6 +197,8 @@ export default function CalculatorPage() {
             onChange={handleP1Change}
             teamPokemon={teamPokemon}
             side="p1"
+            weather={field.weather}
+            terrain={field.terrain}
           />
         </div>
 
@@ -215,6 +217,8 @@ export default function CalculatorPage() {
             teamPokemon={null}
             hasOppositeSidebar={teamPokemon.length > 0}
             side="p2"
+            weather={field.weather}
+            terrain={field.terrain}
           />
         </div>
       </div>

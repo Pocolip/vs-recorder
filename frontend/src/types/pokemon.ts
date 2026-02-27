@@ -35,6 +35,7 @@ export interface PokemonState {
   boosts: BoostSpread;
   curHP: number;
   moves: MoveState[];
+  boostedStat: 'atk' | 'def' | 'spa' | 'spd' | 'spe' | null;
 }
 
 export interface SideState {

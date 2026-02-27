@@ -6,6 +6,7 @@ import {
   getBaseStats,
 } from "../../utils/calcUtils";
 import type { StatSpread, BoostSpread } from "../../types";
+import type { BoostedStat } from "../../utils/calcUtils";
 
 const BOOST_OPTIONS = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6];
 
@@ -16,10 +17,11 @@ interface StatTableProps {
   boosts: BoostSpread;
   nature: string;
   level: number;
-  onChange: (changes: Partial<{ evs: StatSpread; ivs: StatSpread; boosts: BoostSpread }>) => void;
+  boostedStat: BoostedStat | null;
+  onChange: (changes: Partial<{ evs: StatSpread; ivs: StatSpread; boosts: BoostSpread; boostedStat: BoostedStat | null }>) => void;
 }
 
-const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature, level, onChange }) => {
+const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature, level, boostedStat, onChange }) => {
   const baseStats = getBaseStats(species);
   const natureInfo = getNatureInfo(nature);
   const evTotal = Object.values(evs).reduce((sum, v) => sum + v, 0);
@@ -42,12 +44,13 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
   return (
     <div className="text-xs">
       {/* Header */}
-      <div className="grid grid-cols-[3rem_2.5rem_2.5rem_3rem_3rem_3rem] gap-0.5 mb-0.5">
+      <div className="grid grid-cols-[3rem_2.5rem_2.5rem_3rem_3rem_1.5rem_3rem] gap-0.5 mb-0.5">
         <div className="text-gray-500 font-medium"></div>
         <div className="text-gray-500 font-medium text-center">Base</div>
         <div className="text-gray-500 font-medium text-center">IV</div>
         <div className="text-gray-500 font-medium text-center">EV</div>
         <div className="text-gray-500 font-medium text-center">+/-</div>
+        <div className="text-gray-500 font-medium text-center" title="Booster Energy / Proto / Quark">BE</div>
         <div className="text-gray-500 font-medium text-center">Total</div>
       </div>
 
@@ -65,7 +68,7 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
         return (
           <div
             key={stat}
-            className="grid grid-cols-[3rem_2.5rem_2.5rem_3rem_3rem_3rem] gap-0.5 mb-0.5"
+            className="grid grid-cols-[3rem_2.5rem_2.5rem_3rem_3rem_1.5rem_3rem] gap-0.5 mb-0.5"
           >
             {/* Stat label */}
             <div
@@ -117,6 +120,23 @@ const StatTable: React.FC<StatTableProps> = ({ species, evs, ivs, boosts, nature
                   </option>
                 ))}
               </select>
+            ) : (
+              <div />
+            )}
+
+            {/* Booster Energy checkbox */}
+            {hasBoost ? (
+              <div className="flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={boostedStat === stat}
+                  onChange={() =>
+                    onChange({ boostedStat: boostedStat === stat ? null : (stat as BoostedStat) })
+                  }
+                  className="rounded border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
+                  title={`Booster Energy: boost ${STAT_LABELS[stat]}`}
+                />
+              </div>
             ) : (
               <div />
             )}
