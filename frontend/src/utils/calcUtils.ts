@@ -93,7 +93,100 @@ const SPECIES_NAME_MAP: Record<string, string> = {
   "Calyrex-Ice Rider": "Calyrex-Ice",
   "Calyrex-Shadow Rider": "Calyrex-Shadow",
   "Lycanroc-Midday": "Lycanroc",
+  "Terapagos": "Terapagos-Terastal",
 };
+
+// --- Terapagos & Ogerpon tera forme handling ---
+
+const OGERPON_TERA_MAP: Record<string, string> = {
+  "Ogerpon": "Grass",
+  "Ogerpon-Wellspring": "Water",
+  "Ogerpon-Hearthflame": "Fire",
+  "Ogerpon-Cornerstone": "Rock",
+};
+
+const OGERPON_TERA_SPECIES: Record<string, string> = {
+  "Ogerpon": "Ogerpon-Teal-Tera",
+  "Ogerpon-Wellspring": "Ogerpon-Wellspring-Tera",
+  "Ogerpon-Hearthflame": "Ogerpon-Hearthflame-Tera",
+  "Ogerpon-Cornerstone": "Ogerpon-Cornerstone-Tera",
+};
+
+const OGERPON_UNTERA_SPECIES: Record<string, string> = {
+  "Ogerpon-Teal-Tera": "Ogerpon",
+  "Ogerpon-Wellspring-Tera": "Ogerpon-Wellspring",
+  "Ogerpon-Hearthflame-Tera": "Ogerpon-Hearthflame",
+  "Ogerpon-Cornerstone-Tera": "Ogerpon-Cornerstone",
+};
+
+const OGERPON_EMBODY_ASPECT: Record<string, string> = {
+  "Ogerpon": "Embody Aspect (Teal)",
+  "Ogerpon-Wellspring": "Embody Aspect (Wellspring)",
+  "Ogerpon-Hearthflame": "Embody Aspect (Hearthflame)",
+  "Ogerpon-Cornerstone": "Embody Aspect (Cornerstone)",
+};
+
+const OGERPON_BASE_ABILITIES: Record<string, string> = {
+  "Ogerpon": "Defiant",
+  "Ogerpon-Wellspring": "Water Absorb",
+  "Ogerpon-Hearthflame": "Mold Breaker",
+  "Ogerpon-Cornerstone": "Sturdy",
+};
+
+const OGERPON_DEFAULT_ITEMS: Record<string, string> = {
+  "Ogerpon-Wellspring": "Wellspring Mask",
+  "Ogerpon-Hearthflame": "Hearthflame Mask",
+  "Ogerpon-Cornerstone": "Cornerstone Mask",
+};
+
+export function getTeraDefaults(species: string): { teraType: string; item?: string } | null {
+  if (species === "Terapagos" || species === "Terapagos-Terastal" || species === "Terapagos-Stellar") {
+    return { teraType: "Stellar" };
+  }
+  const ogerponType = OGERPON_TERA_MAP[species];
+  if (ogerponType) return { teraType: ogerponType, item: OGERPON_DEFAULT_ITEMS[species] };
+  // Also handle tera forme species
+  const baseSpecies = OGERPON_UNTERA_SPECIES[species];
+  if (baseSpecies) return { teraType: OGERPON_TERA_MAP[baseSpecies], item: OGERPON_DEFAULT_ITEMS[baseSpecies] };
+  return null;
+}
+
+export function applyTeraFormeChange(
+  species: string,
+  isTera: boolean,
+): { species: string; ability: string; teraType: string } | null {
+  if (isTera) {
+    // Tera ON
+    if (species === "Terapagos-Terastal") {
+      return { species: "Terapagos-Stellar", ability: "Teraform Zero", teraType: "Stellar" };
+    }
+    if (OGERPON_TERA_SPECIES[species]) {
+      return {
+        species: OGERPON_TERA_SPECIES[species],
+        ability: OGERPON_EMBODY_ASPECT[species],
+        teraType: OGERPON_TERA_MAP[species],
+      };
+    }
+  } else {
+    // Tera OFF
+    if (species === "Terapagos-Stellar") {
+      return { species: "Terapagos-Terastal", ability: "Tera Shell", teraType: "Stellar" };
+    }
+    const baseSpecies = OGERPON_UNTERA_SPECIES[species];
+    if (baseSpecies) {
+      return {
+        species: baseSpecies,
+        ability: OGERPON_BASE_ABILITIES[baseSpecies],
+        teraType: OGERPON_TERA_MAP[baseSpecies],
+      };
+    }
+  }
+  return null;
+}
+
+export function hasLockedTeraType(species: string): boolean {
+  return getTeraDefaults(species) !== null;
+}
 
 export function normalizeSpeciesName(name: string): string {
   return SPECIES_NAME_MAP[name] || name;

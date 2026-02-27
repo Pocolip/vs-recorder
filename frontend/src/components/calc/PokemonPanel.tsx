@@ -16,6 +16,9 @@ import {
   getCompactSelectStyles,
   normalizeSpeciesName,
   computeHighestStat,
+  getTeraDefaults,
+  applyTeraFormeChange,
+  hasLockedTeraType,
 } from "../../utils/calcUtils";
 import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
@@ -194,28 +197,40 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         setData.boostedStat = null;
       }
 
+      // Apply tera/item defaults for Terapagos/Ogerpon
+      const teraDefaults = getTeraDefaults(species);
+      if (teraDefaults) {
+        if (!setData.teraType) setData.teraType = teraDefaults.teraType;
+        if (!setData.item && teraDefaults.item) setData.item = teraDefaults.item;
+      }
+
       onChange({
         ...setData,
         species,
       });
     } else {
       // Plain species selection
-      const info = getSpeciesInfo(option.value);
+      const species = normalizeSpeciesName(option.value);
+      const info = getSpeciesInfo(species);
       const abilities = info?.abilities ? Object.values(info.abilities).filter(Boolean) : [];
+      const teraDefaults = getTeraDefaults(species);
       onChange({
-        species: option.value,
+        species,
         ability: (abilities[0] as string) || "",
+        ...(teraDefaults ? { teraType: teraDefaults.teraType, item: teraDefaults.item || "" } : {}),
       });
     }
   };
 
   const handleTeamSlotSelect = (mon: PokemonFromPaste) => {
+    const species = normalizeSpeciesName(mon.name);
+    const teraDefaults = getTeraDefaults(species);
     const changes: Partial<PokemonState> = {
-      species: mon.name,
+      species,
       ability: mon.ability || "",
       item: mon.item || "",
       nature: mon.nature || "Hardy",
-      teraType: mon.tera_type || null,
+      teraType: teraDefaults ? teraDefaults.teraType : (mon.tera_type || null),
       status: statusForItem(mon.item),
       level: mon.level || 50,
       moves: (mon.moves || []).slice(0, 4).map((name) => ({
@@ -251,7 +266,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
     // Auto-compute boostedStat if Booster Energy + Proto/Quark
     const ability = changes.ability || "";
     if (changes.item === "Booster Energy" && (ability === "Protosynthesis" || ability === "Quark Drive")) {
-      changes.boostedStat = computeHighestStat(mon.name, changes.evs!, changes.ivs!, changes.level || 50, changes.nature || "Hardy") ?? null;
+      changes.boostedStat = computeHighestStat(species, changes.evs!, changes.ivs!, changes.level || 50, changes.nature || "Hardy") ?? null;
     } else {
       changes.boostedStat = null;
     }
@@ -288,7 +303,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         isSearchable
         filterOption={(option, input) => {
           if (!input) return true;
-          return option.label.toLowerCase().includes(input.toLowerCase());
+          return option.data.pokemon.toLowerCase().includes(input.toLowerCase());
         }}
         menuPlacement="auto"
       />
@@ -358,7 +373,15 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
             <input
               type="checkbox"
               checked={state.isTera}
-              onChange={(e) => onChange({ isTera: e.target.checked })}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                const formeChange = applyTeraFormeChange(state.species, checked);
+                if (formeChange) {
+                  onChange({ isTera: checked, species: formeChange.species, ability: formeChange.ability, teraType: formeChange.teraType });
+                } else {
+                  onChange({ isTera: checked });
+                }
+              }}
               className="rounded border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
             />
             <span className="text-xs text-gray-500 dark:text-gray-400">Tera</span>
@@ -370,8 +393,9 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
               options={typeOptions}
               styles={compactStyles as any}
               placeholder="Type"
-              isClearable
-              isSearchable
+              isClearable={!hasLockedTeraType(state.species)}
+              isSearchable={!hasLockedTeraType(state.species)}
+              isDisabled={hasLockedTeraType(state.species)}
               menuPlacement="auto"
             />
           </div>
