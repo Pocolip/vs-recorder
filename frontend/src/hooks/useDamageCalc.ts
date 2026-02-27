@@ -22,6 +22,10 @@ function buildPokemon(state: PokemonState): Pokemon | null {
     opts.teraType = state.teraType;
   }
 
+  if (state.boostedStat) {
+    opts.boostedStat = state.boostedStat;
+  }
+
   const pokemon = new Pokemon(gen, state.species, opts);
 
   if (state.curHP < 100) {
