@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import Select, { type SingleValue } from "react-select";
 import SidebarSlots from "./SidebarSlots";
 import StatTable from "./StatTable";
@@ -15,6 +15,10 @@ import {
   getSelectStyles,
   getCompactSelectStyles,
   normalizeSpeciesName,
+  computeHighestStat,
+  getTeraDefaults,
+  applyTeraFormeChange,
+  hasLockedTeraType,
 } from "../../utils/calcUtils";
 import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
@@ -45,6 +49,8 @@ interface PokemonPanelProps {
   teamPokemon: PokemonFromPaste[] | null;
   hasOppositeSidebar?: boolean;
   side: "p1" | "p2";
+  weather?: string;
+  terrain?: string;
 }
 
 const PokemonPanel: React.FC<PokemonPanelProps> = ({
@@ -53,6 +59,8 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   teamPokemon,
   hasOppositeSidebar = false,
   side,
+  weather = "",
+  terrain = "",
 }) => {
   const { theme } = useTheme();
   const dark = theme === "dark";
@@ -121,6 +129,43 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
 
   const speciesInfo = getSpeciesInfo(state.species);
 
+  // Auto-check boostedStat when Booster Energy / Proto / Quark conditions are met
+  const prevAbilityRef = useRef(state.ability);
+  const prevItemRef = useRef(state.item);
+  const prevWeatherRef = useRef(weather);
+  const prevTerrainRef = useRef(terrain);
+
+  useEffect(() => {
+    const abilityChanged = prevAbilityRef.current !== state.ability;
+    const itemChanged = prevItemRef.current !== state.item;
+    const weatherChanged = prevWeatherRef.current !== weather;
+    const terrainChanged = prevTerrainRef.current !== terrain;
+
+    prevAbilityRef.current = state.ability;
+    prevItemRef.current = state.item;
+    prevWeatherRef.current = weather;
+    prevTerrainRef.current = terrain;
+
+    if (!abilityChanged && !itemChanged && !weatherChanged && !terrainChanged) return;
+    if (!state.species) return;
+
+    const isProto = state.ability === "Protosynthesis";
+    const isQuark = state.ability === "Quark Drive";
+
+    const shouldAutoBoost =
+      (itemChanged && state.item === "Booster Energy" && (isProto || isQuark)) ||
+      (abilityChanged && (isProto || isQuark) && state.item === "Booster Energy") ||
+      (weatherChanged && weather === "Sun" && isProto) ||
+      (terrainChanged && terrain === "Electric" && isQuark);
+
+    if (shouldAutoBoost) {
+      const highest = computeHighestStat(state.species, state.evs, state.ivs, state.level, state.nature);
+      if (highest) {
+        onChange({ boostedStat: highest });
+      }
+    }
+  }, [state.ability, state.item, state.species, state.evs, state.ivs, state.level, state.nature, weather, terrain, onChange]);
+
   const statusForItem = (item: string | undefined): string => {
     if (item === "Flame Orb") return "brn";
     if (item === "Toxic Orb") return "tox";
@@ -145,28 +190,47 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       if (!setData.status) {
         setData.status = statusForItem(setData.item);
       }
+      // Auto-compute boostedStat if the set has Booster Energy
+      if (setData.item === "Booster Energy" && (setData.ability === "Protosynthesis" || setData.ability === "Quark Drive")) {
+        setData.boostedStat = computeHighestStat(species, setData.evs, setData.ivs, setData.level, setData.nature) ?? null;
+      } else {
+        setData.boostedStat = null;
+      }
+
+      // Apply tera/item defaults for Terapagos/Ogerpon
+      const teraDefaults = getTeraDefaults(species);
+      if (teraDefaults) {
+        if (!setData.teraType) setData.teraType = teraDefaults.teraType;
+        if (!setData.item && teraDefaults.item) setData.item = teraDefaults.item;
+      }
+
       onChange({
         ...setData,
         species,
       });
     } else {
       // Plain species selection
-      const info = getSpeciesInfo(option.value);
+      const species = normalizeSpeciesName(option.value);
+      const info = getSpeciesInfo(species);
       const abilities = info?.abilities ? Object.values(info.abilities).filter(Boolean) : [];
+      const teraDefaults = getTeraDefaults(species);
       onChange({
-        species: option.value,
+        species,
         ability: (abilities[0] as string) || "",
+        ...(teraDefaults ? { teraType: teraDefaults.teraType, item: teraDefaults.item || "" } : {}),
       });
     }
   };
 
   const handleTeamSlotSelect = (mon: PokemonFromPaste) => {
+    const species = normalizeSpeciesName(mon.name);
+    const teraDefaults = getTeraDefaults(species);
     const changes: Partial<PokemonState> = {
-      species: mon.name,
+      species,
       ability: mon.ability || "",
       item: mon.item || "",
       nature: mon.nature || "Hardy",
-      teraType: mon.tera_type || null,
+      teraType: teraDefaults ? teraDefaults.teraType : (mon.tera_type || null),
       status: statusForItem(mon.item),
       level: mon.level || 50,
       moves: (mon.moves || []).slice(0, 4).map((name) => ({
@@ -198,6 +262,14 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
       spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
     };
+
+    // Auto-compute boostedStat if Booster Energy + Proto/Quark
+    const ability = changes.ability || "";
+    if (changes.item === "Booster Energy" && (ability === "Protosynthesis" || ability === "Quark Drive")) {
+      changes.boostedStat = computeHighestStat(species, changes.evs!, changes.ivs!, changes.level || 50, changes.nature || "Hardy") ?? null;
+    } else {
+      changes.boostedStat = null;
+    }
 
     onChange(changes);
   };
@@ -231,7 +303,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         isSearchable
         filterOption={(option, input) => {
           if (!input) return true;
-          return option.label.toLowerCase().includes(input.toLowerCase());
+          return option.data.pokemon.toLowerCase().includes(input.toLowerCase());
         }}
         menuPlacement="auto"
       />
@@ -301,7 +373,15 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
             <input
               type="checkbox"
               checked={state.isTera}
-              onChange={(e) => onChange({ isTera: e.target.checked })}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                const formeChange = applyTeraFormeChange(state.species, checked);
+                if (formeChange) {
+                  onChange({ isTera: checked, species: formeChange.species, ability: formeChange.ability, teraType: formeChange.teraType });
+                } else {
+                  onChange({ isTera: checked });
+                }
+              }}
               className="rounded border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 text-emerald-500 focus:ring-emerald-500 w-3 h-3"
             />
             <span className="text-xs text-gray-500 dark:text-gray-400">Tera</span>
@@ -313,8 +393,9 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
               options={typeOptions}
               styles={compactStyles as any}
               placeholder="Type"
-              isClearable
-              isSearchable
+              isClearable={!hasLockedTeraType(state.species)}
+              isSearchable={!hasLockedTeraType(state.species)}
+              isDisabled={hasLockedTeraType(state.species)}
               menuPlacement="auto"
             />
           </div>
@@ -362,6 +443,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         boosts={state.boosts}
         nature={state.nature}
         level={state.level}
+        boostedStat={state.boostedStat}
         onChange={onChange}
       />
 
