@@ -5,7 +5,6 @@ import SignUp from "./pages/AuthPages/SignUp";
 import ForgotPassword from "./pages/AuthPages/ForgotPassword";
 import ResetPassword from "./pages/AuthPages/ResetPassword";
 import NotFound from "./pages/OtherPage/NotFound";
-import AppLayout from "./layout/AppLayout";
 import TeamLayout from "./layout/TeamLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import HomePage from "./pages/Dashboard/HomePage";
@@ -21,7 +20,7 @@ import MatchupPlannerPage from "./pages/Team/MatchupPlannerPage";
 import PokemonNotesPage from "./pages/Team/PokemonNotesPage";
 import CalculatorPage from "./pages/Team/CalculatorPage";
 import TypeChartPage from "./pages/Team/TypeChartPage";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RootRoute from "./components/auth/RootRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 import * as pokemonService from "./services/pokemonService";
 
@@ -68,18 +67,12 @@ export default function App() {
           }
         />
 
-        {/* Protected dashboard */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/announcements" element={<AnnouncementsPage />} />
-          <Route path="/team/:teamId" element={<TeamLayout />}>
+        {/* Root: Landing page (unauth) or Dashboard (auth) */}
+        <Route path="/" element={<RootRoute />}>
+          <Route index element={<HomePage />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="announcements" element={<AnnouncementsPage />} />
+          <Route path="team/:teamId" element={<TeamLayout />}>
             <Route index element={<Navigate to="replays" replace />} />
             <Route path="replays" element={<ReplaysPage />} />
             <Route path="game-by-game" element={<GameByGamePage />} />
