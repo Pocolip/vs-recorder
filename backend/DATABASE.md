@@ -24,7 +24,6 @@ Relational approach chosen for:
   - Once schema stabilizes (after implementing core features)
   - Export H2 schema or use Flyway/Liquibase for migrations
   - Switch `spring.datasource.url` to PostgreSQL connection
-  - Load Pokemon data into production database
 
 ### Alternative: Docker Compose
 - Can use Docker Compose for local PostgreSQL during development
@@ -55,18 +54,25 @@ created_at           TIMESTAMP DEFAULT NOW()
 updated_at           TIMESTAMP DEFAULT NOW()
 ```
 
+**Relationships:**
+- One-to-many with `replays`, `matches`, `team_members` (cascade all, orphan removal)
+- Many-to-many with `folders` via `team_folders` join table
+
 ### replays
 ```sql
-id          SERIAL PRIMARY KEY
-team_id     INTEGER REFERENCES teams(id) ON DELETE CASCADE
-match_id    INTEGER REFERENCES matches(id) ON DELETE SET NULL -- Optional Bo3 grouping
-url         TEXT UNIQUE NOT NULL
-notes       TEXT
-battle_log  JSONB NOT NULL -- Full battle log from Showdown
-opponent    VARCHAR(100) -- Parsed from battle_log
-result      VARCHAR(10) -- 'win' or 'loss', parsed from battle_log
-date        TIMESTAMP -- Battle date, parsed from battle_log
-created_at  TIMESTAMP DEFAULT NOW()
+id           SERIAL PRIMARY KEY
+team_id      INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE
+match_id     INTEGER REFERENCES matches(id) ON DELETE SET NULL -- Optional Bo3 grouping
+url          TEXT NOT NULL
+notes        TEXT
+battle_log   JSONB NOT NULL -- Full battle log from Showdown
+opponent     VARCHAR(100) -- Parsed from battle_log
+result       VARCHAR(10) -- 'win' or 'loss', parsed from battle_log
+game_number  INTEGER -- 1/2/3 for Bo3 games, null for Bo1
+date         TIMESTAMP -- Battle date, parsed from battle_log
+created_at   TIMESTAMP DEFAULT NOW()
+
+UNIQUE(url, team_id) -- Same URL allowed across different teams
 ```
 
 ### matches
@@ -80,14 +86,52 @@ created_at  TIMESTAMP DEFAULT NOW()
 updated_at  TIMESTAMP DEFAULT NOW()
 ```
 
+### team_members
+```sql
+id            SERIAL PRIMARY KEY
+team_id       INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE
+pokemon_name  VARCHAR(100) NOT NULL
+slot          INTEGER NOT NULL
+notes         TEXT
+created_at    TIMESTAMP DEFAULT NOW()
+updated_at    TIMESTAMP DEFAULT NOW()
+
+UNIQUE(team_id, slot)
+```
+
+**Related table - team_member_calcs:**
+```sql
+team_member_id  INTEGER NOT NULL REFERENCES team_members(id) ON DELETE CASCADE
+calc            VARCHAR(255) -- Saved damage calc result strings
+```
+
+### folders
+```sql
+id          SERIAL PRIMARY KEY
+user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+name        VARCHAR(100) NOT NULL
+position    INTEGER NOT NULL DEFAULT 0
+created_at  TIMESTAMP DEFAULT NOW()
+```
+
+### team_folders (join table)
+```sql
+team_id     INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE
+folder_id   INTEGER NOT NULL REFERENCES folders(id) ON DELETE CASCADE
+PRIMARY KEY (team_id, folder_id)
+```
+
 ### game_plans
 ```sql
 id          SERIAL PRIMARY KEY
 user_id     INTEGER REFERENCES users(id) ON DELETE CASCADE
+team_id     INTEGER -- Optional reference to associate plan with a specific team
 name        VARCHAR(100) NOT NULL
 notes       TEXT
 created_at  TIMESTAMP DEFAULT NOW()
 updated_at  TIMESTAMP DEFAULT NOW()
+
+UNIQUE(team_id, user_id)
 ```
 
 ### game_plan_teams
@@ -96,9 +140,9 @@ id              SERIAL PRIMARY KEY
 game_plan_id    INTEGER REFERENCES game_plans(id) ON DELETE CASCADE
 pokepaste       TEXT NOT NULL
 notes           TEXT
+color           VARCHAR(20) -- UI color for opponent team card
 compositions    JSONB -- Array of {lead1, lead2, back1, back2, notes}
 created_at      TIMESTAMP DEFAULT NOW()
-updated_at      TIMESTAMP DEFAULT NOW()
 ```
 
 **Example compositions JSONB:**
@@ -121,84 +165,76 @@ updated_at      TIMESTAMP DEFAULT NOW()
 ]
 ```
 
-### pokemon
-```sql
-id                  SERIAL PRIMARY KEY
-dex_number          INTEGER NOT NULL
-name                VARCHAR(50) NOT NULL -- Base species name (e.g., "Urshifu")
-alternative_names   TEXT[] -- Array of forme variations for parsing
-type1               VARCHAR(20) NOT NULL
-type2               VARCHAR(20) -- Nullable for single-type Pokemon
-sprite_path         VARCHAR(255) NOT NULL -- Path to hosted sprite image
-created_at          TIMESTAMP DEFAULT NOW()
-```
-
-**Example pokemon data:**
-```json
-{
-  "dex_number": 892,
-  "name": "Urshifu",
-  "alternative_names": [
-    "Urshifu-*",
-    "Urshifu-Rapid-Strike",
-    "Urshifu-Single-Strike",
-    "Urshifu-Rapid-Strike-Gmax",
-    "Urshifu-Single-Strike-Gmax"
-  ],
-  "type1": "Fighting",
-  "type2": "Water",
-  "sprite_path": "/sprites/urshifu-rapid-strike.png"
-}
-```
-
-### exports
+### team_exports
 ```sql
 id              SERIAL PRIMARY KEY
-user_id         INTEGER REFERENCES users(id) ON DELETE CASCADE
-share_code      VARCHAR(10) UNIQUE NOT NULL -- Format: "vs-XXXXXX" (6 alphanumeric)
-export_data     JSONB NOT NULL -- Snapshot of team(s) and replay data
+code            VARCHAR(6) UNIQUE NOT NULL -- 6-char alphanumeric (A-HJ-NP-Z2-9, excludes I/O/0/1)
+user_id         INTEGER NOT NULL -- User who created the export
+team_id         INTEGER NOT NULL -- Source team
+team_name       VARCHAR(100) -- Stored for display without parsing JSON
+export_data     JSONB NOT NULL -- Full export: team, replays, matches, opponent plans
+data_checksum   VARCHAR(64) -- SHA-256 checksum for duplicate detection
+export_options  JSONB -- Options used when creating the export
 created_at      TIMESTAMP DEFAULT NOW()
+expires_at      TIMESTAMP -- Optional expiration for cleanup (null = never expires)
 ```
 
-**Example export_data JSONB:**
-```json
-{
-  "teams": [
-    {
-      "name": "Regulation G Team",
-      "pokepaste": "https://pokepast.es/...",
-      "regulation": "Reg G",
-      "showdown_usernames": ["player1", "player2"],
-      "replays": [
-        {
-          "url": "https://replay.pokemonshowdown.com/...",
-          "notes": "Close game",
-          "opponent": "OpponentName",
-          "result": "win",
-          "date": "2025-01-15T10:30:00Z"
-        }
-      ]
-    }
-  ]
-}
+### password_reset_tokens
+```sql
+id          SERIAL PRIMARY KEY
+user_id     INTEGER NOT NULL REFERENCES users(id)
+token_hash  VARCHAR(64) UNIQUE NOT NULL -- SHA-256 hash (plain token sent via email only)
+expires_at  TIMESTAMP NOT NULL
+used        BOOLEAN NOT NULL DEFAULT FALSE
+used_at     TIMESTAMP
+created_at  TIMESTAMP DEFAULT NOW()
+request_ip  VARCHAR(45) -- IP address for security auditing
+```
+
+## Entity Relationships
+
+```
+User ─(1:N)─> Team ─(1:N)─> Replay
+               │              │
+               ├──(1:N)─> Match ─(1:N)─┘
+               │          (optional Bo3 grouping)
+               │
+               ├──(1:N)─> TeamMember ─(1:N)─> team_member_calcs
+               │
+               └──(M:N)─> Folder (via team_folders)
+
+User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
+User ─(1:N)─> Folder
+User ─(1:N)─> PasswordResetToken
 ```
 
 ## Indexes
 ```sql
+-- teams
 CREATE INDEX idx_teams_user_id ON teams(user_id);
+
+-- replays
 CREATE INDEX idx_replays_team_id ON replays(team_id);
 CREATE INDEX idx_replays_match_id ON replays(match_id);
 CREATE INDEX idx_replays_opponent ON replays(opponent);
 CREATE INDEX idx_replays_result ON replays(result);
 CREATE INDEX idx_replays_date ON replays(date);
+
+-- matches
 CREATE INDEX idx_matches_team_id ON matches(team_id);
 CREATE INDEX idx_matches_opponent ON matches(opponent);
+
+-- game_plans
 CREATE INDEX idx_game_plans_user_id ON game_plans(user_id);
 CREATE INDEX idx_game_plan_teams_game_plan_id ON game_plan_teams(game_plan_id);
-CREATE INDEX idx_pokemon_name ON pokemon(name);
-CREATE INDEX idx_pokemon_dex_number ON pokemon(dex_number);
-CREATE INDEX idx_pokemon_alternative_names ON pokemon USING GIN(alternative_names);
-CREATE INDEX idx_exports_user_id ON exports(user_id);
-CREATE INDEX idx_exports_share_code ON exports(share_code);
-CREATE INDEX idx_exports_created_at ON exports(created_at);
+
+-- team_exports
+CREATE INDEX idx_team_exports_code ON team_exports(code);
+CREATE INDEX idx_team_exports_user_id ON team_exports(user_id);
+CREATE INDEX idx_team_exports_team_id ON team_exports(team_id);
+
+-- password_reset_tokens
+CREATE INDEX idx_token_hash ON password_reset_tokens(token_hash);
+CREATE INDEX idx_prt_user_id ON password_reset_tokens(user_id);
+CREATE INDEX idx_prt_expires_at ON password_reset_tokens(expires_at);
 ```
