@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Target, AlertTriangle } from "lucide-react";
+import { Plus, Target, AlertTriangle, Layers, ArrowLeft } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import OpponentTeamCard from "../../components/team/OpponentTeamCard";
+import LeadGroupCard from "../../components/team/LeadGroupCard";
 import AddOpponentTeamModal from "../../components/modals/AddOpponentTeamModal";
 import TagInput from "../../components/form/TagInput";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
@@ -17,6 +18,7 @@ export default function MatchupPlannerPage() {
   const [parseError, setParseError] = useState<string | null>(null);
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
   const [searchTags, setSearchTags] = useState<string[]>([]);
+  const [groupByLeads, setGroupByLeads] = useState(false);
 
   const {
     opponentTeams,
@@ -41,6 +43,34 @@ export default function MatchupPlannerPage() {
       return matchesPokemonTags(pokemonNames, searchTags);
     });
   }, [opponentTeams, searchTags, teamPokemon]);
+
+  const leadGroups = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        lead1: string;
+        lead2: string;
+        teams: {
+          opponentTeam: (typeof opponentTeams)[number];
+          composition: (typeof opponentTeams)[number]["compositions"][number];
+        }[];
+      }
+    >();
+
+    for (const ot of opponentTeams) {
+      for (const comp of ot.compositions) {
+        if (!comp.lead1 || !comp.lead2) continue;
+        const key = [comp.lead1, comp.lead2].sort().join("+");
+        if (!groups.has(key)) {
+          const [sorted1, sorted2] = [comp.lead1, comp.lead2].sort();
+          groups.set(key, { lead1: sorted1, lead2: sorted2, teams: [] });
+        }
+        groups.get(key)!.teams.push({ opponentTeam: ot, composition: comp });
+      }
+    }
+
+    return [...groups.values()].sort((a, b) => b.teams.length - a.teams.length);
+  }, [opponentTeams]);
 
   useEffect(() => {
     if (team?.pokepaste) {
@@ -127,13 +157,34 @@ export default function MatchupPlannerPage() {
             Plan strategies for specific matchups
           </p>
         </div>
-        <button
-          onClick={() => setShowAddTeamModal(true)}
-          className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-white transition-colors hover:bg-brand-600"
-        >
-          <Plus className="h-4 w-4" />
-          Add Matchup Team
-        </button>
+        <div className="flex items-center gap-2">
+          {groupByLeads ? (
+            <button
+              onClick={() => setGroupByLeads(false)}
+              className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Planner
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => setGroupByLeads(true)}
+                className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                <Layers className="h-4 w-4" />
+                Group By Leads
+              </button>
+              <button
+                onClick={() => setShowAddTeamModal(true)}
+                className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-white transition-colors hover:bg-brand-600"
+              >
+                <Plus className="h-4 w-4" />
+                Add Matchup Team
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Warning if team has no pokepaste */}
@@ -177,74 +228,113 @@ export default function MatchupPlannerPage() {
         </div>
       )}
 
-      {/* Tag Filter */}
-      {!isEmpty && !loading && (
-        <div>
-          <TagInput
-            tags={searchTags}
-            onTagsChange={setSearchTags}
-            placeholder="Filter by opponent pokemon..."
-          />
-          {searchTags.length > 0 && (
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Showing {filteredOpponentTeams.length} of {opponentTeams.length}{" "}
-              matchup teams
+      {groupByLeads ? (
+        /* Grouped By Leads View */
+        leadGroups.length === 0 ? (
+          <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 py-16 text-center dark:border-gray-600 dark:bg-white/[0.02]">
+            <Layers className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+            <h3 className="mb-2 text-xl font-semibold text-gray-700 dark:text-gray-300">
+              No lead pairs yet
+            </h3>
+            <p className="mx-auto max-w-md text-gray-500 dark:text-gray-400">
+              Add strategy plans with lead picks to your matchup teams to see
+              them grouped here.
             </p>
-          )}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {isEmpty && !loading && (
-        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 py-16 text-center dark:border-gray-600 dark:bg-white/[0.02]">
-          <Target className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
-          <h3 className="mb-2 text-xl font-semibold text-gray-700 dark:text-gray-300">
-            No matchup teams yet
-          </h3>
-          <p className="mx-auto mb-6 max-w-md text-gray-500 dark:text-gray-400">
-            Add matchup teams to plan your strategies. You'll be able to define
-            different compositions and notes for each matchup.
-          </p>
-          <button
-            onClick={() => setShowAddTeamModal(true)}
-            className="mx-auto flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-white transition-colors hover:bg-brand-600"
-          >
-            <Plus className="h-5 w-5" />
-            Add Your First Matchup Team
-          </button>
-        </div>
-      )}
-
-      {/* Filtered empty */}
-      {!isEmpty && filteredOpponentTeams.length === 0 && searchTags.length > 0 ? (
-        <div className="py-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400">
-            No matchup teams match your filters
-          </p>
-          <button
-            onClick={() => setSearchTags([])}
-            className="mt-2 text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
-          >
-            Clear filters
-          </button>
-        </div>
-      ) : (
-        !isEmpty && (
-          <div className="space-y-6">
-            {filteredOpponentTeams.map((opponentTeam) => (
-              <OpponentTeamCard
-                key={opponentTeam.id}
-                opponentTeam={opponentTeam}
-                myTeamPokemon={myTeamPokemon}
-                onUpdateNotes={handleUpdateNotes}
-                onAddComposition={addComposition}
-                onUpdateComposition={updateComposition}
-                onDeleteComposition={deleteComposition}
-                onDeleteTeam={handleDeleteOpponentTeam}
-              />
-            ))}
           </div>
+        ) : (
+          <>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {leadGroups.length} unique lead{" "}
+              {leadGroups.length === 1 ? "pair" : "pairs"} across{" "}
+              {leadGroups.reduce((sum, g) => sum + g.teams.length, 0)} matchups
+            </p>
+            <div className="space-y-4">
+              {leadGroups.map((group) => (
+                <LeadGroupCard
+                  key={`${group.lead1}+${group.lead2}`}
+                  lead1={group.lead1}
+                  lead2={group.lead2}
+                  teams={group.teams}
+                />
+              ))}
+            </div>
+          </>
         )
+      ) : (
+        /* Default Planner View */
+        <>
+          {/* Tag Filter */}
+          {!isEmpty && !loading && (
+            <div>
+              <TagInput
+                tags={searchTags}
+                onTagsChange={setSearchTags}
+                placeholder="Filter by opponent pokemon..."
+              />
+              {searchTags.length > 0 && (
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Showing {filteredOpponentTeams.length} of{" "}
+                  {opponentTeams.length} matchup teams
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {isEmpty && !loading && (
+            <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 py-16 text-center dark:border-gray-600 dark:bg-white/[0.02]">
+              <Target className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+              <h3 className="mb-2 text-xl font-semibold text-gray-700 dark:text-gray-300">
+                No matchup teams yet
+              </h3>
+              <p className="mx-auto mb-6 max-w-md text-gray-500 dark:text-gray-400">
+                Add matchup teams to plan your strategies. You'll be able to
+                define different compositions and notes for each matchup.
+              </p>
+              <button
+                onClick={() => setShowAddTeamModal(true)}
+                className="mx-auto flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-white transition-colors hover:bg-brand-600"
+              >
+                <Plus className="h-5 w-5" />
+                Add Your First Matchup Team
+              </button>
+            </div>
+          )}
+
+          {/* Filtered empty */}
+          {!isEmpty &&
+          filteredOpponentTeams.length === 0 &&
+          searchTags.length > 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-gray-500 dark:text-gray-400">
+                No matchup teams match your filters
+              </p>
+              <button
+                onClick={() => setSearchTags([])}
+                className="mt-2 text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            !isEmpty && (
+              <div className="space-y-6">
+                {filteredOpponentTeams.map((opponentTeam) => (
+                  <OpponentTeamCard
+                    key={opponentTeam.id}
+                    opponentTeam={opponentTeam}
+                    myTeamPokemon={myTeamPokemon}
+                    onUpdateNotes={handleUpdateNotes}
+                    onAddComposition={addComposition}
+                    onUpdateComposition={updateComposition}
+                    onDeleteComposition={deleteComposition}
+                    onDeleteTeam={handleDeleteOpponentTeam}
+                  />
+                ))}
+              </div>
+            )
+          )}
+        </>
       )}
 
       {/* Add Modal */}
