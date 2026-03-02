@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import PokemonSprite from "../pokemon/PokemonSprite";
 import PokemonTeam from "../pokemon/PokemonTeam";
+import Popover from "../ui/popover/Popover";
 import type { OpponentTeam } from "./OpponentTeamCard";
 import type { Composition } from "../../types";
 
@@ -52,14 +53,37 @@ const LeadGroupCard: React.FC<LeadGroupCardProps> = ({
       {/* Body: Opponent teams list */}
       {isOpen && (
         <div className={`grid grid-cols-1 gap-px border-t border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800 ${teams.length >= 5 ? "sm:grid-cols-3" : ""}`}>
-          {teams.map(({ opponentTeam }, i) => (
+          {teams.map(({ opponentTeam, composition }, i) => (
             <div
               key={`${opponentTeam.id}-${i}`}
               className={`flex justify-center px-3 py-2 ${i % 2 === 1 ? "bg-gray-50 dark:bg-white/[0.03]" : "bg-white dark:bg-white/[0.02]"}`}
             >
-              {opponentTeam.pokepaste && (
-                <PokemonTeam pokepasteUrl={opponentTeam.pokepaste} size="sm" />
-              )}
+              {opponentTeam.pokepaste ? (
+                (composition.back1 || composition.back2) ? (
+                  <Popover
+                    position={teams.length >= 5 && i % 3 === 2 ? "left" : "right"}
+                    trigger={
+                      <PokemonTeam pokepasteUrl={opponentTeam.pokepaste} size="sm" />
+                    }
+                  >
+                    <div className="rounded-t-xl border-b border-gray-200 bg-gray-100 px-4 py-2 dark:border-white/[0.03] dark:bg-[#252D3A]">
+                      <p className="text-center text-xs font-semibold text-gray-800 dark:text-white/90">
+                        Back
+                      </p>
+                    </div>
+                    <div className="flex justify-center gap-0.5 p-3">
+                      {composition.back1 && (
+                        <PokemonSprite name={composition.back1} size="md" showTooltip />
+                      )}
+                      {composition.back2 && (
+                        <PokemonSprite name={composition.back2} size="md" showTooltip />
+                      )}
+                    </div>
+                  </Popover>
+                ) : (
+                  <PokemonTeam pokepasteUrl={opponentTeam.pokepaste} size="sm" />
+                )
+              ) : null}
             </div>
           ))}
         </div>
