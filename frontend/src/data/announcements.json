@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-03-01-group-by-leads",
+    "date": "2026-03-01",
+    "title": "Matchup Planner: Group By Leads",
+    "message": "New toggle on the Matchup Planner page! You can now group your strategy plans by lead pairs to quickly see which leads cover the most matchups. Hit the 'Group By Leads' button to try it out."
+  },
+  {
     "id": "2026-02-26-calc-matchup-stats",
     "date": "2026-02-26",
     "title": "Calc and Matchup Stat Fixes",
