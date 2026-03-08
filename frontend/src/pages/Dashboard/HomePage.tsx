@@ -34,14 +34,18 @@ function replayHasRatingChange(replay: Replay): boolean {
   return elo != null && typeof elo.after === "number";
 }
 
-/** Build chart point from replay (use rating after this game). */
-function toRatingPoint(replay: Replay, gameIndex: number): { game: number; rating: number; date: string; opponent: string } {
+/** Build chart point from replay (use rating after this game and change). */
+function toRatingPoint(
+  replay: Replay,
+  gameIndex: number
+): { game: number; rating: number; change: number; date: string; opponent: string } {
   const b = replay.battleData!;
   const elo = b.eloChanges![b.userPlayer!];
   const date = replay.createdAt || "";
   return {
     game: gameIndex,
     rating: elo.after,
+    change: elo.change ?? 0,
     date,
     opponent: replay.opponent || "",
   };
@@ -137,6 +141,33 @@ export default function HomePage() {
     () => replaysForChart.map((r, i) => toRatingPoint(r, i + 1)),
     [replaysForChart]
   );
+
+  // Segments for green (up) / red (down) line coloring between consecutive points
+  const { chartDataWithSegments, segments } = useMemo(() => {
+    const segs: { fromIndex: number; toIndex: number; fromValue: number; toValue: number; type: "up" | "down" | "flat" }[] = [];
+    for (let i = 1; i < ratingChartData.length; i++) {
+      const prev = ratingChartData[i - 1].rating;
+      const curr = ratingChartData[i].rating;
+      segs.push({
+        fromIndex: i - 1,
+        toIndex: i,
+        fromValue: prev,
+        toValue: curr,
+        type: curr > prev ? "up" : curr < prev ? "down" : "flat",
+      });
+    }
+    const dataWithSegments = ratingChartData.map((point, i) => ({
+      ...point,
+      ...segs.reduce(
+        (acc, seg, j) => ({
+          ...acc,
+          [`seg_${j}`]: i === seg.fromIndex ? seg.fromValue : i === seg.toIndex ? seg.toValue : undefined,
+        }),
+        {} as Record<string, number | undefined>
+      ),
+    }));
+    return { chartDataWithSegments: dataWithSegments, segments: segs };
+  }, [ratingChartData]);
 
   const regulations = useMemo(() => {
     const regs = new Set(teams.map((t) => t.regulation).filter(Boolean));
@@ -436,7 +467,7 @@ export default function HomePage() {
           ) : (
             <div className="h-[240px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={ratingChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <LineChart data={chartDataWithSegments} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-20" />
                   <XAxis dataKey="game" tick={{ fontSize: 12 }} name="Game" />
                   <YAxis tick={{ fontSize: 12 }} name="Rating" domain={[1000, "auto"]} />
@@ -447,22 +478,53 @@ export default function HomePage() {
                       background: "#fff",
                     }}
                     labelStyle={{ color: "#374151" }}
-                    formatter={(value: number | undefined) => [value ?? 0, "Rating"]}
-                    labelFormatter={(_, payload) => {
-                      const p = payload[0]?.payload as { date: string; opponent: string } | undefined;
-                      if (!p) return "";
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload?.length) return null;
+                      const p = payload.find((e) => e.dataKey === "rating")?.payload as {
+                        rating: number;
+                        change: number;
+                        date: string;
+                        opponent: string;
+                      } | undefined;
+                      if (!p) return null;
                       const dateStr = p.date ? new Date(p.date).toLocaleDateString() : "";
-                      return p.opponent ? `Game vs ${p.opponent}${dateStr ? ` · ${dateStr}` : ""}` : dateStr || "Game";
+                      const labelLine = p.opponent ? `Game vs ${p.opponent}${dateStr ? ` · ${dateStr}` : ""}` : dateStr || `Game ${label}`;
+                      const changeStr =
+                        p.change > 0 ? `(+${p.change})` : p.change < 0 ? `(${p.change})` : "";
+                      return (
+                        <div
+                          className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm"
+                          style={{ background: "#fff" }}
+                        >
+                          <div className="text-sm font-medium text-gray-700">{labelLine}</div>
+                          <div className="text-sm text-gray-600">
+                            Rating: {p.rating}
+                            {changeStr ? ` ${changeStr}` : ""}
+                          </div>
+                        </div>
+                      );
                     }}
                   />
+                  {segments.map((seg, j) => (
+                    <Line
+                      key={j}
+                      type="monotone"
+                      dataKey={`seg_${j}`}
+                      stroke={seg.type === "up" ? "#22c55e" : seg.type === "down" ? "#ef4444" : "#94a3b8"}
+                      strokeWidth={2}
+                      connectNulls={false}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  ))}
                   <Line
                     type="monotone"
                     dataKey="rating"
                     name="Rating"
-                    stroke="#6366f1"
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    activeDot={{ r: 5 }}
+                    stroke="transparent"
+                    strokeWidth={0}
+                    dot={{ r: 3, fill: "#6366f1" }}
+                    activeDot={{ r: 5, fill: "#6366f1" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
