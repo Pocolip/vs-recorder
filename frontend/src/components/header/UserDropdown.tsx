@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useAuth } from "../../context/AuthContext";
+import { clearAppDataAndRefresh } from "../../utils";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,11 @@ export default function UserDropdown() {
     closeDropdown();
     logout();
     navigate("/signin");
+  }
+
+  function handleClearDataAndRefresh() {
+    closeDropdown();
+    clearAppDataAndRefresh();
   }
 
   return (
@@ -64,6 +70,28 @@ export default function UserDropdown() {
             {user?.email || ""}
           </span>
         </div>
+
+        <button
+          onClick={handleClearDataAndRefresh}
+          className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+          title="Clear stored data and reload (fixes sprites not loading or stale data). You'll need to sign in again."
+        >
+          <svg
+            className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M12 4a1 1 0 011 1v1.06A8 8 0 0120 14a1 1 0 11-2 0 6 6 0 00-3.5-5.44 1 1 0 01-.5-.93V6h-1a1 1 0 01-1-1V4a1 1 0 011-1zm-2 0a1 1 0 011 1v1a1 1 0 01-.5.93A6 6 0 005 14a1 1 0 11-2 0 8 8 0 014.5-7.24V5a1 1 0 011-1zm-1 6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6a1 1 0 011-1h4zm10 0a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6a1 1 0 011-1h4z"
+            />
+          </svg>
+          Clear data &amp; refresh
+        </button>
 
         <button
           onClick={handleSignOut}

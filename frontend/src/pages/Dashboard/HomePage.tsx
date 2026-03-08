@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useSearchParams } from "react-router";
 import { Plus, Download, X, Trophy, Calendar, TrendingUp } from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import PageMeta from "../../components/common/PageMeta";
 import PokemonTeam from "../../components/pokemon/PokemonTeam";
 import TagInput from "../../components/form/TagInput";
@@ -16,12 +17,34 @@ import { useMultipleTeamStats } from "../../hooks/useTeamStats";
 import useTeamPokemon from "../../hooks/useTeamPokemon";
 import { useFolderContext } from "../../context/FolderContext";
 import { teamApi } from "../../services/api/teamApi";
+import { replayApi } from "../../services/api/replayApi";
 import { formatTimeAgo } from "../../utils/timeUtils";
-import type { Team } from "../../types";
+import type { Team, Replay } from "../../types";
 
 function shortRegulation(reg: string): string {
   const match = reg.match(/Regulation\s+([A-Z])$/);
   return match ? `Reg ${match[1]}` : reg;
+}
+
+/** Replay has rating change if battleData has userPlayer and eloChanges[userPlayer] with before/after. */
+function replayHasRatingChange(replay: Replay): boolean {
+  const b = replay.battleData;
+  if (!b?.eloChanges || !b.userPlayer) return false;
+  const elo = b.eloChanges[b.userPlayer];
+  return elo != null && typeof elo.after === "number";
+}
+
+/** Build chart point from replay (use rating after this game). */
+function toRatingPoint(replay: Replay, gameIndex: number): { game: number; rating: number; date: string; opponent: string } {
+  const b = replay.battleData!;
+  const elo = b.eloChanges![b.userPlayer!];
+  const date = replay.createdAt || "";
+  return {
+    game: gameIndex,
+    rating: elo.after,
+    date,
+    opponent: replay.opponent || "",
+  };
 }
 
 export default function HomePage() {
@@ -48,6 +71,10 @@ export default function HomePage() {
   });
   const [showToast, setShowToast] = useState(false);
 
+  // All replays with rating change (across all teams) for dashboard line chart
+  const [allReplaysWithRating, setAllReplaysWithRating] = useState<Replay[]>([]);
+  const [chartLoading, setChartLoading] = useState(false);
+
   const dismissBanner = useCallback(() => {
     const viewed: string[] = JSON.parse(localStorage.getItem("viewedAnnouncements") || "[]");
     if (!viewed.includes(latestAnnouncement.id)) {
@@ -60,6 +87,40 @@ export default function HomePage() {
 
   // Re-fetch teams when dataVersion changes (folder assignments changed)
   useEffect(() => { if (dataVersion > 0) refresh(); }, [dataVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch all replays for all teams, filter to those with rating change, sort by date
+  useEffect(() => {
+    if (teams.length === 0) {
+      setAllReplaysWithRating([]);
+      return;
+    }
+    let cancelled = false;
+    setChartLoading(true);
+    Promise.all(teams.map((t) => replayApi.getByTeamId(t.id)))
+      .then((arrays) => {
+        if (cancelled) return;
+        const merged = arrays.flat();
+        const withRating = merged.filter(replayHasRatingChange);
+        const sorted = [...withRating].sort((a, b) => {
+          const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return tA - tB;
+        });
+        setAllReplaysWithRating(sorted);
+      })
+      .catch(() => {
+        if (!cancelled) setAllReplaysWithRating([]);
+      })
+      .finally(() => {
+        if (!cancelled) setChartLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [teams]);
+
+  const ratingChartData = useMemo(
+    () => allReplaysWithRating.map((r, i) => toRatingPoint(r, i + 1)),
+    [allReplaysWithRating]
+  );
 
   const regulations = useMemo(() => {
     const regs = new Set(teams.map((t) => t.regulation).filter(Boolean));
@@ -161,6 +222,8 @@ export default function HomePage() {
             </button>
           </div>
         </div>
+
+        
 
         {/* Stats Cards */}
         {!loading && teams.length > 0 && !activeFolderId && (
@@ -314,6 +377,61 @@ export default function HomePage() {
             ))}
           </div>
         )}
+
+        {/* Rating progression line chart (all replays with rating change, all teams) */}
+        <div
+          data-testid="home-page-graph"
+          className="mt-8 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/30"
+        >
+          <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Rating progression (all replays with rating change)
+          </p>
+          {chartLoading ? (
+            <div className="flex h-[240px] w-full items-center justify-center rounded bg-gray-50 dark:bg-gray-800/50">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Loading chart...</span>
+            </div>
+          ) : ratingChartData.length === 0 ? (
+            <div className="flex h-[240px] w-full items-center justify-center rounded border border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                No replays with rating change yet. Add replays to see your rating over time.
+              </span>
+            </div>
+          ) : (
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={ratingChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-20" />
+                  <XAxis dataKey="game" tick={{ fontSize: 12 }} name="Game" />
+                  <YAxis tick={{ fontSize: 12 }} name="Rating" />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "8px",
+                      border: "1px solid #e5e7eb",
+                      background: "#fff",
+                    }}
+                    labelStyle={{ color: "#374151" }}
+                    formatter={(value: number | undefined) => [value ?? 0, "Rating"]}
+                    labelFormatter={(_, payload) => {
+                      const p = payload[0]?.payload as { date: string; opponent: string } | undefined;
+                      if (!p) return "";
+                      const dateStr = p.date ? new Date(p.date).toLocaleDateString() : "";
+                      return p.opponent ? `Game vs ${p.opponent}${dateStr ? ` · ${dateStr}` : ""}` : dateStr || "Game";
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="rating"
+                    name="Rating"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modals */}
