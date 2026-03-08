@@ -74,6 +74,7 @@ export default function HomePage() {
   // All replays with rating change (across all teams) for dashboard line chart
   const [allReplaysWithRating, setAllReplaysWithRating] = useState<Replay[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
 
   const dismissBanner = useCallback(() => {
     const viewed: string[] = JSON.parse(localStorage.getItem("viewedAnnouncements") || "[]");
@@ -117,9 +118,24 @@ export default function HomePage() {
     return () => { cancelled = true; };
   }, [teams]);
 
+  // Unique Showdown usernames across all teams (for graph account filter)
+  const accountOptions = useMemo(() => {
+    const names = teams.flatMap((t) => t.showdownUsernames || []).filter(Boolean);
+    return Array.from(new Set(names)).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  }, [teams]);
+
+  // Filter replays by selected account: only replays from teams that have this Showdown username
+  const replaysForChart = useMemo(() => {
+    if (!selectedAccount) return allReplaysWithRating;
+    return allReplaysWithRating.filter((r) => {
+      const team = teams.find((t) => t.id === r.teamId);
+      return team?.showdownUsernames?.some((u) => u.localeCompare(selectedAccount, undefined, { sensitivity: "base" }) === 0);
+    });
+  }, [allReplaysWithRating, selectedAccount, teams]);
+
   const ratingChartData = useMemo(
-    () => allReplaysWithRating.map((r, i) => toRatingPoint(r, i + 1)),
-    [allReplaysWithRating]
+    () => replaysForChart.map((r, i) => toRatingPoint(r, i + 1)),
+    [replaysForChart]
   );
 
   const regulations = useMemo(() => {
@@ -383,9 +399,28 @@ export default function HomePage() {
           data-testid="home-page-graph"
           className="mt-8 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/30"
         >
-          <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Rating progression (all replays with rating change)
-          </p>
+          <div className="mb-3 flex flex-row flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Rating progression (all replays with rating change)
+            </p>
+            {accountOptions.length > 0 && (
+              <label className="flex shrink-0 items-center gap-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Account:</span>
+                <select
+                  value={selectedAccount}
+                  onChange={(e) => setSelectedAccount(e.target.value)}
+                  className="h-9 min-w-[140px] rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                >
+                  <option value="">All accounts</option>
+                  {accountOptions.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
           {chartLoading ? (
             <div className="flex h-[240px] w-full items-center justify-center rounded bg-gray-50 dark:bg-gray-800/50">
               <span className="text-sm text-gray-500 dark:text-gray-400">Loading chart...</span>
@@ -393,7 +428,9 @@ export default function HomePage() {
           ) : ratingChartData.length === 0 ? (
             <div className="flex h-[240px] w-full items-center justify-center rounded border border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                No replays with rating change yet. Add replays to see your rating over time.
+                {selectedAccount
+                  ? `No replays with rating change for "${selectedAccount}". Try another account or All accounts.`
+                  : "No replays with rating change yet. Add replays to see your rating over time."}
               </span>
             </div>
           ) : (
