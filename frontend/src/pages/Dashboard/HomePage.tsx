@@ -402,7 +402,7 @@ export default function HomePage() {
                 <LineChart data={ratingChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-20" />
                   <XAxis dataKey="game" tick={{ fontSize: 12 }} name="Game" />
-                  <YAxis tick={{ fontSize: 12 }} name="Rating" />
+                  <YAxis tick={{ fontSize: 12 }} name="Rating" domain={[1000, "auto"]} />
                   <Tooltip
                     contentStyle={{
                       borderRadius: "8px",
