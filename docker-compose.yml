@@ -32,6 +32,7 @@ services:
       - DB_USERNAME=vsrecorder_user
       - DB_PASSWORD=localdevpassword
       - JWT_SECRET=local-dev-secret-change-in-production-minimum-256-bits
+      - RESEND_API_KEY=dev-placeholder     
     ports:
       - "8080:8080"
     depends_on:
