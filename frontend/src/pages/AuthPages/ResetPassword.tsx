@@ -49,7 +49,7 @@ function ResetPasswordForm() {
     authApi
       .validateResetToken(token)
       .then((res) => {
-        setState(res.valid ? "form" : "invalid");
+        setState(res.success ? "form" : "invalid");
       })
       .catch(() => {
         setState("invalid");

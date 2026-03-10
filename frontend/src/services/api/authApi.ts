@@ -30,7 +30,7 @@ export const authApi = {
     apiClient.post("/api/auth/forgot-password", { email }) as Promise<{ message: string }>,
 
   validateResetToken: (token: string) =>
-    apiClient.get(`/api/auth/reset-password/validate?token=${token}`) as Promise<{ valid: boolean }>,
+    apiClient.get(`/api/auth/reset-password/validate?token=${token}`) as Promise<{ success: boolean; message: string }>,
 
   resetPassword: (data: { token: string; newPassword: string }) =>
     apiClient.post("/api/auth/reset-password", data) as Promise<{ message: string }>,
