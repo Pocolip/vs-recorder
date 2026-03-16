@@ -71,7 +71,7 @@ export function setdexToState(setdexEntry: SetdexEntry): PokemonState {
 
   return {
     species: "",
-    level: setdexEntry.level || 50,
+    level: 50,
     nature: setdexEntry.nature || "Hardy",
     ability: setdexEntry.ability || "",
     item: setdexEntry.item || "",

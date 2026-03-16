@@ -8,7 +8,7 @@ function buildPokemon(state: PokemonState): Pokemon | null {
   if (!state.species) return null;
 
   const opts: Record<string, unknown> = {
-    level: state.level || 50,
+    level: 50,
     nature: state.nature || undefined,
     ability: state.ability || undefined,
     item: state.item || undefined,
