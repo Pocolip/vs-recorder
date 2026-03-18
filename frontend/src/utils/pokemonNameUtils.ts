@@ -1,3 +1,5 @@
+import { resolveFromRegistry } from "../services/pokemonService";
+
 const POKEMON_FORM_MAPPINGS: Record<string, string> = {
   // Urshifu forms
   "Urshifu-*": "urshifu",
@@ -179,6 +181,13 @@ export const cleanPokemonName = (pokemonName: string): string => {
 
   cleanName = cleanName.replace(/\s*\(M\)|\s*\(F\)/g, "").trim();
 
+  // Check backend registry first (if loaded)
+  const registryResult = resolveFromRegistry(cleanName);
+  if (registryResult) {
+    return registryResult;
+  }
+
+  // Fallback to static form mappings
   if (POKEMON_FORM_MAPPINGS[cleanName]) {
     return POKEMON_FORM_MAPPINGS[cleanName];
   }

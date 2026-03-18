@@ -3,6 +3,8 @@ package com.yeskatronics.vs_recorder_backend.controllers;
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.dto.PokepasteDTO;
 import com.yeskatronics.vs_recorder_backend.dto.PokemonDTO;
+import com.yeskatronics.vs_recorder_backend.dto.PokemonEntry;
+import com.yeskatronics.vs_recorder_backend.services.PokemonService;
 import com.yeskatronics.vs_recorder_backend.services.PokepasteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * REST Controller for Pokemon-related operations.
- * Provides endpoints for pokepaste parsing and Pokemon sprite retrieval.
+ * Provides endpoints for pokepaste parsing, Pokemon registry, and sprite retrieval.
  *
  * Base path: /api/pokemon
  *
@@ -38,18 +40,57 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PokemonController {
 
     private final PokepasteService pokepasteService;
+    private final PokemonService pokemonService;
     private final RestTemplate restTemplate;
 
-    // Simple in-memory cache for Pokemon name -> ID mapping (7 day TTL)
+    // PokeAPI cache for fallback sprite lookups
     private final Map<String, CacheEntry> spriteCache = new ConcurrentHashMap<>();
     private static final long CACHE_TTL_MS = 7L * 24 * 60 * 60 * 1000; // 7 days
 
     /**
+     * Get the full Pokemon registry
+     * GET /api/pokemon/registry
+     */
+    @GetMapping("/registry")
+    @Operation(
+            summary = "Get Pokemon registry",
+            description = "Returns the full Pokemon registry with all entries, aliases, types, and sprite info. Use the version field for cache busting."
+    )
+    public ResponseEntity<Map<String, Object>> getRegistry() {
+        Map<String, Object> response = Map.of(
+                "version", pokemonService.getRegistryVersion(),
+                "pokemon", pokemonService.getFullRegistry()
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Resolve a Pokemon name to its full entry
+     * GET /api/pokemon/{name}/resolve
+     */
+    @GetMapping("/{name}/resolve")
+    @Operation(
+            summary = "Resolve Pokemon name",
+            description = "Resolves any Pokemon name variant to its canonical entry with types, sprite info, and base species."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully resolved Pokemon"),
+            @ApiResponse(responseCode = "404", description = "Pokemon not found in registry")
+    })
+    public ResponseEntity<PokemonEntry> resolvePokemon(
+            @Parameter(description = "Pokemon name in any format", required = true, example = "Ogerpon-Hearthflame")
+            @PathVariable String name) {
+
+        PokemonEntry entry = pokemonService.getEntry(name);
+        if (entry != null) {
+            return ResponseEntity.ok(entry);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
      * Parse a pokepaste or pokebin URL and extract species names
      * GET /api/pokemon/pokepaste/parse?url=...
-     *
-     * @param url the pokepaste or pokebin URL
-     * @return list of Pokemon species names
      */
     @GetMapping("/pokepaste/parse")
     @Operation(
@@ -75,10 +116,7 @@ public class PokemonController {
         log.info("Parsing pokepaste from URL: {}", url);
 
         try {
-            // Fetch paste data using existing service
             PokepasteDTO.PasteData pasteData = pokepasteService.fetchPasteData(url);
-
-            // Extract species names
             List<String> species = pokepasteService.extractSpeciesNames(pasteData);
 
             log.info("Successfully parsed {} Pokemon species from paste", species.size());
@@ -88,18 +126,13 @@ public class PokemonController {
 
         } catch (IllegalArgumentException e) {
             log.error("Failed to parse pokepaste: {}", e.getMessage());
-            throw e; // Will be caught by GlobalExceptionHandler
+            throw e;
         }
     }
 
     /**
      * Fetch full paste data from a pokepaste or pokebin URL
      * GET /api/pokemon/pokepaste/fetch?url=...
-     *
-     * This endpoint proxies requests to pokepaste/pokebin to avoid CORS issues.
-     *
-     * @param url the pokepaste or pokebin URL
-     * @return full paste data including title, pokemon details, and raw text
      */
     @GetMapping("/pokepaste/fetch")
     @Operation(
@@ -140,13 +173,12 @@ public class PokemonController {
      * Get sprite URL for a Pokemon by name
      * GET /api/pokemon/{name}/sprite
      *
-     * @param name the Pokemon species name (will be normalized)
-     * @return sprite URL
+     * Uses PokemonService for local sprites, falls back to PokeAPI for unknown Pokemon.
      */
     @GetMapping("/{name}/sprite")
     @Operation(
             summary = "Get Pokemon sprite URL",
-            description = "Fetches the sprite URL for a given Pokemon species name from PokeAPI. Results are cached for 7 days."
+            description = "Returns the sprite path for a given Pokemon. Uses local sprite registry first, falls back to PokeAPI."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -156,12 +188,7 @@ public class PokemonController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Failed to fetch Pokemon data from PokeAPI",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Pokemon not found",
+                    description = "Failed to fetch Pokemon data",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
@@ -171,29 +198,31 @@ public class PokemonController {
 
         log.info("Fetching sprite for Pokemon: {}", name);
 
-        try {
-            // Normalize the name (lowercase, replace spaces with hyphens)
-            String normalizedName = normalizePokemonName(name);
+        // Try PokemonService first (local sprites)
+        PokemonEntry entry = pokemonService.getEntry(name);
+        if (entry != null) {
+            String spritePath = pokemonService.getSpritePath(name, false);
+            return ResponseEntity.ok(new PokemonDTO.SpriteResponse(spritePath));
+        }
 
-            // Check cache first
+        // Fall back to PokeAPI for unknown Pokemon
+        try {
+            String normalizedName = name.toLowerCase().trim()
+                    .replace(" ", "-").replace("'", "")
+                    .replace(".", "").replace("\u00e9", "e");
+
             CacheEntry cached = spriteCache.get(normalizedName);
             if (cached != null && !cached.isExpired()) {
-                log.debug("Returning cached sprite URL for: {}", normalizedName);
                 return ResponseEntity.ok(new PokemonDTO.SpriteResponse(cached.spriteUrl));
             }
 
-            // Fetch from PokeAPI
             String pokeApiUrl = "https://pokeapi.co/api/v2/pokemon/" + normalizedName;
-            log.debug("Fetching from PokeAPI: {}", pokeApiUrl);
-
-            // Call PokeAPI to get Pokemon data
             Map<String, Object> response = restTemplate.getForObject(pokeApiUrl, Map.class);
 
             if (response == null) {
                 throw new IllegalArgumentException("Failed to fetch Pokemon data from PokeAPI");
             }
 
-            // Extract sprite URL
             Map<String, Object> sprites = (Map<String, Object>) response.get("sprites");
             if (sprites == null) {
                 throw new IllegalArgumentException("No sprite data found for Pokemon: " + normalizedName);
@@ -204,15 +233,14 @@ public class PokemonController {
                 throw new IllegalArgumentException("No default sprite available for Pokemon: " + normalizedName);
             }
 
-            // Cache the result
             spriteCache.put(normalizedName, new CacheEntry(spriteUrl, System.currentTimeMillis()));
-
-            log.info("Successfully fetched sprite URL for: {}", normalizedName);
             return ResponseEntity.ok(new PokemonDTO.SpriteResponse(spriteUrl));
 
         } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
             log.error("Pokemon not found: {}", name);
             throw new IllegalArgumentException("Pokemon not found: " + name);
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error fetching Pokemon sprite: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Failed to fetch Pokemon sprite: " + e.getMessage());
@@ -220,22 +248,7 @@ public class PokemonController {
     }
 
     /**
-     * Normalize Pokemon name for PokeAPI
-     * - Convert to lowercase
-     * - Replace spaces with hyphens
-     * - Handle special cases
-     */
-    private String normalizePokemonName(String name) {
-        return name.toLowerCase()
-                .trim()
-                .replace(" ", "-")
-                .replace("'", "")
-                .replace(".", "")
-                .replace("é", "e");
-    }
-
-    /**
-     * Simple cache entry with TTL
+     * Simple cache entry with TTL for PokeAPI fallback
      */
     private static class CacheEntry {
         private final String spriteUrl;
@@ -251,9 +264,6 @@ public class PokemonController {
         }
     }
 
-    /**
-     * Exception handler for IllegalArgumentException
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             IllegalArgumentException ex,
