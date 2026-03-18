@@ -83,24 +83,15 @@ class PokemonControllerTest {
 
     @Test
     void testGetPokemonSprite_Success() throws Exception {
-        // Setup
+        // Rillaboom is in the Pokemon registry, so it returns a local sprite path
         String pokemonName = "rillaboom";
-        String expectedSpriteUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/812.png";
-
-        Map<String, Object> mockResponse = new HashMap<>();
-        Map<String, Object> sprites = new HashMap<>();
-        sprites.put("front_default", expectedSpriteUrl);
-        mockResponse.put("sprites", sprites);
-
-        when(restTemplate.getForObject(eq("https://pokeapi.co/api/v2/pokemon/" + pokemonName), eq(Map.class)))
-                .thenReturn(mockResponse);
 
         // Execute & Verify
         mockMvc.perform(get("/api/pokemon/" + pokemonName + "/sprite")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.url").value(expectedSpriteUrl));
+                .andExpect(jsonPath("$.url").value("/sprites/icon0812_f00_s0.png"));
     }
 
     @Test
@@ -125,24 +116,14 @@ class PokemonControllerTest {
 
     @Test
     void testGetPokemonSprite_WithSpaces() throws Exception {
-        // Test that spaces are converted to hyphens
+        // Flutter Mane is in the Pokemon registry, so it returns a local sprite path
         String pokemonName = "Flutter Mane";
-        String normalizedName = "flutter-mane";
-        String expectedSpriteUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1006.png";
-
-        Map<String, Object> mockResponse = new HashMap<>();
-        Map<String, Object> sprites = new HashMap<>();
-        sprites.put("front_default", expectedSpriteUrl);
-        mockResponse.put("sprites", sprites);
-
-        when(restTemplate.getForObject(eq("https://pokeapi.co/api/v2/pokemon/" + normalizedName), eq(Map.class)))
-                .thenReturn(mockResponse);
 
         // Execute & Verify
         mockMvc.perform(get("/api/pokemon/" + pokemonName + "/sprite")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.url").value(expectedSpriteUrl));
+                .andExpect(jsonPath("$.url").value("/sprites/icon0987_f00_s0.png"));
     }
 }

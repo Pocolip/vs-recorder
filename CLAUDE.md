@@ -97,7 +97,8 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 **Key Services**:
 - `ShowdownService` - Fetches battle logs from Pokemon Showdown replay URLs
 - `PokepasteService` - Parses team data from Pokepaste URLs
-- `AnalyticsService` - Calculates win rates, usage stats, matchup analysis
+- `PokemonService` - Authoritative source for Pokemon name resolution, types, sprites, and base species (loaded from `pokemon-data.json`)
+- `AnalyticsService` - Calculates win rates, usage stats, matchup analysis (uses `PokemonService` for name normalization)
 - `ReplayService` - Manages replay CRUD and parsing
 - `MatchService` - Groups replays into Bo3 (Best of 3) sets
 - `GamePlanService` - Tournament preparation and opponent team planning
@@ -141,6 +142,58 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 3. Use React DevTools to inspect component state
 4. Environment config in `.env.development` / `.env.production` (`REACT_APP_API_BASE_URL`)
 
+## Pokemon Data Registry
+
+The app uses a centralized Pokemon data registry (`backend/src/main/resources/pokemon-data.json`) as the single source of truth for Pokemon name resolution, types, sprite info, and base species grouping.
+
+### How It Works
+- `PokemonService` (backend) loads `pokemon-data.json` at startup and provides name resolution for analytics, sprites, and API endpoints
+- The frontend fetches the registry via `GET /api/pokemon/registry` on app init and caches it in localStorage
+- Existing offline fallbacks (`pokemonSpriteMap.json`, `COMMON_VGC_POKEMON`, `POKEMON_FORM_MAPPINGS`) remain as fallbacks if the registry is unavailable
+
+### Updating the Registry
+
+Re-run the generation script when new Pokemon are released or forme handling needs to change:
+
+```bash
+# From project root (requires internet to fetch Showdown aliases)
+node scripts/generate-pokemon-data.js
+```
+
+This reads from:
+1. **`@pkmn/dex`** (installed as frontend devDependency) — complete Showdown Pokedex with types, base species, forme data
+2. **`frontend/src/data/pokemonSpriteMap.json`** — local sprite file form indices (app-specific, not available externally)
+3. **`scripts/pokemon-aliases.json`** — hand-maintained app-specific overrides (see below)
+4. **Showdown `aliases.ts`** — fetched from GitHub at generation time
+
+And outputs: `backend/src/main/resources/pokemon-data.json` (checked into source control)
+
+### When to Regenerate
+- New Pokemon generation or DLC released
+- New VGC regulation adds previously unsupported forms
+- Sprite files are added/updated (form indices change)
+- A Pokemon name isn't resolving correctly in analytics
+
+### Editing `scripts/pokemon-aliases.json`
+
+This file contains two sections:
+
+- **`aliases`**: Maps name variants to canonical keys. Add entries here for:
+  - Battle log format names (e.g., `"Calyrex-Shadow Rider"` → `"calyrex-shadow"`)
+  - Gender suffixes (e.g., `"Indeedee-F"` → `"indeedee-f"`)
+  - Sprite map name mismatches
+  - Any name the app encounters that doesn't resolve correctly
+
+- **`baseSpeciesOverrides`**: Controls analytics grouping. Maps canonical keys to their base species for stats aggregation. Add entries to:
+  - Preserve competitively distinct forms (e.g., `"rotom-wash"` → `"rotom-wash"`, NOT stripped to `"rotom"`)
+  - Override `@pkmn/dex`'s default baseSpecies when our analytics needs differ
+
+After editing, regenerate and run backend tests:
+```bash
+node scripts/generate-pokemon-data.js
+cd backend && mvn test -Dtest=PokemonServiceTest
+```
+
 ## Important Notes
 
 ### Backend
@@ -179,6 +232,8 @@ See BACKEND.md for full API specification. Key endpoints:
 - `/teams/:id/stats/*` - Analytics (usage, matchups, move analysis)
 - `/game-plans/*` - Tournament game planning
 - `/export/*` and `/import/*` - Data portability
+- `/api/pokemon/registry` - Full Pokemon data registry (names, types, sprites, aliases)
+- `/api/pokemon/{name}/resolve` - Resolve any name variant to canonical entry
 
 ## Phase Documentation
 
