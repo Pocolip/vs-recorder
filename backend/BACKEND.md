@@ -64,10 +64,11 @@
 - `DELETE /game-plan-teams/:id` - Remove team from game plan
 
 ### Pokemon
-- `GET /pokemon` - List all Pokemon (with optional search query)
-- `GET /pokemon/:id` - Get single Pokemon by ID
-- `GET /pokemon/search?name=urshifu` - Fuzzy search by name or alternative names
-- `GET /pokemon/dex/:number` - Get Pokemon by dex number
+- `GET /api/pokemon/registry` - Get full Pokemon registry (~1400 entries) with version for cache busting
+- `GET /api/pokemon/{name}/resolve` - Resolve any name variant to canonical entry (types, sprite info, base species)
+- `GET /api/pokemon/{name}/sprite` - Get sprite path (local registry first, PokeAPI fallback)
+- `GET /api/pokemon/pokepaste/parse?url=...` - Parse pokepaste URL, return species list
+- `GET /api/pokemon/pokepaste/fetch?url=...` - Fetch full paste data (CORS proxy)
 
 ### Import/Export
 - `POST /export/json` - Generate JSON export of user's teams and replays (download)

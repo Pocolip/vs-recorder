@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-03-17-under-the-hood",
+    "date": "2026-03-17",
+    "title": "Under the Hood Changes",
+    "message": "The calculator now always fixes levels to 50 and Pokemon name resolution has been tweaked so sprites load more efficiently."
+  },
+  {
     "id": "2026-03-01-group-by-leads",
     "date": "2026-03-01",
     "title": "Matchup Planner: Group By Leads",

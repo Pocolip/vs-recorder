@@ -1,7 +1,7 @@
 {
   "name": "vs-recorder-frontend",
   "private": true,
-  "version": "1.0.27",
+  "version": "1.0.29",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@pkmn/dex": "^0.10.7",
     "@tailwindcss/postcss": "^4.0.8",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",

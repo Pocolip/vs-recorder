@@ -308,7 +308,10 @@ public class BattleLogParser {
      * Known Pokemon forme suffixes that should be removed during normalization.
      * Ordered by length (longest first) to avoid partial matching issues.
      * Examples: "-Galar-Zen" must come before "-Galar", "-Hearthflame-Tera" before "-Terastal"
+     *
+     * @deprecated Use {@link com.yeskatronics.vs_recorder_backend.services.PokemonService#resolveBaseSpecies(String)} instead.
      */
+    @Deprecated
     private static final Set<String> FORME_SUFFIXES = new LinkedHashSet<>(Arrays.asList(
             // Ogerpon (longest Tera forms first)
             //"-Hearthflame-Tera", "-Wellspring-Tera", "-Cornerstone-Tera",
@@ -432,13 +435,18 @@ public class BattleLogParser {
     ));
 
     /**
-     * Normalize Pokemon name (remove forme indicators, gender, level)
+     * Normalize Pokemon name (remove forme indicators, gender, level).
+     *
+     * @deprecated Use {@link com.yeskatronics.vs_recorder_backend.services.PokemonService#resolveBaseSpecies(String)} instead,
+     *             which uses a comprehensive generated registry for accurate normalization.
+     *
      * Examples:
      * - "Urshifu-*, L50, F" -> "Urshifu"
      * - "Terapagos-Terastal, L50, M" -> "Terapagos"
      * - "Calyrex-Shadow, L50" -> "Calyrex"
      * - "Ogerpon-Hearthflame-Tera, L50" -> "Ogerpon"
      */
+    @Deprecated
     public static String normalizePokemonName(String name) {
         if (name == null || name.isEmpty()) {
             return name;

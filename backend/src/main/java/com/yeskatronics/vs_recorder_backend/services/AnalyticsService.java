@@ -1,6 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
 import com.yeskatronics.vs_recorder_backend.dto.AnalyticsDTO;
+import com.yeskatronics.vs_recorder_backend.dto.PokemonEntry;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.repositories.ReplayRepository;
@@ -25,6 +26,7 @@ public class AnalyticsService {
 
     private final ReplayRepository replayRepository;
     private final TeamRepository teamRepository;
+    private final PokemonService pokemonService;
 
     /**
      * Get usage statistics for a team
@@ -105,16 +107,23 @@ public class AnalyticsService {
             List<String> opponentTeam = BattleLogParser.getOpponentTeam(battleData, playerName);
             List<String> opponentPicks = BattleLogParser.getOpponentPicks(battleData, playerName);
 
+            // Normalize opponent picks for comparison
+            Set<String> normalizedOpponentPicks = opponentPicks.stream()
+                    .map(this::normalizeForAnalytics)
+                    .collect(Collectors.toSet());
+
             for (String pokemon : opponentTeam) {
+                String normalizedPokemon = normalizeForAnalytics(pokemon);
+
                 MatchupTracker tracker = opponentStats.computeIfAbsent(
-                        pokemon,
+                        normalizedPokemon,
                         k -> new MatchupTracker()
                 );
 
                 tracker.timesOnTeam++;
                 tracker.gamesAgainst++;
 
-                if (opponentPicks.contains(pokemon)) {
+                if (normalizedOpponentPicks.contains(normalizedPokemon)) {
                     tracker.timesBrought++;
                 }
 
@@ -205,7 +214,7 @@ public class AnalyticsService {
 
         // Normalize opponent Pokemon names
         Set<String> opponentCore = request.getOpponentPokemon().stream()
-                .map(BattleLogParser::normalizePokemonName)
+                .map(this::normalizeForAnalytics)
                 .collect(Collectors.toSet());
 
         // Parse battle logs
@@ -228,7 +237,9 @@ public class AnalyticsService {
             if (playerName == null) continue;
 
             List<String> opponentTeam = BattleLogParser.getOpponentTeam(battleData, playerName);
-            Set<String> opponentTeamSet = new HashSet<>(opponentTeam);
+            Set<String> opponentTeamSet = opponentTeam.stream()
+                    .map(this::normalizeForAnalytics)
+                    .collect(Collectors.toSet());
 
             boolean hadAnyPokemon = false;
 
@@ -341,9 +352,10 @@ public class AnalyticsService {
             // Process each Pokemon that was brought
             for (String pokemon : playerPicks) {
                 Map<String, Integer> moves = BattleLogParser.getPokemonMoves(battleData, pokemon, playerSide);
+                String normalizedPokemon = normalizeForAnalytics(pokemon);
 
                 Map<String, MoveUsageTracker> moveTrackers = pokemonMoveUsage.computeIfAbsent(
-                        pokemon,
+                        normalizedPokemon,
                         k -> new HashMap<>()
                 );
 
@@ -418,12 +430,18 @@ public class AnalyticsService {
     }
 
     /**
-     * Normalize Pokemon name for analytics grouping
-     * Removes temporary forme suffixes like -Tera, -Stellar
-     * Keeps competitive formes like -Rapid-Strike, -Hearthflame
+     * Normalize Pokemon name for analytics grouping.
+     * Uses PokemonService to resolve base species, which handles cosmetic vs competitive forms.
+     * Returns the Showdown name format (e.g., "Ogerpon-Hearthflame", "Raging Bolt").
      */
     private String normalizeForAnalytics(String pokemonName) {
-        return BattleLogParser.normalizePokemonName(pokemonName);
+        String baseSpecies = pokemonService.resolveBaseSpecies(pokemonName);
+        PokemonEntry entry = pokemonService.getEntry(baseSpecies);
+        if (entry != null) {
+            return entry.name();
+        }
+        // Fallback: return the base species display name
+        return pokemonService.getDisplayName(baseSpecies);
     }
 
     // ==================== Helper Methods ====================

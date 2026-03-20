@@ -1,13 +1,30 @@
 /**
- * Pokemon service - fetches Pokemon data from PokeAPI with local sprite support
+ * Pokemon service - fetches Pokemon data from backend registry with PokeAPI fallback
  */
 
 import * as storageService from "./storageService";
 import SPRITE_MAP from "../data/pokemonSpriteMap.json";
+import apiClient from "./api/client";
 
 // Storage configuration
 const STORAGE_KEY = "pokemon_cache";
 const CACHE_EXPIRY_DAYS = 7;
+const REGISTRY_STORAGE_KEY = "pokemon_registry";
+const REGISTRY_VERSION_KEY = "pokemon_registry_version";
+
+// Backend registry data (loaded on init)
+interface RegistryEntry {
+  num: number;
+  form: number;
+  name: string;
+  displayName: string;
+  baseSpecies: string;
+  types: string[];
+  aliases: string[];
+}
+
+let registryData: Record<string, RegistryEntry> | null = null;
+let registryAliasIndex: Record<string, string> | null = null;
 
 // Common VGC Pokemon for fallback
 const COMMON_VGC_POKEMON: Record<string, { id: number; name: string; types: string[] }> = {
@@ -65,9 +82,14 @@ interface CachedPokemon {
 let pokedexInstance: any = null;
 
 /**
- * Initialize the Pokedex instance
+ * Initialize the Pokedex instance and load backend registry
  */
 export async function initialize(): Promise<void> {
+  // Load backend registry (non-blocking)
+  loadRegistry().catch((err) =>
+    console.warn("Failed to load Pokemon registry:", err)
+  );
+
   if (pokedexInstance) return;
 
   try {
@@ -76,6 +98,85 @@ export async function initialize(): Promise<void> {
   } catch (error) {
     console.warn("Failed to initialize PokeAPI wrapper:", error);
   }
+}
+
+/**
+ * Load the Pokemon registry from the backend.
+ * Caches in localStorage with version-based invalidation.
+ */
+export async function loadRegistry(): Promise<void> {
+  if (registryData) return;
+
+  // Try localStorage cache first
+  try {
+    const cachedVersion = localStorage.getItem(REGISTRY_VERSION_KEY);
+    const cachedData = localStorage.getItem(REGISTRY_STORAGE_KEY);
+    if (cachedVersion && cachedData) {
+      registryData = JSON.parse(cachedData);
+      buildAliasIndex();
+    }
+  } catch {
+    // Ignore parse errors
+  }
+
+  // Fetch from backend
+  try {
+    const response: any = await apiClient.get("/api/pokemon/registry");
+    const version = response.version;
+    const pokemon = response.pokemon;
+
+    if (pokemon && typeof pokemon === "object") {
+      registryData = pokemon;
+      buildAliasIndex();
+
+      // Cache in localStorage
+      localStorage.setItem(REGISTRY_VERSION_KEY, version);
+      localStorage.setItem(REGISTRY_STORAGE_KEY, JSON.stringify(pokemon));
+    }
+  } catch (error) {
+    // Registry fetch failed - use cached data or fall back to sprite map
+    if (!registryData) {
+      console.warn("Pokemon registry unavailable, using offline fallbacks");
+    }
+  }
+}
+
+/**
+ * Build alias index from registry data for fast lookups.
+ */
+function buildAliasIndex(): void {
+  if (!registryData) return;
+  registryAliasIndex = {};
+  for (const [key, entry] of Object.entries(registryData)) {
+    registryAliasIndex[key] = key;
+    registryAliasIndex[entry.name.toLowerCase()] = key;
+    for (const alias of entry.aliases) {
+      registryAliasIndex[alias.toLowerCase()] = key;
+    }
+  }
+}
+
+/**
+ * Resolve a Pokemon name to its canonical kebab-case key using the backend registry.
+ * Returns null if not found in registry (caller should fall back to other methods).
+ */
+export function resolveFromRegistry(name: string): string | null {
+  if (!registryAliasIndex) return null;
+  const key = name.toLowerCase().trim();
+  return registryAliasIndex[key] || registryAliasIndex[key.replace(/\s+/g, "-")] || null;
+}
+
+/**
+ * Look up a Pokemon in the backend registry by any name variant.
+ */
+function getRegistryEntry(identifier: string): RegistryEntry | null {
+  if (!registryData || !registryAliasIndex) return null;
+  const key = identifier.toLowerCase().trim();
+  const canonicalKey = registryAliasIndex[key] || registryAliasIndex[key.replace(/\s+/g, "-")];
+  if (canonicalKey && registryData[canonicalKey]) {
+    return registryData[canonicalKey];
+  }
+  return null;
 }
 
 /**
@@ -90,8 +191,22 @@ export async function getPokemon(identifier: string | number): Promise<PokemonDa
     return cached.data;
   }
 
-  // Check static fallback before hitting API (avoids 404s for form-Pokemon like landorus, urshifu)
   const staticKey = typeof normalizedId === "string" ? normalizedId : String(normalizedId);
+
+  // Check backend registry first
+  const registryEntry = getRegistryEntry(staticKey);
+  if (registryEntry) {
+    const spriteUrls = generateSpriteUrls(staticKey);
+    return {
+      id: registryEntry.num,
+      name: registryEntry.displayName,
+      types: registryEntry.types,
+      sprite: spriteUrls.normal,
+      spriteShiny: spriteUrls.shiny,
+    };
+  }
+
+  // Check static fallback (avoids 404s for form-Pokemon like landorus, urshifu)
   if (COMMON_VGC_POKEMON[staticKey]) {
     return enrichFallbackData(COMMON_VGC_POKEMON[staticKey], staticKey);
   }
@@ -195,9 +310,16 @@ function enrichFallbackData(
 }
 
 /**
- * Get sprite info from sprite map
+ * Get sprite info from backend registry, falling back to sprite map
  */
 function getSpriteInfo(identifier: string): { id: number; form: number } | null {
+  // Check backend registry first
+  const registryEntry = getRegistryEntry(identifier);
+  if (registryEntry) {
+    return { id: registryEntry.num, form: registryEntry.form };
+  }
+
+  // Fallback to sprite map
   const key = identifier.toLowerCase().replace(/\s+/g, "-");
   const spriteData = (SPRITE_MAP as unknown as Record<string, { id: number; form: number }>)[key];
   return spriteData || null;

@@ -232,7 +232,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       nature: mon.nature || "Hardy",
       teraType: teraDefaults ? teraDefaults.teraType : (mon.tera_type || null),
       status: statusForItem(mon.item),
-      level: mon.level || 50,
+      level: 50,
       moves: (mon.moves || []).slice(0, 4).map((name) => ({
         name: typeof name === "string" ? name : "",
         crit: false,
