@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-04-27-new-regulations",
+    "date": "2026-04-27",
+    "title": "Added Regulation M-A and M-B",
+    "message": "Regulation M-A and M-B have been added as available selections for your filtering pleasure. Expect more updates coming soon! As always feel free to ping me on twitter @luisfrik or open up an issue on the Github repo."
+  },
+  {
     "id": "2026-03-17-under-the-hood",
     "date": "2026-03-17",
     "title": "Under the Hood Changes",
