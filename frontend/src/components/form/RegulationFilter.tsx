@@ -7,7 +7,7 @@ interface RegulationFilterProps {
 }
 
 function shortRegulation(reg: string): string {
-  const match = reg.match(/Regulation\s+([A-Z])$/);
+  const match = reg.match(/Regulation\s+([A-Z](?:-[A-Z])?)$/);
   return match ? `Reg ${match[1]}` : reg;
 }
 
