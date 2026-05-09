@@ -14368,7 +14368,7 @@
       "form": 1,
       "name": "Zacian-Crowned",
       "displayName": "Zacian Crowned",
-      "baseSpecies": "zacian-crowned",
+      "baseSpecies": "zacian",
       "types": [
         "Fairy",
         "Steel"
@@ -14397,7 +14397,7 @@
       "form": 1,
       "name": "Zamazenta-Crowned",
       "displayName": "Zamazenta Crowned",
-      "baseSpecies": "zamazenta-crowned",
+      "baseSpecies": "zamazenta",
       "types": [
         "Fighting",
         "Steel"

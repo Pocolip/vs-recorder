@@ -221,4 +221,21 @@ class PokemonServiceTest {
         assertEquals(670, info[0]);
         assertEquals(5, info[1]);
     }
+
+    // ==================== Zacian / Zamazenta hero+crowned grouping ====================
+
+    @Test
+    void resolveBaseSpecies_zamazentaCrownedRollsUpToHero() {
+        // Both Hero (Zamazenta) and Crowned (Rusted Shield) are competitively the
+        // same Pokemon — group them under "zamazenta" so paste-roster matching
+        // works regardless of whether the paste lists the base or crowned forme.
+        assertEquals("zamazenta", pokemonService.resolveBaseSpecies("Zamazenta-Crowned"));
+        assertEquals("zamazenta", pokemonService.resolveBaseSpecies("Zamazenta"));
+    }
+
+    @Test
+    void resolveBaseSpecies_zacianCrownedRollsUpToHero() {
+        assertEquals("zacian", pokemonService.resolveBaseSpecies("Zacian-Crowned"));
+        assertEquals("zacian", pokemonService.resolveBaseSpecies("Zacian"));
+    }
 }
