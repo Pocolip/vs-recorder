@@ -312,9 +312,12 @@ public class BattleLogParser {
     }
 
     /**
-     * If {@code revealedName} shares a base species with an existing team-list entry that
+     * If {@code revealedName} shares a Pokedex number with an existing team-list entry that
      * is either a wildcard ({@code Urshifu-*}) or differs from the reveal (paste had
      * {@code Zamazenta} but battle reveals {@code Zamazenta-Crowned}), overwrite the slot.
+     * Matching on dex number rather than {@code baseSpecies} is intentional — formes like
+     * Zamazenta-Crowned have their own {@code baseSpecies} for analytics grouping, so they
+     * wouldn't otherwise match their hero/wildcard slot.
      * Without {@link PokemonService} this only handles the legacy {@code Urshifu-*} case.
      */
     private static void revealTeamForme(List<String> team, String revealedName, PokemonService pokemonService) {
@@ -333,25 +336,31 @@ public class BattleLogParser {
             return;
         }
 
-        String revealedBase = pokemonService.resolveBaseSpecies(revealedName);
+        int[] revealedInfo = pokemonService.getSpriteInfo(revealedName);
+        if (revealedInfo == null) return;
+        int revealedNum = revealedInfo[0];
+        String revealedCanonical = pokemonService.resolveCanonical(revealedName);
 
         // First pass: prefer wildcard slots ({@code X-*}) so we don't accidentally rewrite
-        // a different team member who happens to share a base species.
+        // a different team member who happens to share a dex number.
         for (int i = 0; i < team.size(); i++) {
             String entry = team.get(i);
-            if (entry.contains("-*") && pokemonService.resolveBaseSpecies(entry).equals(revealedBase)) {
-                team.set(i, revealedName);
-                return;
+            if (entry.contains("-*")) {
+                int[] entryInfo = pokemonService.getSpriteInfo(entry);
+                if (entryInfo != null && entryInfo[0] == revealedNum) {
+                    team.set(i, revealedName);
+                    return;
+                }
             }
         }
 
-        // Second pass: rewrite a same-base entry if its canonical name differs from the reveal.
+        // Second pass: rewrite a same-dex entry whose canonical differs from the reveal.
         // Skip if the slot is already exactly the revealed name.
-        String revealedCanonical = pokemonService.resolveCanonical(revealedName);
         for (int i = 0; i < team.size(); i++) {
             String entry = team.get(i);
             if (entry.equals(revealedName)) return;
-            if (pokemonService.resolveBaseSpecies(entry).equals(revealedBase)
+            int[] entryInfo = pokemonService.getSpriteInfo(entry);
+            if (entryInfo != null && entryInfo[0] == revealedNum
                     && !pokemonService.resolveCanonical(entry).equals(revealedCanonical)) {
                 team.set(i, revealedName);
                 return;
@@ -373,7 +382,8 @@ public class BattleLogParser {
 
         if (pokemonService != null) {
             String targetCanonical = pokemonService.resolveCanonical(species);
-            String targetBase = pokemonService.resolveBaseSpecies(species);
+            int[] targetInfo = pokemonService.getSpriteInfo(species);
+            int targetNum = targetInfo != null ? targetInfo[0] : -1;
 
             // Prefer an exact canonical match (handles teams that contain both base and forme,
             // even though species clause makes that rare).
@@ -382,11 +392,15 @@ public class BattleLogParser {
                     return i;
                 }
             }
-            // Fall back to base-species match (covers paste {@code Zamazenta-Crowned} when battle
-            // reveals plain {@code Zamazenta}, or vice versa).
-            for (int i = 0; i < team.size(); i++) {
-                if (pokemonService.resolveBaseSpecies(team.get(i)).equals(targetBase)) {
-                    return i;
+            // Fall back to dex number match (covers an unrevealed wildcard slot or a base/forme
+            // split where revealTeamForme didn't fire — e.g., paste has plain Zamazenta and
+            // battle never reveals the Crowned form, or vice versa).
+            if (targetNum > 0) {
+                for (int i = 0; i < team.size(); i++) {
+                    int[] entryInfo = pokemonService.getSpriteInfo(team.get(i));
+                    if (entryInfo != null && entryInfo[0] == targetNum) {
+                        return i;
+                    }
                 }
             }
             return -1;

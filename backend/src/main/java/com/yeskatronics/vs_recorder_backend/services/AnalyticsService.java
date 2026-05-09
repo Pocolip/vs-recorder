@@ -548,6 +548,14 @@ public class AnalyticsService {
                         tracker.teraWins++;
                     }
                 }
+
+                // Check if Mega Evolved
+                if (BattleLogParser.didMegaEvolve(battleData, pokemon, playerSide)) {
+                    tracker.megaUsage++;
+                    if (replay.isWin()) {
+                        tracker.megaWins++;
+                    }
+                }
             }
         }
 
@@ -561,6 +569,9 @@ public class AnalyticsService {
                     Integer teraWinRate = tracker.teraUsage > 0
                             ? (int) Math.round((tracker.teraWins * 100.0) / tracker.teraUsage)
                             : null;
+                    Integer megaWinRate = tracker.megaUsage > 0
+                            ? (int) Math.round((tracker.megaWins * 100.0) / tracker.megaUsage)
+                            : null;
                     int usageRate = (int) Math.round((tracker.usage * 100.0) / replays.size());
 
                     return new AnalyticsDTO.PokemonUsageStats(
@@ -571,7 +582,9 @@ public class AnalyticsService {
                             tracker.leadUsage,
                             leadWinRate,
                             tracker.teraUsage,
-                            teraWinRate
+                            teraWinRate,
+                            tracker.megaUsage,
+                            megaWinRate
                     );
                 })
                 .sorted(Comparator.comparingInt(AnalyticsDTO.PokemonUsageStats::getUsage).reversed())
@@ -650,6 +663,8 @@ public class AnalyticsService {
         int leadWins = 0;
         int teraUsage = 0;
         int teraWins = 0;
+        int megaUsage = 0;
+        int megaWins = 0;
     }
 
     private static class LeadPairTracker {
