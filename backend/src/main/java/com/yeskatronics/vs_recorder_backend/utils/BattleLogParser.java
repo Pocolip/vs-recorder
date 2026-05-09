@@ -2,6 +2,7 @@ package com.yeskatronics.vs_recorder_backend.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yeskatronics.vs_recorder_backend.services.PokemonService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,6 +13,11 @@ import java.util.regex.Pattern;
 /**
  * Utility class for parsing Pokemon Showdown battle logs.
  * Extracts structured data for analytics from raw battle log JSON.
+ *
+ * <p>Two entry points: {@link #parseBattleLog(String)} (legacy, naive prefix matching) and
+ * {@link #parseBattleLog(String, PokemonService)} (forme-aware — uses the registry to keep
+ * the team list in sync with reveals like {@code Zamazenta-Crowned} or mid-battle Mega evolutions).
+ * Production callers should always pass the service; the no-arg version exists for legacy tests.
  */
 @Slf4j
 public class BattleLogParser {
@@ -24,6 +30,7 @@ public class BattleLogParser {
     private static final Pattern TERA_PATTERN = Pattern.compile("\\|-terastallize\\|p([12])([ab]): ([^|]+)\\|([^|]+)");
     private static final Pattern POKE_PATTERN = Pattern.compile("\\|poke\\|p([12])\\|([^,|]+)");
     private static final Pattern SHOWTEAM_PATTERN = Pattern.compile("\\|showteam\\|p([12])\\|(.+)");
+    private static final Pattern DETAILSCHANGE_PATTERN = Pattern.compile("\\|detailschange\\|p([12])([ab]): ([^|]+)\\|([^,|]+)");
 
     /**
      * Parsed battle data structure
@@ -40,6 +47,8 @@ public class BattleLogParser {
         private List<String> p2Leads;     // First 2 sent out
         private String p1Tera;            // Pokemon that Terastallized
         private String p2Tera;            // Pokemon that Terastallized
+        private String p1Mega;            // Pokemon that Mega Evolved (team-list name)
+        private String p2Mega;            // Pokemon that Mega Evolved (team-list name)
         private Map<String, Map<String, Integer>> p1MoveUsage;  // p1 Pokemon -> Move -> Count
         private Map<String, Map<String, Integer>> p2MoveUsage;  // p2 Pokemon -> Move -> Count
         private String winner;
@@ -58,12 +67,18 @@ public class BattleLogParser {
     }
 
     /**
-     * Parse battle log from JSON string
-     *
-     * @param battleLogJson the battle log JSON from Showdown
-     * @return parsed battle data
+     * Parse battle log without forme-aware normalization. Falls back to naive prefix
+     * matching; safe for replays where paste names match Showdown's emitted names exactly.
      */
     public static BattleData parseBattleLog(String battleLogJson) {
+        return parseBattleLog(battleLogJson, null);
+    }
+
+    /**
+     * Parse battle log using {@link PokemonService} to keep the team list in sync with
+     * mid-battle forme reveals (Zamazenta-Crowned, Mega evolutions, OTS reveals).
+     */
+    public static BattleData parseBattleLog(String battleLogJson, PokemonService pokemonService) {
         try {
             JsonNode root = objectMapper.readTree(battleLogJson);
             BattleData data = new BattleData();
@@ -84,7 +99,7 @@ public class BattleLogParser {
 
             // Parse log line by line
             String[] lines = logText.split("\n");
-            parseLogLines(lines, data);
+            parseLogLines(lines, data, pokemonService);
 
             // Extract winner from log
             data.setWinner(extractWinner(logText));
@@ -98,9 +113,9 @@ public class BattleLogParser {
     }
 
     /**
-     * Parse all log lines to extract battle data
+     * Parse all log lines to extract battle data.
      */
-    private static void parseLogLines(String[] lines, BattleData data) {
+    private static void parseLogLines(String[] lines, BattleData data, PokemonService pokemonService) {
         Set<String> p1Switched = new HashSet<>();
         Set<String> p2Switched = new HashSet<>();
         Map<String, String> p1NicknameMap = new HashMap<>();
@@ -125,56 +140,43 @@ public class BattleLogParser {
                 continue;
             }
 
-            // Parse open team sheet (|showteam|) to reveal Urshifu forme
+            // Parse open team sheet (|showteam|) - reveals actual formes (Urshifu, Zamazenta-Crowned, etc.)
             Matcher showteamMatcher = SHOWTEAM_PATTERN.matcher(line);
             if (showteamMatcher.find()) {
                 String player = showteamMatcher.group(1);
                 String teamData = showteamMatcher.group(2);
+                List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
 
-                // Parse team data to find Urshifu forme
-                // Format: Pokemon||Item|Ability|Move1,Move2,...
-                String[] pokemons = teamData.split("\\]");
-                for (String pokeData : pokemons) {
-                    if (pokeData.contains("Urshifu")) {
-                        String pokemonName = pokeData.split("\\|")[0];
-
-                        // Replace Urshifu-* with actual forme
-                        List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
-                        for (int i = 0; i < team.size(); i++) {
-                            if (team.get(i).startsWith("Urshifu-*")) {
-                                team.set(i, pokemonName);
-                                break;
-                            }
-                        }
-                    }
+                // Format: Pokemon||Item|Ability|Move1,Move2,...]Pokemon||...
+                for (String pokeData : teamData.split("\\]")) {
+                    String revealedName = pokeData.split("\\|")[0].trim();
+                    if (revealedName.isEmpty()) continue;
+                    revealTeamForme(team, revealedName, pokemonService);
                 }
                 continue;
             }
 
-            // Parse switches (|switch|) - identifies picks and leads
+            // Parse switches (|switch|) - identifies picks and leads, may reveal hidden formes
             Matcher switchMatcher = SWITCH_PATTERN.matcher(line);
             if (switchMatcher.find()) {
                 String player = switchMatcher.group(1);
                 String nickname = switchMatcher.group(3).trim();
-                String switchedPokemon = switchMatcher.group(4); // Full name from switch line
+                String switchedRaw = switchMatcher.group(4);
+                String switchedSpecies = switchedRaw.split(",")[0].trim();
 
-                // Check if this reveals Urshifu forme
                 List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
-                if (switchedPokemon.startsWith("Urshifu-") && !switchedPokemon.contains("*")) {
-                    for (int i = 0; i < team.size(); i++) {
-                        if (team.get(i).startsWith("Urshifu-*")) {
-                            team.set(i, switchedPokemon.split(",")[0].trim());
-                            break;
-                        }
-                    }
+
+                // Reveal hidden formes (e.g. Urshifu-* → Urshifu-Rapid-Strike, or |poke| had base
+                // Zamazenta but switch reveals Zamazenta-Crowned).
+                if (!switchedSpecies.contains("*")) {
+                    revealTeamForme(team, switchedSpecies, pokemonService);
                 }
 
                 // Map switch species to team entry
-                String baseSpecies = switchedPokemon.split(",")[0].trim().split("-")[0];
-                String fullTeamEntry = findTeamEntry(team, baseSpecies);
+                String fullTeamEntry = findTeamEntry(team, switchedSpecies, pokemonService);
 
                 // Store nickname -> species mapping
-                String resolvedName = fullTeamEntry != null ? fullTeamEntry : switchedPokemon;
+                String resolvedName = fullTeamEntry != null ? fullTeamEntry : switchedRaw;
                 if ("1".equals(player)) {
                     p1NicknameMap.put(nickname, resolvedName);
                 } else {
@@ -209,6 +211,41 @@ public class BattleLogParser {
                 continue;
             }
 
+            // Parse mid-battle forme changes (|detailschange|) - Mega evolution, Primal reversion, etc.
+            // Tera/Ogerpon mask transforms also use this line; we filter to Mega/Primal here so we
+            // don't mistakenly overwrite a Tera-form team-list slot.
+            Matcher detailsMatcher = DETAILSCHANGE_PATTERN.matcher(line);
+            if (detailsMatcher.find()) {
+                String player = detailsMatcher.group(1);
+                String nickname = detailsMatcher.group(3).trim();
+                String newSpecies = detailsMatcher.group(4).trim();
+
+                if (isMegaOrPrimalForme(newSpecies)) {
+                    List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
+                    Map<String, String> nicknameMap = "1".equals(player) ? p1NicknameMap : p2NicknameMap;
+
+                    // Find the team slot for this nickname's current species and overwrite it.
+                    String currentSpecies = nicknameMap.getOrDefault(nickname, null);
+                    if (currentSpecies != null) {
+                        int slot = findTeamIndex(team, currentSpecies, pokemonService);
+                        if (slot >= 0) {
+                            team.set(slot, newSpecies);
+                            nicknameMap.put(nickname, newSpecies);
+
+                            // Carry pick/lead/move tracking from the old name to the new one.
+                            renamePickEntries(data, player, currentSpecies, newSpecies);
+
+                            if ("1".equals(player)) {
+                                data.setP1Mega(newSpecies);
+                            } else {
+                                data.setP2Mega(newSpecies);
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
+
             // Parse moves (|move|)
             Matcher moveMatcher = MOVE_PATTERN.matcher(line);
             if (moveMatcher.find()) {
@@ -222,8 +259,7 @@ public class BattleLogParser {
 
                 // Map to full team entry
                 List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
-                String baseSpecies = moveSpecies.split("-")[0]; // Get base name
-                String fullTeamEntry = findTeamEntry(team, baseSpecies);
+                String fullTeamEntry = findTeamEntry(team, moveSpecies, pokemonService);
 
                 if (fullTeamEntry != null) {
                     if ("1".equals(player)) {
@@ -251,8 +287,7 @@ public class BattleLogParser {
 
                 // Map to full team entry
                 List<String> team = "1".equals(player) ? data.getP1Team() : data.getP2Team();
-                String baseSpecies = teraSpecies.split("-")[0];
-                String fullTeamEntry = findTeamEntry(team, baseSpecies);
+                String fullTeamEntry = findTeamEntry(team, teraSpecies, pokemonService);
 
                 if (fullTeamEntry != null) {
                     if ("1".equals(player)) {
@@ -277,17 +312,143 @@ public class BattleLogParser {
     }
 
     /**
-     * Find matching team entry for a base species name
-     * Uses Species Clause - only one match possible per team
+     * If {@code revealedName} shares a base species with an existing team-list entry that
+     * is either a wildcard ({@code Urshifu-*}) or differs from the reveal (paste had
+     * {@code Zamazenta} but battle reveals {@code Zamazenta-Crowned}), overwrite the slot.
+     * Without {@link PokemonService} this only handles the legacy {@code Urshifu-*} case.
      */
-    private static String findTeamEntry(List<String> team, String baseSpecies) {
-        for (String teamEntry : team) {
-            // Check if team entry starts with or contains the base species
-            if (teamEntry.startsWith(baseSpecies) || teamEntry.contains(baseSpecies)) {
-                return teamEntry;
+    private static void revealTeamForme(List<String> team, String revealedName, PokemonService pokemonService) {
+        if (revealedName == null || revealedName.isEmpty()) return;
+
+        // Legacy path: only handle Urshifu wildcard.
+        if (pokemonService == null) {
+            if (revealedName.startsWith("Urshifu-")) {
+                for (int i = 0; i < team.size(); i++) {
+                    if (team.get(i).startsWith("Urshifu-*")) {
+                        team.set(i, revealedName);
+                        return;
+                    }
+                }
+            }
+            return;
+        }
+
+        String revealedBase = pokemonService.resolveBaseSpecies(revealedName);
+
+        // First pass: prefer wildcard slots ({@code X-*}) so we don't accidentally rewrite
+        // a different team member who happens to share a base species.
+        for (int i = 0; i < team.size(); i++) {
+            String entry = team.get(i);
+            if (entry.contains("-*") && pokemonService.resolveBaseSpecies(entry).equals(revealedBase)) {
+                team.set(i, revealedName);
+                return;
             }
         }
-        return null;
+
+        // Second pass: rewrite a same-base entry if its canonical name differs from the reveal.
+        // Skip if the slot is already exactly the revealed name.
+        String revealedCanonical = pokemonService.resolveCanonical(revealedName);
+        for (int i = 0; i < team.size(); i++) {
+            String entry = team.get(i);
+            if (entry.equals(revealedName)) return;
+            if (pokemonService.resolveBaseSpecies(entry).equals(revealedBase)
+                    && !pokemonService.resolveCanonical(entry).equals(revealedCanonical)) {
+                team.set(i, revealedName);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Find the team list entry that matches the given species. Uses canonical name resolution
+     * when {@link PokemonService} is available; falls back to the legacy prefix/contains match.
+     */
+    private static String findTeamEntry(List<String> team, String species, PokemonService pokemonService) {
+        int idx = findTeamIndex(team, species, pokemonService);
+        return idx >= 0 ? team.get(idx) : null;
+    }
+
+    private static int findTeamIndex(List<String> team, String species, PokemonService pokemonService) {
+        if (species == null || species.isEmpty()) return -1;
+
+        if (pokemonService != null) {
+            String targetCanonical = pokemonService.resolveCanonical(species);
+            String targetBase = pokemonService.resolveBaseSpecies(species);
+
+            // Prefer an exact canonical match (handles teams that contain both base and forme,
+            // even though species clause makes that rare).
+            for (int i = 0; i < team.size(); i++) {
+                if (pokemonService.resolveCanonical(team.get(i)).equals(targetCanonical)) {
+                    return i;
+                }
+            }
+            // Fall back to base-species match (covers paste {@code Zamazenta-Crowned} when battle
+            // reveals plain {@code Zamazenta}, or vice versa).
+            for (int i = 0; i < team.size(); i++) {
+                if (pokemonService.resolveBaseSpecies(team.get(i)).equals(targetBase)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        // Legacy fallback: prefix match on the chunk before the first hyphen.
+        String legacyBase = species.split("-")[0];
+        for (int i = 0; i < team.size(); i++) {
+            String teamEntry = team.get(i);
+            if (teamEntry.startsWith(legacyBase) || teamEntry.contains(legacyBase)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Detect Mega / Primal formes by suffix. Tera and Ogerpon mask formes also fire
+     * {@code |detailschange|}, so we filter to the species-changing transforms here.
+     */
+    private static boolean isMegaOrPrimalForme(String species) {
+        if (species == null) return false;
+        return species.endsWith("-Mega")
+                || species.endsWith("-Mega-X")
+                || species.endsWith("-Mega-Y")
+                || species.endsWith("-Primal");
+    }
+
+    /**
+     * After a mid-battle forme change, port any picks/leads/move-usage entries keyed by the
+     * pre-change name over to the new name so analytics see a single mega-evolved Pokemon
+     * rather than two separate entries.
+     */
+    private static void renamePickEntries(BattleData data, String player, String oldName, String newName) {
+        if (oldName.equals(newName)) return;
+
+        List<String> picks = "1".equals(player) ? data.getP1Picks() : data.getP2Picks();
+        List<String> leads = "1".equals(player) ? data.getP1Leads() : data.getP2Leads();
+        Map<String, Map<String, Integer>> moveUsage =
+                "1".equals(player) ? data.getP1MoveUsage() : data.getP2MoveUsage();
+
+        replaceInList(picks, oldName, newName);
+        replaceInList(leads, oldName, newName);
+
+        Map<String, Integer> moves = moveUsage.remove(oldName);
+        if (moves != null) {
+            moveUsage.merge(newName, moves, (a, b) -> {
+                a.forEach((k, v) -> b.merge(k, v, Integer::sum));
+                return b;
+            });
+        }
+
+        if (oldName.equals(data.getP1Tera())) data.setP1Tera(newName);
+        if (oldName.equals(data.getP2Tera())) data.setP2Tera(newName);
+    }
+
+    private static void replaceInList(List<String> list, String oldName, String newName) {
+        for (int i = 0; i < list.size(); i++) {
+            if (oldName.equals(list.get(i))) {
+                list.set(i, newName);
+            }
+        }
     }
 
     /**
@@ -504,6 +665,17 @@ public class BattleLogParser {
             return pokemon.equals(data.getP1Tera());
         } else {
             return pokemon.equals(data.getP2Tera());
+        }
+    }
+
+    /**
+     * Check if a Pokemon Mega Evolved (or Primal Reverted).
+     */
+    public static boolean didMegaEvolve(BattleData data, String pokemon, String player) {
+        if ("p1".equalsIgnoreCase(player) || "1".equals(player)) {
+            return pokemon.equals(data.getP1Mega());
+        } else {
+            return pokemon.equals(data.getP2Mega());
         }
     }
 

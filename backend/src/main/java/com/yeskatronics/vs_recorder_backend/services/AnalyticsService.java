@@ -462,7 +462,7 @@ public class AnalyticsService {
 
         for (Replay replay : replays) {
             try {
-                BattleLogParser.BattleData parsed = BattleLogParser.parseBattleLog(replay.getBattleLog());
+                BattleLogParser.BattleData parsed = BattleLogParser.parseBattleLog(replay.getBattleLog(), pokemonService);
                 ParsedReplay pr = new ParsedReplay();
                 pr.battleData = parsed;
                 pr.replay = replay;
