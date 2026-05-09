@@ -28,6 +28,19 @@ function getTeraFromReplay(replay: Replay): string | null {
   return normalizePokemonName(userTeraEvents[0].pokemon);
 }
 
+function getMegaFromReplay(replay: Replay): string | null {
+  if (!replay.battleData?.userPlayer || !replay.battleData?.megaEvents) return null;
+  const userMegaEvents = replay.battleData.megaEvents[replay.battleData.userPlayer];
+  if (!Array.isArray(userMegaEvents) || userMegaEvents.length === 0) return null;
+  return normalizePokemonName(userMegaEvents[0].pokemon);
+}
+
+// Regulations where Mega Evolution is the active mechanic instead of Tera (default: Mega).
+function isMegaRegulation(regulation: string | null | undefined): boolean {
+  if (!regulation) return true;
+  return /Regulation\s+M(-[A-Z])?$/i.test(regulation);
+}
+
 function getWinRateColor(winRate: number): string {
   if (winRate >= 60) return "text-green-600 dark:text-green-400";
   if (winRate >= 40) return "text-yellow-600 dark:text-yellow-400";
@@ -102,6 +115,9 @@ export default function UsageStatsPage() {
       const gamesWithTera = validReplays.filter((r) => getTeraFromReplay(r) === pokemon);
       const winsWithTera = gamesWithTera.filter((r) => r.result === "win");
 
+      const gamesWithMega = validReplays.filter((r) => getMegaFromReplay(r) === pokemon);
+      const winsWithMega = gamesWithMega.filter((r) => r.result === "win");
+
       return {
         pokemon,
         usage: gamesWithPokemon.length,
@@ -111,6 +127,8 @@ export default function UsageStatsPage() {
         leadWinRate: gamesAsLead.length > 0 ? Math.round((winsAsLead.length / gamesAsLead.length) * 100) : 0,
         teraUsage: gamesWithTera.length,
         teraWinRate: gamesWithTera.length > 0 ? Math.round((winsWithTera.length / gamesWithTera.length) * 100) : null,
+        megaUsage: gamesWithMega.length,
+        megaWinRate: gamesWithMega.length > 0 ? Math.round((winsWithMega.length / gamesWithMega.length) * 100) : null,
       };
     });
 
@@ -195,6 +213,8 @@ export default function UsageStatsPage() {
 
   const validGameCount = replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
   const { individualStats, leadPairStats, bestLeadStats } = usageStats;
+  const showMega = isMegaRegulation(team?.regulation);
+  const mechanicLabel = showMega ? "Mega" : "Tera";
 
   return (
     <>
@@ -223,46 +243,52 @@ export default function UsageStatsPage() {
                     <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">Win %</th>
                     <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">Lead Usage</th>
                     <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">Lead Win %</th>
-                    <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">Tera Usage</th>
-                    <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">Tera Win %</th>
+                    <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">{mechanicLabel} Usage</th>
+                    <th className="px-2 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-300">{mechanicLabel} Win %</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {individualStats.map((stat) => (
-                    <tr key={stat.pokemon} className="border-b border-gray-100 dark:border-gray-700/50">
-                      <td className="px-2 py-3">
-                        <div className="flex items-center gap-3">
-                          <PokemonSprite name={stat.pokemon} size="sm" />
-                          <span className="capitalize text-gray-800 dark:text-gray-100">
-                            {getDisplayName(stat.pokemon)}
+                  {individualStats.map((stat) => {
+                    const mechanicUsage = showMega ? stat.megaUsage : stat.teraUsage;
+                    const mechanicWinRate = showMega ? stat.megaWinRate : stat.teraWinRate;
+                    return (
+                      <tr key={stat.pokemon} className="border-b border-gray-100 dark:border-gray-700/50">
+                        <td className="px-2 py-3">
+                          <div className="flex items-center gap-3">
+                            <PokemonSprite name={stat.pokemon} size="sm" />
+                            <span className="capitalize text-gray-800 dark:text-gray-100">
+                              {getDisplayName(stat.pokemon)}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-2 py-3 text-center">
+                          <div className="text-gray-800 dark:text-gray-100">{stat.usage}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">({stat.usageRate}%)</div>
+                        </td>
+                        <td className="px-2 py-3 text-center">
+                          <span className={`font-semibold ${stat.usage > 0 ? getWinRateColor(stat.overallWinRate) : "text-gray-400"}`}>
+                            {stat.usage > 0 ? `${stat.overallWinRate}%` : "\u2014"}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-2 py-3 text-center">
-                        <div className="text-gray-800 dark:text-gray-100">{stat.usage}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">({stat.usageRate}%)</div>
-                      </td>
-                      <td className="px-2 py-3 text-center">
-                        <span className={`font-semibold ${stat.usage > 0 ? getWinRateColor(stat.overallWinRate) : "text-gray-400"}`}>
-                          {stat.usage > 0 ? `${stat.overallWinRate}%` : "\u2014"}
-                        </span>
-                      </td>
-                      <td className="px-2 py-3 text-center text-gray-800 dark:text-gray-100">{stat.leadUsage}</td>
-                      <td className="px-2 py-3 text-center">
-                        <span className={`font-semibold ${stat.leadUsage > 0 ? getWinRateColor(stat.leadWinRate) : "text-gray-400"}`}>
-                          {stat.leadUsage > 0 ? `${stat.leadWinRate}%` : "\u2014"}
-                        </span>
-                      </td>
-                      <td className="px-2 py-3 text-center text-gray-800 dark:text-gray-100">{stat.teraUsage}</td>
-                      <td className="px-2 py-3 text-center">
-                        {stat.teraWinRate !== null ? (
-                          <span className={`font-semibold ${getWinRateColor(stat.teraWinRate)}`}>{stat.teraWinRate}%</span>
-                        ) : (
-                          <span className="text-gray-400">&mdash;</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-2 py-3 text-center text-gray-800 dark:text-gray-100">{stat.leadUsage}</td>
+                        <td className="px-2 py-3 text-center">
+                          <span className={`font-semibold ${stat.leadUsage > 0 ? getWinRateColor(stat.leadWinRate) : "text-gray-400"}`}>
+                            {stat.leadUsage > 0 ? `${stat.leadWinRate}%` : "\u2014"}
+                          </span>
+                        </td>
+                        <td className="px-2 py-3 text-center text-gray-800 dark:text-gray-100">
+                          {mechanicUsage > 0 ? mechanicUsage : <span className="text-gray-400">&mdash;</span>}
+                        </td>
+                        <td className="px-2 py-3 text-center">
+                          {mechanicWinRate !== null && mechanicWinRate !== undefined ? (
+                            <span className={`font-semibold ${getWinRateColor(mechanicWinRate)}`}>{mechanicWinRate}%</span>
+                          ) : (
+                            <span className="text-gray-400">&mdash;</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
