@@ -167,6 +167,17 @@ export function resolveFromRegistry(name: string): string | null {
 }
 
 /**
+ * Resolve a name to its registry-defined baseSpecies key, used for analytics
+ * grouping (e.g. Zamazenta-Crowned → "zamazenta", Charizard-Mega-Y → "charizard").
+ * Falls back to the canonical key when no registry entry exists.
+ */
+export function resolveBaseSpeciesFromRegistry(name: string): string | null {
+  const canonical = resolveFromRegistry(name);
+  if (!canonical || !registryData) return canonical;
+  return registryData[canonical]?.baseSpecies ?? canonical;
+}
+
+/**
  * Look up a Pokemon in the backend registry by any name variant.
  */
 function getRegistryEntry(identifier: string): RegistryEntry | null {

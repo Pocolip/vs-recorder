@@ -4,7 +4,7 @@ import { Zap } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
-import { cleanPokemonName, getDisplayName } from "../../utils/pokemonNameUtils";
+import { getDisplayName, resolveAnalyticsKey } from "../../utils/pokemonNameUtils";
 import * as pokepasteService from "../../services/pokepasteService";
 import { analyticsApi } from "../../services/api/analyticsApi";
 
@@ -48,7 +48,7 @@ export default function MoveUsagePage() {
           try {
             const parsed = await pokepasteService.fetchAndParse(team.pokepaste);
             pokepasteMovesets = parsed.reduce<Record<string, string[]>>((acc, pokemon) => {
-              const pokemonName = pokemon.name ? cleanPokemonName(pokemon.name) : "";
+              const pokemonName = pokemon.name ? resolveAnalyticsKey(pokemon.name) : "";
               if (pokemonName && pokemon.moves) {
                 if (acc[pokemonName]) {
                   const existingMoves = new Set(acc[pokemonName]);
@@ -72,7 +72,7 @@ export default function MoveUsagePage() {
         const usageStats: Record<string, Record<string, number>> = {};
         if (backendMoveData?.pokemonMoves) {
           backendMoveData.pokemonMoves.forEach(({ pokemon, moves }) => {
-            const key = cleanPokemonName(pokemon);
+            const key = resolveAnalyticsKey(pokemon);
             if (!usageStats[key]) usageStats[key] = {};
             moves.forEach((moveEntry) => {
               // Handle both possible field names from backend

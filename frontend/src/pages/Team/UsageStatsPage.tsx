@@ -5,13 +5,11 @@ import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
 import * as pokepasteService from "../../services/pokepasteService";
-import { cleanPokemonName, getDisplayName } from "../../utils/pokemonNameUtils";
+import { getDisplayName, resolveAnalyticsKey } from "../../utils/pokemonNameUtils";
 import type { Replay } from "../../types";
 
 function normalizePokemonName(pokemonName: string): string {
-  const cleaned = cleanPokemonName(pokemonName);
-  if (cleaned.startsWith("terapagos")) return "terapagos";
-  return cleaned;
+  return resolveAnalyticsKey(pokemonName);
 }
 
 function getLeadsFromReplay(replay: Replay): string[] {
