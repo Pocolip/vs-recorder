@@ -166,6 +166,11 @@ const POKEMON_FORM_MAPPINGS: Record<string, string> = {
   "Charizard-Mega-Y": "charizard-mega-y",
   "Mewtwo-Mega-X": "mewtwo-mega-x",
   "Mewtwo-Mega-Y": "mewtwo-mega-y",
+
+  // Floette
+  "Floette-Eternal": "floette-eternal",
+  "Floette-Eternal Flower": "floette-eternal",
+  "Floette-Mega": "floette-mega",
 };
 
 export const cleanPokemonName = (pokemonName: string): string => {

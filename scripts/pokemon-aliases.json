@@ -84,7 +84,13 @@
     "Mimikyu": "mimikyu-disguised",
 
     "Vivillon-Pokeball": "vivillon",
-    "vivillon-pokeball": "vivillon"
+    "vivillon-pokeball": "vivillon",
+
+    "Floette-Eternal": "floette-eternal",
+    "Floette-Eternal Flower": "floette-eternal",
+    "floette-eternal-flower": "floette-eternal",
+    "Floette-Mega": "floette-mega",
+    "floette-mega": "floette-mega"
   },
 
   "baseSpeciesOverrides": {
@@ -150,6 +156,8 @@
     "meowstic-f": "meowstic-f",
     "basculegion-f": "basculegion-f",
     "oinkologne-f": "oinkologne-f",
-    "toxtricity-low-key": "toxtricity-low-key"
+    "toxtricity-low-key": "toxtricity-low-key",
+    "floette-eternal": "floette-eternal",
+    "floette-mega": "floette-eternal"
   }
 }

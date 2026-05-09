@@ -202,6 +202,9 @@
   "vivillon-fancy": { "id": 666, "form": 18 },
   "vivillon-pokeball": { "id": 666, "form": 19 },
 
+  "floette-eternal": { "id": 670, "form": 5 },
+  "floette-mega": { "id": 670, "form": 5 },
+
   "tatsugiri": { "id": 978, "form": 0 },
   "tatsugiri-curly": { "id": 978, "form": 0 },
   "tatsugiri-droopy": { "id": 978, "form": 1 },
