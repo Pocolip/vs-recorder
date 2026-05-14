@@ -11,6 +11,8 @@ interface GameCardProps {
   isEditingNote: boolean;
   isSavingNote: boolean;
   noteText: string;
+  /** When true, render Mega Evolution column instead of Terastallization. */
+  showMega?: boolean;
   onStartEditNote: (replay: Replay) => void;
   onCancelEditNote: () => void;
   onSaveNote: (id: number) => void;
@@ -63,6 +65,7 @@ export default function GameCard({
   isEditingNote,
   isSavingNote,
   noteText,
+  showMega = false,
   onStartEditNote,
   onCancelEditNote,
   onSaveNote,
@@ -95,6 +98,18 @@ export default function GameCard({
     return { userTera, opponentTera };
   };
 
+  const getMegaData = () => {
+    if (!replay.battleData?.megaEvents) {
+      return { userMega: null, opponentMega: null };
+    }
+
+    const { megaEvents, userPlayer, opponentPlayer } = replay.battleData;
+    const userMega = userPlayer && megaEvents[userPlayer]?.length ? megaEvents[userPlayer][0] : null;
+    const opponentMega = opponentPlayer && megaEvents[opponentPlayer]?.length ? megaEvents[opponentPlayer][0] : null;
+
+    return { userMega, opponentMega };
+  };
+
   const getEloData = () => {
     if (!replay.battleData?.eloChanges) {
       return { userElo: null, opponentElo: null };
@@ -120,6 +135,7 @@ export default function GameCard({
   const resultDisplay = getResultDisplay(replay.result);
   const teamData = getTeamData();
   const teraData = getTeraData();
+  const megaData = getMegaData();
   const eloData = getEloData();
 
   return (
@@ -200,13 +216,19 @@ export default function GameCard({
           </div>
         </div>
 
-        {/* Terastallization */}
+        {/* Terastallization / Mega Evolution column (regulation-dependent) */}
         <div className="lg:col-span-1">
-          <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">Tera</p>
+          <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">{showMega ? "Mega" : "Tera"}</p>
           <div className="space-y-1">
             <div className="flex items-center gap-1">
               <span className="w-6 shrink-0 text-xs text-blue-600 dark:text-blue-400">You</span>
-              {teraData.userTera ? (
+              {showMega ? (
+                megaData.userMega ? (
+                  <PokemonSprite name={cleanPokemonName(megaData.userMega.megaForme)} size="sm" />
+                ) : (
+                  <span className="text-xs text-gray-400">&mdash;</span>
+                )
+              ) : teraData.userTera ? (
                 <div className="flex items-center gap-0.5">
                   <PokemonSprite name={cleanPokemonName(teraData.userTera.pokemon)} size="sm" />
                   <TypeIcon type={teraData.userTera.type} size="w-4 h-4" />
@@ -217,7 +239,13 @@ export default function GameCard({
             </div>
             <div className="flex items-center gap-1">
               <span className="w-6 shrink-0 text-xs text-red-600 dark:text-red-400">Opp</span>
-              {teraData.opponentTera ? (
+              {showMega ? (
+                megaData.opponentMega ? (
+                  <PokemonSprite name={cleanPokemonName(megaData.opponentMega.megaForme)} size="sm" />
+                ) : (
+                  <span className="text-xs text-gray-400">&mdash;</span>
+                )
+              ) : teraData.opponentTera ? (
                 <div className="flex items-center gap-0.5">
                   <PokemonSprite name={cleanPokemonName(teraData.opponentTera.pokemon)} size="sm" />
                   <TypeIcon type={teraData.opponentTera.type} size="w-4 h-4" />

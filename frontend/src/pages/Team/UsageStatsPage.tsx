@@ -6,6 +6,7 @@ import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
 import * as pokepasteService from "../../services/pokepasteService";
 import { getDisplayName, resolveAnalyticsKey } from "../../utils/pokemonNameUtils";
+import { isMegaRegulation } from "../../utils/regulationUtils";
 import type { Replay } from "../../types";
 
 function normalizePokemonName(pokemonName: string): string {
@@ -31,12 +32,6 @@ function getMegaFromReplay(replay: Replay): string | null {
   const userMegaEvents = replay.battleData.megaEvents[replay.battleData.userPlayer];
   if (!Array.isArray(userMegaEvents) || userMegaEvents.length === 0) return null;
   return normalizePokemonName(userMegaEvents[0].pokemon);
-}
-
-// Regulations where Mega Evolution is the active mechanic instead of Tera (default: Mega).
-function isMegaRegulation(regulation: string | null | undefined): boolean {
-  if (!regulation) return true;
-  return /Regulation\s+M(-[A-Z])?$/i.test(regulation);
 }
 
 function getWinRateColor(winRate: number): string {
