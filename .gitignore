@@ -35,6 +35,11 @@ Thumbs.db
 
 screenshots/
 
+# Claude Code runtime + per-user state (keep .claude/agents/ tracked)
+.claude/settings.local.json
+.claude/scheduled_tasks.json
+.claude/scheduled_tasks.lock
+
 # Terraform
 infra/.terraform/
 infra/*.tfstate
