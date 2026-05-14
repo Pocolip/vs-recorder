@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-14-misc-fixes",
+    "date": "2026-05-14",
+    "title": "Miscellaneous Fixes",
+    "message": "Fixed some forme resolution plus some tera > mega transition (both should work depending on reg). Getting back into the groove!"
+  },
+  {
     "id": "2026-04-27-new-regulations",
     "date": "2026-04-27",
     "title": "Added Regulation M-A and M-B",
