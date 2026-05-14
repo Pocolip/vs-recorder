@@ -1,8 +1,10 @@
 package com.yeskatronics.vs_recorder_backend.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yeskatronics.vs_recorder_backend.services.PokemonService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
@@ -18,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class BattleLogParserTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private PokemonService pokemonService;
 
     // Helper to load test files
     private String loadTestFile(String filename) throws IOException {
@@ -423,5 +428,23 @@ class BattleLogParserTest {
                                 "/bo1/bothtera.json"));
 
         assertEquals("surgevgc", battleData.getWinner());
+    }
+
+    // ==================== Forme-aware parsing (with PokemonService) ====================
+
+    @Test
+    void testParseBattleLog_withPokemonService_shouldRevealZacianCrowned() throws IOException {
+        // maus.json has p1's team listed as "Zacian-*" in |poke|, then |switch|
+        // reveals "Zacian-Crowned". The forme-aware parser must rewrite the team
+        // slot so picks/moves key on the revealed forme rather than the wildcard.
+        BattleLogParser.BattleData battleData =
+                BattleLogParser.parseBattleLog(loadTestFile("/bo1/maus.json"), pokemonService);
+
+        assertTrue(battleData.getP1Team().contains("Zacian-Crowned"),
+                "Team list should be rewritten from Zacian-* to Zacian-Crowned");
+        assertFalse(battleData.getP1Team().contains("Zacian-*"),
+                "Wildcard slot should not survive after the reveal");
+        assertTrue(battleData.getP1Picks().contains("Zacian-Crowned"),
+                "Picks should be keyed on the revealed forme");
     }
 }

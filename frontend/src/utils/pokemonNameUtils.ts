@@ -1,4 +1,4 @@
-import { resolveFromRegistry } from "../services/pokemonService";
+import { resolveFromRegistry, resolveBaseSpeciesFromRegistry } from "../services/pokemonService";
 
 const POKEMON_FORM_MAPPINGS: Record<string, string> = {
   // Urshifu forms
@@ -166,6 +166,11 @@ const POKEMON_FORM_MAPPINGS: Record<string, string> = {
   "Charizard-Mega-Y": "charizard-mega-y",
   "Mewtwo-Mega-X": "mewtwo-mega-x",
   "Mewtwo-Mega-Y": "mewtwo-mega-y",
+
+  // Floette
+  "Floette-Eternal": "floette-eternal",
+  "Floette-Eternal Flower": "floette-eternal",
+  "Floette-Mega": "floette-mega",
 };
 
 export const cleanPokemonName = (pokemonName: string): string => {
@@ -198,6 +203,20 @@ export const cleanPokemonName = (pokemonName: string): string => {
     .replace(/[^a-z0-9-]/g, "")
     .replace(/--+/g, "-")
     .replace(/^-|-$/g, "");
+};
+
+/**
+ * Resolve a Pokemon name to the key used for analytics joins (Usage Stats, Move
+ * Usage). Mirrors {@link cleanPokemonName} but collapses competitive formes to
+ * their registry-defined baseSpecies — so paste species "Zamazenta" and
+ * battle-log species "Zamazenta-Crowned" both resolve to the same key.
+ *
+ * Display callers (sprites, getDisplayName) should keep using cleanPokemonName.
+ */
+export const resolveAnalyticsKey = (pokemonName: string): string => {
+  if (!pokemonName) return "";
+  const canonical = cleanPokemonName(pokemonName);
+  return resolveBaseSpeciesFromRegistry(canonical) ?? canonical;
 };
 
 export const parseShowdownName = (showdownName: string): string => {

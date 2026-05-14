@@ -797,4 +797,43 @@ class AnalyticsServiceTest {
                 .findFirst().get();
         assertEquals(1, incineroarUsage.getTeraUsage(), "Incineroar (nicknamed Battle Beast) should have 1 tera usage");
     }
+
+    /**
+     * Regression: paste lists base "Zamazenta" but the |poke| line emits the
+     * wildcard "Zamazenta-*" and |switch| reveals "Zamazenta-Crowned". Before the
+     * registry-grouping fix the analytics keyed picks under "Zamazenta-Crowned"
+     * which never matched the paste-roster "Zamazenta" entry — so Usage Stats
+     * showed 0 usage and Move Usage rendered a 7th ghost Pokemon.
+     *
+     * Fixture extracted from a real exported team (Yuma's nationals team).
+     */
+    @Test
+    void testRegression_zamazentaBasePaste_groupsCrownedUnderHero() throws IOException {
+        // Override the default test-team username to match the real player.
+        testTeam.setShowdownUsernames(new java.util.ArrayList<>(Arrays.asList("blipbuglookingahh")));
+        testTeam.setRegulation("VGC 2026 Regulation I");
+        testTeam = teamRepository.save(testTeam);
+
+        createReplayFromJson(loadTestReplay("yuma/zamazenta-base-paste.json"));
+
+        AnalyticsDTO.UsageStatsResponse usage = analyticsService.getUsageStats(testTeam.getId());
+        AnalyticsDTO.MoveUsageResponse moves = analyticsService.getMoveUsageStats(testTeam.getId());
+
+        // Usage Stats: Zamazenta (the hero/base form, matching the paste species
+        // line) must have usage > 0 even though the battle log emitted Crowned.
+        AnalyticsDTO.PokemonUsageStats zamazenta = usage.getPokemonStats().stream()
+                .filter(s -> "Zamazenta".equals(s.getPokemon()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError(
+                        "Zamazenta should appear in usage stats; got: " + usage.getPokemonStats()));
+        assertTrue(zamazenta.getUsage() > 0,
+                "Zamazenta should have non-zero usage when brought to battle as Crowned");
+
+        // Move Usage: should have at most one entry per team Pokemon. Specifically,
+        // there must be NO "Zamazenta-Crowned" ghost entry alongside "Zamazenta".
+        assertTrue(moves.getPokemonMoves().stream().anyMatch(m -> "Zamazenta".equals(m.getPokemon())),
+                "Zamazenta should appear in move usage");
+        assertFalse(moves.getPokemonMoves().stream().anyMatch(m -> "Zamazenta-Crowned".equals(m.getPokemon())),
+                "Zamazenta-Crowned should NOT appear as a separate ghost entry");
+    }
 }

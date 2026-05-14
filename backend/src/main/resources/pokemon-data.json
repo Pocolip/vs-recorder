@@ -1,5 +1,5 @@
 {
-  "version": "2026.03",
+  "version": "2026.05",
   "pokemon": {
     "bulbasaur": {
       "num": 1,
@@ -10513,21 +10513,25 @@
     },
     "floette-eternal": {
       "num": 670,
-      "form": 0,
+      "form": 5,
       "name": "Floette-Eternal",
       "displayName": "Floette Eternal",
-      "baseSpecies": "floette",
+      "baseSpecies": "floette-eternal",
       "types": [
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [
+        "Floette-Eternal Flower",
+        "floette-eternal-flower",
+        "floette-mega"
+      ]
     },
     "floette-mega": {
       "num": 670,
-      "form": 0,
+      "form": 5,
       "name": "Floette-Mega",
       "displayName": "Floette Mega",
-      "baseSpecies": "floette",
+      "baseSpecies": "floette-eternal",
       "types": [
         "Fairy"
       ],
@@ -14364,7 +14368,7 @@
       "form": 1,
       "name": "Zacian-Crowned",
       "displayName": "Zacian Crowned",
-      "baseSpecies": "zacian-crowned",
+      "baseSpecies": "zacian",
       "types": [
         "Fairy",
         "Steel"
@@ -14393,7 +14397,7 @@
       "form": 1,
       "name": "Zamazenta-Crowned",
       "displayName": "Zamazenta Crowned",
-      "baseSpecies": "zamazenta-crowned",
+      "baseSpecies": "zamazenta",
       "types": [
         "Fighting",
         "Steel"
