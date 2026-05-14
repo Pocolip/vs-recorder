@@ -28,6 +28,7 @@ public class ReplayDTO {
         private Map<String, List<String>> teams; // "p1" -> [pokemon], "p2" -> [pokemon]
         private Map<String, List<String>> actualPicks; // "p1" -> [pokemon brought], "p2" -> [pokemon brought]
         private Map<String, List<TeraEvent>> teraEvents; // "p1" -> [tera events], "p2" -> [tera events]
+        private Map<String, List<MegaEvent>> megaEvents; // "p1" -> [mega evolution events]
         private Map<String, EloChange> eloChanges; // "p1" -> elo data, "p2" -> elo data
         private Map<String, Map<String, Map<String, Integer>>> moveUsage; // "p1" -> {pokemon -> {move -> count}}
     }
@@ -41,6 +42,17 @@ public class ReplayDTO {
     public static class TeraEvent {
         private String pokemon;
         private String type;
+    }
+
+    /**
+     * Mega Evolution / Primal Reversion event
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MegaEvent {
+        private String pokemon;     // Team-roster entry (e.g., "Charizard")
+        private String megaForme;   // Resulting forme (e.g., "Charizard-Mega-Y")
     }
 
     /**

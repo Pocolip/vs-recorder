@@ -77,6 +77,18 @@ public interface ReplayMapper {
             }
             battleData.setTeraEvents(teraEvents);
 
+            // Convert mega events
+            Map<String, List<ReplayDTO.MegaEvent>> megaEvents = new HashMap<>();
+            if (rawData.getMegaEvents() != null) {
+                for (Map.Entry<String, List<ReplayMatcher.MegaEvent>> entry : rawData.getMegaEvents().entrySet()) {
+                    List<ReplayDTO.MegaEvent> dtoEvents = entry.getValue().stream()
+                            .map(e -> new ReplayDTO.MegaEvent(e.getPokemon(), e.getMegaForme()))
+                            .collect(Collectors.toList());
+                    megaEvents.put(entry.getKey(), dtoEvents);
+                }
+            }
+            battleData.setMegaEvents(megaEvents);
+
             // Convert ELO changes
             Map<String, ReplayDTO.EloChange> eloChanges = new HashMap<>();
             for (Map.Entry<String, ReplayMatcher.EloChange> entry : rawData.getEloChanges().entrySet()) {

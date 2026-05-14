@@ -27,6 +27,8 @@ public class AnalyticsDTO {
         private Integer leadWinRate;    // Win rate as lead (null if never lead)
         private int teraUsage;          // Times Terastallized
         private Integer teraWinRate;    // Win rate when Tera'd (null if never)
+        private int megaUsage;          // Times Mega Evolved (or Primal Reverted)
+        private Integer megaWinRate;    // Win rate when Mega'd (null if never)
     }
 
     /**

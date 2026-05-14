@@ -7,6 +7,7 @@ import GameCard from "../../components/team/GameCard";
 import TagInput from "../../components/form/TagInput";
 import * as replayService from "../../services/replayService";
 import { matchesPokemonTags, getOpponentPokemonFromReplay } from "../../utils/pokemonNameUtils";
+import { isMegaRegulation } from "../../utils/regulationUtils";
 import type { Replay } from "../../types";
 
 export default function GameByGamePage() {
@@ -211,6 +212,7 @@ export default function GameByGamePage() {
               isEditingNote={editingNoteId === replay.id}
               isSavingNote={savingNoteId === replay.id}
               noteText={noteText}
+              showMega={isMegaRegulation(team?.regulation)}
               onStartEditNote={startEditingNote}
               onCancelEditNote={cancelEditingNote}
               onSaveNote={saveNote}

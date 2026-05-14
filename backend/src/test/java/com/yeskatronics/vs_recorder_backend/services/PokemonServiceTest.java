@@ -188,4 +188,54 @@ class PokemonServiceTest {
         assertNotNull(pokemonService.getRegistryVersion());
         assertFalse(pokemonService.getRegistryVersion().isEmpty());
     }
+
+    // ==================== Floette-Eternal / Floette-Mega ====================
+
+    @Test
+    void resolveCanonical_floetteEternalVariants() {
+        assertEquals("floette-eternal", pokemonService.resolveCanonical("Floette-Eternal"));
+        assertEquals("floette-eternal", pokemonService.resolveCanonical("Floette-Eternal Flower"));
+        assertEquals("floette-eternal", pokemonService.resolveCanonical("floette-eternal"));
+    }
+
+    @Test
+    void resolveBaseSpecies_floetteEternalIsItsOwnBase() {
+        // Floette-Eternal is competitively distinct from baby Floette and should
+        // not roll up under it in analytics.
+        assertEquals("floette-eternal", pokemonService.resolveBaseSpecies("Floette-Eternal"));
+        assertEquals("floette", pokemonService.resolveBaseSpecies("Floette"));
+    }
+
+    @Test
+    void resolveBaseSpecies_floetteMegaRollsUpToEternal() {
+        // Showdown emits "Floette-Mega" (not "Floette-Eternal-Mega") because only
+        // Eternal can mega-evolve. Analytics groups it under floette-eternal.
+        assertEquals("floette-mega", pokemonService.resolveCanonical("Floette-Mega"));
+        assertEquals("floette-eternal", pokemonService.resolveBaseSpecies("Floette-Mega"));
+    }
+
+    @Test
+    void getSpriteInfo_floetteEternalUsesForm5() {
+        int[] info = pokemonService.getSpriteInfo("Floette-Eternal");
+        assertNotNull(info);
+        assertEquals(670, info[0]);
+        assertEquals(5, info[1]);
+    }
+
+    // ==================== Zacian / Zamazenta hero+crowned grouping ====================
+
+    @Test
+    void resolveBaseSpecies_zamazentaCrownedRollsUpToHero() {
+        // Both Hero (Zamazenta) and Crowned (Rusted Shield) are competitively the
+        // same Pokemon — group them under "zamazenta" so paste-roster matching
+        // works regardless of whether the paste lists the base or crowned forme.
+        assertEquals("zamazenta", pokemonService.resolveBaseSpecies("Zamazenta-Crowned"));
+        assertEquals("zamazenta", pokemonService.resolveBaseSpecies("Zamazenta"));
+    }
+
+    @Test
+    void resolveBaseSpecies_zacianCrownedRollsUpToHero() {
+        assertEquals("zacian", pokemonService.resolveBaseSpecies("Zacian-Crowned"));
+        assertEquals("zacian", pokemonService.resolveBaseSpecies("Zacian"));
+    }
 }

@@ -172,6 +172,7 @@ public class ReplayMatcher {
         private Map<String, List<String>> teams; // "p1" -> [pokemon], "p2" -> [pokemon]
         private Map<String, List<String>> actualPicks; // "p1" -> [pokemon brought to battle]
         private Map<String, List<TeraEvent>> teraEvents; // "p1" -> [tera events]
+        private Map<String, List<MegaEvent>> megaEvents; // "p1" -> [mega evolution events]
         private Map<String, EloChange> eloChanges; // "p1" -> elo data
         private Map<String, Map<String, Map<String, Integer>>> moveUsage; // "p1" -> {pokemon -> {move -> count}}
     }
@@ -184,6 +185,17 @@ public class ReplayMatcher {
         public TeraEvent(String pokemon, String type) {
             this.pokemon = pokemon;
             this.type = type;
+        }
+    }
+
+    @Data
+    public static class MegaEvent {
+        private String pokemon;     // Team-roster entry (e.g., "Charizard")
+        private String megaForme;   // Resulting forme (e.g., "Charizard-Mega-Y")
+
+        public MegaEvent(String pokemon, String megaForme) {
+            this.pokemon = pokemon;
+            this.megaForme = megaForme;
         }
     }
 
@@ -219,6 +231,9 @@ public class ReplayMatcher {
         data.setTeraEvents(new HashMap<>());
         data.getTeraEvents().put("p1", new ArrayList<>());
         data.getTeraEvents().put("p2", new ArrayList<>());
+        data.setMegaEvents(new HashMap<>());
+        data.getMegaEvents().put("p1", new ArrayList<>());
+        data.getMegaEvents().put("p2", new ArrayList<>());
         data.setEloChanges(new HashMap<>());
         data.setMoveUsage(new HashMap<>());
         data.getMoveUsage().put("p1", new HashMap<>());
@@ -341,6 +356,25 @@ public class ReplayMatcher {
                         if (!switchedIn.get(player).contains(resolvedName)) {
                             switchedIn.get(player).add(resolvedName);
                             data.getActualPicks().get(player).add(resolvedName);
+                        }
+                    }
+                }
+                // Extract Mega Evolution / Primal Reversion: |detailschange|p1a: Nickname|Charizard-Mega-Y, ...
+                // Tera and Ogerpon mask transforms also fire |detailschange|; we filter to Mega/Primal here.
+                else if (line.startsWith("|detailschange|")) {
+                    String[] parts = line.split("\\|");
+                    if (parts.length >= 4) {
+                        String playerPoke = parts[2];
+                        String position = playerPoke.split(":")[0].trim();
+                        String player = position.substring(0, 2);
+                        String newSpecies = parts[3].split(",")[0].trim();
+
+                        if (newSpecies.endsWith("-Mega")
+                                || newSpecies.endsWith("-Mega-X")
+                                || newSpecies.endsWith("-Mega-Y")
+                                || newSpecies.endsWith("-Primal")) {
+                            String teamEntry = positionToSpecies.getOrDefault(position, "Unknown");
+                            data.getMegaEvents().get(player).add(new MegaEvent(teamEntry, newSpecies));
                         }
                     }
                 }
