@@ -182,7 +182,7 @@ export default function GameCard({
                 ) : (
                   <Circle className="h-3 w-3" />
                 )}
-                {replay.reviewed ? "Reviewed" : "Mark Reviewed"}
+                Reviewed
               </button>
             )}
           </div>

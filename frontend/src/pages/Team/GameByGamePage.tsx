@@ -12,7 +12,7 @@ import type { Replay } from "../../types";
 
 export default function GameByGamePage() {
   const { team, statsVersion } = useActiveTeam();
-  const { replays, loading, refreshStats } = useTeamStats(team?.id ?? null);
+  const { replays, loading, refreshStats, updateReplaysLocal } = useTeamStats(team?.id ?? null);
 
   const prevVersion = useRef(statsVersion);
   useEffect(() => {
@@ -60,8 +60,9 @@ export default function GameByGamePage() {
   const toggleReviewed = async (replay: Replay) => {
     try {
       setTogglingReviewedId(replay.id);
-      await replayService.update(replay.id, { reviewed: !replay.reviewed });
-      refreshStats();
+      const next = !replay.reviewed;
+      await replayService.update(replay.id, { reviewed: next });
+      updateReplaysLocal([{ id: replay.id, changes: { reviewed: next } }]);
     } catch (error) {
       console.error("Error toggling reviewed status:", error);
     } finally {
@@ -91,10 +92,11 @@ export default function GameByGamePage() {
     if (filteredReplays.length === 0 || bulkUpdating) return;
     try {
       setBulkUpdating(true);
+      const targets = filteredReplays.map((r) => r.id);
       await Promise.all(
-        filteredReplays.map((r) => replayService.update(r.id, { reviewed }))
+        targets.map((id) => replayService.update(id, { reviewed }))
       );
-      refreshStats();
+      updateReplaysLocal(targets.map((id) => ({ id, changes: { reviewed } })));
     } catch (error) {
       console.error("Error bulk updating reviewed status:", error);
     } finally {

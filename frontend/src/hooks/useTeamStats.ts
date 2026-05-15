@@ -69,6 +69,21 @@ export const useTeamStats = (teamId: number | null, options: UseTeamStatsOptions
     loadStats(teamId);
   };
 
+  const updateReplaysLocal = (
+    updates: { id: number; changes: Partial<Replay> }[]
+  ) => {
+    if (updates.length === 0) return;
+    setStats((prev) => {
+      const map = new Map(updates.map((u) => [u.id, u.changes]));
+      return {
+        ...prev,
+        replays: prev.replays.map((r) =>
+          map.has(r.id) ? { ...r, ...map.get(r.id)! } : r
+        ),
+      };
+    });
+  };
+
   const resetStats = () => {
     setStats(DEFAULT_STATS);
     setError(null);
@@ -101,6 +116,7 @@ export const useTeamStats = (teamId: number | null, options: UseTeamStatsOptions
     lastUpdated,
     loadStats,
     refreshStats,
+    updateReplaysLocal,
     resetStats,
     isLoading: loading,
     hasError: !!error,
