@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-15-reviewed-replays",
+    "date": "2026-05-15",
+    "title": "Mark Replays as Reviewed",
+    "message": "You can now mark replays as 'Reviewed' on the Game by Game page. Each replay has a per-card toggle, there's a new filter dropdown (Reviewed / Unreviewed) that combines with the result filter, and the Add Replay modal has a checkbox to preemptively mark imports. There are also bulk Mark/Reset buttons at the bottom that act on whatever is currently visible after filters."
+  },
+  {
     "id": "2026-05-14-misc-fixes",
     "date": "2026-05-14",
     "title": "Miscellaneous Fixes",
