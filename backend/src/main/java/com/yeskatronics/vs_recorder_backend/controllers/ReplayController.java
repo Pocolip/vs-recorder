@@ -74,10 +74,17 @@ public class ReplayController {
 
         Replay savedReplay = replayService.createReplayFromUrl(teamId, request.getUrl());
 
-        // Update notes if provided
-        if (request.getNotes() != null && !request.getNotes().isEmpty()) {
+        // Apply optional fields (notes, reviewed) via partial update
+        boolean hasNotes = request.getNotes() != null && !request.getNotes().isEmpty();
+        boolean hasReviewed = Boolean.TRUE.equals(request.getReviewed());
+        if (hasNotes || hasReviewed) {
             Replay updates = new Replay();
-            updates.setNotes(request.getNotes());
+            if (hasNotes) {
+                updates.setNotes(request.getNotes());
+            }
+            if (hasReviewed) {
+                updates.setReviewed(true);
+            }
             savedReplay = replayService.updateReplay(savedReplay.getId(), updates);
         }
 

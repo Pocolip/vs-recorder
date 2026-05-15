@@ -293,6 +293,11 @@ public class ReplayService {
             existingReplay.setDate(updates.getDate());
         }
 
+        // Update reviewed flag if provided
+        if (updates.getReviewed() != null) {
+            existingReplay.setReviewed(updates.getReviewed());
+        }
+
         // Note: battleLog is immutable and should not be updated
 
         Replay savedReplay = replayRepository.save(existingReplay);

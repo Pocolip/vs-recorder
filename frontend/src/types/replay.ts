@@ -21,6 +21,7 @@ export interface Replay {
   gameNumber: number | null;
   matchId: number | null;
   notes: string;
+  reviewed: boolean;
   battleData: BattleData | null;
   battleLog: string | null;
   createdAt: string;
