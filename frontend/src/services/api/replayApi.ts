@@ -8,8 +8,8 @@ export const replayApi = {
   getByTeamId: (teamId: number) =>
     apiClient.get(`/api/replays?teamId=${teamId}`) as Promise<Replay[]>,
 
-  createFromUrl: (teamId: number, url: string, notes = "") =>
-    apiClient.post(`/api/replays/from-url?teamId=${teamId}`, { url, notes }) as Promise<Replay>,
+  createFromUrl: (teamId: number, url: string, notes = "", reviewed = false) =>
+    apiClient.post(`/api/replays/from-url?teamId=${teamId}`, { url, notes, reviewed }) as Promise<Replay>,
 
   create: (teamId: number, data: Partial<Replay>) =>
     apiClient.post(`/api/replays?teamId=${teamId}`, data) as Promise<Replay>,

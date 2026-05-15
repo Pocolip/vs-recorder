@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -62,6 +63,10 @@ public class Replay {
     @Size(max = 10, message = "Result must not exceed 10 characters")
     @Column(length = 10)
     private String result; // 'win' or 'loss'
+
+    @Column(name = "reviewed", nullable = false)
+    @ColumnDefault("false")
+    private Boolean reviewed = false;
 
     /**
      * Game number in a Bo3 match set.

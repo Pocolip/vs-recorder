@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Calendar, Filter, SortAsc, SortDesc } from "lucide-react";
+import { Calendar, Filter, SortAsc, SortDesc, CheckCircle2, RotateCcw } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
@@ -25,10 +25,13 @@ export default function GameByGamePage() {
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [filterResult, setFilterResult] = useState("all");
+  const [filterReviewed, setFilterReviewed] = useState("all");
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
   const [noteText, setNoteText] = useState("");
   const [savingNoteId, setSavingNoteId] = useState<number | null>(null);
+  const [togglingReviewedId, setTogglingReviewedId] = useState<number | null>(null);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
 
   const startEditingNote = (replay: Replay) => {
     setEditingNoteId(replay.id);
@@ -54,6 +57,18 @@ export default function GameByGamePage() {
     }
   };
 
+  const toggleReviewed = async (replay: Replay) => {
+    try {
+      setTogglingReviewedId(replay.id);
+      await replayService.update(replay.id, { reviewed: !replay.reviewed });
+      refreshStats();
+    } catch (error) {
+      console.error("Error toggling reviewed status:", error);
+    } finally {
+      setTogglingReviewedId(null);
+    }
+  };
+
   const filteredReplays = useMemo(() => {
     return replays.filter((replay) => {
       if (searchTags.length > 0 && !matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags)) {
@@ -62,9 +77,30 @@ export default function GameByGamePage() {
       if (filterResult !== "all" && replay.result !== filterResult) {
         return false;
       }
+      if (filterReviewed === "reviewed" && !replay.reviewed) {
+        return false;
+      }
+      if (filterReviewed === "unreviewed" && replay.reviewed) {
+        return false;
+      }
       return true;
     });
-  }, [replays, searchTags, filterResult]);
+  }, [replays, searchTags, filterResult, filterReviewed]);
+
+  const bulkSetReviewed = async (reviewed: boolean) => {
+    if (filteredReplays.length === 0 || bulkUpdating) return;
+    try {
+      setBulkUpdating(true);
+      await Promise.all(
+        filteredReplays.map((r) => replayService.update(r.id, { reviewed }))
+      );
+      refreshStats();
+    } catch (error) {
+      console.error("Error bulk updating reviewed status:", error);
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
 
   const sortedReplays = useMemo(() => {
     return [...filteredReplays].sort((a, b) => {
@@ -94,6 +130,7 @@ export default function GameByGamePage() {
 
   const clearFilters = () => {
     setFilterResult("all");
+    setFilterReviewed("all");
     setSortBy("date");
     setSortOrder("desc");
     setSearchTags([]);
@@ -162,6 +199,19 @@ export default function GameByGamePage() {
             </select>
           </div>
 
+          {/* Reviewed Filter */}
+          <div className="flex items-center gap-2">
+            <select
+              value={filterReviewed}
+              onChange={(e) => setFilterReviewed(e.target.value)}
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 focus:border-brand-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            >
+              <option value="all">All Reviewed Status</option>
+              <option value="reviewed">Reviewed Only</option>
+              <option value="unreviewed">Unreviewed Only</option>
+            </select>
+          </div>
+
           {/* Sort Controls */}
           <div className="flex items-center gap-2">
             <select
@@ -213,10 +263,12 @@ export default function GameByGamePage() {
               isSavingNote={savingNoteId === replay.id}
               noteText={noteText}
               showMega={isMegaRegulation(team?.regulation)}
+              isTogglingReviewed={togglingReviewedId === replay.id}
               onStartEditNote={startEditingNote}
               onCancelEditNote={cancelEditingNote}
               onSaveNote={saveNote}
               onNoteTextChange={setNoteText}
+              onToggleReviewed={toggleReviewed}
             />
           ))}
         </div>
@@ -245,6 +297,38 @@ export default function GameByGamePage() {
               <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">{winRate}%</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">Win Rate</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Reviewed Actions */}
+      {replays.length > 0 && (
+        <div className="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
+          <h4 className="mb-1 text-base font-semibold text-gray-800 dark:text-white/90">
+            Bulk update reviewed status
+          </h4>
+          <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+            Applies to the {filteredReplays.length} replay{filteredReplays.length === 1 ? "" : "s"} currently visible after filters above.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => bulkSetReviewed(true)}
+              disabled={bulkUpdating || filteredReplays.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              {bulkUpdating ? "Updating..." : "Mark visible as Reviewed"}
+            </button>
+            <button
+              type="button"
+              onClick={() => bulkSetReviewed(false)}
+              disabled={bulkUpdating || filteredReplays.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              <RotateCcw className="h-4 w-4" />
+              {bulkUpdating ? "Updating..." : "Reset visible to Unreviewed"}
+            </button>
           </div>
         </div>
       )}

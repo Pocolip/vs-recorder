@@ -78,6 +78,8 @@ public class ReplayDTO {
         private String url;
 
         private String notes;
+
+        private Boolean reviewed;
     }
 
     /**
@@ -122,6 +124,8 @@ public class ReplayDTO {
         private String result;
 
         private LocalDateTime date;
+
+        private Boolean reviewed;
     }
 
     /**
@@ -141,6 +145,7 @@ public class ReplayDTO {
         private Integer gameNumber; // 1, 2, 3 for Bo3; null for Bo1
         private LocalDateTime date;
         private String notes;
+        private Boolean reviewed;
         private LocalDateTime createdAt;
     }
 
@@ -160,6 +165,7 @@ public class ReplayDTO {
         private Integer gameNumber; // 1, 2, 3 for Bo3; null for Bo1
         private LocalDateTime date;
         private String notes;
+        private Boolean reviewed;
         private LocalDateTime createdAt;
         private BattleData battleData;
     }

@@ -21,6 +21,7 @@ const AddReplayModal: React.FC<AddReplayModalProps> = ({
 }) => {
   const [replayUrl, setReplayUrl] = useState("");
   const [notes, setNotes] = useState("");
+  const [markReviewed, setMarkReviewed] = useState(false);
   const [bulkMode, setBulkMode] = useState(false);
   const [bulkUrls, setBulkUrls] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ const AddReplayModal: React.FC<AddReplayModalProps> = ({
     if (isOpen) {
       setReplayUrl("");
       setNotes("");
+      setMarkReviewed(false);
       setBulkMode(false);
       setBulkUrls("");
       setError("");
@@ -61,7 +63,7 @@ const AddReplayModal: React.FC<AddReplayModalProps> = ({
       setLoading(true);
       setError("");
       const cleanUrl = trimmedUrl.split("?")[0];
-      await replayService.createFromUrl(teamId, cleanUrl, notes.trim() || undefined);
+      await replayService.createFromUrl(teamId, cleanUrl, notes.trim() || undefined, markReviewed);
       onAdded();
       onClose();
     } catch (err) {
@@ -100,7 +102,8 @@ const AddReplayModal: React.FC<AddReplayModalProps> = ({
       const result = await replayService.createManyFromUrls(
         teamId,
         cleanUrls,
-        (current, total) => setProgress({ current, total })
+        (current, total) => setProgress({ current, total }),
+        markReviewed
       );
 
       if (result.failed.length > 0) {
@@ -198,6 +201,20 @@ const AddReplayModal: React.FC<AddReplayModalProps> = ({
             />
           </div>
 
+          {/* Mark as reviewed */}
+          <div>
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={markReviewed}
+                onChange={(e) => setMarkReviewed(e.target.checked)}
+                disabled={loading}
+                className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500/30 dark:border-gray-600 dark:bg-gray-800"
+              />
+              Mark as reviewed
+            </label>
+          </div>
+
           {/* Error */}
           {error && (
             <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-500/20 dark:bg-red-500/10">
@@ -255,6 +272,20 @@ const AddReplayModal: React.FC<AddReplayModalProps> = ({
             <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
               Enter one replay URL per line
             </p>
+          </div>
+
+          {/* Mark all as reviewed */}
+          <div>
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={markReviewed}
+                onChange={(e) => setMarkReviewed(e.target.checked)}
+                disabled={loading}
+                className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500/30 dark:border-gray-600 dark:bg-gray-800"
+              />
+              Mark all as reviewed
+            </label>
           </div>
 
           {/* Info Box */}
