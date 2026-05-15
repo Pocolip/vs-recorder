@@ -23,9 +23,10 @@ export async function getById(id: number): Promise<Replay | null> {
 export async function createFromUrl(
   teamId: number,
   url: string,
-  notes?: string
+  notes?: string,
+  reviewed?: boolean
 ): Promise<Replay> {
-  return await replayApi.createFromUrl(teamId, url, notes);
+  return await replayApi.createFromUrl(teamId, url, notes, reviewed);
 }
 
 /**
@@ -56,6 +57,7 @@ export async function update(
     result?: string;
     opponent?: string;
     notes?: string;
+    reviewed?: boolean;
   }
 ): Promise<Replay> {
   return await replayApi.update(id, updates);
@@ -138,14 +140,15 @@ export async function getCountByTeamId(teamId: number): Promise<number> {
 export async function createManyFromUrls(
   teamId: number,
   urls: string[],
-  progressCallback?: (current: number, total: number) => void
+  progressCallback?: (current: number, total: number) => void,
+  reviewed?: boolean
 ): Promise<{ success: Replay[]; failed: { url: string; error: string }[] }> {
   const success: Replay[] = [];
   const failed: { url: string; error: string }[] = [];
 
   for (let i = 0; i < urls.length; i++) {
     try {
-      const replay = await createFromUrl(teamId, urls[i]);
+      const replay = await createFromUrl(teamId, urls[i], undefined, reviewed);
       success.push(replay);
       if (progressCallback) {
         progressCallback(i + 1, urls.length);
