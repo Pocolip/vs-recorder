@@ -3,6 +3,21 @@ import { Save, MessageSquare, ChevronDown, X } from "lucide-react";
 import PokemonSprite from "../pokemon/PokemonSprite";
 import type { TeamMember } from "../../types";
 
+const CALC_BG_DEFAULT =
+  "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-white/[0.03]";
+const CALC_BG_BY_KO: Record<string, string> = {
+  ohko: "border-red-300 bg-red-50 dark:border-red-500/40 dark:bg-red-500/10",
+  "2hko": "border-yellow-300 bg-yellow-50 dark:border-yellow-500/40 dark:bg-yellow-500/10",
+  "3hko": "border-green-300 bg-green-50 dark:border-green-500/40 dark:bg-green-500/10",
+};
+
+function calcBg(calc: string): string {
+  if (/\bOHKO\b/.test(calc)) return CALC_BG_BY_KO.ohko;
+  if (/\b2HKO\b/.test(calc)) return CALC_BG_BY_KO["2hko"];
+  if (/\b3HKO\b/.test(calc)) return CALC_BG_BY_KO["3hko"];
+  return CALC_BG_DEFAULT;
+}
+
 interface PokemonNoteCardProps {
   member: TeamMember;
   isEditingNote: boolean;
@@ -163,7 +178,7 @@ const PokemonNoteCard: React.FC<PokemonNoteCardProps> = ({
             {member.calcs?.map((calc, index) => (
               <div
                 key={index}
-                className="group/calc flex items-start gap-2 rounded border border-gray-200 bg-gray-50 px-2 py-1.5 dark:border-gray-700 dark:bg-white/[0.03]"
+                className={`group/calc flex items-start gap-2 rounded border px-2 py-1.5 ${calcBg(calc)}`}
               >
                 <span className="flex-1 break-words text-sm text-gray-700 dark:text-gray-300">
                   {calc}

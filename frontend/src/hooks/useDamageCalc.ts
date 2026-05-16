@@ -1,11 +1,16 @@
 import { useMemo } from "react";
 import { calculate, Generations, Pokemon, Move, Field } from "@smogon/calc";
+import { CHAMPIONS_GEN, DEFAULT_IVS, spsToEvs } from "../utils/calcUtils";
 import type { PokemonState, FieldState, MoveState } from "../types";
 
+// Champions damage math reuses the Gen 9 engine (the Smogon calc lib has no
+// Gen 10 yet); SPs are remapped to EVs and IVs locked to 31 at build time.
 const gen = Generations.get(9);
 
-function buildPokemon(state: PokemonState): Pokemon | null {
+function buildPokemon(state: PokemonState, selectedGen: number): Pokemon | null {
   if (!state.species) return null;
+
+  const isChampions = selectedGen === CHAMPIONS_GEN;
 
   const opts: Record<string, unknown> = {
     level: 50,
@@ -13,8 +18,8 @@ function buildPokemon(state: PokemonState): Pokemon | null {
     ability: state.ability || undefined,
     item: state.item || undefined,
     status: state.status || undefined,
-    evs: { ...state.evs },
-    ivs: { ...state.ivs },
+    evs: isChampions ? spsToEvs(state.sps) : { ...state.evs },
+    ivs: isChampions ? { ...DEFAULT_IVS } : { ...state.ivs },
     boosts: { ...state.boosts },
   };
 
@@ -26,7 +31,16 @@ function buildPokemon(state: PokemonState): Pokemon | null {
     opts.boostedStat = state.boostedStat;
   }
 
-  const pokemon = new Pokemon(gen, state.species, opts);
+  let pokemon: Pokemon;
+  try {
+    pokemon = new Pokemon(gen, state.species, opts);
+  } catch (e) {
+    // Species (or item/ability) doesn't resolve in Smogon's Gen 9 dex.
+    // Return null so the calc bails on this side without killing the other,
+    // letting move names still render via MoveResults.
+    console.warn(`[calc] failed to build ${state.species}:`, (e as Error).message);
+    return null;
+  }
 
   if (state.curHP < 100) {
     pokemon.originalCurHP = Math.round((state.curHP / 100) * pokemon.maxHP());
@@ -90,13 +104,14 @@ export function useDamageCalc(
   p1State: PokemonState,
   p2State: PokemonState,
   fieldState: FieldState,
+  selectedGen: number,
 ): CalcResults | null {
   return useMemo(() => {
     if (!p1State.species || !p2State.species) return null;
 
     try {
-      const p1 = buildPokemon(p1State);
-      const p2 = buildPokemon(p2State);
+      const p1 = buildPokemon(p1State, selectedGen);
+      const p2 = buildPokemon(p2State, selectedGen);
       if (!p1 || !p2) return null;
 
       const field = buildField(fieldState);
@@ -131,5 +146,5 @@ export function useDamageCalc(
       console.error("Calc error:", e);
       return null;
     }
-  }, [p1State, p2State, fieldState]);
+  }, [p1State, p2State, fieldState, selectedGen]);
 }

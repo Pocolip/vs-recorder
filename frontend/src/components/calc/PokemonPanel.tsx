@@ -12,6 +12,7 @@ import {
   NATURES_LIST,
   STATUS_OPTIONS,
   setdexToState,
+  setdex10ToState,
   getSelectStyles,
   getCompactSelectStyles,
   normalizeSpeciesName,
@@ -19,9 +20,12 @@ import {
   getTeraDefaults,
   applyTeraFormeChange,
   hasLockedTeraType,
+  CHAMPIONS_GEN,
+  getFormeGroup,
 } from "../../utils/calcUtils";
 import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
+import { SETDEX_GEN10 } from "../../data/setdex-gen10";
 import type { PokemonState, MoveState } from "../../types";
 import type { PokemonData as PokemonFromPaste } from "../../services/pokepasteService";
 
@@ -51,6 +55,7 @@ interface PokemonPanelProps {
   side: "p1" | "p2";
   weather?: string;
   terrain?: string;
+  gen: number;
 }
 
 const PokemonPanel: React.FC<PokemonPanelProps> = ({
@@ -61,7 +66,9 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   side,
   weather = "",
   terrain = "",
+  gen,
 }) => {
+  const isChampions = gen === CHAMPIONS_GEN;
   const { theme } = useTheme();
   const dark = theme === "dark";
   const selectStyles = useMemo(() => getSelectStyles(dark), [dark]);
@@ -70,7 +77,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   // Build species + set options: setdex Pokemon with sets, then all remaining species
   const speciesOptions = useMemo((): SetdexGroup[] => {
     const allSpecies = getSpeciesList();
-    const setdexEntries = SETDEX_GEN9 as Record<string, Record<string, Record<string, unknown>>>;
+    const setdexEntries = (isChampions ? SETDEX_GEN10 : SETDEX_GEN9) as Record<string, Record<string, Record<string, unknown>>>;
     const setdexNames = new Set(Object.keys(setdexEntries));
 
     // Pokemon with setdex entries (grouped by Pokemon, each set is an option)
@@ -97,7 +104,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       }));
 
     return [...withSets, { label: "Other Pokemon", options: withoutSets }];
-  }, []);
+  }, [isChampions]);
 
   // Current selected value for species select
   const selectedSpeciesOption = useMemo(() => {
@@ -180,7 +187,9 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
 
     // If it's a setdex entry (has set data)
     if (option.set) {
-      const setData = setdexToState(option.set as Parameters<typeof setdexToState>[0]);
+      const setData = isChampions
+        ? setdex10ToState(option.set as Parameters<typeof setdex10ToState>[0])
+        : setdexToState(option.set as Parameters<typeof setdexToState>[0]);
       const species = normalizeSpeciesName(option.pokemon);
       // Default to first ability if setdex doesn't specify one
       if (!setData.ability) {
@@ -245,7 +254,8 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       changes.moves!.push({ name: "", crit: false, bpOverride: null });
     }
 
-    changes.evs = {
+    // Pokepaste still labels the line "EVs:" in Champions, but the numbers are SPs.
+    const pasteStatValues = {
       hp: mon.evs?.HP ?? mon.evs?.hp ?? 0,
       atk: mon.evs?.Atk ?? mon.evs?.atk ?? 0,
       def: mon.evs?.Def ?? mon.evs?.def ?? 0,
@@ -254,14 +264,22 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       spe: mon.evs?.Spe ?? mon.evs?.spe ?? 0,
     };
 
-    changes.ivs = {
-      hp: mon.ivs?.HP ?? mon.ivs?.hp ?? 31,
-      atk: mon.ivs?.Atk ?? mon.ivs?.atk ?? 31,
-      def: mon.ivs?.Def ?? mon.ivs?.def ?? 31,
-      spa: mon.ivs?.SpA ?? mon.ivs?.spa ?? 31,
-      spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
-      spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
-    };
+    if (isChampions) {
+      changes.evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      changes.ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
+      changes.sps = pasteStatValues;
+    } else {
+      changes.evs = pasteStatValues;
+      changes.ivs = {
+        hp: mon.ivs?.HP ?? mon.ivs?.hp ?? 31,
+        atk: mon.ivs?.Atk ?? mon.ivs?.atk ?? 31,
+        def: mon.ivs?.Def ?? mon.ivs?.def ?? 31,
+        spa: mon.ivs?.SpA ?? mon.ivs?.spa ?? 31,
+        spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
+        spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
+      };
+      changes.sps = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+    }
 
     // Auto-compute boostedStat if Booster Energy + Proto/Quark
     const ability = changes.ability || "";
@@ -307,6 +325,30 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         }}
         menuPlacement="auto"
       />
+
+      {/* Forme selector (only for species with ability-driven in-battle forme changes) */}
+      {(() => {
+        const formeGroup = getFormeGroup(state.species);
+        if (!formeGroup) return null;
+        const current = formeGroup.find((f) => f.species === state.species) ?? formeGroup[0];
+        return (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Forme:</span>
+            <div className="flex-1">
+              <Select<SelectOption>
+                value={{ value: current.species, label: current.label }}
+                onChange={(opt: SingleValue<SelectOption>) => {
+                  if (opt) onChange({ species: opt.value });
+                }}
+                options={formeGroup.map((f) => ({ value: f.species, label: f.label }))}
+                styles={compactStyles as any}
+                isSearchable={false}
+                menuPlacement="auto"
+              />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Types display */}
       {speciesInfo && (
@@ -440,9 +482,11 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         species={state.species}
         evs={state.evs}
         ivs={state.ivs}
+        sps={state.sps}
         boosts={state.boosts}
         nature={state.nature}
         level={state.level}
+        gen={gen}
         boostedStat={state.boostedStat}
         onChange={onChange}
       />

@@ -26,12 +26,13 @@ export default function CalculatorPage() {
   const [selectedP2Move, setSelectedP2Move] = useState(snapshot?.selectedP2Move ?? 0);
   const [activeSide, setActiveSide] = useState<"p1" | "p2">(snapshot?.activeSide ?? "p1");
   const [teamPokemon, setTeamPokemon] = useState<PokemonFromPaste[]>(snapshot?.teamPokemon ?? []);
+  const [gen, setGen] = useState<number>(snapshot?.gen ?? 10);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Keep refs in sync for the unmount save
-  const stateRef = useRef({ p1, p2, field, selectedP1Move, selectedP2Move, activeSide, teamPokemon });
-  stateRef.current = { p1, p2, field, selectedP1Move, selectedP2Move, activeSide, teamPokemon };
+  const stateRef = useRef({ p1, p2, field, selectedP1Move, selectedP2Move, activeSide, teamPokemon, gen });
+  stateRef.current = { p1, p2, field, selectedP1Move, selectedP2Move, activeSide, teamPokemon, gen };
 
   // Save state to context on unmount
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function CalculatorPage() {
   }, [teamId, calcStore]);
 
   const { teamMembers, updateMemberCalcs } = useTeamMembers(teamId, team?.pokepaste);
-  const calcResults = useDamageCalc(p1, p2, field);
+  const calcResults = useDamageCalc(p1, p2, field, gen);
 
   // Load team paste on mount (skip if we already have it from snapshot)
   useEffect(() => {
@@ -128,7 +129,7 @@ export default function CalculatorPage() {
       <div className="space-y-3">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <GenerationPicker value={9} onChange={() => {}} />
+        <GenerationPicker value={gen} onChange={setGen} />
         <a
           href="https://nerd-of-now.github.io/NCP-VGC-Damage-Calculator/"
           target="_blank"
@@ -199,6 +200,7 @@ export default function CalculatorPage() {
             side="p1"
             weather={field.weather}
             terrain={field.terrain}
+            gen={gen}
           />
         </div>
 
@@ -219,6 +221,7 @@ export default function CalculatorPage() {
             side="p2"
             weather={field.weather}
             terrain={field.terrain}
+            gen={gen}
           />
         </div>
       </div>
