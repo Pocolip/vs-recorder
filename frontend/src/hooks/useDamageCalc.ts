@@ -98,12 +98,20 @@ export function useDamageCalc(
   selectedGen: number,
 ): CalcResults | null {
   return useMemo(() => {
-    if (!p1State.species || !p2State.species) return null;
+    if (!p1State.species || !p2State.species) {
+      console.log("[calc] skip: missing species", { p1: p1State.species, p2: p2State.species });
+      return null;
+    }
 
     try {
+      console.log("[calc] building", { gen: selectedGen, p1: p1State.species, p2: p2State.species, p1sps: p1State.sps, p2sps: p2State.sps });
       const p1 = buildPokemon(p1State, selectedGen);
       const p2 = buildPokemon(p2State, selectedGen);
-      if (!p1 || !p2) return null;
+      if (!p1 || !p2) {
+        console.log("[calc] build returned null");
+        return null;
+      }
+      console.log("[calc] built", p1.species.name, p2.species.name);
 
       const field = buildField(fieldState);
       const reverseField = buildField({
@@ -132,9 +140,10 @@ export function useDamageCalc(
           }
         });
 
+      console.log("[calc] results", { p1: p1Results.length, p2: p2Results.length, p1null: p1Results.filter((r) => !r).length });
       return { p1Results, p2Results };
     } catch (e) {
-      console.error("Calc error:", e);
+      console.error("[calc] threw:", e);
       return null;
     }
   }, [p1State, p2State, fieldState, selectedGen]);
