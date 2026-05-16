@@ -152,6 +152,9 @@ const SPECIES_NAME_MAP: Record<string, string> = {
   "Calyrex-Shadow Rider": "Calyrex-Shadow",
   "Lycanroc-Midday": "Lycanroc",
   "Terapagos": "Terapagos-Terastal",
+  // Smogon's Gen 9 dex only lists Aegislash-Shield / -Blade, not a base form;
+  // the Champions setdex uses the unsuffixed name.
+  "Aegislash": "Aegislash-Shield",
 };
 
 // --- Terapagos & Ogerpon tera forme handling ---

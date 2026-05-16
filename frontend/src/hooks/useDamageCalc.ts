@@ -31,7 +31,16 @@ function buildPokemon(state: PokemonState, selectedGen: number): Pokemon | null 
     opts.boostedStat = state.boostedStat;
   }
 
-  const pokemon = new Pokemon(gen, state.species, opts);
+  let pokemon: Pokemon;
+  try {
+    pokemon = new Pokemon(gen, state.species, opts);
+  } catch (e) {
+    // Species (or item/ability) doesn't resolve in Smogon's Gen 9 dex.
+    // Return null so the calc bails on this side without killing the other,
+    // letting move names still render via MoveResults.
+    console.warn(`[calc] failed to build ${state.species}:`, (e as Error).message);
+    return null;
+  }
 
   if (state.curHP < 100) {
     pokemon.originalCurHP = Math.round((state.curHP / 100) * pokemon.maxHP());
