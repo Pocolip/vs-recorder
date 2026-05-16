@@ -33,14 +33,18 @@ export const CHAMPIONS_GEN = 10;
 
 // Convert Champions Stat Points to legacy EVs for the Gen 9 calc engine.
 // Formula from Nerd of Now's damage_MASTER.js: max(0, sps * 8 - 4).
-export const spsToEvs = (sps: StatSpread): StatSpread => ({
-  hp: Math.max(0, sps.hp * 8 - 4),
-  atk: Math.max(0, sps.atk * 8 - 4),
-  def: Math.max(0, sps.def * 8 - 4),
-  spa: Math.max(0, sps.spa * 8 - 4),
-  spd: Math.max(0, sps.spd * 8 - 4),
-  spe: Math.max(0, sps.spe * 8 - 4),
-});
+// Accepts a possibly-undefined input — older snapshots may lack `sps`.
+export const spsToEvs = (sps: StatSpread | undefined): StatSpread => {
+  const s = sps ?? DEFAULT_SPS;
+  return {
+    hp: Math.max(0, (s.hp ?? 0) * 8 - 4),
+    atk: Math.max(0, (s.atk ?? 0) * 8 - 4),
+    def: Math.max(0, (s.def ?? 0) * 8 - 4),
+    spa: Math.max(0, (s.spa ?? 0) * 8 - 4),
+    spd: Math.max(0, (s.spd ?? 0) * 8 - 4),
+    spe: Math.max(0, (s.spe ?? 0) * 8 - 4),
+  };
+};
 
 export const NATURES_LIST: string[] = Object.keys(NATURES).sort();
 
