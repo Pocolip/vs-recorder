@@ -158,6 +158,20 @@ export default function AboutPage() {
             development!
           </p>
 
+          <a
+            href="https://ko-fi.com/R6R31ZMWZT"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-4 inline-block"
+          >
+            <img
+              height={36}
+              style={{ border: 0, height: 36 }}
+              src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
+              alt="Buy Me a Coffee at ko-fi.com"
+            />
+          </a>
+
           <div className="space-y-3">
             <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-white/[0.04]">
               <DollarSign className="h-5 w-5 text-blue-400" />
