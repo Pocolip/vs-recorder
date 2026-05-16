@@ -20,21 +20,24 @@ const MoveResults: React.FC<MoveResultsProps> = ({
   onSelectIndex,
   isActive = true,
 }) => {
-  if (!results || results.length === 0) {
-    return (
-      <div className="space-y-1">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center gap-2 px-2 py-1 rounded bg-gray-100 dark:bg-slate-800/50">
-            <span className="text-gray-400 dark:text-gray-600 text-xs">-</span>
-          </div>
-        ))}
-      </div>
-    );
+  // Always render move names, even when calc failed (e.g. Mega forms not in
+  // Smogon's Gen 9 dex). The damage range just stays blank in that case.
+  const filledMoves = [...moves];
+  while (filledMoves.length < 4) {
+    filledMoves.push({ name: "", crit: false, bpOverride: null });
   }
+
+  // Map move index (in full state.moves) to its result index (results only
+  // contains entries for moves with names — see useDamageCalc filter).
+  let resultCursor = 0;
+  const resultByMoveIndex: (ReturnType<typeof calculate> | null)[] = filledMoves.map((m) => {
+    if (!m.name) return null;
+    return results?.[resultCursor++] ?? null;
+  });
 
   return (
     <div className="space-y-1">
-      {moves.map((move, i) => {
+      {filledMoves.map((move, i) => {
         if (!move.name) {
           return (
             <div key={i} className="flex items-center gap-2 px-2 py-1 rounded bg-gray-100 dark:bg-slate-800/50">
@@ -43,7 +46,7 @@ const MoveResults: React.FC<MoveResultsProps> = ({
           );
         }
 
-        const result = results[i];
+        const result = resultByMoveIndex[i];
         const range = result ? formatDamageRange(result) : "";
         const colorClass = getDamageColor(result);
         const isSelected = selectedIndex === i && isActive;

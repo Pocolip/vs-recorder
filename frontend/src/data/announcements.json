@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-16-champions-calc-and-notes",
+    "date": "2026-05-16",
+    "title": "Pokemon Champions in the Calculator + Color-Coded Notes",
+    "message": "The calculator now supports Pokemon Champions! Champions is the new default gen — IVs are locked at 31 and the EV column is replaced with Stat Points (max 32 per stat, 66 total). The Champions setdex is pulled from Nerd of Now's latest update, so picking a team mon from your paste in Champions auto-loads the SPs the same way EVs do in Gen IX. There's also a new Forme dropdown that appears for Aegislash, Mimikyu, Palafin, Eiscue, Morpeko, Wishiwashi, Cramorant, and Minior — flip between formes without re-searching. Lastly: saved calcs on the Pokemon Notes page are now color-coded by KO chance (red OHKO / yellow 2HKO / green 3HKO) so you can scan them faster."
+  },
+  {
     "id": "2026-05-15-reviewed-replays",
     "date": "2026-05-15",
     "title": "Mark Replays as Reviewed",

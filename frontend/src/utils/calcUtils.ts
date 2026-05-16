@@ -26,7 +26,25 @@ export const STAT_LABELS: Record<keyof StatSpread, string> = {
 
 export const DEFAULT_EVS: StatSpread = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 export const DEFAULT_IVS: StatSpread = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
+export const DEFAULT_SPS: StatSpread = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 export const DEFAULT_BOOSTS: BoostSpread = { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+
+export const CHAMPIONS_GEN = 10;
+
+// Convert Champions Stat Points to legacy EVs for the Gen 9 calc engine.
+// Formula from Nerd of Now's damage_MASTER.js: max(0, sps * 8 - 4).
+// Accepts a possibly-undefined input — older snapshots may lack `sps`.
+export const spsToEvs = (sps: StatSpread | undefined): StatSpread => {
+  const s = sps ?? DEFAULT_SPS;
+  return {
+    hp: Math.max(0, (s.hp ?? 0) * 8 - 4),
+    atk: Math.max(0, (s.atk ?? 0) * 8 - 4),
+    def: Math.max(0, (s.def ?? 0) * 8 - 4),
+    spa: Math.max(0, (s.spa ?? 0) * 8 - 4),
+    spd: Math.max(0, (s.spd ?? 0) * 8 - 4),
+    spe: Math.max(0, (s.spe ?? 0) * 8 - 4),
+  };
+};
 
 export const NATURES_LIST: string[] = Object.keys(NATURES).sort();
 
@@ -48,6 +66,16 @@ interface SetdexEntry {
   tera_type?: string;
   evs?: Record<string, number>;
   ivs?: Record<string, number>;
+  moves?: string[];
+}
+
+interface Setdex10Entry {
+  level?: number;
+  nature?: string;
+  ability?: string;
+  item?: string;
+  tera_type?: string;
+  sps?: Record<string, number>;
   moves?: string[];
 }
 
@@ -80,6 +108,36 @@ export function setdexToState(setdexEntry: SetdexEntry): PokemonState {
     status: "",
     evs,
     ivs,
+    sps: { ...DEFAULT_SPS },
+    boosts: { ...DEFAULT_BOOSTS },
+    curHP: 100,
+    moves: (setdexEntry.moves || []).map((name) => ({ name, crit: false, bpOverride: null })),
+    boostedStat: null,
+  };
+}
+
+export function setdex10ToState(setdexEntry: Setdex10Entry): PokemonState {
+  const sps: StatSpread = { ...DEFAULT_SPS };
+
+  if (setdexEntry.sps) {
+    for (const [ncpKey, val] of Object.entries(setdexEntry.sps)) {
+      const ourKey = NCP_STAT_MAP[ncpKey];
+      if (ourKey) sps[ourKey] = val;
+    }
+  }
+
+  return {
+    species: "",
+    level: 50,
+    nature: setdexEntry.nature || "Hardy",
+    ability: setdexEntry.ability || "",
+    item: setdexEntry.item || "",
+    teraType: setdexEntry.tera_type || null,
+    isTera: false,
+    status: "",
+    evs: { ...DEFAULT_EVS },
+    ivs: { ...DEFAULT_IVS },
+    sps,
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
     moves: (setdexEntry.moves || []).map((name) => ({ name, crit: false, bpOverride: null })),
@@ -94,6 +152,9 @@ const SPECIES_NAME_MAP: Record<string, string> = {
   "Calyrex-Shadow Rider": "Calyrex-Shadow",
   "Lycanroc-Midday": "Lycanroc",
   "Terapagos": "Terapagos-Terastal",
+  // Smogon's Gen 9 dex only lists Aegislash-Shield / -Blade, not a base form;
+  // the Champions setdex uses the unsuffixed name.
+  "Aegislash": "Aegislash-Shield",
 };
 
 // --- Terapagos & Ogerpon tera forme handling ---
@@ -190,6 +251,58 @@ export function hasLockedTeraType(species: string): boolean {
 
 export function normalizeSpeciesName(name: string): string {
   return SPECIES_NAME_MAP[name] || name;
+}
+
+// In-battle forme-change groups (ability-driven only). Megas, Primals, and
+// permanent forme distinctions (Calyrex-Ice/Shadow, Urshifu styles, etc.)
+// are not here — those are picked directly from the species picker.
+const FORME_GROUPS: ReadonlyArray<ReadonlyArray<{ species: string; label: string }>> = [
+  [
+    { species: "Aegislash-Shield", label: "Shield" },
+    { species: "Aegislash-Blade", label: "Blade" },
+  ],
+  [
+    { species: "Mimikyu", label: "Disguised" },
+    { species: "Mimikyu-Busted", label: "Busted" },
+  ],
+  [
+    { species: "Palafin", label: "Zero" },
+    { species: "Palafin-Hero", label: "Hero" },
+  ],
+  [
+    { species: "Eiscue", label: "Ice" },
+    { species: "Eiscue-Noice", label: "Noice" },
+  ],
+  [
+    { species: "Morpeko", label: "Full Belly" },
+    { species: "Morpeko-Hangry", label: "Hangry" },
+  ],
+  [
+    { species: "Wishiwashi", label: "Solo" },
+    { species: "Wishiwashi-School", label: "School" },
+  ],
+  [
+    { species: "Cramorant", label: "Base" },
+    { species: "Cramorant-Gulping", label: "Gulping" },
+    { species: "Cramorant-Gorging", label: "Gorging" },
+  ],
+  [
+    { species: "Minior", label: "Core" },
+    { species: "Minior-Meteor", label: "Meteor" },
+  ],
+];
+
+export interface FormeOption {
+  species: string;
+  label: string;
+}
+
+export function getFormeGroup(species: string): ReadonlyArray<FormeOption> | null {
+  if (!species) return null;
+  for (const group of FORME_GROUPS) {
+    if (group.some((f) => f.species === species)) return group;
+  }
+  return null;
 }
 
 export function getBaseStats(species: string): StatsTable | null {
@@ -326,6 +439,7 @@ export function createDefaultPokemonState(species = ""): PokemonState {
     status: "",
     evs: { ...DEFAULT_EVS },
     ivs: { ...DEFAULT_IVS },
+    sps: { ...DEFAULT_SPS },
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
     moves: [

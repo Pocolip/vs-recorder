@@ -10,6 +10,7 @@ interface CalcSnapshot {
   selectedP2Move: number;
   activeSide: "p1" | "p2";
   teamPokemon: PokemonFromPaste[];
+  gen: number;
 }
 
 interface CalcStateContextType {
