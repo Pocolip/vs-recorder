@@ -12,6 +12,7 @@ import {
   NATURES_LIST,
   STATUS_OPTIONS,
   setdexToState,
+  setdex10ToState,
   getSelectStyles,
   getCompactSelectStyles,
   normalizeSpeciesName,
@@ -19,9 +20,11 @@ import {
   getTeraDefaults,
   applyTeraFormeChange,
   hasLockedTeraType,
+  CHAMPIONS_GEN,
 } from "../../utils/calcUtils";
 import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
+import { SETDEX_GEN10 } from "../../data/setdex-gen10";
 import type { PokemonState, MoveState } from "../../types";
 import type { PokemonData as PokemonFromPaste } from "../../services/pokepasteService";
 
@@ -51,6 +54,7 @@ interface PokemonPanelProps {
   side: "p1" | "p2";
   weather?: string;
   terrain?: string;
+  gen: number;
 }
 
 const PokemonPanel: React.FC<PokemonPanelProps> = ({
@@ -61,7 +65,9 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   side,
   weather = "",
   terrain = "",
+  gen,
 }) => {
+  const isChampions = gen === CHAMPIONS_GEN;
   const { theme } = useTheme();
   const dark = theme === "dark";
   const selectStyles = useMemo(() => getSelectStyles(dark), [dark]);
@@ -70,7 +76,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   // Build species + set options: setdex Pokemon with sets, then all remaining species
   const speciesOptions = useMemo((): SetdexGroup[] => {
     const allSpecies = getSpeciesList();
-    const setdexEntries = SETDEX_GEN9 as Record<string, Record<string, Record<string, unknown>>>;
+    const setdexEntries = (isChampions ? SETDEX_GEN10 : SETDEX_GEN9) as Record<string, Record<string, Record<string, unknown>>>;
     const setdexNames = new Set(Object.keys(setdexEntries));
 
     // Pokemon with setdex entries (grouped by Pokemon, each set is an option)
@@ -97,7 +103,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       }));
 
     return [...withSets, { label: "Other Pokemon", options: withoutSets }];
-  }, []);
+  }, [isChampions]);
 
   // Current selected value for species select
   const selectedSpeciesOption = useMemo(() => {
@@ -180,7 +186,9 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
 
     // If it's a setdex entry (has set data)
     if (option.set) {
-      const setData = setdexToState(option.set as Parameters<typeof setdexToState>[0]);
+      const setData = isChampions
+        ? setdex10ToState(option.set as Parameters<typeof setdex10ToState>[0])
+        : setdexToState(option.set as Parameters<typeof setdexToState>[0]);
       const species = normalizeSpeciesName(option.pokemon);
       // Default to first ability if setdex doesn't specify one
       if (!setData.ability) {
@@ -440,9 +448,11 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         species={state.species}
         evs={state.evs}
         ivs={state.ivs}
+        sps={state.sps}
         boosts={state.boosts}
         nature={state.nature}
         level={state.level}
+        gen={gen}
         boostedStat={state.boostedStat}
         onChange={onChange}
       />

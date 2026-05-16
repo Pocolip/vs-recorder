@@ -32,6 +32,7 @@ export interface PokemonState {
   status: string;
   evs: StatSpread;
   ivs: StatSpread;
+  sps: StatSpread;
   boosts: BoostSpread;
   curHP: number;
   moves: MoveState[];

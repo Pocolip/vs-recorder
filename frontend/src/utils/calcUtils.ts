@@ -26,7 +26,21 @@ export const STAT_LABELS: Record<keyof StatSpread, string> = {
 
 export const DEFAULT_EVS: StatSpread = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 export const DEFAULT_IVS: StatSpread = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
+export const DEFAULT_SPS: StatSpread = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
 export const DEFAULT_BOOSTS: BoostSpread = { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+
+export const CHAMPIONS_GEN = 10;
+
+// Convert Champions Stat Points to legacy EVs for the Gen 9 calc engine.
+// Formula from Nerd of Now's damage_MASTER.js: max(0, sps * 8 - 4).
+export const spsToEvs = (sps: StatSpread): StatSpread => ({
+  hp: Math.max(0, sps.hp * 8 - 4),
+  atk: Math.max(0, sps.atk * 8 - 4),
+  def: Math.max(0, sps.def * 8 - 4),
+  spa: Math.max(0, sps.spa * 8 - 4),
+  spd: Math.max(0, sps.spd * 8 - 4),
+  spe: Math.max(0, sps.spe * 8 - 4),
+});
 
 export const NATURES_LIST: string[] = Object.keys(NATURES).sort();
 
@@ -48,6 +62,16 @@ interface SetdexEntry {
   tera_type?: string;
   evs?: Record<string, number>;
   ivs?: Record<string, number>;
+  moves?: string[];
+}
+
+interface Setdex10Entry {
+  level?: number;
+  nature?: string;
+  ability?: string;
+  item?: string;
+  tera_type?: string;
+  sps?: Record<string, number>;
   moves?: string[];
 }
 
@@ -80,6 +104,36 @@ export function setdexToState(setdexEntry: SetdexEntry): PokemonState {
     status: "",
     evs,
     ivs,
+    sps: { ...DEFAULT_SPS },
+    boosts: { ...DEFAULT_BOOSTS },
+    curHP: 100,
+    moves: (setdexEntry.moves || []).map((name) => ({ name, crit: false, bpOverride: null })),
+    boostedStat: null,
+  };
+}
+
+export function setdex10ToState(setdexEntry: Setdex10Entry): PokemonState {
+  const sps: StatSpread = { ...DEFAULT_SPS };
+
+  if (setdexEntry.sps) {
+    for (const [ncpKey, val] of Object.entries(setdexEntry.sps)) {
+      const ourKey = NCP_STAT_MAP[ncpKey];
+      if (ourKey) sps[ourKey] = val;
+    }
+  }
+
+  return {
+    species: "",
+    level: 50,
+    nature: setdexEntry.nature || "Hardy",
+    ability: setdexEntry.ability || "",
+    item: setdexEntry.item || "",
+    teraType: setdexEntry.tera_type || null,
+    isTera: false,
+    status: "",
+    evs: { ...DEFAULT_EVS },
+    ivs: { ...DEFAULT_IVS },
+    sps,
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
     moves: (setdexEntry.moves || []).map((name) => ({ name, crit: false, bpOverride: null })),
@@ -326,6 +380,7 @@ export function createDefaultPokemonState(species = ""): PokemonState {
     status: "",
     evs: { ...DEFAULT_EVS },
     ivs: { ...DEFAULT_IVS },
+    sps: { ...DEFAULT_SPS },
     boosts: { ...DEFAULT_BOOSTS },
     curHP: 100,
     moves: [
