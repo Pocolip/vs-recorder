@@ -253,7 +253,8 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       changes.moves!.push({ name: "", crit: false, bpOverride: null });
     }
 
-    changes.evs = {
+    // Pokepaste still labels the line "EVs:" in Champions, but the numbers are SPs.
+    const pasteStatValues = {
       hp: mon.evs?.HP ?? mon.evs?.hp ?? 0,
       atk: mon.evs?.Atk ?? mon.evs?.atk ?? 0,
       def: mon.evs?.Def ?? mon.evs?.def ?? 0,
@@ -262,14 +263,22 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
       spe: mon.evs?.Spe ?? mon.evs?.spe ?? 0,
     };
 
-    changes.ivs = {
-      hp: mon.ivs?.HP ?? mon.ivs?.hp ?? 31,
-      atk: mon.ivs?.Atk ?? mon.ivs?.atk ?? 31,
-      def: mon.ivs?.Def ?? mon.ivs?.def ?? 31,
-      spa: mon.ivs?.SpA ?? mon.ivs?.spa ?? 31,
-      spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
-      spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
-    };
+    if (isChampions) {
+      changes.evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      changes.ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
+      changes.sps = pasteStatValues;
+    } else {
+      changes.evs = pasteStatValues;
+      changes.ivs = {
+        hp: mon.ivs?.HP ?? mon.ivs?.hp ?? 31,
+        atk: mon.ivs?.Atk ?? mon.ivs?.atk ?? 31,
+        def: mon.ivs?.Def ?? mon.ivs?.def ?? 31,
+        spa: mon.ivs?.SpA ?? mon.ivs?.spa ?? 31,
+        spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
+        spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
+      };
+      changes.sps = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+    }
 
     // Auto-compute boostedStat if Booster Energy + Proto/Quark
     const ability = changes.ability || "";
