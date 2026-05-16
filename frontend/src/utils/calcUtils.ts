@@ -253,6 +253,58 @@ export function normalizeSpeciesName(name: string): string {
   return SPECIES_NAME_MAP[name] || name;
 }
 
+// In-battle forme-change groups (ability-driven only). Megas, Primals, and
+// permanent forme distinctions (Calyrex-Ice/Shadow, Urshifu styles, etc.)
+// are not here — those are picked directly from the species picker.
+const FORME_GROUPS: ReadonlyArray<ReadonlyArray<{ species: string; label: string }>> = [
+  [
+    { species: "Aegislash-Shield", label: "Shield" },
+    { species: "Aegislash-Blade", label: "Blade" },
+  ],
+  [
+    { species: "Mimikyu", label: "Disguised" },
+    { species: "Mimikyu-Busted", label: "Busted" },
+  ],
+  [
+    { species: "Palafin", label: "Zero" },
+    { species: "Palafin-Hero", label: "Hero" },
+  ],
+  [
+    { species: "Eiscue", label: "Ice" },
+    { species: "Eiscue-Noice", label: "Noice" },
+  ],
+  [
+    { species: "Morpeko", label: "Full Belly" },
+    { species: "Morpeko-Hangry", label: "Hangry" },
+  ],
+  [
+    { species: "Wishiwashi", label: "Solo" },
+    { species: "Wishiwashi-School", label: "School" },
+  ],
+  [
+    { species: "Cramorant", label: "Base" },
+    { species: "Cramorant-Gulping", label: "Gulping" },
+    { species: "Cramorant-Gorging", label: "Gorging" },
+  ],
+  [
+    { species: "Minior", label: "Core" },
+    { species: "Minior-Meteor", label: "Meteor" },
+  ],
+];
+
+export interface FormeOption {
+  species: string;
+  label: string;
+}
+
+export function getFormeGroup(species: string): ReadonlyArray<FormeOption> | null {
+  if (!species) return null;
+  for (const group of FORME_GROUPS) {
+    if (group.some((f) => f.species === species)) return group;
+  }
+  return null;
+}
+
 export function getBaseStats(species: string): StatsTable | null {
   if (!species) return null;
   for (const s of gen.species) {

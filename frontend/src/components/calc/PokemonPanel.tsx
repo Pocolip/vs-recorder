@@ -21,6 +21,7 @@ import {
   applyTeraFormeChange,
   hasLockedTeraType,
   CHAMPIONS_GEN,
+  getFormeGroup,
 } from "../../utils/calcUtils";
 import { useTheme } from "../../context/ThemeContext";
 import { SETDEX_GEN9 } from "../../data/setdex-gen9";
@@ -324,6 +325,30 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
         }}
         menuPlacement="auto"
       />
+
+      {/* Forme selector (only for species with ability-driven in-battle forme changes) */}
+      {(() => {
+        const formeGroup = getFormeGroup(state.species);
+        if (!formeGroup) return null;
+        const current = formeGroup.find((f) => f.species === state.species) ?? formeGroup[0];
+        return (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Forme:</span>
+            <div className="flex-1">
+              <Select<SelectOption>
+                value={{ value: current.species, label: current.label }}
+                onChange={(opt: SingleValue<SelectOption>) => {
+                  if (opt) onChange({ species: opt.value });
+                }}
+                options={formeGroup.map((f) => ({ value: f.species, label: f.label }))}
+                styles={compactStyles as any}
+                isSearchable={false}
+                menuPlacement="auto"
+              />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Types display */}
       {speciesInfo && (
