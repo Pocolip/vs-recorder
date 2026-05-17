@@ -6,7 +6,13 @@ import {
   Save,
   X as XIcon,
   ExternalLink,
+  GripVertical,
+  ChevronDown,
 } from "lucide-react";
+import type {
+  DraggableAttributes,
+  DraggableSyntheticListeners,
+} from "@dnd-kit/core";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import PokemonSprite from "../pokemon/PokemonSprite";
 import PokemonDropdown from "../form/PokemonDropdown";
@@ -52,6 +58,12 @@ interface OpponentTeamCardProps {
   ) => Promise<unknown>;
   onDeleteComposition: (id: number, index: number) => Promise<unknown>;
   onDeleteTeam: (id: number) => Promise<unknown>;
+  dragHandleProps?: {
+    attributes: DraggableAttributes;
+    listeners: DraggableSyntheticListeners;
+  };
+  isExpanded?: boolean;
+  onToggleExpand?: (id: number) => void;
 }
 
 const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
@@ -62,6 +74,9 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
   onUpdateComposition,
   onDeleteComposition,
   onDeleteTeam,
+  dragHandleProps,
+  isExpanded = true,
+  onToggleExpand,
 }) => {
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [editedNotes, setEditedNotes] = useState(opponentTeam.notes || "");
@@ -149,12 +164,28 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
 
   return (
     <div
-      className="rounded-lg border border-l-4 border-gray-200 dark:border-gray-700"
+      className="flex overflow-hidden rounded-lg border border-l-4 border-gray-200 dark:border-gray-700"
       style={{ borderLeftColor: teamColor.border }}
     >
+      {dragHandleProps && (
+        <div
+          {...dragHandleProps.attributes}
+          {...dragHandleProps.listeners}
+          className="flex w-7 flex-shrink-0 cursor-grab touch-none items-start justify-center border-r border-gray-200 bg-gray-50 pt-5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 active:cursor-grabbing dark:border-gray-700 dark:bg-white/[0.02] dark:hover:bg-white/[0.04] dark:hover:text-gray-300"
+          title="Drag to reorder"
+          aria-label="Drag to reorder matchup team"
+        >
+          <GripVertical className="h-4 w-4" />
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
       {/* Header */}
-      <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-white/[0.02]">
-        {/* Top row: Team name + delete button */}
+      <div
+        className={`bg-gray-50 p-4 dark:bg-white/[0.02] ${
+          isExpanded ? "border-b border-gray-200 dark:border-gray-700" : ""
+        }`}
+      >
+        {/* Top row: Team name + collapse + delete */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <h3
@@ -178,14 +209,34 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
             )}
           </div>
 
-          {/* Delete Team Button */}
-          <button
-            onClick={() => setShowDeleteTeamModal(true)}
-            className="flex-shrink-0 rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-            title="Delete matchup team"
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
+          <div className="flex flex-shrink-0 items-center gap-1">
+            {onToggleExpand && (
+              <button
+                onClick={() => onToggleExpand(opponentTeam.id)}
+                className="rounded p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/[0.05] dark:hover:text-gray-300"
+                title={isExpanded ? "Collapse" : "Expand"}
+                aria-label={
+                  isExpanded ? "Collapse matchup team" : "Expand matchup team"
+                }
+                aria-expanded={isExpanded}
+              >
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform ${
+                    isExpanded ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+            )}
+
+            {/* Delete Team Button */}
+            <button
+              onClick={() => setShowDeleteTeamModal(true)}
+              className="rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+              title="Delete matchup team"
+            >
+              <Trash2 className="h-3 w-3" />
+            </button>
+          </div>
         </div>
 
         {/* Sprites row */}
@@ -196,6 +247,7 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
         )}
 
         {/* Bottom row: Notes */}
+        {isExpanded && (
         <div className="mt-3">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-800 dark:text-white/90">
@@ -282,9 +334,11 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
             </p>
           )}
         </div>
+        )}
       </div>
 
       {/* Strategy Plans Section */}
+      {isExpanded && (
       <div className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <h4 className="text-sm font-semibold text-gray-800 dark:text-white/90">
@@ -327,6 +381,7 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
           ))}
         </div>
       </div>
+      )}
 
       {/* Delete Plan Modal */}
       <ConfirmationModal
@@ -366,6 +421,7 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
         confirmText="Delete Team"
         variant="danger"
       />
+      </div>
     </div>
   );
 };

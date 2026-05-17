@@ -50,6 +50,7 @@ public class GamePlan {
     private String notes;
 
     @OneToMany(mappedBy = "gamePlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position ASC, id ASC")
     private List<GamePlanTeam> teams = new ArrayList<>();
 
     @CreationTimestamp

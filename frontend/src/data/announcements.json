@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-17-matchup-planner-enhancements",
+    "date": "2026-05-17",
+    "title": "Matchup Planner Enhancements",
+    "message": "The matchup planner has been enhanced to let you expand and collapse the cards and allow you to re-order them. In the future we'll add VR Paste functionality and let you import teams from the latest tournaments."
+  },
+  {
     "id": "2026-05-16-champions-calc-and-notes",
     "date": "2026-05-16",
     "title": "Pokemon Champions in the Calculator + Color-Coded Notes",

@@ -47,6 +47,11 @@ export const gamePlanApi = {
   deleteTeam: (gamePlanId: number, teamId: number) =>
     apiClient.delete(`/api/game-plans/${gamePlanId}/teams/${teamId}`) as Promise<void>,
 
+  reorderTeams: (gamePlanId: number, orderedIds: number[]) =>
+    apiClient.put(`/api/game-plans/${gamePlanId}/teams/reorder`, {
+      orderedIds,
+    }) as Promise<void>,
+
   // Compositions
   addComposition: (gamePlanId: number, teamId: number, composition: Composition) =>
     apiClient.post(`/api/game-plans/${gamePlanId}/teams/${teamId}/compositions`, {

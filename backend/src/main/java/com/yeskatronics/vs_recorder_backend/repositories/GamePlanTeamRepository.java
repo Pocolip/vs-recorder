@@ -14,11 +14,12 @@ import java.util.Optional;
 public interface GamePlanTeamRepository extends JpaRepository<GamePlanTeam, Long> {
 
     /**
-     * Find all teams for a specific game plan
+     * Find all teams for a specific game plan, ordered by manual position
+     * (ascending) with id as tiebreak for stability.
      * @param gamePlanId the game plan ID
      * @return list of game plan teams
      */
-    List<GamePlanTeam> findByGamePlanId(Long gamePlanId);
+    List<GamePlanTeam> findByGamePlanIdOrderByPositionAscIdAsc(Long gamePlanId);
 
     /**
      * Find a team by ID and game plan ID (for verification)

@@ -245,6 +245,112 @@ class GamePlanServiceTest {
     }
 
     @Test
+    void testAddTeamToGamePlan_PlacesNewTeamAtTopAndShiftsOthers() {
+        GamePlan plan = new GamePlan();
+        plan.setName("Order Plan");
+        GamePlan savedPlan = gamePlanService.createGamePlan(plan, testUser1.getId());
+
+        GamePlanTeam t1 = new GamePlanTeam();
+        t1.setPokepaste("paste-1");
+        GamePlanTeam saved1 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t1);
+
+        GamePlanTeam t2 = new GamePlanTeam();
+        t2.setPokepaste("paste-2");
+        GamePlanTeam saved2 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t2);
+
+        GamePlanTeam t3 = new GamePlanTeam();
+        t3.setPokepaste("paste-3");
+        GamePlanTeam saved3 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t3);
+
+        List<GamePlanTeam> teams = gamePlanService.getTeamsByGamePlanId(savedPlan.getId());
+
+        assertEquals(3, teams.size());
+        assertEquals(saved3.getId(), teams.get(0).getId());
+        assertEquals(saved2.getId(), teams.get(1).getId());
+        assertEquals(saved1.getId(), teams.get(2).getId());
+        assertEquals(0, teams.get(0).getPosition());
+        assertEquals(1, teams.get(1).getPosition());
+        assertEquals(2, teams.get(2).getPosition());
+    }
+
+    @Test
+    void testReorderTeams_AssignsPositionsInGivenOrder() {
+        GamePlan plan = new GamePlan();
+        plan.setName("Reorder Plan");
+        GamePlan savedPlan = gamePlanService.createGamePlan(plan, testUser1.getId());
+
+        GamePlanTeam t1 = new GamePlanTeam();
+        t1.setPokepaste("paste-1");
+        GamePlanTeam saved1 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t1);
+
+        GamePlanTeam t2 = new GamePlanTeam();
+        t2.setPokepaste("paste-2");
+        GamePlanTeam saved2 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t2);
+
+        GamePlanTeam t3 = new GamePlanTeam();
+        t3.setPokepaste("paste-3");
+        GamePlanTeam saved3 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t3);
+
+        // Reorder to: t1, t2, t3 (i.e. reverse of insertion-driven top-stack order)
+        gamePlanService.reorderTeams(
+                savedPlan.getId(),
+                testUser1.getId(),
+                List.of(saved1.getId(), saved2.getId(), saved3.getId()));
+
+        List<GamePlanTeam> reordered = gamePlanService.getTeamsByGamePlanId(savedPlan.getId());
+        assertEquals(3, reordered.size());
+        assertEquals(saved1.getId(), reordered.get(0).getId());
+        assertEquals(saved2.getId(), reordered.get(1).getId());
+        assertEquals(saved3.getId(), reordered.get(2).getId());
+        assertEquals(0, reordered.get(0).getPosition());
+        assertEquals(1, reordered.get(1).getPosition());
+        assertEquals(2, reordered.get(2).getPosition());
+    }
+
+    @Test
+    void testReorderTeams_RejectsCountMismatch() {
+        GamePlan plan = new GamePlan();
+        plan.setName("Mismatch Plan");
+        GamePlan savedPlan = gamePlanService.createGamePlan(plan, testUser1.getId());
+
+        GamePlanTeam t1 = new GamePlanTeam();
+        t1.setPokepaste("paste-1");
+        GamePlanTeam saved1 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t1);
+
+        GamePlanTeam t2 = new GamePlanTeam();
+        t2.setPokepaste("paste-2");
+        gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t2);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                gamePlanService.reorderTeams(
+                        savedPlan.getId(),
+                        testUser1.getId(),
+                        List.of(saved1.getId())));
+    }
+
+    @Test
+    void testReorderTeams_RejectsForeignTeamId() {
+        GamePlan plan = new GamePlan();
+        plan.setName("Foreign ID Plan");
+        GamePlan savedPlan = gamePlanService.createGamePlan(plan, testUser1.getId());
+
+        GamePlanTeam t1 = new GamePlanTeam();
+        t1.setPokepaste("paste-1");
+        GamePlanTeam saved1 = gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t1);
+
+        GamePlanTeam t2 = new GamePlanTeam();
+        t2.setPokepaste("paste-2");
+        gamePlanService.addTeamToGamePlan(savedPlan.getId(), testUser1.getId(), t2);
+
+        long bogusId = saved1.getId() + 9999;
+        assertThrows(IllegalArgumentException.class, () ->
+                gamePlanService.reorderTeams(
+                        savedPlan.getId(),
+                        testUser1.getId(),
+                        List.of(saved1.getId(), bogusId)));
+    }
+
+    @Test
     void testDeleteGamePlanTeam() {
         GamePlan gamePlan = new GamePlan();
         gamePlan.setName("Test Plan");
@@ -505,7 +611,11 @@ class GamePlanServiceTest {
         List<GamePlanTeam> teams = gamePlanService.getTeamsByGamePlanId(finalPlan.getId());
 
         assertEquals(2, teams.size());
-        assertEquals(1, teams.get(0).getCompositions().size());
-        assertEquals(2, teams.get(1).getCompositions().size());
+        // New teams are placed at position 0 (top) and push existing teams down,
+        // so team2 (added last, 2 compositions) precedes team1 (added first, 1 composition).
+        assertEquals(2, teams.get(0).getCompositions().size());
+        assertEquals(1, teams.get(1).getCompositions().size());
+        assertEquals(0, teams.get(0).getPosition());
+        assertEquals(1, teams.get(1).getPosition());
     }
 }

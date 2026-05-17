@@ -114,6 +114,18 @@ public class GamePlanDTO {
     }
 
     /**
+     * Request DTO for reordering all teams in a game plan.
+     * The list must contain every team ID currently in the plan exactly once.
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReorderTeamsRequest {
+        @NotNull(message = "orderedIds is required")
+        private List<Long> orderedIds;
+    }
+
+    /**
      * Response DTO for a game plan team
      */
     @Data
@@ -125,6 +137,7 @@ public class GamePlanDTO {
         private String pokepaste;
         private String notes;
         private String color;
+        private Integer position;
         private List<TeamCompositionDTO> compositions;
         private LocalDateTime createdAt;
     }
