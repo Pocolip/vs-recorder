@@ -101,6 +101,10 @@ GitHub Actions handles CI and deployment:
 - [API Documentation](http://localhost:8080/swagger-ui.html) - Swagger UI (when backend is running)
 - [Database Schema](backend/DATABASE.md) - Entity relationships and migration guide
 
+## Contributing
+
+Issues and pull requests are welcome from anyone. See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit style, and the PR workflow.
+
 ## License
 
 MIT
