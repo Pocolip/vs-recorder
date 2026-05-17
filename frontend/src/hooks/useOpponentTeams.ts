@@ -9,6 +9,7 @@ interface OpponentTeam {
   pokepaste: string;
   notes: string;
   color: string;
+  position: number;
   compositions: Composition[];
   createdAt: string;
 }
@@ -38,6 +39,7 @@ export const useOpponentTeams = (
     pokepaste: team.pokepaste,
     notes: team.notes || "",
     color: team.color || "blue",
+    position: team.position ?? 0,
     compositions: team.compositions || [],
     createdAt: team.createdAt,
   });
@@ -164,6 +166,33 @@ export const useOpponentTeams = (
     return transformedTeam;
   };
 
+  const reorderOpponentTeams = useCallback(
+    async (orderedIds: number[]) => {
+      if (!gamePlanId) {
+        throw new Error("Game plan not initialized");
+      }
+
+      setOpponentTeams((prev) => {
+        const byId = new Map(prev.map((t) => [t.id, t]));
+        return orderedIds
+          .map((id, i) => {
+            const team = byId.get(id);
+            return team ? { ...team, position: i } : null;
+          })
+          .filter((t): t is OpponentTeam => t !== null);
+      });
+      setLastUpdated(new Date());
+
+      try {
+        await gamePlanApi.reorderTeams(gamePlanId, orderedIds);
+      } catch (err) {
+        console.error("Failed to reorder opponent teams:", err);
+        await loadOpponentTeams(teamId);
+      }
+    },
+    [gamePlanId, teamId, loadOpponentTeams],
+  );
+
   const deleteComposition = async (opponentTeamId: number, index: number) => {
     if (!gamePlanId) {
       throw new Error("Game plan not initialized");
@@ -220,6 +249,7 @@ export const useOpponentTeams = (
     addComposition,
     updateComposition,
     deleteComposition,
+    reorderOpponentTeams,
     refresh,
     getOpponentTeamById,
     resetState,

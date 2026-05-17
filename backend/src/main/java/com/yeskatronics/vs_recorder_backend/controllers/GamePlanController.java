@@ -245,6 +245,27 @@ public class GamePlanController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Reorder teams in game plan",
+               description = "Set the manual display order of all opponent teams. The request body must contain every team ID in the plan exactly once.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Teams reordered successfully"),
+            @ApiResponse(responseCode = "400", description = "ID list does not match the teams in this game plan"),
+            @ApiResponse(responseCode = "404", description = "Game plan not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PutMapping("/{gamePlanId}/teams/reorder")
+    public ResponseEntity<Void> reorderTeams(
+            @PathVariable Long gamePlanId,
+            Authentication authentication,
+            @Valid @RequestBody GamePlanDTO.ReorderTeamsRequest request) {
+
+        Long userId = getCurrentUserId(authentication);
+        log.info("Reordering teams in game plan: {}", gamePlanId);
+
+        gamePlanService.reorderTeams(gamePlanId, userId, request.getOrderedIds());
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "Update team", description = "Update team pokepaste and/or notes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Team updated successfully",

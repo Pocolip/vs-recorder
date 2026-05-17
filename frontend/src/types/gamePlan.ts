@@ -13,6 +13,7 @@ export interface GamePlanTeam {
   playerName: string;
   notes: string;
   color?: string;
+  position?: number;
   compositions: Composition[];
   createdAt: string;
   updatedAt: string;
