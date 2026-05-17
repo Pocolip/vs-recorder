@@ -1,12 +1,38 @@
 import { useState, useEffect, useMemo } from "react";
-import { Plus, Target, AlertTriangle, Layers, ArrowLeft } from "lucide-react";
+import {
+  Plus,
+  Target,
+  AlertTriangle,
+  Layers,
+  ArrowLeft,
+  ChevronsUp,
+  ChevronsDown,
+} from "lucide-react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import PageMeta from "../../components/common/PageMeta";
-import OpponentTeamCard from "../../components/team/OpponentTeamCard";
+import SortableOpponentTeamCard, {
+  OpponentTeamDragPreview,
+} from "../../components/team/SortableOpponentTeamCard";
 import LeadGroupCard from "../../components/team/LeadGroupCard";
 import AddOpponentTeamModal from "../../components/modals/AddOpponentTeamModal";
 import TagInput from "../../components/form/TagInput";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useOpponentTeams } from "../../hooks/useOpponentTeams";
+import { useCollapsedOpponentTeams } from "../../hooks/useCollapsedOpponentTeams";
 import useTeamPokemon from "../../hooks/useTeamPokemon";
 import * as pokepasteService from "../../services/pokepasteService";
 import { matchesPokemonTags } from "../../utils/pokemonNameUtils";
@@ -19,9 +45,11 @@ export default function MatchupPlannerPage() {
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [groupByLeads, setGroupByLeads] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<number | null>(null);
 
   const {
     opponentTeams,
+    gamePlanId,
     loading,
     error,
     createOpponentTeam,
@@ -30,9 +58,46 @@ export default function MatchupPlannerPage() {
     addComposition,
     updateComposition,
     deleteComposition,
+    reorderOpponentTeams,
     refresh,
     isEmpty,
   } = useOpponentTeams(team?.id ?? null);
+
+  const {
+    isExpanded: isCardExpanded,
+    toggle: toggleCardExpanded,
+    collapseAll,
+    expandAll,
+  } = useCollapsedOpponentTeams(gamePlanId);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+  );
+
+  const isReorderable = searchTags.length === 0;
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as number);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveDragId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = opponentTeams.findIndex((t) => t.id === active.id);
+    const newIndex = opponentTeams.findIndex((t) => t.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const newOrder = arrayMove(opponentTeams, oldIndex, newIndex);
+    reorderOpponentTeams(newOrder.map((t) => t.id));
+  };
+
+  const activeDragTeam = useMemo(
+    () =>
+      activeDragId != null
+        ? opponentTeams.find((t) => t.id === activeDragId) ?? null
+        : null,
+    [activeDragId, opponentTeams],
+  );
 
   const { teamPokemon } = useTeamPokemon(opponentTeams);
 
@@ -168,6 +233,28 @@ export default function MatchupPlannerPage() {
             </button>
           ) : (
             <>
+              {!isEmpty && (
+                <>
+                  <button
+                    onClick={() =>
+                      collapseAll(opponentTeams.map((t) => t.id))
+                    }
+                    className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                    title="Collapse all matchup teams"
+                  >
+                    <ChevronsUp className="h-4 w-4" />
+                    Collapse All
+                  </button>
+                  <button
+                    onClick={expandAll}
+                    className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                    title="Expand all matchup teams"
+                  >
+                    <ChevronsDown className="h-4 w-4" />
+                    Expand All
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => setGroupByLeads(true)}
                 className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -318,20 +405,49 @@ export default function MatchupPlannerPage() {
             </div>
           ) : (
             !isEmpty && (
-              <div className="space-y-6">
-                {filteredOpponentTeams.map((opponentTeam) => (
-                  <OpponentTeamCard
-                    key={opponentTeam.id}
-                    opponentTeam={opponentTeam}
-                    myTeamPokemon={myTeamPokemon}
-                    onUpdateNotes={handleUpdateNotes}
-                    onAddComposition={addComposition}
-                    onUpdateComposition={updateComposition}
-                    onDeleteComposition={deleteComposition}
-                    onDeleteTeam={handleDeleteOpponentTeam}
-                  />
-                ))}
-              </div>
+              <>
+                {!isReorderable && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Clear filters to reorder matchup teams.
+                  </p>
+                )}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDragCancel={() => setActiveDragId(null)}
+                >
+                  <SortableContext
+                    items={filteredOpponentTeams.map((t) => t.id)}
+                    strategy={verticalListSortingStrategy}
+                    disabled={!isReorderable}
+                  >
+                    <div className="space-y-6">
+                      {filteredOpponentTeams.map((opponentTeam) => (
+                        <SortableOpponentTeamCard
+                          key={opponentTeam.id}
+                          opponentTeam={opponentTeam}
+                          myTeamPokemon={myTeamPokemon}
+                          dragDisabled={!isReorderable}
+                          isExpanded={isCardExpanded(opponentTeam.id)}
+                          onToggleExpand={toggleCardExpanded}
+                          onUpdateNotes={handleUpdateNotes}
+                          onAddComposition={addComposition}
+                          onUpdateComposition={updateComposition}
+                          onDeleteComposition={deleteComposition}
+                          onDeleteTeam={handleDeleteOpponentTeam}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeDragTeam ? (
+                      <OpponentTeamDragPreview team={activeDragTeam} />
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
+              </>
             )
           )}
         </>

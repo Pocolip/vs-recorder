@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for GamePlan business logic.
@@ -210,7 +212,18 @@ public class GamePlanService {
         GamePlan gamePlan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
+        // New teams go to position 0; shift existing teams down by 1.
+        List<GamePlanTeam> existing = gamePlanTeamRepository.findByGamePlanIdOrderByPositionAscIdAsc(gamePlanId);
+        for (GamePlanTeam existingTeam : existing) {
+            Integer pos = existingTeam.getPosition();
+            existingTeam.setPosition((pos == null ? 0 : pos) + 1);
+        }
+        if (!existing.isEmpty()) {
+            gamePlanTeamRepository.saveAll(existing);
+        }
+
         team.setGamePlan(gamePlan);
+        team.setPosition(0);
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(team);
         log.info("Team added successfully with ID: {}", savedTeam.getId());
@@ -239,7 +252,43 @@ public class GamePlanService {
     @Transactional(readOnly = true)
     public List<GamePlanTeam> getTeamsByGamePlanId(Long gamePlanId) {
         log.debug("Fetching teams for game plan ID: {}", gamePlanId);
-        return gamePlanTeamRepository.findByGamePlanId(gamePlanId);
+        return gamePlanTeamRepository.findByGamePlanIdOrderByPositionAscIdAsc(gamePlanId);
+    }
+
+    /**
+     * Reorder all teams in a game plan to match the given ID order.
+     * Assigns position 0..N-1 according to the order of {@code orderedIds}.
+     *
+     * @param gamePlanId the game plan ID
+     * @param userId the user ID (for ownership verification)
+     * @param orderedIds the desired team order
+     * @throws IllegalArgumentException if game plan not owned, count mismatches, or an ID doesn't belong to the plan
+     */
+    public void reorderTeams(Long gamePlanId, Long userId, List<Long> orderedIds) {
+        log.info("Reordering {} teams for game plan ID: {}", orderedIds.size(), gamePlanId);
+
+        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
+            throw new IllegalArgumentException("Game plan not found or not owned by user");
+        }
+
+        List<GamePlanTeam> teams = gamePlanTeamRepository.findByGamePlanIdOrderByPositionAscIdAsc(gamePlanId);
+        if (teams.size() != orderedIds.size()) {
+            throw new IllegalArgumentException("Team count mismatch: expected " + teams.size() + ", got " + orderedIds.size());
+        }
+
+        Map<Long, GamePlanTeam> byId = teams.stream()
+                .collect(Collectors.toMap(GamePlanTeam::getId, t -> t));
+
+        for (int i = 0; i < orderedIds.size(); i++) {
+            GamePlanTeam team = byId.get(orderedIds.get(i));
+            if (team == null) {
+                throw new IllegalArgumentException("Team ID " + orderedIds.get(i) + " not found in game plan: " + gamePlanId);
+            }
+            team.setPosition(i);
+        }
+
+        gamePlanTeamRepository.saveAll(teams);
+        log.info("Reordered teams for game plan ID: {}", gamePlanId);
     }
 
     /**
