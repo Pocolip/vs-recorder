@@ -212,7 +212,7 @@ export default function MatchupPlannerPage() {
       <PageMeta title="Matchup Planner | VS Recorder" description="Plan matchup strategies" />
       <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-800 dark:text-white/90">
             <Target className="h-6 w-6 text-brand-500" />
@@ -222,7 +222,7 @@ export default function MatchupPlannerPage() {
             Plan strategies for specific matchups
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {groupByLeads ? (
             <button
               onClick={() => setGroupByLeads(false)}
