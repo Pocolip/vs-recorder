@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-17-speed-tiers",
+    "date": "2026-05-17",
+    "title": "New: Speed Tiers Page",
+    "message": "Every team now has a Speed Tiers tab with a per-regulation reference table, your team's Pokemon are highlighted at their actual paste speeds, with separate rows for any mega forme you're holding a stone for. Global Tailwind / Trick Room toggles, plus tap any row to preview a +Choice Scarf modifier on just that row."
+  },
+  {
     "id": "2026-05-17-matchup-planner-enhancements",
     "date": "2026-05-17",
     "title": "Matchup Planner Enhancements",

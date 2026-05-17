@@ -333,6 +333,23 @@ export function calcFinalStat(
   return calcStat(gen, statName as keyof StatsTable, base, iv, ev, level, nature);
 }
 
+// Speed stat at Lv50 for a species + spread. In Champions mode, `evOrSp` is
+// treated as SPs (Champions Stat Points) and converted to legacy EVs the
+// same way useDamageCalc does. Returns 0 if the species can't be resolved.
+export function computeSpeedAtLevel50(
+  species: string,
+  evOrSp: number,
+  iv: number,
+  nature: string,
+  isChampions = false,
+): number {
+  const baseStats = getBaseStats(species);
+  if (!baseStats) return 0;
+  const ev = isChampions ? Math.max(0, evOrSp * 8 - 4) : evOrSp;
+  const ivResolved = isChampions ? 31 : iv;
+  return calcFinalStat("spe", baseStats.spe, ivResolved, ev, 50, nature);
+}
+
 let _speciesListCache: string[] | null = null;
 export function getSpeciesList(): string[] {
   if (_speciesListCache) return _speciesListCache;
