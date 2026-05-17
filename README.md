@@ -15,6 +15,7 @@ VS Recorder helps Pokemon VGC (Video Game Championships) players improve through
 - **Performance Analytics** - Win rates, Pokemon usage stats, lead pair analysis, matchup breakdown, tera frequency, and move usage charts
 - **Match Grouping** - Organize replays into Bo3 (Best of 3) sets for tournament-accurate records
 - **Damage Calculator** - Native calc powered by `@smogon/calc` with NCP VGC tournament sets, team sidebar loading, and the ability to save results to Pokemon notes
+- **Speed Tiers** - Per-regulation speed reference table with the team's Pokemon overlaid at their actual paste speeds, plus Tailwind / Trick Room toggles and a per-row Choice Scarf preview. Data is pre-generated and checked in — see [scripts/SPEED_TIERS.md](scripts/SPEED_TIERS.md) for how to update.
 - **Pokemon Notes** - Per-team-member notes with saved damage calcs for quick reference during play
 - **Opponent Planner** - Prepare lead/back compositions and notes for specific opponent teams before a tournament
 - **Search & Filter** - Tag-based team search and Pokemon name filtering on the home page
@@ -98,6 +99,7 @@ GitHub Actions handles CI and deployment:
 
 - [Backend README](backend/README.md) - API setup, configuration, endpoints, testing
 - [Frontend README](frontend/README.md) - Development setup, project structure, damage calculator details
+- [Speed Tier Data](scripts/SPEED_TIERS.md) - Regenerating the per-regulation speed tier JSON and managing overrides
 - [API Documentation](http://localhost:8080/swagger-ui.html) - Swagger UI (when backend is running)
 - [Database Schema](backend/DATABASE.md) - Entity relationships and migration guide
 

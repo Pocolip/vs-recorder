@@ -304,6 +304,7 @@ const AppSidebar: React.FC = () => {
         { name: "Matchup Planner", path: `/team/${team.id}/matchup-planner` },
         { name: "Pokemon Notes", path: `/team/${team.id}/pokemon-notes` },
         { name: "Calculator", path: `/team/${team.id}/calculator` },
+        { name: "Speed Tiers", path: `/team/${team.id}/speed-tiers` },
         { name: "Type Chart", path: `/team/${team.id}/type-chart`, dividerAfter: true },
         { name: "Edit Team", onClick: () => setShowEditModal(true), icon: <Pencil className="h-3 w-3" /> },
         { name: "Export Team", onClick: () => setShowExportModal(true), icon: <Share2 className="h-3 w-3" /> },

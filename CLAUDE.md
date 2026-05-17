@@ -194,6 +194,31 @@ node scripts/generate-pokemon-data.js
 cd backend && mvn test -Dtest=PokemonServiceTest
 ```
 
+## Speed Tier Data
+
+The Speed Tiers page (`frontend/src/pages/Team/SpeedTiersPage.tsx`) loads a per-regulation JSON of pre-computed speed values:
+
+- `frontend/src/data/speedTiers-regM-A.json` — generated, checked in
+
+Regenerate with:
+
+```bash
+# From project root
+node scripts/generate-speed-tiers.js
+# or, from frontend/:
+npm run generate:speed-tiers
+```
+
+The script (`scripts/generate-speed-tiers.js`) reads:
+1. `frontend/src/data/setdex-gen10.ts` for the base species list (Champions / Reg M-A meta)
+2. `frontend/src/utils/megaStones.ts` for item → mega forme mapping
+3. `scripts/speed-tier-overrides.json` for per-regulation `add`/`remove` patches
+4. `@smogon/calc` Gen 9 dex for base stats and `calcStat`
+
+Each species gets four rows (252+, 252 neutral, 0 neutral, 0 -Spe). Mega formes of every base species are auto-included when `@smogon/calc` knows them.
+
+Re-run after editing `setdex-gen10.ts`, `megaStones.ts`, or `speed-tier-overrides.json`, or when bumping `@smogon/calc`.
+
 ## Important Notes
 
 ### Backend
