@@ -125,13 +125,13 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({ isOpen, onClose, onCreated 
 
         {/* Pokepaste URL */}
         <div>
-          <Label htmlFor="pokepaste-url">Pokepaste URL</Label>
+          <Label htmlFor="pokepaste-url">Team Paste URL</Label>
           <input
             id="pokepaste-url"
             type="text"
             value={pokepaste}
             onChange={(e) => setPokepaste(e.target.value)}
-            placeholder="https://pokepast.es/..."
+            placeholder="https://pokepast.es/... or https://vrpastes.com/..."
             className={`h-11 w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 ${
               !isValidUrl
                 ? "border-red-400 focus:border-red-400 focus:ring-red-500/10 dark:border-red-500"
@@ -139,7 +139,7 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({ isOpen, onClose, onCreated 
             }`}
           />
           {!isValidUrl && (
-            <p className="mt-1 text-xs text-red-500">Enter a valid pokepast.es or pokebin.com URL</p>
+            <p className="mt-1 text-xs text-red-500">Enter a valid pokepast.es, pokebin.com, or vrpastes.com URL</p>
           )}
           {previewNames && previewNames.length > 0 && (
             <div className="mt-3">

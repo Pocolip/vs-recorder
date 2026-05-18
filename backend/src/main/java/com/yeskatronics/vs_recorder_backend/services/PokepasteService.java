@@ -30,11 +30,16 @@ public class PokepasteService {
 
     private static final String POKEBIN_BASE = "https://pokebin.com";
 
+    private static final String VRPASTES_API_BASE = "https://vrpaste-backend.vercel.app/api/paste";
+
     private static final Pattern POKEPASTE_URL_PATTERN = Pattern.compile(
             "https://pokepast\\.es/([a-zA-Z0-9]+)(?:/raw)?"
     );
     private static final Pattern POKEBIN_URL_PATTERN = Pattern.compile(
             "https://pokebin\\.com/([a-zA-Z0-9]+)(?:/json)?"
+    );
+    private static final Pattern VRPASTES_URL_PATTERN = Pattern.compile(
+            "https?://(?:www\\.)?vrpastes\\.com/([a-zA-Z0-9]+)"
     );
 
 
@@ -48,6 +53,12 @@ public class PokepasteService {
     public PokepasteDTO.PasteData fetchPasteData(String url) {
         log.info("Fetching paste data from: {}", url);
 
+        // Check if it's a VR Pastes URL
+        Matcher vrpastesMatcher = VRPASTES_URL_PATTERN.matcher(url);
+        if (vrpastesMatcher.find()) {
+            return fetchVRPastesData(url, vrpastesMatcher.group(1));
+        }
+
         // Check if it's a Pokebin URL
         Matcher pokebinMatcher = POKEBIN_URL_PATTERN.matcher(url);
         if (pokebinMatcher.find()) {
@@ -60,7 +71,7 @@ public class PokepasteService {
             return fetchPokepasteData(url, pokepasteMatcher.group(1));
         }
 
-        throw new IllegalArgumentException("Invalid URL - must be a Pokepaste or Pokebin URL");
+        throw new IllegalArgumentException("Invalid URL - must be a Pokepaste, Pokebin, or VR Pastes URL");
     }
 
     /**
@@ -201,6 +212,92 @@ public class PokepasteService {
     }
 
     /**
+     * Fetch data from VR Pastes (vrpastes.com)
+     */
+    private PokepasteDTO.PasteData fetchVRPastesData(String originalUrl, String pasteId) {
+        log.info("Fetching from VR Pastes: {}", pasteId);
+        String apiUrl = VRPASTES_API_BASE + "/" + pasteId + "?lang=english";
+
+        try {
+            long startTime = System.currentTimeMillis();
+            log.debug("Fetching from: {}", apiUrl);
+            String jsonResponse = restTemplate.getForObject(apiUrl, String.class);
+            long fetchDuration = System.currentTimeMillis() - startTime;
+            log.info("Fetched VR Pastes data in {}ms", fetchDuration);
+
+            if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
+                throw new IllegalArgumentException("Failed to fetch VR Pastes data or paste is empty");
+            }
+
+            JsonNode root = objectMapper.readTree(jsonResponse);
+
+            PokepasteDTO.PasteData pasteData = new PokepasteDTO.PasteData();
+            pasteData.setSource("vrpastes");
+            pasteData.setRawText(jsonResponse);
+
+            String title = root.path("title").asText(null);
+            if (title != null && !title.isEmpty()) {
+                pasteData.setTitle(title);
+            }
+
+            // VR Pastes calls this field "teams" but it's actually the list of Pokemon
+            JsonNode teamsNode = root.path("teams");
+            if (!teamsNode.isArray()) {
+                throw new IllegalArgumentException("Invalid VR Pastes response - missing 'teams' array");
+            }
+
+            for (JsonNode memberNode : teamsNode) {
+                PokepasteDTO.PokemonData pokemon = new PokepasteDTO.PokemonData();
+
+                String species = memberNode.path("species").asText(null);
+                if (species == null || species.isEmpty()) continue;
+                pokemon.setSpecies(species);
+
+                String name = memberNode.path("name").asText(null);
+                if (name != null && !name.isEmpty() && !name.equals(species)) {
+                    pokemon.setNickname(name);
+                }
+
+                String item = memberNode.path("item").asText(null);
+                if (item != null && !item.isEmpty()) {
+                    pokemon.setItem(item);
+                }
+
+                String ability = memberNode.path("ability").asText(null);
+                if (ability != null && !ability.isEmpty()) {
+                    pokemon.setAbility(ability);
+                }
+
+                String teraType = memberNode.path("teraType").asText(null);
+                if (teraType != null && !teraType.isEmpty()) {
+                    pokemon.setTeraType(teraType);
+                }
+
+                JsonNode movesNode = memberNode.path("moves");
+                if (movesNode.isArray()) {
+                    for (JsonNode move : movesNode) {
+                        String moveName = move.asText(null);
+                        if (moveName != null && !moveName.isEmpty()) {
+                            pokemon.getMoves().add(moveName);
+                        }
+                    }
+                }
+
+                pasteData.getPokemon().add(pokemon);
+            }
+
+            log.info("Successfully fetched VR Pastes with {} Pokemon", pasteData.getPokemon().size());
+            return pasteData;
+
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error fetching VR Pastes data: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to fetch or parse VR Pastes data: " + e.getMessage());
+        }
+    }
+
+    /**
      * Parse a single Pokemon section
      */
     private PokepasteDTO.PokemonData parsePokemonSection(String section) {
@@ -272,7 +369,8 @@ public class PokepasteService {
      */
     public boolean isValidPokepasteUrl(String url) {
         return POKEPASTE_URL_PATTERN.matcher(url).matches() ||
-                POKEBIN_URL_PATTERN.matcher(url).matches();
+                POKEBIN_URL_PATTERN.matcher(url).matches() ||
+                VRPASTES_URL_PATTERN.matcher(url).matches();
     }
 
     /**
