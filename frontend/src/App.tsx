@@ -20,6 +20,7 @@ import MatchupPlannerPage from "./pages/Team/MatchupPlannerPage";
 import PokemonNotesPage from "./pages/Team/PokemonNotesPage";
 import CalculatorPage from "./pages/Team/CalculatorPage";
 import TypeChartPage from "./pages/Team/TypeChartPage";
+import SpeedTiersPage from "./pages/Team/SpeedTiersPage";
 import RootRoute from "./components/auth/RootRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 import * as pokemonService from "./services/pokemonService";
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="matchup-planner" element={<MatchupPlannerPage />} />
             <Route path="pokemon-notes" element={<PokemonNotesPage />} />
             <Route path="calculator" element={<CalculatorPage />} />
+            <Route path="speed-tiers" element={<SpeedTiersPage />} />
             <Route path="type-chart" element={<TypeChartPage />} />
           </Route>
         </Route>
