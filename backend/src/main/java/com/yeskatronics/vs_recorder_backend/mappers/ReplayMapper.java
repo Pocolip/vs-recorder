@@ -2,8 +2,12 @@ package com.yeskatronics.vs_recorder_backend.mappers;
 
 import com.yeskatronics.vs_recorder_backend.dto.ReplayDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
+import com.yeskatronics.vs_recorder_backend.entities.TeamMember;
+import com.yeskatronics.vs_recorder_backend.services.PokemonService;
+import com.yeskatronics.vs_recorder_backend.utils.PlayerIdentifier;
 import com.yeskatronics.vs_recorder_backend.utils.ReplayMatcher;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,7 +16,10 @@ import java.util.stream.Collectors;
  * MapStruct mapper for Replay entity and DTOs.
  */
 @Mapper(componentModel = "spring")
-public interface ReplayMapper {
+public abstract class ReplayMapper {
+
+    @Autowired
+    protected PokemonService pokemonService;
 
     /**
      * Convert CreateRequest to Replay entity
@@ -21,7 +28,7 @@ public interface ReplayMapper {
     @Mapping(target = "team", ignore = true)
     @Mapping(target = "match", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    Replay toEntity(ReplayDTO.CreateRequest dto);
+    public abstract Replay toEntity(ReplayDTO.CreateRequest dto);
 
     /**
      * Convert UpdateRequest to Replay entity (for partial updates)
@@ -32,14 +39,14 @@ public interface ReplayMapper {
     @Mapping(target = "url", ignore = true)
     @Mapping(target = "battleLog", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    Replay toEntity(ReplayDTO.UpdateRequest dto);
+    public abstract Replay toEntity(ReplayDTO.UpdateRequest dto);
 
     /**
      * Convert Replay entity to Response DTO (includes battleLog)
      */
     @Mapping(source = "team.id", target = "teamId")
     @Mapping(source = "match.id", target = "matchId")
-    ReplayDTO.Response toDTO(Replay replay);
+    public abstract ReplayDTO.Response toDTO(Replay replay);
 
     /**
      * Convert Replay entity to Summary DTO (excludes battleLog for list views)
@@ -47,13 +54,13 @@ public interface ReplayMapper {
     @Mapping(source = "team.id", target = "teamId")
     @Mapping(source = "match.id", target = "matchId")
     @Mapping(target = "battleData", ignore = true)
-    ReplayDTO.Summary toSummaryDTO(Replay replay);
+    public abstract ReplayDTO.Summary toSummaryDTO(Replay replay);
 
     /**
      * After mapping, populate battleData from battleLog
      */
     @AfterMapping
-    default void populateBattleData(@MappingTarget ReplayDTO.Summary summary, Replay replay) {
+    protected void populateBattleData(@MappingTarget ReplayDTO.Summary summary, Replay replay) {
         if (replay.getBattleLog() != null && !replay.getBattleLog().isEmpty()) {
             // Extract raw battle data from battle log
             ReplayMatcher.BattleData rawData = ReplayMatcher.extractBattleData(
@@ -101,29 +108,22 @@ public interface ReplayMapper {
             }
             battleData.setEloChanges(eloChanges);
 
-            // Determine userPlayer and opponentPlayer based on usernames
-            String userPlayer = null;
-            String opponentPlayer = null;
+            List<String> registeredRoster = replay.getTeam().getTeamMembers() == null
+                    ? Collections.emptyList()
+                    : replay.getTeam().getTeamMembers().stream()
+                        .map(TeamMember::getPokemonName)
+                        .collect(Collectors.toList());
 
-            if (replay.getTeam().getShowdownUsernames() != null) {
-                for (Map.Entry<String, String> entry : rawData.getPlayers().entrySet()) {
-                    String player = entry.getKey(); // "p1" or "p2"
-                    String username = entry.getValue();
+            PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                    replay.getTeam().getShowdownUsernames(),
+                    registeredRoster,
+                    rawData.getPlayers(),
+                    rawData.getTeams(),
+                    pokemonService
+            );
 
-                    // Check if this username belongs to the user
-                    boolean isUser = replay.getTeam().getShowdownUsernames().stream()
-                            .anyMatch(u -> u.equalsIgnoreCase(username));
-
-                    if (isUser) {
-                        userPlayer = player;
-                    } else {
-                        opponentPlayer = player;
-                    }
-                }
-            }
-
-            battleData.setUserPlayer(userPlayer);
-            battleData.setOpponentPlayer(opponentPlayer);
+            battleData.setUserPlayer(id.userPlayer());
+            battleData.setOpponentPlayer(id.opponentPlayer());
 
             summary.setBattleData(battleData);
         }

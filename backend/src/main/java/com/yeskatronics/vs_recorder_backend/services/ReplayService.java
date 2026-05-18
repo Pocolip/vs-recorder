@@ -1,14 +1,15 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Match;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
+import com.yeskatronics.vs_recorder_backend.entities.TeamMember;
 import com.yeskatronics.vs_recorder_backend.repositories.MatchRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.ReplayRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamRepository;
+import com.yeskatronics.vs_recorder_backend.utils.PlayerIdentifier;
 import com.yeskatronics.vs_recorder_backend.utils.ReplayMatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service class for Replay entity business logic.
@@ -35,6 +37,7 @@ public class ReplayService {
     private final MatchRepository matchRepository;
     private final ShowdownService showdownService;
     private final ObjectMapper objectMapper;
+    private final PokemonService pokemonService;
 
     /**
      * Create a new replay
@@ -102,7 +105,7 @@ public class ReplayService {
                 .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         // Fetch battle log from Showdown
-        ShowdownDTO.ReplayData replayData = showdownService.fetchReplayData(url, team.getShowdownUsernames());
+        ShowdownDTO.ReplayData replayData = showdownService.fetchReplayData(url, team);
 
         // Parse Bo3 information from battle log
         ReplayMatcher.Bo3MatchInfo matchInfo = ReplayMatcher.parseBattleLog(replayData.getBattleLog());
@@ -451,33 +454,22 @@ public class ReplayService {
             }
 
             try {
-                JsonNode root = objectMapper.readTree(replay.getBattleLog());
+                String logText = objectMapper.readTree(replay.getBattleLog()).path("log").asText();
 
-                String player1 = root.get("players").get(0).asText();
-                String player2 = root.get("players").get(1).asText();
-                String logText = root.path("log").asText();
+                ReplayMatcher.BattleData parsed = ReplayMatcher.extractBattleData(
+                        replay.getBattleLog(), newUsernames);
 
-                // Match against usernames (same logic as ShowdownService)
-                String userPlayer = null;
-                String opponent = null;
+                List<String> roster = replay.getTeam().getTeamMembers() == null
+                        ? Collections.emptyList()
+                        : replay.getTeam().getTeamMembers().stream()
+                            .map(TeamMember::getPokemonName)
+                            .collect(Collectors.toList());
 
-                for (String username : newUsernames) {
-                    if (player1.equalsIgnoreCase(username)) {
-                        userPlayer = player1;
-                        opponent = player2;
-                        break;
-                    } else if (player2.equalsIgnoreCase(username)) {
-                        userPlayer = player2;
-                        opponent = player1;
-                        break;
-                    }
-                }
+                PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                        newUsernames, roster, parsed.getPlayers(), parsed.getTeams(), pokemonService);
 
-                // If no match found, default to player1
-                if (userPlayer == null) {
-                    userPlayer = player1;
-                    opponent = player2;
-                }
+                String userPlayer = id.userUsername();
+                String opponent = id.opponentUsername();
 
                 String winner = showdownService.extractWinner(logText);
                 String result = showdownService.determineResult(userPlayer, winner);

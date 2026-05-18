@@ -1,6 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.services;
 
 import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
+import com.yeskatronics.vs_recorder_backend.entities.Team;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Fail.fail;
@@ -28,6 +30,12 @@ class ShowdownServiceTest {
 
     @MockitoBean
     private RestTemplate restTemplate;
+
+    private Team teamWithUsernames(String... usernames) {
+        Team team = new Team();
+        team.setShowdownUsernames(new ArrayList<>(List.of(usernames)));
+        return team;
+    }
 
     private String loadTestFile(String filename) {
         try {
@@ -52,7 +60,7 @@ class ShowdownServiceTest {
         // When: Fetch replay data
         ShowdownDTO.ReplayData result = showdownService.fetchReplayData(
                 "https://replay.pokemonshowdown.com/gen9vgc2025-12345",
-                List.of("mofonguero")
+                teamWithUsernames("mofonguero")
         );
 
         // Then: Verify correct parsing
@@ -75,7 +83,7 @@ class ShowdownServiceTest {
         // When: Fetch replay data using a URL with ?p2 query param
         ShowdownDTO.ReplayData result = showdownService.fetchReplayData(
                 "https://replay.pokemonshowdown.com/gen9vgc2025regg-12345?p2",
-                List.of("mofonguero")
+                teamWithUsernames("mofonguero")
         );
 
         // Then: Verify the query param was stripped and JSON fetched from clean URL
