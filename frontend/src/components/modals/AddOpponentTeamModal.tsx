@@ -43,13 +43,13 @@ const AddOpponentTeamModal: React.FC<AddOpponentTeamModalProps> = ({
     e.preventDefault();
 
     if (!formData.pokepaste.trim()) {
-      setError("Pokepaste or Pokebin URL is required");
+      setError("Team paste URL is required");
       return;
     }
 
     if (!pokepasteService.isValidPokepasteUrl(formData.pokepaste.trim())) {
       setError(
-        "Please enter a valid Pokepaste or Pokebin URL (e.g., https://pokepast.es/abc123 or https://pokebin.com/abc123)",
+        "Please enter a valid Pokepaste, Pokebin, or VR Pastes URL (e.g., https://pokepast.es/abc123 or https://vrpastes.com/abc123)",
       );
       return;
     }
@@ -91,19 +91,19 @@ const AddOpponentTeamModal: React.FC<AddOpponentTeamModalProps> = ({
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               <LinkIcon className="mr-1 inline h-4 w-4" />
-              Pokepaste / Pokebin URL *
+              Team Paste URL *
             </label>
             <input
               type="url"
               value={formData.pokepaste}
               onChange={(e) => handleInputChange("pokepaste", e.target.value)}
-              placeholder="https://pokepast.es/... or https://pokebin.com/..."
+              placeholder="https://pokepast.es/... or https://vrpastes.com/..."
               className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
               disabled={loading}
               required
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Link to the matchup team on Pokepaste or Pokebin
+              Link to the matchup team on Pokepaste, Pokebin, or VR Pastes
             </p>
           </div>
 
