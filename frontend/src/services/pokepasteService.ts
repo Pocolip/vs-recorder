@@ -1,5 +1,5 @@
 /**
- * Pokepaste service - fetches and parses Pokemon team pastes from pokepast.es and pokebin
+ * Pokepaste service - fetches and parses Pokemon team pastes from pokepast.es, pokebin, and vrpastes.com
  */
 
 import * as storageService from "./storageService";
@@ -8,13 +8,14 @@ import { apiClient } from "./api";
 // URL patterns
 const POKEPASTE_PATTERN = /^https?:\/\/(www\.)?pokepast\.es\/([a-zA-Z0-9]+)/;
 const POKEBIN_PATTERN = /^https?:\/\/(www\.)?pokebin\.com\/([a-zA-Z0-9]+)/;
+const VRPASTES_PATTERN = /^https?:\/\/(www\.)?vrpastes\.com\/([a-zA-Z0-9]+)/;
 
 // Cache configuration — v3 to invalidate old-format entries from original frontend
 const CACHE_KEY = "pokepaste_cache_v3";
 const CACHE_EXPIRY_HOURS = 24;
 
 interface PasteServiceType {
-  type: "pokepaste" | "pokebin";
+  type: "pokepaste" | "pokebin" | "vrpastes";
   pasteId: string;
 }
 
@@ -60,6 +61,11 @@ export function detectPasteService(url: string): PasteServiceType | null {
     return { type: "pokebin", pasteId: pokebinMatch[2] };
   }
 
+  const vrpastesMatch = url.match(VRPASTES_PATTERN);
+  if (vrpastesMatch) {
+    return { type: "vrpastes", pasteId: vrpastesMatch[2] };
+  }
+
   return null;
 }
 
@@ -86,7 +92,8 @@ export async function fetchAndParse(
   if (detected.type === "pokepaste") {
     pokemonData = await fetchPokepaste(detected.pasteId, pasteUrl, options?.maxPokemon);
   } else {
-    pokemonData = await fetchPokebin(detected.pasteId, pasteUrl, options?.maxPokemon);
+    // pokebin and vrpastes both proxy through the backend (CORS blocks direct browser fetch)
+    pokemonData = await fetchViaBackend(detected.pasteId, pasteUrl, options?.maxPokemon);
   }
 
   // Cache the result
@@ -121,9 +128,9 @@ async function fetchPokepaste(
 }
 
 /**
- * Fetch pokebin data via backend API
+ * Fetch via backend proxy — used for pokebin and vrpastes, since both block direct CORS
  */
-async function fetchPokebin(
+async function fetchViaBackend(
   _pasteId: string,
   originalUrl: string,
   maxPokemon?: number
@@ -150,10 +157,10 @@ async function fetchPokebin(
     } else if (data.rawText) {
       return parsePokepasteText(data.rawText as string, { maxPokemon });
     } else {
-      throw new Error("Invalid response from pokebin API");
+      throw new Error("Invalid response from paste API");
     }
   } catch (error) {
-    console.error("Error fetching pokebin:", error);
+    console.error("Error fetching paste via backend:", error);
     throw error;
   }
 }
@@ -395,12 +402,24 @@ export async function getCacheStats(): Promise<{
 }
 
 /**
- * Fetch the paste title from a pokepaste or pokebin URL.
- * Both services expose a /json endpoint with a title field.
+ * Fetch the paste title from a paste URL.
+ * Pokepaste and Pokebin expose a /json endpoint directly; VR Pastes goes through the backend
+ * proxy since its API blocks browser-origin CORS.
  */
 export async function fetchPasteTitle(pasteUrl: string): Promise<string | null> {
   const detected = detectPasteService(pasteUrl);
   if (!detected) return null;
+
+  if (detected.type === "vrpastes") {
+    try {
+      const data = await apiClient.get("/api/pokemon/pokepaste/parse", {
+        params: { url: pasteUrl },
+      }) as { title?: string | null };
+      return data.title || null;
+    } catch {
+      return null;
+    }
+  }
 
   const jsonUrl =
     detected.type === "pokepaste"

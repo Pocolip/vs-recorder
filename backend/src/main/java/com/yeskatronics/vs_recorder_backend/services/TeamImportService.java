@@ -36,7 +36,7 @@ public class TeamImportService {
 
     // Validation patterns
     private static final Pattern POKEPASTE_URL_PATTERN = Pattern.compile(
-            "^https://(pokepast\\.es|pokebin\\.com)/[a-zA-Z0-9]+$"
+            "^https://(pokepast\\.es|pokebin\\.com|(?:www\\.)?vrpastes\\.com)/[a-zA-Z0-9]+$"
     );
     private static final Pattern REPLAY_URL_PATTERN = Pattern.compile(
             "^https://replay\\.pokemonshowdown\\.com/[a-zA-Z0-9-]+$"

@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-18-vrpastes-support",
+    "date": "2026-05-18",
+    "title": "New: VR Paste Support",
+    "message": "Added VR Paste support for creating teams and matchups."
+  },
+  {
     "id": "2026-05-17-speed-tiers",
     "date": "2026-05-17",
     "title": "New: Speed Tiers Page",
