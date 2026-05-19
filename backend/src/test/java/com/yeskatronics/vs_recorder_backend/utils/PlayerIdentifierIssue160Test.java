@@ -68,6 +68,55 @@ class PlayerIdentifierIssue160Test {
         assertEquals(6, parsed.getTeams().get("p2").size());
     }
 
+    // ==================== Follow-up: two registered usernames, different teams ====================
+    //
+    // Reporter's second report: team is registered with both kevintoodlepoot and
+    // testing-toodle, both play each other on ladder, but only kevintoodlepoot is
+    // bringing the registered perish-trap team — testing-toodle brought a different
+    // Charizard-Y team. Previously the cascade defaulted to p1 (testing-toodle), so
+    // the perish team rendered as the opponent. Should now resolve to p2 via tier 1.
+
+    private static final List<String> FOLLOWUP_USERNAMES =
+            List.of("kevintoodlepoot", "testing-toodle");
+    private static final List<String> FOLLOWUP_ROSTER = List.of(
+            "Gengar-Mega", "Incineroar", "Sinistcha", "Politoed", "Tinkaton", "Kommo-o");
+
+    @Test
+    void followupGame1_differentTeams_resolvesToP2WithPerishRoster() throws Exception {
+        String battleLogJson = readReplay("replays/issue160-followup/game1.json");
+        ReplayMatcher.BattleData parsed = ReplayMatcher.extractBattleData(
+                battleLogJson, FOLLOWUP_USERNAMES);
+
+        PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                FOLLOWUP_USERNAMES,
+                FOLLOWUP_ROSTER,
+                parsed.getPlayers(),
+                parsed.getTeams(),
+                pokemonService);
+
+        assertEquals("p2", id.userPlayer());
+        assertEquals("kevintoodlepoot", id.userUsername());
+        assertEquals("testing-toodle", id.opponentUsername());
+    }
+
+    @Test
+    void followupGame2_differentTeams_resolvesToP2WithPerishRoster() throws Exception {
+        String battleLogJson = readReplay("replays/issue160-followup/game2.json");
+        ReplayMatcher.BattleData parsed = ReplayMatcher.extractBattleData(
+                battleLogJson, FOLLOWUP_USERNAMES);
+
+        PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                FOLLOWUP_USERNAMES,
+                FOLLOWUP_ROSTER,
+                parsed.getPlayers(),
+                parsed.getTeams(),
+                pokemonService);
+
+        assertEquals("p2", id.userPlayer());
+        assertEquals("kevintoodlepoot", id.userUsername());
+        assertEquals("testing-toodle", id.opponentUsername());
+    }
+
     private String readReplay(String path) throws Exception {
         ClassPathResource resource = new ClassPathResource(path);
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);

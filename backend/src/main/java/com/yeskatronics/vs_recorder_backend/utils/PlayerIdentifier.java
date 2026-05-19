@@ -93,12 +93,17 @@ public final class PlayerIdentifier {
         if (registeredRoster == null || registeredRoster.isEmpty()) return false;
         if (pokemonService == null) return false;
 
-        Set<String> revealedCanon = revealed.stream()
-                .map(pokemonService::resolveCanonical)
+        // resolveBaseSpecies (not resolveCanonical) collapses mid-battle reveals like
+        // Gengar-Mega/Charizard-Mega-Y → base form and Tera-Burst variants → base,
+        // while still keeping competitively distinct formes separate (Ogerpon-Hearthflame
+        // vs -Wellspring, Calyrex-Shadow vs -Ice). Without this, pokepastes that name a
+        // Mega/Tera variant fail to match the base species emitted in |poke| lines.
+        Set<String> revealedBase = revealed.stream()
+                .map(pokemonService::resolveBaseSpecies)
                 .collect(Collectors.toSet());
 
         return registeredRoster.stream()
-                .map(pokemonService::resolveCanonical)
-                .allMatch(revealedCanon::contains);
+                .map(pokemonService::resolveBaseSpecies)
+                .allMatch(revealedBase::contains);
     }
 }

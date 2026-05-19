@@ -149,4 +149,81 @@ class PlayerIdentifierTest {
 
         assertEquals("p1", id.userPlayer());
     }
+
+    // ==================== Forme normalization via base species ====================
+
+    @Test
+    void teamMatch_megaInPokepasteCollapsesToBaseInPokeLine() {
+        // Reporter's follow-up case: pokepaste registers Gengar-Mega (the @Gengarite
+        // forme), but the |poke| line emits base "Gengar" until mid-battle Mega Evolve.
+        // Tier 1 must still recognize the perish team on the side that brought it.
+        List<String> registered = List.of(
+                "Gengar-Mega", "Incineroar", "Sinistcha", "Politoed", "Tinkaton", "Kommo-o");
+        List<String> revealedP2 = List.of(
+                "Gengar", "Incineroar", "Sinistcha", "Politoed", "Tinkaton", "Kommo-o");
+        List<String> revealedP1 = List.of(
+                "Whimsicott", "Glimmora", "Charizard", "Floette-Eternal", "Basculegion", "Garchomp");
+
+        PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                List.of("testing-toodle", "kevintoodlepoot"),
+                registered,
+                Map.of("p1", "testing-toodle", "p2", "kevintoodlepoot"),
+                Map.of("p1", revealedP1, "p2", revealedP2),
+                pokemonService);
+
+        assertEquals("p2", id.userPlayer());
+        assertEquals("kevintoodlepoot", id.userUsername());
+        assertEquals("testing-toodle", id.opponentUsername());
+    }
+
+    @Test
+    void teamMatch_teraBurstFormeCollapsesToBaseCompetitiveForm() {
+        // Registered roster has Ogerpon-Hearthflame; revealed roster contains the
+        // post-Tera-Burst variant. resolveBaseSpecies must collapse them.
+        List<String> registered = List.of(
+                "Whimsicott", "Charizard", "Basculegion", "Garchomp", "Glimmora", "Ogerpon-Hearthflame");
+        List<String> revealedP2 = List.of(
+                "Whimsicott", "Charizard", "Basculegion", "Garchomp", "Glimmora", "Ogerpon-Hearthflame-Tera");
+
+        PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                List.of("WrongAlt"),
+                registered,
+                Map.of("p1", "Stranger1", "p2", "Stranger2"),
+                Map.of("p1", RINGER_ROSTER, "p2", revealedP2),
+                pokemonService);
+
+        assertEquals("p2", id.userPlayer());
+    }
+
+    @Test
+    void teamMatch_keepsCompetitivelyDistinctFormesSeparate() {
+        // Ogerpon-Hearthflame and Ogerpon-Wellspring are different competitive entities
+        // and must NOT cross-match. baseSpecies preserves these (Hearthflame and
+        // Wellspring each have their own baseSpecies in the registry).
+        List<String> registered = List.of(
+                "Whimsicott", "Charizard", "Basculegion", "Garchomp", "Glimmora", "Ogerpon-Hearthflame");
+        List<String> revealedP2 = List.of(
+                "Whimsicott", "Charizard", "Basculegion", "Garchomp", "Glimmora", "Ogerpon-Wellspring");
+
+        PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                List.of("Alice"),
+                registered,
+                Map.of("p1", "Stranger1", "p2", "Alice"),
+                Map.of("p1", RINGER_ROSTER, "p2", revealedP2),
+                pokemonService);
+
+        // p2 has Alice (name match) but team is different, so tier 1 fails for both.
+        // Tier 2 (name only) picks p2.
+        assertEquals("p2", id.userPlayer());
+        // But the team-match tier itself should NOT have fired for p2 — verify by
+        // running the same input without any matching name. Should default to p1.
+        PlayerIdentifier.Identification noNameMatch = PlayerIdentifier.identify(
+                List.of("WrongAlt"),
+                registered,
+                Map.of("p1", "Stranger1", "p2", "Stranger2"),
+                Map.of("p1", RINGER_ROSTER, "p2", revealedP2),
+                pokemonService);
+        assertEquals("p1", noNameMatch.userPlayer(),
+                "Hearthflame and Wellspring must not cross-match");
+    }
 }
