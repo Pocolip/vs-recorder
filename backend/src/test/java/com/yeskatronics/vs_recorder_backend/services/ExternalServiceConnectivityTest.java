@@ -2,6 +2,7 @@ package com.yeskatronics.vs_recorder_backend.services;
 
 import com.yeskatronics.vs_recorder_backend.dto.PokepasteDTO;
 import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
+import com.yeskatronics.vs_recorder_backend.entities.Team;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,8 +48,10 @@ class ExternalServiceConnectivityTest {
                 "https://replay.pokemonshowdown.com/gen9vgc2026regf-2497886991-lhkjlbj27mv7j0abg9980qu601bm9cipw";
 
         try {
+            Team team = new Team();
+            team.setShowdownUsernames(new ArrayList<>(List.of("genshinmintpicker")));
             ShowdownDTO.ReplayData battleLog =
-                    showdownService.fetchReplayData(testReplayUrl, List.of("genshinmintpicker"));
+                    showdownService.fetchReplayData(testReplayUrl, team);
 
             assertNotNull(battleLog, "Battle log should not be null");
             assertFalse(battleLog.getBattleLog().isEmpty(),

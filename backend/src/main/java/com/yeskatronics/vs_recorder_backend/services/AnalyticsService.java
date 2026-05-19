@@ -4,9 +4,11 @@ import com.yeskatronics.vs_recorder_backend.dto.AnalyticsDTO;
 import com.yeskatronics.vs_recorder_backend.dto.PokemonEntry;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
+import com.yeskatronics.vs_recorder_backend.entities.TeamMember;
 import com.yeskatronics.vs_recorder_backend.repositories.ReplayRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamRepository;
 import com.yeskatronics.vs_recorder_backend.utils.BattleLogParser;
+import com.yeskatronics.vs_recorder_backend.utils.PlayerIdentifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -477,25 +479,38 @@ public class AnalyticsService {
     }
 
     /**
-     * Identify which player in the battle data corresponds to the team owner
+     * Identify which player in the battle data corresponds to the team owner.
+     * Delegates to {@link PlayerIdentifier} so all four call sites share the same
+     * cascading match.
      */
     private String identifyPlayer(Team team, BattleLogParser.BattleData battleData) {
         if (battleData.getPlayer1() == null || battleData.getPlayer2() == null) {
             return null;
         }
 
-        for (String username : team.getShowdownUsernames()) {
-            if (battleData.getPlayer1().equalsIgnoreCase(username)) {
-                return battleData.getPlayer1();
-            }
-            if (battleData.getPlayer2().equalsIgnoreCase(username)) {
-                return battleData.getPlayer2();
-            }
-        }
+        Map<String, String> players = new HashMap<>();
+        players.put("p1", battleData.getPlayer1());
+        players.put("p2", battleData.getPlayer2());
 
-        // Default to player1 if no match
-        log.warn("Could not identify player for team {}, defaulting to player1", team.getId());
-        return battleData.getPlayer1();
+        Map<String, List<String>> teams = new HashMap<>();
+        teams.put("p1", battleData.getP1Team() != null ? battleData.getP1Team() : Collections.emptyList());
+        teams.put("p2", battleData.getP2Team() != null ? battleData.getP2Team() : Collections.emptyList());
+
+        List<String> roster = team.getTeamMembers() == null
+                ? Collections.emptyList()
+                : team.getTeamMembers().stream()
+                    .map(TeamMember::getPokemonName)
+                    .collect(Collectors.toList());
+
+        PlayerIdentifier.Identification id = PlayerIdentifier.identify(
+                team.getShowdownUsernames(),
+                roster,
+                players,
+                teams,
+                pokemonService);
+
+        String userUsername = id.userUsername();
+        return (userUsername == null || userUsername.isBlank()) ? battleData.getPlayer1() : userUsername;
     }
 
     /**
