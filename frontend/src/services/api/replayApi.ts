@@ -1,6 +1,19 @@
 import apiClient from "./client";
 import type { Replay } from "../../types";
 
+/**
+ * Non-persisting parse of a single replay, used by the bulk-import grouping step.
+ * Mirrors backend ShowdownDTO.ReplayPreview.
+ */
+export interface ReplayPreview {
+  url: string;
+  opponent: string;
+  result: string;
+  userTeam: string[];
+  matchesTeam: boolean;
+  identified: boolean;
+}
+
 export const replayApi = {
   getById: (id: number) =>
     apiClient.get(`/api/replays/${id}`) as Promise<Replay>,
@@ -10,6 +23,9 @@ export const replayApi = {
 
   createFromUrl: (teamId: number, url: string, notes = "", reviewed = false) =>
     apiClient.post(`/api/replays/from-url?teamId=${teamId}`, { url, notes, reviewed }) as Promise<Replay>,
+
+  previewFromUrl: (teamId: number, url: string) =>
+    apiClient.post(`/api/replays/preview?teamId=${teamId}`, { url }) as Promise<ReplayPreview>,
 
   create: (teamId: number, data: Partial<Replay>) =>
     apiClient.post(`/api/replays?teamId=${teamId}`, data) as Promise<Replay>,
