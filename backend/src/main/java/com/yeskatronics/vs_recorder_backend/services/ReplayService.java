@@ -139,6 +139,19 @@ public class ReplayService {
     }
 
     /**
+     * Preview a replay from URL WITHOUT persisting it. Used by the bulk-import flow to
+     * detect the team-of-six the owner ran in each replay so the UI can group them.
+     */
+    public ShowdownDTO.ReplayPreview previewReplayFromUrl(Long teamId, String url) {
+        url = url.split("\\?")[0];
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
+
+        return showdownService.previewReplay(url, team);
+    }
+
+    /**
      * Get a replay by ID
      *
      * @param id the replay ID

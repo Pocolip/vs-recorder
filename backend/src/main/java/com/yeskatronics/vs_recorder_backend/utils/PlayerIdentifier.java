@@ -77,14 +77,14 @@ public final class PlayerIdentifier {
         return new Identification(userSide, opp, userName, oppName);
     }
 
-    private static boolean nameMatches(String username, List<String> registered) {
+    public static boolean nameMatches(String username, List<String> registered) {
         if (username == null || username.isBlank() || registered == null) {
             return false;
         }
         return registered.stream().anyMatch(u -> u != null && u.equalsIgnoreCase(username));
     }
 
-    private static boolean teamMatches(
+    public static boolean teamMatches(
             List<String> revealed,
             List<String> registeredRoster,
             PokemonService pokemonService

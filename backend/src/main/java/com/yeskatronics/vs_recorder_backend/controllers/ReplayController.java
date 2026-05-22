@@ -2,6 +2,7 @@ package com.yeskatronics.vs_recorder_backend.controllers;
 
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.dto.ReplayDTO;
+import com.yeskatronics.vs_recorder_backend.dto.ShowdownDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.mappers.ReplayMapper;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
@@ -90,6 +91,33 @@ public class ReplayController {
 
         ReplayDTO.Summary response = replayMapper.toSummaryDTO(savedReplay);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Preview a replay from URL WITHOUT persisting it (bulk-import grouping step).
+     * POST /api/replays/preview?teamId={teamId}
+     *
+     * Returns the team-of-six the owner ran in this replay plus signal flags so the
+     * frontend can group replays by team before the user chooses what to import.
+     *
+     * @param teamId the team ID
+     * @param authentication the authenticated user
+     * @param request the replay URL
+     * @return the parsed (non-persisted) preview
+     */
+    @PostMapping("/preview")
+    public ResponseEntity<ShowdownDTO.ReplayPreview> previewReplayFromUrl(
+            @RequestParam Long teamId,
+            Authentication authentication,
+            @Valid @RequestBody ReplayDTO.CreateFromUrlRequest request) {
+
+        Long userId = getCurrentUserId(authentication);
+
+        // Verify team ownership
+        verifyTeamOwnership(teamId, userId);
+
+        ShowdownDTO.ReplayPreview preview = replayService.previewReplayFromUrl(teamId, request.getUrl());
+        return ResponseEntity.ok(preview);
     }
 
     /**
