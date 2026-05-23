@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-23-bulk-import",
+    "date": "2026-05-23",
+    "title": "Bulk Import Updates",
+    "message": "We've updated bulk replay imports to preview and sort in case users load replays from different teams. That means you'll only be able to import exact team matches, but we'll look to add versioning to teams in the future to allow more freedom during the teambuilding process."
+  },
+  {
     "id": "2026-05-18-vrpastes-support",
     "date": "2026-05-18",
     "title": "New: VR Paste Support",

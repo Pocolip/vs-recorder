@@ -3,7 +3,10 @@
  */
 
 import { replayApi } from "./api";
+import type { ReplayPreview } from "./api/replayApi";
 import type { Replay, Match } from "../types";
+
+export type { ReplayPreview } from "./api/replayApi";
 
 /**
  * Get a replay by ID
@@ -167,6 +170,39 @@ export async function createManyFromUrls(
   }
 
   return { success, failed };
+}
+
+/**
+ * Preview multiple replays from URLs WITHOUT persisting them, with progress callback.
+ * Used by the bulk-import flow to detect the team-of-six the owner ran in each replay
+ * so the UI can group them before the user chooses what to import.
+ */
+export async function previewManyFromUrls(
+  teamId: number,
+  urls: string[],
+  progressCallback?: (current: number, total: number) => void
+): Promise<{ previews: ReplayPreview[]; failed: { url: string; error: string }[] }> {
+  const previews: ReplayPreview[] = [];
+  const failed: { url: string; error: string }[] = [];
+
+  for (let i = 0; i < urls.length; i++) {
+    try {
+      const preview = await replayApi.previewFromUrl(teamId, urls[i]);
+      previews.push(preview);
+    } catch (error) {
+      failed.push({
+        url: urls[i],
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+    if (progressCallback) {
+      progressCallback(i + 1, urls.length);
+    }
+    // Add small delay between requests
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
+  return { previews, failed };
 }
 
 /**
