@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ChevronsUp,
   ChevronsDown,
+  Trophy,
 } from "lucide-react";
 import {
   DndContext,
@@ -29,6 +30,7 @@ import SortableOpponentTeamCard, {
 } from "../../components/team/SortableOpponentTeamCard";
 import LeadGroupCard from "../../components/team/LeadGroupCard";
 import AddOpponentTeamModal from "../../components/modals/AddOpponentTeamModal";
+import RecentTourModal from "../../components/modals/RecentTourModal";
 import TagInput from "../../components/form/TagInput";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useOpponentTeams } from "../../hooks/useOpponentTeams";
@@ -43,6 +45,7 @@ export default function MatchupPlannerPage() {
   const [parsingPokepaste, setParsingPokepaste] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+  const [showRecentTourModal, setShowRecentTourModal] = useState(false);
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [groupByLeads, setGroupByLeads] = useState(false);
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
@@ -172,6 +175,13 @@ export default function MatchupPlannerPage() {
     setShowAddTeamModal(false);
   };
 
+  const handleImportFromRecentTour = async (
+    pokepasteUrl: string,
+    notes: string,
+  ) => {
+    await createOpponentTeam({ pokepaste: pokepasteUrl, notes, color: "blue" });
+  };
+
   const handleUpdateNotes = async (
     opponentTeamId: number,
     updates: { pokepaste?: string; notes?: string; color?: string },
@@ -261,6 +271,14 @@ export default function MatchupPlannerPage() {
               >
                 <Layers className="h-4 w-4" />
                 Group By Leads
+              </button>
+              <button
+                onClick={() => setShowRecentTourModal(true)}
+                className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                title="Browse popular teams from recent tournaments"
+              >
+                <Trophy className="h-4 w-4" />
+                Recent Tour
               </button>
               <button
                 onClick={() => setShowAddTeamModal(true)}
@@ -458,6 +476,14 @@ export default function MatchupPlannerPage() {
         isOpen={showAddTeamModal}
         onClose={() => setShowAddTeamModal(false)}
         onSubmit={handleAddOpponentTeam}
+      />
+
+      {/* Recent Tour Modal */}
+      <RecentTourModal
+        isOpen={showRecentTourModal}
+        onClose={() => setShowRecentTourModal(false)}
+        teamRegulation={team?.regulation}
+        onImport={handleImportFromRecentTour}
       />
     </div>
     </>
