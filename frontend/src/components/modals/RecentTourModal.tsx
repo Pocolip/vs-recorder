@@ -213,9 +213,15 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="mx-2 my-4 flex max-h-[90vh] w-[calc(100vw-1rem)] max-w-4xl flex-col sm:mx-auto"
+      className="mx-2 my-4 w-[calc(100vw-1rem)] max-w-4xl overflow-hidden sm:mx-auto"
     >
-      <div className="flex flex-col overflow-hidden">
+      {/*
+        Explicit height (not just max-h) so the inner `flex-1 overflow-y-auto`
+        list has a definite parent height to fill — without it the list grows
+        to fit its content, overflows the dialog, and scroll-wheel events
+        bubble up to the Modal's outer wrapper.
+      */}
+      <div className="flex h-[calc(90vh-2rem)] max-h-[calc(100dvh-2rem)] flex-col">
         {/* Header */}
         <div className="border-b border-gray-200 px-5 pb-4 pt-5 dark:border-gray-700 sm:px-7 sm:pt-7">
           <h2 className="flex items-center gap-2 pr-10 text-lg font-semibold text-gray-800 dark:text-white/90 sm:text-xl">
@@ -272,7 +278,7 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
             </div>
 
             {/* Cluster list */}
-            <div className="flex-1 space-y-2 overflow-y-auto px-5 py-4 sm:px-7">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-5 py-4 sm:px-7">
               {composition && composition.clusters.length > 0 ? (
                 composition.clusters.map((cluster, idx) => {
                   const key = `${activeSize}-${idx}`;
