@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-05-24-recent-tour",
+    "date": "2026-05-24",
+    "title": "New: Recent Tour Imports",
+    "message": "The Matchup Planner has a new 'Recent Tour' button that lets you browse popular tournament team archetypes (4/5/6-mon compositions) from the last two months and import one straight into your matchups. Currently covers Regulation M-A — more regulations coming. Data sourced from labmaus.net."
+  },
+  {
     "id": "2026-05-23-bulk-import",
     "date": "2026-05-23",
     "title": "Bulk Import Updates",
