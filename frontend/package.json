@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:speed-tiers": "node ../scripts/generate-speed-tiers.js"
+    "generate:speed-tiers": "node ../scripts/generate-speed-tiers.js",
+    "generate:tournament-teams": "node ../scripts/generate-tournament-teams.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
