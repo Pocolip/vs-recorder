@@ -1,0 +1,68 @@
+name: Weekly Data Refresh
+
+# Pulls the latest NCP gen-10 setdex and LabMaus top-teams data once a week
+# and opens a single create-or-update PR against develop for review.
+
+on:
+  schedule:
+    - cron: '0 16 * * 1'   # Mondays 16:00 UTC (9am PT / 12pm ET)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Refresh NCP setdex (gen 10)
+        run: node scripts/update-setdex-gen10.js
+
+      - name: Regenerate speed tiers
+        run: node scripts/generate-speed-tiers.js
+
+      - name: Refresh tournament teams (LabMaus)
+        run: node scripts/generate-tournament-teams.js
+
+      - name: Open or update PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: develop
+          branch: chore/weekly-data-refresh
+          delete-branch: true
+          commit-message: 'chore: weekly data refresh'
+          title: 'chore: weekly data refresh'
+          body: |
+            Automated weekly refresh.
+
+            **Possible changes:**
+            - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js)
+            - `frontend/src/data/speedTiers-regM-A.json` — regenerated from the setdex above
+            - `frontend/src/data/tournamentTeams-regM-A.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-A)
+
+            If none of the upstream sources changed, this PR will not be opened.
+
+            > Auto-created PRs do not trigger CI by default. To run the frontend build against these changes, close and reopen the PR, or push an empty commit.
+          add-paths: |
+            frontend/src/data/setdex-gen10.ts
+            frontend/src/data/speedTiers-regM-A.json
+            frontend/src/data/tournamentTeams-regM-A.json
+          labels: |
+            automated
+            data-refresh
