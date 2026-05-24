@@ -288,6 +288,10 @@ function parseNameLine(line: string): {
     name = name.split(" @ ")[0];
   }
 
+  // Strip "Mega " prefix some pastes use (e.g. "Mega Floette @ Floettite").
+  // The mega forme is signaled by the item; the species name should stay base.
+  name = name.replace(/^Mega\s+/i, "");
+
   // Extract gender
   if (name.includes(" (M)")) {
     gender = "M";
