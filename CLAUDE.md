@@ -219,6 +219,10 @@ Each species gets four rows (252+, 252 neutral, 0 neutral, 0 -Spe). Mega formes 
 
 Re-run after editing `setdex-gen10.ts`, `megaStones.ts`, or `speed-tier-overrides.json`, or when bumping `@smogon/calc`.
 
+### Automated weekly refresh
+
+`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`), then regenerates `speedTiers-regM-A.json` and `tournamentTeams-regM-A.json` from it. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged.
+
 ## Important Notes
 
 ### Backend
