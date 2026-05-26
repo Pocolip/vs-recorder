@@ -77,6 +77,8 @@ public class ReplayService {
             handleBo3Match(savedReplay, matchInfo, team);
         }
 
+        touchTeam(team.getId());
+
         log.info("Replay created successfully with ID: {}", savedReplay.getId());
 
         return savedReplay;
@@ -133,6 +135,8 @@ public class ReplayService {
         if (matchInfo.isBo3()) {
             handleBo3Match(savedReplay, matchInfo, team);
         }
+
+        touchTeam(team.getId());
 
         log.info("Replay created from URL with ID: {}", savedReplay.getId());
         return savedReplay;
@@ -317,6 +321,11 @@ public class ReplayService {
         // Note: battleLog is immutable and should not be updated
 
         Replay savedReplay = replayRepository.save(existingReplay);
+
+        if (savedReplay.getTeam() != null) {
+            touchTeam(savedReplay.getTeam().getId());
+        }
+
         log.info("Replay updated successfully: {}", savedReplay.getId());
 
         return savedReplay;
@@ -374,11 +383,17 @@ public class ReplayService {
     public void deleteReplay(Long id) {
         log.info("Deleting replay ID: {}", id);
 
-        if (!replayRepository.existsById(id)) {
-            throw new IllegalArgumentException("Replay not found with ID: " + id);
+        Replay replay = replayRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Replay not found with ID: " + id));
+
+        Long teamId = replay.getTeam() != null ? replay.getTeam().getId() : null;
+
+        replayRepository.delete(replay);
+
+        if (teamId != null) {
+            touchTeam(teamId);
         }
 
-        replayRepository.deleteById(id);
         log.info("Replay deleted successfully: {}", id);
     }
 
@@ -441,6 +456,19 @@ public class ReplayService {
     @Transactional(readOnly = true)
     public boolean replayUrlExists(String url) {
         return replayRepository.existsByUrl(url);
+    }
+
+    // ==================== Team activity timestamp ====================
+
+    /**
+     * Bump the parent team's updatedAt. Inlined here (rather than calling
+     * TeamService) to avoid a circular bean dependency: TeamService -> ReplayService.
+     */
+    private void touchTeam(Long teamId) {
+        teamRepository.findById(teamId).ifPresent(team -> {
+            team.setUpdatedAt(LocalDateTime.now());
+            teamRepository.save(team);
+        });
     }
 
     // ==================== Replay Reprocessing ====================
