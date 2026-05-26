@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -297,6 +298,18 @@ public class TeamService {
     @Transactional(readOnly = true)
     public long countTeamsByUserId(Long userId) {
         return teamRepository.countByUserId(userId);
+    }
+
+    /**
+     * Bump the team's updatedAt timestamp to reflect activity on a child entity
+     * (replay, team member notes, matchup planner). Silently no-ops if the team
+     * does not exist.
+     */
+    public void touchTeam(Long teamId) {
+        teamRepository.findById(teamId).ifPresent(team -> {
+            team.setUpdatedAt(LocalDateTime.now());
+            teamRepository.save(team);
+        });
     }
 
     /**

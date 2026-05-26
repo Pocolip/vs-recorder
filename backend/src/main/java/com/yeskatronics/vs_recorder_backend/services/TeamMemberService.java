@@ -23,6 +23,7 @@ public class TeamMemberService {
 
     private final TeamMemberRepository teamMemberRepository;
     private final TeamRepository teamRepository;
+    private final TeamService teamService;
 
     public TeamMember createTeamMember(TeamMember teamMember, Long teamId) {
         log.info("Creating team member for team ID: {}", teamId);
@@ -61,7 +62,13 @@ public class TeamMemberService {
             existing.setCalcs(updates.getCalcs());
         }
 
-        return teamMemberRepository.save(existing);
+        TeamMember saved = teamMemberRepository.save(existing);
+
+        if (saved.getTeam() != null) {
+            teamService.touchTeam(saved.getTeam().getId());
+        }
+
+        return saved;
     }
 
     public void deleteTeamMember(Long id) {

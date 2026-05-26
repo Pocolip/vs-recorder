@@ -29,6 +29,17 @@ public class GamePlanService {
     private final GamePlanRepository gamePlanRepository;
     private final GamePlanTeamRepository gamePlanTeamRepository;
     private final UserRepository userRepository;
+    private final TeamService teamService;
+
+    /**
+     * Bump the team's updatedAt when a matchup-planner edit lands. Safe no-op
+     * for legacy/standalone game plans that aren't linked to a team.
+     */
+    private void touchLinkedTeam(GamePlan plan) {
+        if (plan != null && plan.getTeamId() != null) {
+            teamService.touchTeam(plan.getTeamId());
+        }
+    }
 
     // ==================== GamePlan CRUD ====================
 
@@ -115,6 +126,7 @@ public class GamePlanService {
         }
 
         GamePlan savedPlan = gamePlanRepository.save(existingPlan);
+        touchLinkedTeam(savedPlan);
         log.info("Game plan updated successfully: {}", id);
 
         return savedPlan;
@@ -226,6 +238,7 @@ public class GamePlanService {
         team.setPosition(0);
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(team);
+        touchLinkedTeam(gamePlan);
         log.info("Team added successfully with ID: {}", savedTeam.getId());
 
         return savedTeam;
@@ -267,9 +280,8 @@ public class GamePlanService {
     public void reorderTeams(Long gamePlanId, Long userId, List<Long> orderedIds) {
         log.info("Reordering {} teams for game plan ID: {}", orderedIds.size(), gamePlanId);
 
-        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
-            throw new IllegalArgumentException("Game plan not found or not owned by user");
-        }
+        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
         List<GamePlanTeam> teams = gamePlanTeamRepository.findByGamePlanIdOrderByPositionAscIdAsc(gamePlanId);
         if (teams.size() != orderedIds.size()) {
@@ -288,6 +300,7 @@ public class GamePlanService {
         }
 
         gamePlanTeamRepository.saveAll(teams);
+        touchLinkedTeam(plan);
         log.info("Reordered teams for game plan ID: {}", gamePlanId);
     }
 
@@ -304,10 +317,8 @@ public class GamePlanService {
     public GamePlanTeam updateGamePlanTeam(Long id, Long gamePlanId, Long userId, GamePlanTeam updates) {
         log.info("Updating game plan team ID: {}", id);
 
-        // Verify game plan ownership
-        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
-            throw new IllegalArgumentException("Game plan not found or not owned by user");
-        }
+        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
         GamePlanTeam existingTeam = gamePlanTeamRepository.findByIdAndGamePlanId(id, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -324,6 +335,7 @@ public class GamePlanService {
         }
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(existingTeam);
+        touchLinkedTeam(plan);
         log.info("Game plan team updated successfully: {}", id);
 
         return savedTeam;
@@ -340,15 +352,14 @@ public class GamePlanService {
     public void deleteGamePlanTeam(Long id, Long gamePlanId, Long userId) {
         log.info("Deleting game plan team ID: {}", id);
 
-        // Verify game plan ownership
-        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
-            throw new IllegalArgumentException("Game plan not found or not owned by user");
-        }
+        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(id, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
 
         gamePlanTeamRepository.delete(team);
+        touchLinkedTeam(plan);
         log.info("Game plan team deleted successfully: {}", id);
     }
 
@@ -368,10 +379,8 @@ public class GamePlanService {
                                        GamePlanTeam.TeamComposition composition) {
         log.info("Adding composition to game plan team ID: {}", teamId);
 
-        // Verify game plan ownership
-        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
-            throw new IllegalArgumentException("Game plan not found or not owned by user");
-        }
+        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(teamId, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -379,6 +388,7 @@ public class GamePlanService {
         team.addComposition(composition);
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(team);
+        touchLinkedTeam(plan);
         log.info("Composition added successfully to team ID: {}", teamId);
 
         return savedTeam;
@@ -399,10 +409,8 @@ public class GamePlanService {
                                           int index, GamePlanTeam.TeamComposition composition) {
         log.info("Updating composition {} in game plan team ID: {}", index, teamId);
 
-        // Verify game plan ownership
-        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
-            throw new IllegalArgumentException("Game plan not found or not owned by user");
-        }
+        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(teamId, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -414,6 +422,7 @@ public class GamePlanService {
         team.updateComposition(index, composition);
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(team);
+        touchLinkedTeam(plan);
         log.info("Composition updated successfully at index {}", index);
 
         return savedTeam;
@@ -432,10 +441,8 @@ public class GamePlanService {
     public GamePlanTeam deleteComposition(Long teamId, Long gamePlanId, Long userId, int index) {
         log.info("Deleting composition {} from game plan team ID: {}", index, teamId);
 
-        // Verify game plan ownership
-        if (!gamePlanRepository.existsByIdAndUserId(gamePlanId, userId)) {
-            throw new IllegalArgumentException("Game plan not found or not owned by user");
-        }
+        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(teamId, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -447,6 +454,7 @@ public class GamePlanService {
         team.removeComposition(index);
 
         GamePlanTeam savedTeam = gamePlanTeamRepository.save(team);
+        touchLinkedTeam(plan);
         log.info("Composition deleted successfully at index {}", index);
 
         return savedTeam;
