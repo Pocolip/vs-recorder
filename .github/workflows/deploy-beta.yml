@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'feat/**'
       - 'fix/**'
       - 'bugfix/**'
   workflow_dispatch:  # Allow manual trigger from GitHub UI
