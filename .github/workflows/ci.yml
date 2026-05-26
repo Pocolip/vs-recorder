@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'feat/**'
       - 'fix/**'
       - 'bugfix/**'
   pull_request:
