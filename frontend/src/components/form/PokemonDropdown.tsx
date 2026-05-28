@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import PokemonSprite from "../pokemon/PokemonSprite";
 import { getDisplayName } from "../../utils/pokemonNameUtils";
@@ -22,7 +23,12 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [menuPosition, setMenuPosition] = useState<
+    { top: number; left: number; width: number } | null
+  >(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -34,23 +40,48 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
     setSearchTerm("");
   };
 
+  useLayoutEffect(() => {
+    if (!isOpen || !buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setMenuPosition({
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, [isOpen]);
+
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const insideTrigger = dropdownRef.current?.contains(target);
+      const insideMenu = menuRef.current?.contains(target);
+      if (!insideTrigger && !insideMenu) {
         setIsOpen(false);
         setSearchTerm("");
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
+    const handleDismiss = () => {
+      setIsOpen(false);
+      setSearchTerm("");
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleDismiss, true);
+    window.addEventListener("resize", handleDismiss);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleDismiss, true);
+      window.removeEventListener("resize", handleDismiss);
+    };
   }, [isOpen]);
 
   return (
     <div ref={dropdownRef} className="relative">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
@@ -77,55 +108,65 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
         />
       </button>
 
-      {isOpen && (
-        <div className="absolute z-50 mt-1 flex max-h-64 w-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
-          {options.length > 5 && (
-            <div className="border-b border-gray-200 p-2 dark:border-gray-700">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search Pokemon..."
-                className="w-full rounded border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-600 dark:text-white/90 dark:placeholder-gray-500"
-                autoFocus
-              />
-            </div>
-          )}
-
-          <div className="max-h-52 overflow-y-auto">
-            {filteredOptions.length === 0 ? (
-              <div className="px-3 py-2 text-center text-sm text-gray-400">
-                No Pokemon found
+      {isOpen && menuPosition &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="fixed z-50 flex max-h-64 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
+            style={{
+              top: menuPosition.top,
+              left: menuPosition.left,
+              width: menuPosition.width,
+            }}
+          >
+            {options.length > 5 && (
+              <div className="border-b border-gray-200 p-2 dark:border-gray-700">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search Pokemon..."
+                  className="w-full rounded border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-600 dark:text-white/90 dark:placeholder-gray-500"
+                  autoFocus
+                />
               </div>
-            ) : (
-              filteredOptions.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => handleSelect(option)}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                    value === option
-                      ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400"
-                      : "text-gray-800 dark:text-white/90"
-                  }`}
-                >
-                  {showSprite && (
-                    <div className="flex-shrink-0">
-                      <PokemonSprite name={option} size="sm" />
-                    </div>
-                  )}
-                  <span className="text-sm">{getDisplayName(option)}</span>
-                  {value === option && (
-                    <span className="ml-auto text-brand-500 dark:text-brand-400">
-                      &#10003;
-                    </span>
-                  )}
-                </button>
-              ))
             )}
-          </div>
-        </div>
-      )}
+
+            <div className="max-h-52 overflow-y-auto">
+              {filteredOptions.length === 0 ? (
+                <div className="px-3 py-2 text-center text-sm text-gray-400">
+                  No Pokemon found
+                </div>
+              ) : (
+                filteredOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => handleSelect(option)}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                      value === option
+                        ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400"
+                        : "text-gray-800 dark:text-white/90"
+                    }`}
+                  >
+                    {showSprite && (
+                      <div className="flex-shrink-0">
+                        <PokemonSprite name={option} size="sm" />
+                      </div>
+                    )}
+                    <span className="text-sm">{getDisplayName(option)}</span>
+                    {value === option && (
+                      <span className="ml-auto text-brand-500 dark:text-brand-400">
+                        &#10003;
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
