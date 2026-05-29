@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import PokemonSprite from "../pokemon/PokemonSprite";
@@ -21,10 +21,13 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
   disabled = false,
   showSprite = true,
 }) => {
+  const MENU_MAX_HEIGHT = 256;
+  const MENU_GAP = 4;
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [menuPosition, setMenuPosition] = useState<
-    { top: number; left: number; width: number } | null
+    { top: number; left: number; width: number; placement: "below" | "above" } | null
   >(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -40,15 +43,30 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
     setSearchTerm("");
   };
 
-  useLayoutEffect(() => {
-    if (!isOpen || !buttonRef.current) return;
+  const updatePosition = useCallback(() => {
+    if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) {
+      setIsOpen(false);
+      setSearchTerm("");
+      return;
+    }
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const openAbove =
+      spaceBelow < MENU_MAX_HEIGHT + MENU_GAP && spaceAbove > spaceBelow;
     setMenuPosition({
-      top: rect.bottom + 4,
+      top: openAbove ? rect.top - MENU_GAP : rect.bottom + MENU_GAP,
       left: rect.left,
       width: rect.width,
+      placement: openAbove ? "above" : "below",
     });
-  }, [isOpen]);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    updatePosition();
+  }, [isOpen, updatePosition]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -63,20 +81,15 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
       }
     };
 
-    const handleDismiss = () => {
-      setIsOpen(false);
-      setSearchTerm("");
-    };
-
     document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("scroll", handleDismiss, true);
-    window.addEventListener("resize", handleDismiss);
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", handleDismiss, true);
-      window.removeEventListener("resize", handleDismiss);
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
     };
-  }, [isOpen]);
+  }, [isOpen, updatePosition]);
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -117,6 +130,8 @@ const PokemonDropdown: React.FC<PokemonDropdownProps> = ({
               top: menuPosition.top,
               left: menuPosition.left,
               width: menuPosition.width,
+              transform:
+                menuPosition.placement === "above" ? "translateY(-100%)" : undefined,
             }}
           >
             {options.length > 5 && (
