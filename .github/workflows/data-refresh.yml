@@ -36,6 +36,18 @@ jobs:
       - name: Regenerate speed tiers
         run: node scripts/generate-speed-tiers.js
 
+      - name: Prep CA bundle for labmaus.net
+        # labmaus.net's TLS server only sends its leaf cert. macOS curl does
+        # AIA fetching of the missing intermediate; Linux curl does not. Pull
+        # the Sectigo intermediate the leaf cert advertises and append it to
+        # the system bundle so curl in the next step can build the chain.
+        run: |
+          set -euo pipefail
+          curl -sSf http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt -o /tmp/sectigo-intermediate.crt
+          openssl x509 -inform DER -in /tmp/sectigo-intermediate.crt -out /tmp/sectigo-intermediate.pem
+          cat /etc/ssl/certs/ca-certificates.crt /tmp/sectigo-intermediate.pem > /tmp/ca-bundle.pem
+          echo "CURL_CA_BUNDLE=/tmp/ca-bundle.pem" >> "$GITHUB_ENV"
+
       - name: Refresh tournament teams (LabMaus)
         run: node scripts/generate-tournament-teams.js
 
