@@ -2,10 +2,10 @@
   "regulation": "M-A",
   "labmausRegulation": "Regulation Set M-A",
   "dateRange": {
-    "from": "2026-04-08",
-    "to": "2026-06-07"
+    "from": "2026-04-09",
+    "to": "2026-06-08"
   },
-  "generatedAt": "2026-06-07",
+  "generatedAt": "2026-06-08",
   "compositions": [
     {
       "size": 4,
@@ -23,8 +23,8 @@
             "Basculegion-M",
             "Kingambit"
           ],
-          "wins": 1897,
-          "losses": 901,
+          "wins": 1911,
+          "losses": 910,
           "teams": [
             {
               "name": "mudhiman",
@@ -341,8 +341,8 @@
             "Whimsicott",
             "Kingambit"
           ],
-          "wins": 1313,
-          "losses": 585,
+          "wins": 1327,
+          "losses": 594,
           "teams": [
             {
               "name": "BIlllmads",
@@ -659,8 +659,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 1195,
-          "losses": 509,
+          "wins": 1205,
+          "losses": 514,
           "teams": [
             {
               "name": "Shishio_Ax",
@@ -977,8 +977,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 1109,
-          "losses": 474,
+          "wins": 1117,
+          "losses": 479,
           "teams": [
             {
               "name": "soahmed",
@@ -1295,8 +1295,8 @@
             "Garchomp",
             "Kingambit"
           ],
-          "wins": 1281,
-          "losses": 590,
+          "wins": 1288,
+          "losses": 592,
           "teams": [
             {
               "name": "mudhiman",
@@ -1613,7 +1613,7 @@
             "Basculegion-M",
             "Kingambit"
           ],
-          "wins": 1237,
+          "wins": 1245,
           "losses": 579,
           "teams": [
             {
@@ -1931,8 +1931,8 @@
             "Whimsicott",
             "Basculegion-M"
           ],
-          "wins": 1181,
-          "losses": 550,
+          "wins": 1199,
+          "losses": 561,
           "teams": [
             {
               "name": "sword",
@@ -2249,8 +2249,8 @@
             "Garchomp",
             "Basculegion-M"
           ],
-          "wins": 1121,
-          "losses": 559,
+          "wins": 1125,
+          "losses": 562,
           "teams": [
             {
               "name": "mudhiman",
@@ -2567,8 +2567,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 1165,
-          "losses": 515,
+          "wins": 1172,
+          "losses": 517,
           "teams": [
             {
               "name": "Grimmothy_Snarl",
@@ -2885,8 +2885,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 996,
-          "losses": 453,
+          "wins": 1003,
+          "losses": 455,
           "teams": [
             {
               "name": "BIlllmads",
@@ -3203,8 +3203,8 @@
             "Basculegion-M",
             "Kingambit"
           ],
-          "wins": 1009,
-          "losses": 459,
+          "wins": 1027,
+          "losses": 470,
           "teams": [
             {
               "name": "sword",
@@ -3521,8 +3521,8 @@
             "Basculegion-M",
             "Kingambit"
           ],
-          "wins": 995,
-          "losses": 450,
+          "wins": 1009,
+          "losses": 459,
           "teams": [
             {
               "name": "sword",
@@ -4157,8 +4157,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 937,
-          "losses": 399,
+          "wins": 947,
+          "losses": 404,
           "teams": [
             {
               "name": "TingusThePingus",
@@ -4793,8 +4793,8 @@
             "Pelipper",
             "Basculegion-M"
           ],
-          "wins": 1008,
-          "losses": 482,
+          "wins": 1012,
+          "losses": 485,
           "teams": [
             {
               "name": "BlackwingKakashi",
@@ -5747,8 +5747,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 839,
-          "losses": 367,
+          "wins": 853,
+          "losses": 375,
           "teams": [
             {
               "name": "MegaUmbreonVGC",
@@ -6065,8 +6065,8 @@
             "Incineroar",
             "Sneasler"
           ],
-          "wins": 805,
-          "losses": 400,
+          "wins": 823,
+          "losses": 407,
           "teams": [
             {
               "name": "Selahattin Sturm",
@@ -6383,8 +6383,8 @@
             "Garchomp",
             "Sylveon"
           ],
-          "wins": 776,
-          "losses": 365,
+          "wins": 780,
+          "losses": 368,
           "teams": [
             {
               "name": "Mentosbombe",
@@ -7326,324 +7326,6 @@
         },
         {
           "pokemon": [
-            "006",
-            "445",
-            "700",
-            "902"
-          ],
-          "pokemonNames": [
-            "Charizard",
-            "Garchomp",
-            "Sylveon",
-            "Basculegion-M"
-          ],
-          "wins": 713,
-          "losses": 348,
-          "teams": [
-            {
-              "name": "Mentosbombe",
-              "placement": 3,
-              "record": "10-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/5b6333455eb1d308",
-              "tournamentName": "SpearPillar Champions Tour #4 | Reg M-A $100 Prize"
-            },
-            {
-              "name": "Kojay",
-              "placement": 4,
-              "record": "10-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/026ccbe833514d3c",
-              "tournamentName": "SpearPillar Champions Tour #4 | Reg M-A $100 Prize"
-            },
-            {
-              "name": "PlasmaCap",
-              "placement": 4,
-              "record": "9-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/ff49735cfdef034e",
-              "tournamentName": "Maddo's Cup #8 | 100€ for the Winner | Reg M-A"
-            },
-            {
-              "name": "Duxlemon",
-              "placement": 1,
-              "record": "9-1-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/ea25e09006131d26",
-              "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
-            },
-            {
-              "name": "BigNation",
-              "placement": 1,
-              "record": "10-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/800a3c915f24ab69",
-              "tournamentName": "Chaos League Sunday Slam #100 ($100 Prize Pool)"
-            },
-            {
-              "name": "Kojay",
-              "placement": 1,
-              "record": "9-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/f72602b39bd3b599",
-              "tournamentName": "10ToesDownVGC #31 Champions $100 Top 4(Late Join)"
-            },
-            {
-              "name": "Chrom",
-              "placement": 23,
-              "record": "12-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/c8fc5bcfddc17b3b",
-              "tournamentName": "The Grand Champions Festival"
-            },
-            {
-              "name": "Kojay",
-              "placement": 2,
-              "record": "9-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/0575b8df0394ea8c",
-              "tournamentName": "*Sitrus-Series*|Champions|$50 to winner|#58"
-            },
-            {
-              "name": "P_Amyrand",
-              "placement": 2,
-              "record": "8-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/0df4d758e8e4565c",
-              "tournamentName": "Alpensee Tour (Reg M-A) #58"
-            },
-            {
-              "name": "charpie",
-              "placement": 2,
-              "record": "8-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/8bbaa9c426e9010b",
-              "tournamentName": "VGCA Battle Hall: Academy Ace Edition #1"
-            },
-            {
-              "name": "Kojay",
-              "placement": 3,
-              "record": "8-1-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/7caaeccf61114454",
-              "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
-            },
-            {
-              "name": "KKCWind",
-              "placement": 4,
-              "record": "7-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/dadb91d6f888bff0",
-              "tournamentName": "Sheep Cup#14[Reg M-A]"
-            },
-            {
-              "name": "TheGamerVGC",
-              "placement": 5,
-              "record": "8-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/fe863526ff682822",
-              "tournamentName": "SpearPillar Champions Tour #5 | Reg M-A $100 Prize"
-            },
-            {
-              "name": "B3rtani",
-              "placement": 6,
-              "record": "8-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/b0dacd199c393647",
-              "tournamentName": "Maddo's Cup #8 | 100€ for the Winner | Reg M-A"
-            },
-            {
-              "name": "Ksomon",
-              "placement": 1,
-              "record": "10-0-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/ebef6770b45e9f2f",
-              "tournamentName": "Champions Collective #9"
-            },
-            {
-              "name": "WoChienReaction",
-              "placement": 1,
-              "record": "7-1-0",
-              "pokemonNames": [
-                "Charizard",
-                "Chimecho",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Sneasler"
-              ],
-              "pokepasteUrl": "https://pokepast.es/eccfe0e23bb7c725",
-              "tournamentName": "Intimidators Champions Challenge #10- REG M-A"
-            },
-            {
-              "name": "NMR | FelipeT",
-              "placement": 1,
-              "record": "8-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/9da3ce35f701f567",
-              "tournamentName": "The Drywalls Series #5 - Champions!"
-            },
-            {
-              "name": "Abe",
-              "placement": 1,
-              "record": "7-2-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Farigiraf"
-              ],
-              "pokepasteUrl": "https://pokepast.es/6a0fdb49e963db57",
-              "tournamentName": "VGC Trainer School; champions M/A #6"
-            },
-            {
-              "name": "washy",
-              "placement": 1,
-              "record": "5-0-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/428cc9b02a20bdb6",
-              "tournamentName": "Pokepal Smackdown #143 (Champions) (Reg M-A)"
-            },
-            {
-              "name": "DaniVGC03",
-              "placement": 6,
-              "record": "6-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/fa7a9a3ddc0f8c45",
-              "tournamentName": "Alpensee Tour (Reg M-A) #58"
-            }
-          ]
-        },
-        {
-          "pokemon": [
             "142",
             "445",
             "700",
@@ -7655,8 +7337,8 @@
             "Sylveon",
             "Basculegion-M"
           ],
-          "wins": 687,
-          "losses": 341,
+          "wins": 699,
+          "losses": 344,
           "teams": [
             {
               "name": "Mentosbombe",
@@ -7962,6 +7644,324 @@
         },
         {
           "pokemon": [
+            "006",
+            "445",
+            "700",
+            "902"
+          ],
+          "pokemonNames": [
+            "Charizard",
+            "Garchomp",
+            "Sylveon",
+            "Basculegion-M"
+          ],
+          "wins": 722,
+          "losses": 353,
+          "teams": [
+            {
+              "name": "Mentosbombe",
+              "placement": 3,
+              "record": "10-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/5b6333455eb1d308",
+              "tournamentName": "SpearPillar Champions Tour #4 | Reg M-A $100 Prize"
+            },
+            {
+              "name": "Kojay",
+              "placement": 4,
+              "record": "10-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/026ccbe833514d3c",
+              "tournamentName": "SpearPillar Champions Tour #4 | Reg M-A $100 Prize"
+            },
+            {
+              "name": "PlasmaCap",
+              "placement": 4,
+              "record": "9-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/ff49735cfdef034e",
+              "tournamentName": "Maddo's Cup #8 | 100€ for the Winner | Reg M-A"
+            },
+            {
+              "name": "Duxlemon",
+              "placement": 1,
+              "record": "9-1-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/ea25e09006131d26",
+              "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
+            },
+            {
+              "name": "BigNation",
+              "placement": 1,
+              "record": "10-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/800a3c915f24ab69",
+              "tournamentName": "Chaos League Sunday Slam #100 ($100 Prize Pool)"
+            },
+            {
+              "name": "Kojay",
+              "placement": 1,
+              "record": "9-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/f72602b39bd3b599",
+              "tournamentName": "10ToesDownVGC #31 Champions $100 Top 4(Late Join)"
+            },
+            {
+              "name": "Chrom",
+              "placement": 23,
+              "record": "12-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/c8fc5bcfddc17b3b",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "Kojay",
+              "placement": 2,
+              "record": "9-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/0575b8df0394ea8c",
+              "tournamentName": "*Sitrus-Series*|Champions|$50 to winner|#58"
+            },
+            {
+              "name": "P_Amyrand",
+              "placement": 2,
+              "record": "8-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/0df4d758e8e4565c",
+              "tournamentName": "Alpensee Tour (Reg M-A) #58"
+            },
+            {
+              "name": "charpie",
+              "placement": 2,
+              "record": "8-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/8bbaa9c426e9010b",
+              "tournamentName": "VGCA Battle Hall: Academy Ace Edition #1"
+            },
+            {
+              "name": "Kojay",
+              "placement": 3,
+              "record": "8-1-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/7caaeccf61114454",
+              "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
+            },
+            {
+              "name": "KKCWind",
+              "placement": 4,
+              "record": "7-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/dadb91d6f888bff0",
+              "tournamentName": "Sheep Cup#14[Reg M-A]"
+            },
+            {
+              "name": "TheGamerVGC",
+              "placement": 5,
+              "record": "8-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/fe863526ff682822",
+              "tournamentName": "SpearPillar Champions Tour #5 | Reg M-A $100 Prize"
+            },
+            {
+              "name": "B3rtani",
+              "placement": 6,
+              "record": "8-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/b0dacd199c393647",
+              "tournamentName": "Maddo's Cup #8 | 100€ for the Winner | Reg M-A"
+            },
+            {
+              "name": "Ksomon",
+              "placement": 1,
+              "record": "10-0-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/ebef6770b45e9f2f",
+              "tournamentName": "Champions Collective #9"
+            },
+            {
+              "name": "WoChienReaction",
+              "placement": 1,
+              "record": "7-1-0",
+              "pokemonNames": [
+                "Charizard",
+                "Chimecho",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Sneasler"
+              ],
+              "pokepasteUrl": "https://pokepast.es/eccfe0e23bb7c725",
+              "tournamentName": "Intimidators Champions Challenge #10- REG M-A"
+            },
+            {
+              "name": "NMR | FelipeT",
+              "placement": 1,
+              "record": "8-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/9da3ce35f701f567",
+              "tournamentName": "The Drywalls Series #5 - Champions!"
+            },
+            {
+              "name": "Abe",
+              "placement": 1,
+              "record": "7-2-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Farigiraf"
+              ],
+              "pokepasteUrl": "https://pokepast.es/6a0fdb49e963db57",
+              "tournamentName": "VGC Trainer School; champions M/A #6"
+            },
+            {
+              "name": "washy",
+              "placement": 1,
+              "record": "5-0-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/428cc9b02a20bdb6",
+              "tournamentName": "Pokepal Smackdown #143 (Champions) (Reg M-A)"
+            },
+            {
+              "name": "DaniVGC03",
+              "placement": 6,
+              "record": "6-3-0",
+              "pokemonNames": [
+                "Charizard",
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/fa7a9a3ddc0f8c45",
+              "tournamentName": "Alpensee Tour (Reg M-A) #58"
+            }
+          ]
+        },
+        {
+          "pokemon": [
             "003",
             "006",
             "445",
@@ -7969,7 +7969,7 @@
           ],
           "pokemonNames": [
             "Venusaur",
-            "Charizard-Mega Y",
+            "Charizard",
             "Garchomp",
             "Incineroar"
           ],
@@ -8927,8 +8927,8 @@
             "Whimsicott",
             "Glimmora"
           ],
-          "wins": 738,
-          "losses": 356,
+          "wins": 754,
+          "losses": 366,
           "teams": [
             {
               "name": "Drurtle",
@@ -9245,8 +9245,8 @@
             "Basculegion-M",
             "Glimmora"
           ],
-          "wins": 730,
-          "losses": 354,
+          "wins": 742,
+          "losses": 362,
           "teams": [
             {
               "name": "Drurtle",
@@ -9570,8 +9570,8 @@
             "Basculegion-M",
             "Kingambit"
           ],
-          "wins": 915,
-          "losses": 406,
+          "wins": 929,
+          "losses": 415,
           "teams": [
             {
               "name": "sword",
@@ -10210,8 +10210,8 @@
             "Basculegion-M",
             "Glimmora"
           ],
-          "wins": 677,
-          "losses": 323,
+          "wins": 689,
+          "losses": 331,
           "teams": [
             {
               "name": "Drurtle",
@@ -10530,8 +10530,8 @@
             "Sylveon",
             "Basculegion-M"
           ],
-          "wins": 620,
-          "losses": 306,
+          "wins": 624,
+          "losses": 309,
           "teams": [
             {
               "name": "Mentosbombe",
@@ -10850,8 +10850,8 @@
             "Glimmora",
             "Kingambit"
           ],
-          "wins": 538,
-          "losses": 249,
+          "wins": 546,
+          "losses": 255,
           "teams": [
             {
               "name": "Drurtle",
@@ -11170,8 +11170,8 @@
             "Glimmora",
             "Kingambit"
           ],
-          "wins": 519,
-          "losses": 238,
+          "wins": 527,
+          "losses": 244,
           "teams": [
             {
               "name": "Drurtle",
@@ -11490,8 +11490,8 @@
             "Glimmora",
             "Kingambit"
           ],
-          "wins": 523,
-          "losses": 246,
+          "wins": 531,
+          "losses": 252,
           "teams": [
             {
               "name": "Drurtle",
@@ -11810,8 +11810,8 @@
             "Glimmora",
             "Kingambit"
           ],
-          "wins": 512,
-          "losses": 238,
+          "wins": 520,
+          "losses": 244,
           "teams": [
             {
               "name": "Drurtle",
@@ -12130,8 +12130,8 @@
             "Pelipper",
             "Basculegion-M"
           ],
-          "wins": 558,
-          "losses": 230,
+          "wins": 562,
+          "losses": 233,
           "teams": [
             {
               "name": "LovelyLuna",
@@ -12450,8 +12450,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 409,
-          "losses": 164,
+          "wins": 416,
+          "losses": 166,
           "teams": [
             {
               "name": "Shishio_Ax",
@@ -13730,8 +13730,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 392,
-          "losses": 161,
+          "wins": 395,
+          "losses": 164,
           "teams": [
             {
               "name": "TingusThePingus",
@@ -14002,6 +14002,326 @@
               ],
               "pokepasteUrl": "https://pokepast.es/835eb024d4c30335",
               "tournamentName": "[REG M-A] LearningtoSam's Weekly"
+            },
+            {
+              "name": "Sakusa",
+              "placement": 10,
+              "record": "6-2-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/1845dbc08603c8cc",
+              "tournamentName": "Champions Cup"
+            },
+            {
+              "name": "Novastence",
+              "placement": 13,
+              "record": "7-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/eb3f42ca3e490949",
+              "tournamentName": "Maddo's Cup #8 | 100€ for the Winner | Reg M-A"
+            }
+          ]
+        },
+        {
+          "pokemon": [
+            "445",
+            "478",
+            "902",
+            "903",
+            "983"
+          ],
+          "pokemonNames": [
+            "Garchomp",
+            "Froslass",
+            "Basculegion-M",
+            "Sneasler",
+            "Kingambit"
+          ],
+          "wins": 470,
+          "losses": 195,
+          "teams": [
+            {
+              "name": "Kaz z",
+              "placement": 18,
+              "record": "13-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/6a9d92ff26cca4c3",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "Pabloam",
+              "placement": 29,
+              "record": "12-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/06e6a4da985ac3a5",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "ParroTiest",
+              "placement": 3,
+              "record": "8-2-0",
+              "pokemonNames": [
+                "Garchomp",
+                "Froslass",
+                "Talonflame",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/848cd7c7cb32559a",
+              "tournamentName": "VGCA Battle Hall: Academy Ace Edition #1"
+            },
+            {
+              "name": "shaikhvgc786",
+              "placement": 4,
+              "record": "9-2-0",
+              "pokemonNames": [
+                "Garchomp",
+                "Froslass",
+                "Sylveon",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/0c5091cfc97606f4",
+              "tournamentName": "*Sitrus-Series*|Champions|$50 to winner|#58"
+            },
+            {
+              "name": "ironicpanda",
+              "placement": 46,
+              "record": "12-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/83533838183d56bf",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "Kibble125",
+              "placement": 47,
+              "record": "12-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/44460d7760fb2a96",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "CptAuroOG",
+              "placement": 1,
+              "record": "7-0-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/e6ee3274b69d678b",
+              "tournamentName": "[REG M-A] LearningtoSam's Weekly"
+            },
+            {
+              "name": "Xeb41",
+              "placement": 5,
+              "record": "7-1-0",
+              "pokemonNames": [
+                "Garchomp",
+                "Froslass-Mega",
+                "Floette-Mega",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/3d5314b535e0403b",
+              "tournamentName": "Delites Champions Cup #1 (Reg M-A)"
+            },
+            {
+              "name": "Davidbob32",
+              "placement": 5,
+              "record": "7-2-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/d5e29c2bd34ef0de",
+              "tournamentName": "VGCA Battle Hall #26"
+            },
+            {
+              "name": "SpicyCigar",
+              "placement": 5,
+              "record": "6-1-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/73a0e330e6f81d70",
+              "tournamentName": "Rookidee VGC Cup"
+            },
+            {
+              "name": "bowl_4",
+              "placement": 6,
+              "record": "5-2-0",
+              "pokemonNames": [
+                "Garchomp",
+                "Froslass-Mega",
+                "Delphox-Mega",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/ecfaeeea15deb512",
+              "tournamentName": "Extreme Speed Pokémon Champions #2"
+            },
+            {
+              "name": "Bebot",
+              "placement": 8,
+              "record": "5-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/5a0a2ceda1a7fb92",
+              "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
+            },
+            {
+              "name": "Jonnycat",
+              "placement": 8,
+              "record": "6-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/efddb60c6f7fa5e1",
+              "tournamentName": "10ToesDownVGC #31 Champions $100 Top 4(Late Join)"
+            },
+            {
+              "name": "damiameru",
+              "placement": 2,
+              "record": "6-2-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/cbad0d9cd5a296c1",
+              "tournamentName": "Friday Fight Night #52 Reg M-A Bo3"
+            },
+            {
+              "name": "zL",
+              "placement": 2,
+              "record": "4-1-0",
+              "pokemonNames": [
+                "Dragonite",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/3511e0aeacd42dc7",
+              "tournamentName": "Pokepal Smackdown #143 (Champions) (Reg M-A)"
+            },
+            {
+              "name": "Victor Matheus",
+              "placement": 2,
+              "record": "5-3-0",
+              "pokemonNames": [
+                "Dragonite",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/c98c93784cdc3ed5",
+              "tournamentName": "Intimidators Champions Challenge #15 REG M-A"
+            },
+            {
+              "name": "Ayabe",
+              "placement": 2,
+              "record": "7-2-0",
+              "pokemonNames": [
+                "Dragonite",
+                "Garchomp",
+                "Froslass",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/d7060b1eee3b0aa0",
+              "tournamentName": "Sketch Academy Pride Month x MMHM Qualifier 1"
+            },
+            {
+              "name": "LiebesleidVGC",
+              "placement": 10,
+              "record": "8-2-0",
+              "pokemonNames": [
+                "Garchomp",
+                "Froslass",
+                "Floette-Mega",
+                "Basculegion-M",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/49b3061cb21922ff",
+              "tournamentName": "SpearPillar x WonderWorld #1| $300 Prize Reg M-A"
             },
             {
               "name": "Sakusa",
@@ -14352,326 +14672,6 @@
               ],
               "pokepasteUrl": "https://pokepast.es/fcbcd40379bcc6f6",
               "tournamentName": "WARTORTLE WEDNESDAYS #60 REG M-A BO3 SWISS"
-            }
-          ]
-        },
-        {
-          "pokemon": [
-            "445",
-            "478",
-            "902",
-            "903",
-            "983"
-          ],
-          "pokemonNames": [
-            "Garchomp",
-            "Froslass",
-            "Basculegion-M",
-            "Sneasler",
-            "Kingambit"
-          ],
-          "wins": 463,
-          "losses": 193,
-          "teams": [
-            {
-              "name": "Kaz z",
-              "placement": 18,
-              "record": "13-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/6a9d92ff26cca4c3",
-              "tournamentName": "The Grand Champions Festival"
-            },
-            {
-              "name": "Pabloam",
-              "placement": 29,
-              "record": "12-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/06e6a4da985ac3a5",
-              "tournamentName": "The Grand Champions Festival"
-            },
-            {
-              "name": "ParroTiest",
-              "placement": 3,
-              "record": "8-2-0",
-              "pokemonNames": [
-                "Garchomp",
-                "Froslass",
-                "Talonflame",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/848cd7c7cb32559a",
-              "tournamentName": "VGCA Battle Hall: Academy Ace Edition #1"
-            },
-            {
-              "name": "shaikhvgc786",
-              "placement": 4,
-              "record": "9-2-0",
-              "pokemonNames": [
-                "Garchomp",
-                "Froslass",
-                "Sylveon",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/0c5091cfc97606f4",
-              "tournamentName": "*Sitrus-Series*|Champions|$50 to winner|#58"
-            },
-            {
-              "name": "ironicpanda",
-              "placement": 46,
-              "record": "12-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/83533838183d56bf",
-              "tournamentName": "The Grand Champions Festival"
-            },
-            {
-              "name": "Kibble125",
-              "placement": 47,
-              "record": "12-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/44460d7760fb2a96",
-              "tournamentName": "The Grand Champions Festival"
-            },
-            {
-              "name": "CptAuroOG",
-              "placement": 1,
-              "record": "7-0-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/e6ee3274b69d678b",
-              "tournamentName": "[REG M-A] LearningtoSam's Weekly"
-            },
-            {
-              "name": "Xeb41",
-              "placement": 5,
-              "record": "7-1-0",
-              "pokemonNames": [
-                "Garchomp",
-                "Froslass-Mega",
-                "Floette-Mega",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/3d5314b535e0403b",
-              "tournamentName": "Delites Champions Cup #1 (Reg M-A)"
-            },
-            {
-              "name": "Davidbob32",
-              "placement": 5,
-              "record": "7-2-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/d5e29c2bd34ef0de",
-              "tournamentName": "VGCA Battle Hall #26"
-            },
-            {
-              "name": "SpicyCigar",
-              "placement": 5,
-              "record": "6-1-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/73a0e330e6f81d70",
-              "tournamentName": "Rookidee VGC Cup"
-            },
-            {
-              "name": "bowl_4",
-              "placement": 6,
-              "record": "5-2-0",
-              "pokemonNames": [
-                "Garchomp",
-                "Froslass-Mega",
-                "Delphox-Mega",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/ecfaeeea15deb512",
-              "tournamentName": "Extreme Speed Pokémon Champions #2"
-            },
-            {
-              "name": "Bebot",
-              "placement": 8,
-              "record": "5-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/5a0a2ceda1a7fb92",
-              "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
-            },
-            {
-              "name": "Jonnycat",
-              "placement": 8,
-              "record": "6-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/efddb60c6f7fa5e1",
-              "tournamentName": "10ToesDownVGC #31 Champions $100 Top 4(Late Join)"
-            },
-            {
-              "name": "damiameru",
-              "placement": 2,
-              "record": "6-2-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/cbad0d9cd5a296c1",
-              "tournamentName": "Friday Fight Night #52 Reg M-A Bo3"
-            },
-            {
-              "name": "zL",
-              "placement": 2,
-              "record": "4-1-0",
-              "pokemonNames": [
-                "Dragonite",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/3511e0aeacd42dc7",
-              "tournamentName": "Pokepal Smackdown #143 (Champions) (Reg M-A)"
-            },
-            {
-              "name": "Victor Matheus",
-              "placement": 2,
-              "record": "5-3-0",
-              "pokemonNames": [
-                "Dragonite",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/c98c93784cdc3ed5",
-              "tournamentName": "Intimidators Champions Challenge #15 REG M-A"
-            },
-            {
-              "name": "LiebesleidVGC",
-              "placement": 10,
-              "record": "8-2-0",
-              "pokemonNames": [
-                "Garchomp",
-                "Froslass",
-                "Floette-Mega",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/49b3061cb21922ff",
-              "tournamentName": "SpearPillar x WonderWorld #1| $300 Prize Reg M-A"
-            },
-            {
-              "name": "Sakusa",
-              "placement": 10,
-              "record": "6-2-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/1845dbc08603c8cc",
-              "tournamentName": "Champions Cup"
-            },
-            {
-              "name": "Novastence",
-              "placement": 13,
-              "record": "7-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/eb3f42ca3e490949",
-              "tournamentName": "Maddo's Cup #8 | 100€ for the Winner | Reg M-A"
-            },
-            {
-              "name": "Setagaya",
-              "placement": 14,
-              "record": "5-3-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Basculegion-M",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/d80a35b31b0f29d5",
-              "tournamentName": "Champions Cup"
             }
           ]
         },
@@ -16290,7 +16290,7 @@
             "Basculegion-M",
             "Kingambit"
           ],
-          "wins": 378,
+          "wins": 386,
           "losses": 188,
           "teams": [
             {
@@ -16504,6 +16504,21 @@
               "tournamentName": "Mt. Moon Champions VGC Weekly #1 2026"
             },
             {
+              "name": "Hrishi",
+              "placement": 1,
+              "record": "8-0-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Sylveon",
+                "Basculegion-M",
+                "Scovillain",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/9710cda423f8193a",
+              "tournamentName": "Mudkip's Marsh Pit #0"
+            },
+            {
               "name": "Silo",
               "placement": 2,
               "record": "5-3-1",
@@ -16576,21 +16591,6 @@
                 "Kingambit"
               ],
               "pokepasteUrl": "https://pokepast.es/b3542a135702f8f8",
-              "tournamentName": "*Sitrus-Series*|Champions|$50 to winner|#58"
-            },
-            {
-              "name": "Drakypana",
-              "placement": 12,
-              "record": "6-3-0",
-              "pokemonNames": [
-                "Charizard",
-                "Aerodactyl",
-                "Garchomp",
-                "Sylveon",
-                "Basculegion-M",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/b11ddfcfa1f3d6ae",
               "tournamentName": "*Sitrus-Series*|Champions|$50 to winner|#58"
             }
           ]
@@ -18530,8 +18530,8 @@
             "Incineroar",
             "Basculegion-M"
           ],
-          "wins": 326,
-          "losses": 112,
+          "wins": 330,
+          "losses": 115,
           "teams": [
             {
               "name": "joethefenix",
@@ -18850,8 +18850,8 @@
             "Incineroar",
             "Basculegion-M"
           ],
-          "wins": 337,
-          "losses": 115,
+          "wins": 341,
+          "losses": 118,
           "teams": [
             {
               "name": "LovelyLuna",
@@ -19177,8 +19177,8 @@
             "Glimmora",
             "Kingambit"
           ],
-          "wins": 505,
-          "losses": 232,
+          "wins": 513,
+          "losses": 238,
           "teams": [
             {
               "name": "Drurtle",
@@ -20465,8 +20465,8 @@
             "Incineroar",
             "Basculegion-M"
           ],
-          "wins": 261,
-          "losses": 78,
+          "wins": 265,
+          "losses": 81,
           "teams": [
             {
               "name": "LovelyLuna",
@@ -26927,8 +26927,8 @@
             "Sneasler",
             "Kingambit"
           ],
-          "wins": 92,
-          "losses": 48,
+          "wins": 95,
+          "losses": 51,
           "teams": [
             {
               "name": "tigerozi11",
@@ -27141,6 +27141,21 @@
               "tournamentName": "[REG M-A] LearningtoSam's Weekly"
             },
             {
+              "name": "gardevoila",
+              "placement": 15,
+              "record": "3-3-0",
+              "pokemonNames": [
+                "Aerodactyl",
+                "Garchomp",
+                "Froslass",
+                "Rotom-Wash",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/b7101ce493aaffb0",
+              "tournamentName": "VGC Trainer school x MMHM x Pride month event! #1"
+            },
+            {
               "name": "Leninedevectra",
               "placement": 16,
               "record": "2-3-0",
@@ -27214,21 +27229,6 @@
               ],
               "pokepasteUrl": "https://pokepast.es/98235dd197c44677",
               "tournamentName": "Alpensee Tour (Reg M-A) #58"
-            },
-            {
-              "name": "Zemar12",
-              "placement": 157,
-              "record": "10-4-0",
-              "pokemonNames": [
-                "Aerodactyl",
-                "Garchomp",
-                "Froslass",
-                "Rotom-Wash",
-                "Sneasler",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/cc0a081ef4443a9c",
-              "tournamentName": "The Grand Champions Festival"
             }
           ]
         },
@@ -27683,6 +27683,193 @@
         },
         {
           "pokemon": [
+            "038-a",
+            "094",
+            "149",
+            "727",
+            "903",
+            "983"
+          ],
+          "pokemonNames": [
+            "Ninetales-Alola",
+            "Gengar",
+            "Dragonite",
+            "Incineroar",
+            "Sneasler",
+            "Kingambit"
+          ],
+          "wins": 80,
+          "losses": 29,
+          "teams": [
+            {
+              "name": "SupahSanti",
+              "placement": 4,
+              "record": "16-3-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/1d90697499513e65",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "Cnorth26",
+              "placement": 15,
+              "record": "14-3-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/1501bb0dc22a2012",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "tyk04",
+              "placement": 7,
+              "record": "7-3-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/65a73dcb333ea66d",
+              "tournamentName": "Talon's FIGHT CLUB #82 POKEMON CHAMPIONS"
+            },
+            {
+              "name": "Silo",
+              "placement": 1,
+              "record": "4-0-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/65f582ae408c83d5",
+              "tournamentName": "DucPokémonChampions#2"
+            },
+            {
+              "name": "KaitoKunnnnn",
+              "placement": 4,
+              "record": "6-2-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/98720d93c9ec8333",
+              "tournamentName": "Sketch Academy Pride Month x MMHM Qualifier 1"
+            },
+            {
+              "name": "Flafferson",
+              "placement": 8,
+              "record": "3-3-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/6f6cb3b5c7df0df5",
+              "tournamentName": "Champions Tour LEPE #2"
+            },
+            {
+              "name": "Art_Vandelay",
+              "placement": 10,
+              "record": "3-3-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/c260b31f1238ac36",
+              "tournamentName": "Devils Den Tournaments #77"
+            },
+            {
+              "name": "BigSteveJRPG",
+              "placement": 11,
+              "record": "5-2-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/df7179b10bbd1248",
+              "tournamentName": "Boldore's Gate #8 - $5 USD - Champions Weekly 4/27"
+            },
+            {
+              "name": "Skraw",
+              "placement": 27,
+              "record": "3-2-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/eabb5fe4896056f5",
+              "tournamentName": "The Drywalls Series #6 - Champions!"
+            },
+            {
+              "name": "Thud124",
+              "placement": 161,
+              "record": "10-5-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/1a067faaa03c2ae4",
+              "tournamentName": "The Grand Champions Festival"
+            },
+            {
+              "name": "Siddharth S",
+              "placement": 220,
+              "record": "9-3-0",
+              "pokemonNames": [
+                "Ninetales-Alola",
+                "Gengar",
+                "Dragonite",
+                "Incineroar",
+                "Sneasler",
+                "Kingambit"
+              ],
+              "pokepasteUrl": "https://pokepast.es/feda317e78c9bf8c",
+              "tournamentName": "The Grand Champions Festival"
+            }
+          ]
+        },
+        {
+          "pokemon": [
             "003",
             "006",
             "445",
@@ -27970,238 +28157,6 @@
               ],
               "pokepasteUrl": "https://pokepast.es/5b6fbae5b696e864",
               "tournamentName": "Extreme Speed Pokémon Champions #2"
-            }
-          ]
-        },
-        {
-          "pokemon": [
-            "094",
-            "1013",
-            "248",
-            "727",
-            "784",
-            "983"
-          ],
-          "pokemonNames": [
-            "Gengar",
-            "Sinistcha",
-            "Tyranitar",
-            "Incineroar",
-            "Kommo-o",
-            "Kingambit"
-          ],
-          "wins": 76,
-          "losses": 34,
-          "teams": [
-            {
-              "name": "PollitoA7",
-              "placement": 14,
-              "record": "9-3-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/fc444acf463edee9",
-              "tournamentName": "Pokemon Champions First Tour $500 Prize Pool"
-            },
-            {
-              "name": "PorygonPeo",
-              "placement": 5,
-              "record": "8-2-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/b57f13dff2a9c3c7",
-              "tournamentName": "Alpensee Anniversary by codecentric AG (500€💰)"
-            },
-            {
-              "name": "CrisVGC",
-              "placement": 40,
-              "record": "7-3-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/ba00dd65d9b8e8f8",
-              "tournamentName": "Pokemon Champions First Tour $500 Prize Pool"
-            },
-            {
-              "name": "shaikhvgc786",
-              "placement": 6,
-              "record": "7-2-0",
-              "pokemonNames": [
-                "Gengar-Mega",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/ffb94793c3e61696",
-              "tournamentName": "Unova Champions League / POKÉMON CHAMPIONS / 30€"
-            },
-            {
-              "name": "EmbyPlays",
-              "placement": 10,
-              "record": "6-2-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/0b077f64e0227a10",
-              "tournamentName": "VGCA Battle #25"
-            },
-            {
-              "name": "Atomios",
-              "placement": 11,
-              "record": "5-3-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/23b2e4886793178b",
-              "tournamentName": "CHAMPIONS REG. M-A |👑CROWN FIGHT Bo3 TOUR #66👑"
-            },
-            {
-              "name": "Alan Ruiz",
-              "placement": 14,
-              "record": "4-2-0",
-              "pokemonNames": [
-                "Gengar-Mega",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/29d9d459d4a46da2",
-              "tournamentName": "Extreme Speed Pokémon Champions"
-            },
-            {
-              "name": "Frostee",
-              "placement": 19,
-              "record": "6-3-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/8cfb0cc2c0bbe425",
-              "tournamentName": "ZGG #3 Pokemon Champions VGC $100 Tournament!"
-            },
-            {
-              "name": "CrisVGC",
-              "placement": 23,
-              "record": "5-2-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/41766f7281efeda8",
-              "tournamentName": "TORNEO SALIDA POKÉMON CHAMPIONS"
-            },
-            {
-              "name": "OneScoopMan",
-              "placement": 41,
-              "record": "5-3-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/9d0e5986c70aa06f",
-              "tournamentName": "Wide League Pokemon Champions SNR #84 $200 Prize"
-            },
-            {
-              "name": "Watashi",
-              "placement": 2,
-              "record": "3-1-0",
-              "pokemonNames": [
-                "Gengar-Mega",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/5095e703e4d75a69",
-              "tournamentName": "🏆Pokémon CHAMPIONS🏆 Mi Dulce Japón Tournament #1"
-            },
-            {
-              "name": "frankina",
-              "placement": 11,
-              "record": "4-3-0",
-              "pokemonNames": [
-                "Gengar-Mega",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/512014fc9354a671",
-              "tournamentName": "POKEMON CHAMPAGNE- LO CAMBIA TODO N°1"
-            },
-            {
-              "name": "Alanbrito",
-              "placement": 26,
-              "record": "3-2-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/46e17035e0114280",
-              "tournamentName": "Extreme Speed Pokémon Champions #3"
-            },
-            {
-              "name": "almondspy",
-              "placement": 35,
-              "record": "4-3-0",
-              "pokemonNames": [
-                "Gengar",
-                "Sinistcha",
-                "Tyranitar",
-                "Incineroar",
-                "Kommo-o",
-                "Kingambit"
-              ],
-              "pokepasteUrl": "https://pokepast.es/294cdcda7d9e02b4",
-              "tournamentName": "VGC Trainer school; CHAMPIONS FORMAT! (M/A)"
             }
           ]
         }
