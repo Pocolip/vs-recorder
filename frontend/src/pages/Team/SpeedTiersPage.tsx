@@ -11,6 +11,7 @@ import {
 } from "../../utils/calcUtils";
 import { getMegaForme, getItemSpeedMultiplier } from "../../utils/megaStones";
 import speedTiersMA from "../../data/speedTiers-regM-A.json";
+import speedTiersMB from "../../data/speedTiers-regM-B.json";
 
 interface SpeedTierRow {
   pokemon: string;
@@ -29,6 +30,7 @@ interface RegulationData {
 
 const REGULATIONS: Record<string, RegulationData> = {
   "M-A": speedTiersMA as RegulationData,
+  "M-B": speedTiersMB as RegulationData,
 };
 
 function getSpeEvFromPaste(p: PasteData): number {
