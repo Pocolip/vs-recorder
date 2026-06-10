@@ -1,0 +1,79 @@
+{
+  "regulation": "M-B",
+  "generatedAt": "2026-06-10",
+  "speciesCount": 3,
+  "entries": [
+    {
+      "pokemon": "Raichu-Mega-Y",
+      "baseSpeed": 130,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 200
+    },
+    {
+      "pokemon": "Raichu-Mega-Y",
+      "baseSpeed": 130,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 182
+    },
+    {
+      "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Raichu-Mega-X",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Raichu-Mega-X",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Raichu-Mega-Y",
+      "baseSpeed": 130,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Raichu-Mega-Y",
+      "baseSpeed": 130,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Raichu-Mega-X",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Raichu-Mega-X",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    }
+  ]
+}

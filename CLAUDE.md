@@ -196,9 +196,15 @@ cd backend && mvn test -Dtest=PokemonServiceTest
 
 ## Speed Tier Data
 
-The Speed Tiers page (`frontend/src/pages/Team/SpeedTiersPage.tsx`) loads a per-regulation JSON of pre-computed speed values:
+The Speed Tiers page (`frontend/src/pages/Team/SpeedTiersPage.tsx`) loads a per-regulation JSON of pre-computed speed values, one file per regulation:
 
 - `frontend/src/data/speedTiers-regM-A.json` — generated, checked in
+- `frontend/src/data/speedTiers-regM-B.json` — generated, checked in
+
+Each regulation's species list is the source of truth, kept in `scripts/regulation-species/`:
+
+- `scripts/regulation-species/regM-A.json` — flat array of canonical `@smogon/calc` Gen 9 species names allowed in Reg M-A (seeded from Serebii's M-A page)
+- `scripts/regulation-species/regM-B.json` — same shape for Reg M-B
 
 Regenerate with:
 
@@ -209,19 +215,27 @@ node scripts/generate-speed-tiers.js
 npm run generate:speed-tiers
 ```
 
-The script (`scripts/generate-speed-tiers.js`) reads:
-1. `frontend/src/data/setdex-gen10.ts` for the base species list (Champions / Reg M-A meta)
-2. `frontend/src/utils/megaStones.ts` for item → mega forme mapping
-3. `scripts/speed-tier-overrides.json` for per-regulation `add`/`remove` patches
-4. `@smogon/calc` Gen 9 dex for base stats and `calcStat`
+The script (`scripts/generate-speed-tiers.js`) discovers every `regulation-species/regM-*.json` file and emits one `speedTiers-reg{X}.json` per. It reads:
+1. `scripts/regulation-species/regM-*.json` — the explicit species list per regulation
+2. `@smogon/calc` Gen 9 dex — base stats, `calcStat`, and the full mega forme list (used to auto-expand each base species into its mega variants)
 
-Each species gets four rows (252+, 252 neutral, 0 neutral, 0 -Spe). Mega formes of every base species are auto-included when `@smogon/calc` knows them.
+Each species gets four rows (252+, 252 neutral, 0 neutral, 0 -Spe). Mega formes are auto-expanded — listing the base species (e.g. `Charizard`) implicitly covers `Charizard-Mega-X` / `Charizard-Mega-Y`. For species `@smogon/calc` doesn't know, an object entry `{ "species": "Name", "baseSpeed": 123 }` forces inclusion.
 
-Re-run after editing `setdex-gen10.ts`, `megaStones.ts`, or `speed-tier-overrides.json`, or when bumping `@smogon/calc`.
+### Adding a new regulation
+
+Drop a new `scripts/regulation-species/regM-{X}.json` with the allowed species list, run the generator, then import the new `speedTiers-reg{X}.json` and add it to the `REGULATIONS` map in `SpeedTiersPage.tsx`. If it's a Champions-era regulation, add it to `CHAMPIONS_REGULATIONS` in `generate-speed-tiers.js` so the spread labels read `SPs` instead of `EVs`.
+
+### Editing an existing regulation
+
+Hand-edit the relevant `scripts/regulation-species/regM-*.json` (add/remove species names), regenerate, spot-check the diff on the corresponding `speedTiers-reg*.json`.
+
+### Note on `setdex-gen10.ts`
+
+`frontend/src/data/setdex-gen10.ts` is mirrored from NCP and powers the **damage calculator's preset-sets dropdown** (`frontend/src/components/calc/PokemonPanel.tsx`). It is no longer an input to the speed tier generator — those concerns are decoupled.
 
 ### Automated weekly refresh
 
-`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`), then regenerates `speedTiers-regM-A.json` and `tournamentTeams-regM-A.json` from it. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged.
+`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`), regenerates the speed tier JSONs from the per-regulation species lists, and pulls the latest LabMaus tournament teams. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged. Speed-tier diffs only appear when a regulation species list was hand-edited or `@smogon/calc` base stats shifted.
 
 ## Important Notes
 
