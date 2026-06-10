@@ -1,7 +1,7 @@
 {
   "regulation": "M-A",
-  "generatedAt": "2026-06-07",
-  "speciesCount": 220,
+  "generatedAt": "2026-06-10",
+  "speciesCount": 265,
   "entries": [
     {
       "pokemon": "Absol-Mega-Z",
@@ -53,6 +53,12 @@
     },
     {
       "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 205
+    },
+    {
+      "pokemon": "Manectric-Mega",
       "baseSpeed": 135,
       "spread": "32 SPs / +Spe",
       "speedStat": 205
@@ -166,6 +172,12 @@
       "speedStat": 191
     },
     {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 190
+    },
+    {
       "pokemon": "Alakazam",
       "baseSpeed": 120,
       "spread": "32 SPs / +Spe",
@@ -208,10 +220,22 @@
       "speedStat": 187
     },
     {
+      "pokemon": "Manectric-Mega",
+      "baseSpeed": 135,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 187
+    },
+    {
       "pokemon": "Delphox-Mega",
       "baseSpeed": 134,
       "spread": "32 SPs / Neutral",
       "speedStat": 186
+    },
+    {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 185
     },
     {
       "pokemon": "Whimsicott",
@@ -316,12 +340,6 @@
       "speedStat": 178
     },
     {
-      "pokemon": "Metagross-Mega",
-      "baseSpeed": 110,
-      "spread": "32 SPs / +Spe",
-      "speedStat": 178
-    },
-    {
       "pokemon": "Raichu",
       "baseSpeed": 110,
       "spread": "32 SPs / +Spe",
@@ -352,10 +370,22 @@
       "speedStat": 178
     },
     {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
       "pokemon": "Zoroark-Hisui",
       "baseSpeed": 110,
       "spread": "32 SPs / +Spe",
       "speedStat": 178
+    },
+    {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 177
     },
     {
       "pokemon": "Ninetales-Alola",
@@ -394,9 +424,27 @@
       "speedStat": 174
     },
     {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 173
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 173
+    },
+    {
       "pokemon": "Alakazam",
       "baseSpeed": 120,
       "spread": "32 SPs / Neutral",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
       "speedStat": 172
     },
     {
@@ -412,13 +460,19 @@
       "speedStat": 172
     },
     {
-      "pokemon": "Pawmot",
+      "pokemon": "Manectric",
       "baseSpeed": 105,
       "spread": "32 SPs / +Spe",
       "speedStat": 172
     },
     {
       "pokemon": "Pinsir-Mega",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
       "baseSpeed": 105,
       "spread": "32 SPs / +Spe",
       "speedStat": 172
@@ -508,12 +562,6 @@
       "speedStat": 170
     },
     {
-      "pokemon": "Floette-Mega",
-      "baseSpeed": 102,
-      "spread": "32 SPs / +Spe",
-      "speedStat": 169
-    },
-    {
       "pokemon": "Furfrou",
       "baseSpeed": 102,
       "spread": "32 SPs / +Spe",
@@ -526,7 +574,43 @@
       "speedStat": 169
     },
     {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 169
+    },
+    {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
       "pokemon": "Glimmora-Mega",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Simisear",
       "baseSpeed": 101,
       "spread": "32 SPs / +Spe",
       "speedStat": 168
@@ -574,6 +658,12 @@
       "speedStat": 167
     },
     {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
       "pokemon": "Houndoom-Mega",
       "baseSpeed": 115,
       "spread": "32 SPs / Neutral",
@@ -581,6 +671,12 @@
     },
     {
       "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Medicham-Mega",
       "baseSpeed": 100,
       "spread": "32 SPs / +Spe",
       "speedStat": 167
@@ -601,6 +697,24 @@
       "pokemon": "Starmie",
       "baseSpeed": 115,
       "spread": "32 SPs / Neutral",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
       "speedStat": 167
     },
     {
@@ -700,12 +814,6 @@
       "speedStat": 162
     },
     {
-      "pokemon": "Metagross-Mega",
-      "baseSpeed": 110,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 162
-    },
-    {
       "pokemon": "Mimikyu",
       "baseSpeed": 96,
       "spread": "32 SPs / +Spe",
@@ -736,6 +844,12 @@
       "speedStat": 162
     },
     {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
       "pokemon": "Zoroark-Hisui",
       "baseSpeed": 110,
       "spread": "32 SPs / Neutral",
@@ -754,6 +868,12 @@
       "speedStat": 161
     },
     {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 161
+    },
+    {
       "pokemon": "Houndoom",
       "baseSpeed": 95,
       "spread": "32 SPs / +Spe",
@@ -769,6 +889,12 @@
       "pokemon": "Ninetales-Alola",
       "baseSpeed": 109,
       "spread": "32 SPs / Neutral",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
       "speedStat": 161
     },
     {
@@ -808,13 +934,25 @@
       "speedStat": 158
     },
     {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 158
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
       "pokemon": "Lopunny",
       "baseSpeed": 105,
       "spread": "32 SPs / Neutral",
       "speedStat": 157
     },
     {
-      "pokemon": "Pawmot",
+      "pokemon": "Manectric",
       "baseSpeed": 105,
       "spread": "32 SPs / Neutral",
       "speedStat": 157
@@ -829,6 +967,12 @@
       "pokemon": "Rotom",
       "baseSpeed": 91,
       "spread": "32 SPs / +Spe",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
       "speedStat": 157
     },
     {
@@ -880,6 +1024,12 @@
       "speedStat": 156
     },
     {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
       "pokemon": "Emolga",
       "baseSpeed": 103,
       "spread": "32 SPs / Neutral",
@@ -893,6 +1043,12 @@
     },
     {
       "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 155
+    },
+    {
+      "pokemon": "Manectric-Mega",
       "baseSpeed": 135,
       "spread": "0 SPs / Neutral",
       "speedStat": 155
@@ -913,12 +1069,6 @@
       "pokemon": "Excadrill",
       "baseSpeed": 88,
       "spread": "32 SPs / +Spe",
-      "speedStat": 154
-    },
-    {
-      "pokemon": "Floette-Mega",
-      "baseSpeed": 102,
-      "spread": "32 SPs / Neutral",
       "speedStat": 154
     },
     {
@@ -952,6 +1102,12 @@
       "speedStat": 153
     },
     {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
       "pokemon": "Garchomp-Mega-Z",
       "baseSpeed": 151,
       "spread": "0 SPs / -Spe",
@@ -967,6 +1123,30 @@
       "pokemon": "Lucario-Mega-Z",
       "baseSpeed": 151,
       "spread": "0 SPs / -Spe",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
       "speedStat": 153
     },
     {
@@ -1000,7 +1180,19 @@
       "speedStat": 152
     },
     {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
       "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Medicham-Mega",
       "baseSpeed": 100,
       "spread": "32 SPs / Neutral",
       "speedStat": 152
@@ -1013,6 +1205,24 @@
     },
     {
       "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
       "baseSpeed": 100,
       "spread": "32 SPs / Neutral",
       "speedStat": 152
@@ -1126,6 +1336,12 @@
       "speedStat": 150
     },
     {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
       "pokemon": "Gourgeist",
       "baseSpeed": 84,
       "spread": "32 SPs / +Spe",
@@ -1174,9 +1390,9 @@
       "speedStat": 147
     },
     {
-      "pokemon": "Tatsugiri",
-      "baseSpeed": 82,
-      "spread": "32 SPs / +Spe",
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
       "speedStat": 147
     },
     {
@@ -1228,6 +1444,12 @@
       "speedStat": 145
     },
     {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
       "pokemon": "Chandelure",
       "baseSpeed": 80,
       "spread": "32 SPs / +Spe",
@@ -1258,6 +1480,12 @@
       "speedStat": 145
     },
     {
+      "pokemon": "Glalie",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
       "pokemon": "Goodra",
       "baseSpeed": 80,
       "spread": "32 SPs / +Spe",
@@ -1276,6 +1504,12 @@
       "speedStat": 145
     },
     {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
       "pokemon": "Meganium",
       "baseSpeed": 80,
       "spread": "32 SPs / +Spe",
@@ -1283,6 +1517,12 @@
     },
     {
       "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Passimian",
       "baseSpeed": 80,
       "spread": "32 SPs / +Spe",
       "speedStat": 145
@@ -1420,9 +1660,27 @@
       "speedStat": 142
     },
     {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 141
+    },
+    {
       "pokemon": "Vivillon",
       "baseSpeed": 89,
       "spread": "32 SPs / Neutral",
+      "speedStat": 141
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "32 SPs / +Spe",
       "speedStat": 141
     },
     {
@@ -1468,6 +1726,12 @@
       "speedStat": 139
     },
     {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
       "pokemon": "Beedrill",
       "baseSpeed": 75,
       "spread": "32 SPs / +Spe",
@@ -1475,6 +1739,12 @@
     },
     {
       "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Florges",
       "baseSpeed": 75,
       "spread": "32 SPs / +Spe",
       "speedStat": 139
@@ -1499,6 +1769,12 @@
     },
     {
       "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Manectric-Mega",
       "baseSpeed": 135,
       "spread": "0 SPs / -Spe",
       "speedStat": 139
@@ -1600,7 +1876,19 @@
       "speedStat": 137
     },
     {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
       "pokemon": "Samurott-Hisui",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Toxicroak",
       "baseSpeed": 85,
       "spread": "32 SPs / Neutral",
       "speedStat": 137
@@ -1609,6 +1897,12 @@
       "pokemon": "Gourgeist",
       "baseSpeed": 84,
       "spread": "32 SPs / Neutral",
+      "speedStat": 136
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "32 SPs / +Spe",
       "speedStat": 136
     },
     {
@@ -1684,6 +1978,12 @@
       "speedStat": 135
     },
     {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
       "pokemon": "Clefable-Mega",
       "baseSpeed": 70,
       "spread": "32 SPs / +Spe",
@@ -1696,13 +1996,13 @@
       "speedStat": 134
     },
     {
-      "pokemon": "Metagross",
+      "pokemon": "Flapple",
       "baseSpeed": 70,
       "spread": "32 SPs / +Spe",
       "speedStat": 134
     },
     {
-      "pokemon": "Mr. Rime",
+      "pokemon": "Luxray",
       "baseSpeed": 70,
       "spread": "32 SPs / +Spe",
       "speedStat": 134
@@ -1735,12 +2035,6 @@
       "pokemon": "Skarmory",
       "baseSpeed": 70,
       "spread": "32 SPs / +Spe",
-      "speedStat": 134
-    },
-    {
-      "pokemon": "Tatsugiri",
-      "baseSpeed": 82,
-      "spread": "32 SPs / Neutral",
       "speedStat": 134
     },
     {
@@ -1792,6 +2086,12 @@
       "speedStat": 132
     },
     {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
       "pokemon": "Chandelure",
       "baseSpeed": 80,
       "spread": "32 SPs / Neutral",
@@ -1811,6 +2111,12 @@
     },
     {
       "pokemon": "Gardevoir",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Glalie",
       "baseSpeed": 80,
       "spread": "32 SPs / Neutral",
       "speedStat": 132
@@ -1840,6 +2146,12 @@
       "speedStat": 132
     },
     {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
       "pokemon": "Meganium",
       "baseSpeed": 80,
       "spread": "32 SPs / Neutral",
@@ -1847,6 +2159,12 @@
     },
     {
       "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Passimian",
       "baseSpeed": 80,
       "spread": "32 SPs / Neutral",
       "speedStat": 132
@@ -1954,12 +2272,6 @@
       "speedStat": 130
     },
     {
-      "pokemon": "Metagross-Mega",
-      "baseSpeed": 110,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 130
-    },
-    {
       "pokemon": "Raichu",
       "baseSpeed": 110,
       "spread": "0 SPs / Neutral",
@@ -1984,6 +2296,12 @@
       "speedStat": 130
     },
     {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
       "pokemon": "Weavile",
       "baseSpeed": 125,
       "spread": "0 SPs / -Spe",
@@ -1996,6 +2314,12 @@
       "speedStat": 130
     },
     {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 129
+    },
+    {
       "pokemon": "Ninetales-Alola",
       "baseSpeed": 109,
       "spread": "0 SPs / Neutral",
@@ -2006,6 +2330,30 @@
       "baseSpeed": 66,
       "spread": "32 SPs / +Spe",
       "speedStat": 129
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 129
+    },
+    {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
     },
     {
       "pokemon": "Emboar",
@@ -2074,6 +2422,12 @@
       "speedStat": 128
     },
     {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
       "pokemon": "Absol",
       "baseSpeed": 75,
       "spread": "32 SPs / Neutral",
@@ -2092,6 +2446,12 @@
       "speedStat": 127
     },
     {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
       "pokemon": "Beedrill",
       "baseSpeed": 75,
       "spread": "32 SPs / Neutral",
@@ -2105,6 +2465,12 @@
     },
     {
       "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Florges",
       "baseSpeed": 75,
       "spread": "32 SPs / Neutral",
       "speedStat": 127
@@ -2164,6 +2530,18 @@
       "speedStat": 126
     },
     {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
       "pokemon": "Sneasler",
       "baseSpeed": 120,
       "spread": "0 SPs / -Spe",
@@ -2176,19 +2554,31 @@
       "speedStat": 126
     },
     {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
       "pokemon": "Lopunny",
       "baseSpeed": 105,
       "spread": "0 SPs / Neutral",
       "speedStat": 125
     },
     {
-      "pokemon": "Pawmot",
+      "pokemon": "Manectric",
       "baseSpeed": 105,
       "spread": "0 SPs / Neutral",
       "speedStat": 125
     },
     {
       "pokemon": "Pinsir-Mega",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
       "baseSpeed": 105,
       "spread": "0 SPs / Neutral",
       "speedStat": 125
@@ -2221,6 +2611,12 @@
       "pokemon": "Meowstic",
       "baseSpeed": 104,
       "spread": "0 SPs / Neutral",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "32 SPs / Neutral",
       "speedStat": 124
     },
     {
@@ -2284,7 +2680,7 @@
       "speedStat": 123
     },
     {
-      "pokemon": "Grimmsnarl",
+      "pokemon": "Goodra-Hisui",
       "baseSpeed": 60,
       "spread": "32 SPs / +Spe",
       "speedStat": 123
@@ -2305,6 +2701,12 @@
       "pokemon": "Primarina",
       "baseSpeed": 60,
       "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "0 SPs / -Spe",
       "speedStat": 123
     },
     {
@@ -2338,6 +2740,12 @@
       "speedStat": 123
     },
     {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
       "pokemon": "Clawitzer",
       "baseSpeed": 59,
       "spread": "32 SPs / +Spe",
@@ -2356,9 +2764,9 @@
       "speedStat": 122
     },
     {
-      "pokemon": "Floette-Mega",
-      "baseSpeed": 102,
-      "spread": "0 SPs / Neutral",
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
       "speedStat": 122
     },
     {
@@ -2374,13 +2782,7 @@
       "speedStat": 122
     },
     {
-      "pokemon": "Metagross",
-      "baseSpeed": 70,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 122
-    },
-    {
-      "pokemon": "Mr. Rime",
+      "pokemon": "Luxray",
       "baseSpeed": 70,
       "spread": "32 SPs / Neutral",
       "speedStat": 122
@@ -2446,6 +2848,12 @@
       "speedStat": 121
     },
     {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
       "pokemon": "Glimmora-Mega",
       "baseSpeed": 101,
       "spread": "0 SPs / Neutral",
@@ -2455,6 +2863,42 @@
       "pokemon": "Houndoom-Mega",
       "baseSpeed": 115,
       "spread": "0 SPs / -Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
       "speedStat": 121
     },
     {
@@ -2494,7 +2938,19 @@
       "speedStat": 120
     },
     {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
       "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Medicham-Mega",
       "baseSpeed": 100,
       "spread": "0 SPs / Neutral",
       "speedStat": 120
@@ -2507,6 +2963,24 @@
     },
     {
       "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
       "baseSpeed": 100,
       "spread": "0 SPs / Neutral",
       "speedStat": 120
@@ -2578,6 +3052,24 @@
       "speedStat": 117
     },
     {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
       "pokemon": "Emboar",
       "baseSpeed": 65,
       "spread": "32 SPs / Neutral",
@@ -2632,6 +3124,12 @@
       "speedStat": 117
     },
     {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 117
+    },
+    {
       "pokemon": "Maushold",
       "baseSpeed": 111,
       "spread": "0 SPs / -Spe",
@@ -2640,12 +3138,6 @@
     {
       "pokemon": "Maushold-Four",
       "baseSpeed": 111,
-      "spread": "0 SPs / -Spe",
-      "speedStat": 117
-    },
-    {
-      "pokemon": "Metagross-Mega",
-      "baseSpeed": 110,
       "spread": "0 SPs / -Spe",
       "speedStat": 117
     },
@@ -2698,6 +3190,12 @@
       "speedStat": 117
     },
     {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
       "pokemon": "Umbreon",
       "baseSpeed": 65,
       "spread": "32 SPs / Neutral",
@@ -2705,6 +3203,12 @@
     },
     {
       "pokemon": "Vaporeon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Wyrdeer",
       "baseSpeed": 65,
       "spread": "32 SPs / Neutral",
       "speedStat": 117
@@ -2725,6 +3229,12 @@
       "pokemon": "Chesnaught",
       "baseSpeed": 64,
       "spread": "32 SPs / Neutral",
+      "speedStat": 116
+    },
+    {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "0 SPs / -Spe",
       "speedStat": 116
     },
     {
@@ -2770,22 +3280,28 @@
       "speedStat": 115
     },
     {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
       "pokemon": "Typhlosion-Hisui",
       "baseSpeed": 95,
       "spread": "0 SPs / Neutral",
       "speedStat": 115
     },
     {
-      "pokemon": "Floette",
-      "baseSpeed": 52,
-      "spread": "32 SPs / +Spe",
-      "speedStat": 114
-    },
-    {
       "pokemon": "Tinkaton",
       "baseSpeed": 94,
       "spread": "0 SPs / Neutral",
       "speedStat": 114
+    },
+    {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 113
     },
     {
       "pokemon": "Tyranitar",
@@ -2836,6 +3352,12 @@
       "speedStat": 112
     },
     {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
       "pokemon": "Clefable",
       "baseSpeed": 60,
       "spread": "32 SPs / Neutral",
@@ -2851,6 +3373,12 @@
       "pokemon": "Empoleon",
       "baseSpeed": 60,
       "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
       "speedStat": 112
     },
     {
@@ -2872,7 +3400,7 @@
       "speedStat": 112
     },
     {
-      "pokemon": "Grimmsnarl",
+      "pokemon": "Goodra-Hisui",
       "baseSpeed": 60,
       "spread": "32 SPs / Neutral",
       "speedStat": 112
@@ -2902,15 +3430,15 @@
       "speedStat": 112
     },
     {
-      "pokemon": "Oranguru",
-      "baseSpeed": 60,
-      "spread": "32 SPs / Neutral",
+      "pokemon": "Manectric",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
       "speedStat": 112
     },
     {
-      "pokemon": "Pawmot",
-      "baseSpeed": 105,
-      "spread": "0 SPs / -Spe",
+      "pokemon": "Oranguru",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
       "speedStat": 112
     },
     {
@@ -2932,6 +3460,12 @@
       "speedStat": 112
     },
     {
+      "pokemon": "Sharpedo-Mega",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
       "pokemon": "Sylveon",
       "baseSpeed": 60,
       "spread": "32 SPs / Neutral",
@@ -2941,12 +3475,6 @@
       "pokemon": "Toucannon",
       "baseSpeed": 60,
       "spread": "32 SPs / Neutral",
-      "speedStat": 112
-    },
-    {
-      "pokemon": "Ursaluna",
-      "baseSpeed": 50,
-      "spread": "32 SPs / +Spe",
       "speedStat": 112
     },
     {
@@ -3028,16 +3556,28 @@
       "speedStat": 110
     },
     {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
       "pokemon": "Pikachu",
       "baseSpeed": 90,
       "spread": "0 SPs / Neutral",
       "speedStat": 110
     },
     {
-      "pokemon": "Floette-Mega",
-      "baseSpeed": 102,
-      "spread": "0 SPs / -Spe",
-      "speedStat": 109
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
     },
     {
       "pokemon": "Furfrou",
@@ -3076,6 +3616,12 @@
       "speedStat": 108
     },
     {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
       "pokemon": "Dragonite-Mega",
       "baseSpeed": 100,
       "spread": "0 SPs / -Spe",
@@ -3089,6 +3635,12 @@
     },
     {
       "pokemon": "Gardevoir-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Glalie-Mega",
       "baseSpeed": 100,
       "spread": "0 SPs / -Spe",
       "speedStat": 108
@@ -3112,6 +3664,12 @@
       "speedStat": 108
     },
     {
+      "pokemon": "Medicham-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
       "pokemon": "Ninetales",
       "baseSpeed": 100,
       "spread": "0 SPs / -Spe",
@@ -3119,6 +3677,48 @@
     },
     {
       "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
       "baseSpeed": 100,
       "spread": "0 SPs / -Spe",
       "speedStat": 108
@@ -3166,7 +3766,19 @@
       "speedStat": 107
     },
     {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 107
+    },
+    {
       "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Bellibolt",
       "baseSpeed": 45,
       "spread": "32 SPs / +Spe",
       "speedStat": 106
@@ -3268,15 +3880,15 @@
       "speedStat": 105
     },
     {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
       "pokemon": "Crabominable",
       "baseSpeed": 43,
       "spread": "32 SPs / +Spe",
-      "speedStat": 104
-    },
-    {
-      "pokemon": "Floette",
-      "baseSpeed": 52,
-      "spread": "32 SPs / Neutral",
       "speedStat": 104
     },
     {
@@ -3322,6 +3934,12 @@
       "speedStat": 103
     },
     {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
       "pokemon": "Typhlosion-Hisui",
       "baseSpeed": 95,
       "spread": "0 SPs / -Spe",
@@ -3358,6 +3976,12 @@
       "speedStat": 102
     },
     {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
       "pokemon": "Kingambit",
       "baseSpeed": 50,
       "spread": "32 SPs / Neutral",
@@ -3370,22 +3994,28 @@
       "speedStat": 102
     },
     {
-      "pokemon": "Tatsugiri",
-      "baseSpeed": 82,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 102
-    },
-    {
       "pokemon": "Tinkaton",
       "baseSpeed": 94,
       "spread": "0 SPs / -Spe",
       "speedStat": 102
     },
     {
-      "pokemon": "Ursaluna",
-      "baseSpeed": 50,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 102
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
     },
     {
       "pokemon": "Gyarados",
@@ -3419,6 +4049,12 @@
     },
     {
       "pokemon": "Altaria-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Arbok",
       "baseSpeed": 80,
       "spread": "0 SPs / Neutral",
       "speedStat": 100
@@ -3466,6 +4102,12 @@
       "speedStat": 100
     },
     {
+      "pokemon": "Glalie",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
       "pokemon": "Goodra",
       "baseSpeed": 80,
       "spread": "0 SPs / Neutral",
@@ -3484,6 +4126,12 @@
       "speedStat": 100
     },
     {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
       "pokemon": "Meganium",
       "baseSpeed": 80,
       "spread": "0 SPs / Neutral",
@@ -3491,6 +4139,12 @@
     },
     {
       "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Passimian",
       "baseSpeed": 80,
       "spread": "0 SPs / Neutral",
       "speedStat": 100
@@ -3511,6 +4165,12 @@
       "pokemon": "Arcanine-Hisui",
       "baseSpeed": 90,
       "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "32 SPs / +Spe",
       "speedStat": 99
     },
     {
@@ -3539,6 +4199,12 @@
     },
     {
       "pokemon": "Pikachu",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Roserade",
       "baseSpeed": 90,
       "spread": "0 SPs / -Spe",
       "speedStat": 99
@@ -3604,6 +4270,12 @@
       "speedStat": 97
     },
     {
+      "pokemon": "Bellibolt",
+      "baseSpeed": 45,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 97
+    },
+    {
       "pokemon": "Conkeldurr",
       "baseSpeed": 45,
       "spread": "32 SPs / Neutral",
@@ -3613,6 +4285,12 @@
       "pokemon": "Excadrill",
       "baseSpeed": 88,
       "spread": "0 SPs / -Spe",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "0 SPs / Neutral",
       "speedStat": 97
     },
     {
@@ -3652,6 +4330,12 @@
       "speedStat": 95
     },
     {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
       "pokemon": "Beedrill",
       "baseSpeed": 75,
       "spread": "0 SPs / Neutral",
@@ -3664,13 +4348,13 @@
       "speedStat": 95
     },
     {
-      "pokemon": "Dondozo",
-      "baseSpeed": 35,
-      "spread": "32 SPs / +Spe",
+      "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
       "speedStat": 95
     },
     {
-      "pokemon": "Emboar-Mega",
+      "pokemon": "Florges",
       "baseSpeed": 75,
       "spread": "0 SPs / Neutral",
       "speedStat": 95
@@ -3808,6 +4492,12 @@
       "speedStat": 94
     },
     {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
       "pokemon": "Crabominable-Mega",
       "baseSpeed": 33,
       "spread": "32 SPs / +Spe",
@@ -3820,13 +4510,43 @@
       "speedStat": 93
     },
     {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
       "pokemon": "Rhyperior",
       "baseSpeed": 40,
       "spread": "32 SPs / Neutral",
       "speedStat": 92
     },
     {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
       "pokemon": "Stunfisk",
+      "baseSpeed": 32,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Stunfisk-Galar",
       "baseSpeed": 32,
       "spread": "32 SPs / +Spe",
       "speedStat": 92
@@ -3841,12 +4561,6 @@
       "pokemon": "Sandaconda",
       "baseSpeed": 71,
       "spread": "0 SPs / Neutral",
-      "speedStat": 91
-    },
-    {
-      "pokemon": "Tatsugiri",
-      "baseSpeed": 82,
-      "spread": "0 SPs / -Spe",
       "speedStat": 91
     },
     {
@@ -3886,6 +4600,30 @@
       "speedStat": 90
     },
     {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
       "pokemon": "Chandelure",
       "baseSpeed": 80,
       "spread": "0 SPs / -Spe",
@@ -3895,6 +4633,12 @@
       "pokemon": "Clefable-Mega",
       "baseSpeed": 70,
       "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
       "speedStat": 90
     },
     {
@@ -3910,6 +4654,12 @@
       "speedStat": 90
     },
     {
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
       "pokemon": "Gallade",
       "baseSpeed": 80,
       "spread": "0 SPs / -Spe",
@@ -3917,6 +4667,12 @@
     },
     {
       "pokemon": "Gardevoir",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Glalie",
       "baseSpeed": 80,
       "spread": "0 SPs / -Spe",
       "speedStat": 90
@@ -3940,7 +4696,19 @@
       "speedStat": 90
     },
     {
+      "pokemon": "Luxray",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
       "pokemon": "Mamoswine",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Medicham",
       "baseSpeed": 80,
       "spread": "0 SPs / -Spe",
       "speedStat": 90
@@ -3958,21 +4726,15 @@
       "speedStat": 90
     },
     {
-      "pokemon": "Metagross",
-      "baseSpeed": 70,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 90
-    },
-    {
       "pokemon": "Milotic",
       "baseSpeed": 81,
       "spread": "0 SPs / -Spe",
       "speedStat": 90
     },
     {
-      "pokemon": "Mr. Rime",
-      "baseSpeed": 70,
-      "spread": "0 SPs / Neutral",
+      "pokemon": "Passimian",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
       "speedStat": 90
     },
     {
@@ -3985,6 +4747,12 @@
       "pokemon": "Polteageist",
       "baseSpeed": 70,
       "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Reuniclus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
       "speedStat": 90
     },
     {
@@ -4036,6 +4804,12 @@
       "speedStat": 90
     },
     {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
       "pokemon": "Snorlax",
       "baseSpeed": 30,
       "spread": "32 SPs / +Spe",
@@ -4078,6 +4852,12 @@
       "speedStat": 90
     },
     {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 89
+    },
+    {
       "pokemon": "Hatterene",
       "baseSpeed": 29,
       "spread": "32 SPs / +Spe",
@@ -4088,6 +4868,12 @@
       "baseSpeed": 79,
       "spread": "0 SPs / -Spe",
       "speedStat": 89
+    },
+    {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 88
     },
     {
       "pokemon": "Basculegion",
@@ -4144,12 +4930,6 @@
       "speedStat": 87
     },
     {
-      "pokemon": "Dondozo",
-      "baseSpeed": 35,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 87
-    },
-    {
       "pokemon": "Garganacl",
       "baseSpeed": 35,
       "spread": "32 SPs / Neutral",
@@ -4174,6 +4954,12 @@
       "speedStat": 87
     },
     {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 87
+    },
+    {
       "pokemon": "Skeledirge",
       "baseSpeed": 66,
       "spread": "0 SPs / Neutral",
@@ -4192,9 +4978,33 @@
       "speedStat": 85
     },
     {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
       "pokemon": "Beedrill",
       "baseSpeed": 75,
       "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
       "speedStat": 85
     },
     {
@@ -4219,6 +5029,12 @@
       "pokemon": "Flareon",
       "baseSpeed": 65,
       "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Florges",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
       "speedStat": 85
     },
     {
@@ -4294,6 +5110,12 @@
       "speedStat": 85
     },
     {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
       "pokemon": "Alcremie",
       "baseSpeed": 64,
       "spread": "0 SPs / Neutral",
@@ -4312,6 +5134,12 @@
       "speedStat": 84
     },
     {
+      "pokemon": "Stunfisk-Galar",
+      "baseSpeed": 32,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 84
+    },
+    {
       "pokemon": "Abomasnow-Mega",
       "baseSpeed": 30,
       "spread": "32 SPs / Neutral",
@@ -4319,6 +5147,24 @@
     },
     {
       "pokemon": "Appletun",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Reuniclus",
       "baseSpeed": 30,
       "spread": "32 SPs / Neutral",
       "speedStat": 82
@@ -4354,6 +5200,18 @@
       "speedStat": 82
     },
     {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 82
+    },
+    {
       "pokemon": "Snorlax",
       "baseSpeed": 30,
       "spread": "32 SPs / Neutral",
@@ -4378,6 +5236,18 @@
       "speedStat": 82
     },
     {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
       "pokemon": "Clefable-Mega",
       "baseSpeed": 70,
       "spread": "0 SPs / -Spe",
@@ -4390,19 +5260,19 @@
       "speedStat": 81
     },
     {
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
       "pokemon": "Hatterene",
       "baseSpeed": 29,
       "spread": "32 SPs / Neutral",
       "speedStat": 81
     },
     {
-      "pokemon": "Metagross",
-      "baseSpeed": 70,
-      "spread": "0 SPs / -Spe",
-      "speedStat": 81
-    },
-    {
-      "pokemon": "Mr. Rime",
+      "pokemon": "Luxray",
       "baseSpeed": 70,
       "spread": "0 SPs / -Spe",
       "speedStat": 81
@@ -4486,6 +5356,12 @@
       "speedStat": 80
     },
     {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
       "pokemon": "Clefable",
       "baseSpeed": 60,
       "spread": "0 SPs / Neutral",
@@ -4510,7 +5386,7 @@
       "speedStat": 80
     },
     {
-      "pokemon": "Grimmsnarl",
+      "pokemon": "Goodra-Hisui",
       "baseSpeed": 60,
       "spread": "0 SPs / Neutral",
       "speedStat": 80
@@ -4546,6 +5422,12 @@
       "speedStat": 80
     },
     {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 79
+    },
+    {
       "pokemon": "Clawitzer",
       "baseSpeed": 59,
       "spread": "0 SPs / Neutral",
@@ -4576,10 +5458,40 @@
       "speedStat": 78
     },
     {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 78
+    },
+    {
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 78
+    },
+    {
       "pokemon": "Skeledirge",
       "baseSpeed": 66,
       "spread": "0 SPs / -Spe",
       "speedStat": 77
+    },
+    {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
     },
     {
       "pokemon": "Emboar",
@@ -4642,6 +5554,12 @@
       "speedStat": 76
     },
     {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
       "pokemon": "Alcremie",
       "baseSpeed": 64,
       "spread": "0 SPs / -Spe",
@@ -4672,6 +5590,12 @@
       "speedStat": 75
     },
     {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 75
+    },
+    {
       "pokemon": "Abomasnow",
       "baseSpeed": 60,
       "spread": "0 SPs / -Spe",
@@ -4681,6 +5605,12 @@
       "pokemon": "Aegislash-Shield",
       "baseSpeed": 60,
       "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "32 SPs / Neutral",
       "speedStat": 72
     },
     {
@@ -4708,13 +5638,7 @@
       "speedStat": 72
     },
     {
-      "pokemon": "Floette",
-      "baseSpeed": 52,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 72
-    },
-    {
-      "pokemon": "Grimmsnarl",
+      "pokemon": "Goodra-Hisui",
       "baseSpeed": 60,
       "spread": "0 SPs / -Spe",
       "speedStat": 72
@@ -4810,19 +5734,31 @@
       "speedStat": 70
     },
     {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
       "pokemon": "Kingambit",
       "baseSpeed": 50,
       "spread": "0 SPs / Neutral",
       "speedStat": 70
     },
     {
-      "pokemon": "Sableye",
-      "baseSpeed": 50,
-      "spread": "0 SPs / Neutral",
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "0 SPs / -Spe",
       "speedStat": 70
     },
     {
-      "pokemon": "Ursaluna",
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Sableye",
       "baseSpeed": 50,
       "spread": "0 SPs / Neutral",
       "speedStat": 70
@@ -4870,7 +5806,19 @@
       "speedStat": 67
     },
     {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 67
+    },
+    {
       "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 65
+    },
+    {
+      "pokemon": "Bellibolt",
       "baseSpeed": 45,
       "spread": "0 SPs / Neutral",
       "speedStat": 65
@@ -4885,12 +5833,6 @@
       "pokemon": "Chesnaught-Mega",
       "baseSpeed": 44,
       "spread": "0 SPs / Neutral",
-      "speedStat": 64
-    },
-    {
-      "pokemon": "Floette",
-      "baseSpeed": 52,
-      "spread": "0 SPs / -Spe",
       "speedStat": 64
     },
     {
@@ -4930,6 +5872,12 @@
       "speedStat": 63
     },
     {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
       "pokemon": "Crabominable",
       "baseSpeed": 43,
       "spread": "0 SPs / Neutral",
@@ -4948,12 +5896,6 @@
       "speedStat": 63
     },
     {
-      "pokemon": "Ursaluna",
-      "baseSpeed": 50,
-      "spread": "0 SPs / -Spe",
-      "speedStat": 63
-    },
-    {
       "pokemon": "Araquanid",
       "baseSpeed": 42,
       "spread": "0 SPs / Neutral",
@@ -4964,6 +5906,24 @@
       "baseSpeed": 48,
       "spread": "0 SPs / -Spe",
       "speedStat": 61
+    },
+    {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
     },
     {
       "pokemon": "Hippowdon",
@@ -4979,6 +5939,18 @@
     },
     {
       "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 58
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 58
+    },
+    {
+      "pokemon": "Bellibolt",
       "baseSpeed": 45,
       "spread": "0 SPs / -Spe",
       "speedStat": 58
@@ -5026,12 +5998,6 @@
       "speedStat": 55
     },
     {
-      "pokemon": "Dondozo",
-      "baseSpeed": 35,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 55
-    },
-    {
       "pokemon": "Garganacl",
       "baseSpeed": 35,
       "spread": "0 SPs / Neutral",
@@ -5056,6 +6022,24 @@
       "speedStat": 55
     },
     {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
       "pokemon": "Rhyperior",
       "baseSpeed": 40,
       "spread": "0 SPs / -Spe",
@@ -5068,7 +6052,19 @@
       "speedStat": 53
     },
     {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 52
+    },
+    {
       "pokemon": "Stunfisk",
+      "baseSpeed": 32,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 52
+    },
+    {
+      "pokemon": "Stunfisk-Galar",
       "baseSpeed": 32,
       "spread": "0 SPs / Neutral",
       "speedStat": 52
@@ -5086,6 +6082,18 @@
       "speedStat": 50
     },
     {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
       "pokemon": "Drampa",
       "baseSpeed": 36,
       "spread": "0 SPs / -Spe",
@@ -5095,6 +6103,12 @@
       "pokemon": "Drampa-Mega",
       "baseSpeed": 36,
       "spread": "0 SPs / -Spe",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Reuniclus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
       "speedStat": 50
     },
     {
@@ -5128,6 +6142,12 @@
       "speedStat": 50
     },
     {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
       "pokemon": "Snorlax",
       "baseSpeed": 30,
       "spread": "0 SPs / Neutral",
@@ -5146,9 +6166,9 @@
       "speedStat": 50
     },
     {
-      "pokemon": "Dondozo",
-      "baseSpeed": 35,
-      "spread": "0 SPs / -Spe",
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "0 SPs / Neutral",
       "speedStat": 49
     },
     {
@@ -5182,6 +6202,12 @@
       "speedStat": 49
     },
     {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 48
+    },
+    {
       "pokemon": "Crabominable-Mega",
       "baseSpeed": 33,
       "spread": "0 SPs / -Spe",
@@ -5194,6 +6220,12 @@
       "speedStat": 46
     },
     {
+      "pokemon": "Stunfisk-Galar",
+      "baseSpeed": 32,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 46
+    },
+    {
       "pokemon": "Abomasnow-Mega",
       "baseSpeed": 30,
       "spread": "0 SPs / -Spe",
@@ -5201,6 +6233,24 @@
     },
     {
       "pokemon": "Appletun",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Reuniclus",
       "baseSpeed": 30,
       "spread": "0 SPs / -Spe",
       "speedStat": 45
@@ -5236,6 +6286,12 @@
       "speedStat": 45
     },
     {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
       "pokemon": "Snorlax",
       "baseSpeed": 30,
       "spread": "0 SPs / -Spe",
@@ -5254,10 +6310,28 @@
       "speedStat": 45
     },
     {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 44
+    },
+    {
       "pokemon": "Hatterene",
       "baseSpeed": 29,
       "spread": "0 SPs / -Spe",
       "speedStat": 44
+    },
+    {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 43
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 40
     },
     {
       "pokemon": "Sableye-Mega",
@@ -5270,6 +6344,12 @@
       "baseSpeed": 20,
       "spread": "0 SPs / Neutral",
       "speedStat": 40
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 36
     },
     {
       "pokemon": "Sableye-Mega",

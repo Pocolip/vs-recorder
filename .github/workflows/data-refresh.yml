@@ -64,8 +64,8 @@ jobs:
             Automated weekly refresh.
 
             **Possible changes:**
-            - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js)
-            - `frontend/src/data/speedTiers-regM-A.json` — regenerated from the setdex above
+            - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js) (used by the damage calculator's preset-sets dropdown)
+            - `frontend/src/data/speedTiers-reg*.json` — regenerated from `scripts/regulation-species/regM-*.json` (only diffs when a regulation list was hand-edited or `@smogon/calc` base stats change)
             - `frontend/src/data/tournamentTeams-regM-A.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-A)
 
             If none of the upstream sources changed, this PR will not be opened.
@@ -74,6 +74,7 @@ jobs:
           add-paths: |
             frontend/src/data/setdex-gen10.ts
             frontend/src/data/speedTiers-regM-A.json
+            frontend/src/data/speedTiers-regM-B.json
             frontend/src/data/tournamentTeams-regM-A.json
           labels: |
             automated

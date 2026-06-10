@@ -4,19 +4,21 @@
  * Generate per-regulation speed tier JSON for the Speed Tiers page.
  *
  * Reads:
- *   - frontend/src/data/setdex-gen10.ts (Champions / Reg M-A setdex — species list + items)
- *   - scripts/speed-tier-overrides.json (per-regulation add/remove)
- *   - @smogon/calc Gen 9 dex (base stats, calcStat)
- *   - frontend/src/utils/megaStones.ts (item → mega forme map — parsed as text)
+ *   - scripts/regulation-species/regM-*.json (per-regulation explicit species list)
+ *   - @smogon/calc Gen 9 dex (base stats, calcStat, mega forme list)
  *
- * Writes:
- *   - frontend/src/data/speedTiers-regM-A.json
+ * Writes one file per regulation:
+ *   - frontend/src/data/speedTiers-reg{REG}.json
+ *
+ * Each regulation JSON is a flat array of canonical @smogon/calc Gen 9 species
+ * names (or { species, baseSpeed } objects for species missing from the dex).
+ * Mega formes are auto-expanded — listing the base species is enough.
  *
  * Usage: node scripts/generate-speed-tiers.js
  */
 
 import { createRequire } from "module";
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -27,50 +29,13 @@ const require = createRequire(resolve(ROOT, "frontend/package.json"));
 const { Generations, calcStat } = require("@smogon/calc");
 const gen = Generations.get(9);
 
-// ---------- Load setdex-gen10 (pure object literal in a .ts file) ----------
+const REG_SPECIES_DIR = resolve(ROOT, "scripts/regulation-species");
+const OUT_DIR = resolve(ROOT, "frontend/src/data");
 
-function loadSetdex(path) {
-  const text = readFileSync(path, "utf8");
-  const body = text
-    .replace(/^export const SETDEX_GEN10 = /, "")
-    .replace(/;?\s*$/, "");
-  // The file is pure data — no imports, no expressions. Function() eval is safe
-  // for a generator script consuming source-controlled content.
-  return new Function("return " + body)();
-}
-
-// ---------- Load mega stone map (parse the data block from megaStones.ts) ----------
-
-function loadMegaStoneMap(path) {
-  const text = readFileSync(path, "utf8");
-  const match = text.match(/MEGA_STONE_FORMES:\s*Record<string,\s*string>\s*=\s*({[\s\S]*?\n};)/);
-  if (!match) throw new Error("Could not find MEGA_STONE_FORMES literal in " + path);
-  // Strip trailing semicolon and TS-specific colon-key shorthand isn't used here.
-  const body = match[1].replace(/;\s*$/, "");
-  return new Function("return " + body)();
-}
-
-// ---------- Build the species list ----------
-
-const SETDEX_PATH = resolve(ROOT, "frontend/src/data/setdex-gen10.ts");
-const MEGA_STONES_PATH = resolve(ROOT, "frontend/src/utils/megaStones.ts");
-const OVERRIDES_PATH = resolve(ROOT, "scripts/speed-tier-overrides.json");
-const OUT_PATH = resolve(ROOT, "frontend/src/data/speedTiers-regM-A.json");
-
-const SETDEX = loadSetdex(SETDEX_PATH);
-const MEGA = loadMegaStoneMap(MEGA_STONES_PATH);
-const OVERRIDES = JSON.parse(readFileSync(OVERRIDES_PATH, "utf8"));
-
-const REGULATION = "M-A";
-
-// Some setdex names need light remapping to match @smogon/calc species spelling.
-const SPECIES_REMAP = {
-  Aegislash: "Aegislash-Shield",
-};
-
-function normalizeSpecies(name) {
-  return SPECIES_REMAP[name] || name;
-}
+// Champions-era regulations (M-A and onward) display Stat Points instead of
+// EVs in the UI. 32 SPs ≡ 252 EVs (formula: sps*8-4), 0 SPs ≡ 0 EVs, so the
+// computed speed stat is identical — only the labels change.
+const CHAMPIONS_REGULATIONS = new Set(["M-A", "M-B"]);
 
 // Look up the base speed of a species. Returns null if unknown.
 function lookupBaseSpeed(species) {
@@ -80,20 +45,9 @@ function lookupBaseSpeed(species) {
   return null;
 }
 
-// Collect species: base setdex keys + mega formes induced by items in their sets.
-const speciesMap = new Map(); // species -> baseSpeed
-function addSpecies(name, explicitSpeed) {
-  const speed = explicitSpeed != null ? explicitSpeed : lookupBaseSpeed(name);
-  if (speed == null) {
-    console.warn(`[skip] ${name}: not in @smogon/calc and no override base speed`);
-    return;
-  }
-  if (!speciesMap.has(name)) speciesMap.set(name, speed);
-}
-
 // Collect every mega forme @smogon/calc knows of, keyed by base species, so we
-// can auto-include all megas of any species in the setdex (the setdex itself
-// may not have a set using the relevant stone).
+// can auto-include all megas of any species in the regulation list (the list
+// itself only names the base species — Charizard implies Mega-X and Mega-Y).
 const megasByBase = new Map();
 for (const s of gen.species) {
   const idx = s.name.indexOf("-Mega");
@@ -104,86 +58,81 @@ for (const s of gen.species) {
   }
 }
 
-for (const rawName of Object.keys(SETDEX)) {
-  const species = normalizeSpecies(rawName);
-  addSpecies(species);
-
-  // Auto-include all known mega formes of this species.
-  for (const mega of megasByBase.get(species) || []) {
-    addSpecies(mega);
-  }
-  // Also pick up mega formes referenced by items in this Pokemon's sets, in
-  // case the @smogon/calc forme isn't keyed off the base species name
-  // (e.g. Tatsugiri-Curly-Mega has base "Tatsugiri-Curly" not "Tatsugiri").
-  const sets = SETDEX[rawName];
-  for (const setKey of Object.keys(sets)) {
-    const item = sets[setKey].item;
-    if (!item) continue;
-    const megaForme = MEGA[item];
-    if (megaForme) addSpecies(megaForme);
-  }
+function discoverRegulations() {
+  const files = readdirSync(REG_SPECIES_DIR).filter((f) => /^regM-[A-Z]\.json$/i.test(f));
+  return files
+    .map((f) => ({ file: f, reg: f.replace(/^reg/, "").replace(/\.json$/, "") }))
+    .sort((a, b) => a.reg.localeCompare(b.reg));
 }
 
-// Apply per-regulation overrides
-const regOverrides = OVERRIDES[REGULATION] || { add: [], remove: [] };
-for (const entry of regOverrides.add || []) {
-  const name = typeof entry === "string" ? entry : entry?.species;
-  const explicitSpeed = typeof entry === "object" ? entry.baseSpeed : undefined;
-  if (!name) continue;
-  addSpecies(name, explicitSpeed);
-  // Auto-include mega formes of override-added species too.
-  for (const mega of megasByBase.get(name) || []) {
-    addSpecies(mega);
+function buildSpeciesMap(speciesList) {
+  const speciesMap = new Map(); // species -> baseSpeed
+  function addSpecies(name, explicitSpeed) {
+    const speed = explicitSpeed != null ? explicitSpeed : lookupBaseSpeed(name);
+    if (speed == null) {
+      console.warn(`[skip] ${name}: not in @smogon/calc and no override base speed`);
+      return;
+    }
+    if (!speciesMap.has(name)) speciesMap.set(name, speed);
   }
-}
-for (const name of regOverrides.remove || []) {
-  speciesMap.delete(name);
-}
 
-// ---------- Generate the rows ----------
-
-// Champions-era regulations (M-A and onward) display Stat Points instead of
-// EVs in the UI. 32 SPs ≡ 252 EVs (formula: sps*8-4), 0 SPs ≡ 0 EVs, so the
-// computed speed stat is identical — only the labels change.
-const CHAMPIONS_REGULATIONS = new Set(["M-A"]);
-const usesSps = CHAMPIONS_REGULATIONS.has(REGULATION);
-const STAT_UNIT = usesSps ? "SPs" : "EVs";
-const MAX_INVEST = usesSps ? 32 : 252;
-
-const SPREADS = [
-  { ev: 252, nature: "Jolly", label: `${MAX_INVEST} ${STAT_UNIT} / +Spe` },
-  { ev: 252, nature: "Hardy", label: `${MAX_INVEST} ${STAT_UNIT} / Neutral` },
-  { ev: 0,   nature: "Hardy", label: `0 ${STAT_UNIT} / Neutral` },
-  { ev: 0,   nature: "Brave", label: `0 ${STAT_UNIT} / -Spe` },
-];
-
-const entries = [];
-for (const [species, baseSpeed] of speciesMap.entries()) {
-  for (const spread of SPREADS) {
-    const speedStat = calcStat(gen, "spe", baseSpeed, 31, spread.ev, 50, spread.nature);
-    entries.push({
-      pokemon: species,
-      baseSpeed,
-      spread: spread.label,
-      speedStat,
-    });
+  for (const entry of speciesList) {
+    const name = typeof entry === "string" ? entry : entry?.species;
+    const explicitSpeed = typeof entry === "object" ? entry.baseSpeed : undefined;
+    if (!name) continue;
+    addSpecies(name, explicitSpeed);
+    for (const mega of megasByBase.get(name) || []) {
+      addSpecies(mega);
+    }
   }
+  return speciesMap;
 }
 
-// Sort descending by speedStat; stable secondary sort by name for determinism.
-entries.sort((a, b) => {
-  if (b.speedStat !== a.speedStat) return b.speedStat - a.speedStat;
-  return a.pokemon.localeCompare(b.pokemon);
-});
+function generateRegulation({ file, reg }) {
+  const path = resolve(REG_SPECIES_DIR, file);
+  const speciesList = JSON.parse(readFileSync(path, "utf8"));
+  const speciesMap = buildSpeciesMap(speciesList);
 
-const today = new Date().toISOString().slice(0, 10);
-const output = {
-  regulation: REGULATION,
-  generatedAt: today,
-  speciesCount: speciesMap.size,
-  entries,
-};
+  const usesSps = CHAMPIONS_REGULATIONS.has(reg);
+  const STAT_UNIT = usesSps ? "SPs" : "EVs";
+  const MAX_INVEST = usesSps ? 32 : 252;
 
-writeFileSync(OUT_PATH, JSON.stringify(output, null, 2) + "\n");
+  const SPREADS = [
+    { ev: 252, nature: "Jolly", label: `${MAX_INVEST} ${STAT_UNIT} / +Spe` },
+    { ev: 252, nature: "Hardy", label: `${MAX_INVEST} ${STAT_UNIT} / Neutral` },
+    { ev: 0,   nature: "Hardy", label: `0 ${STAT_UNIT} / Neutral` },
+    { ev: 0,   nature: "Brave", label: `0 ${STAT_UNIT} / -Spe` },
+  ];
 
-console.log(`Wrote ${entries.length} rows for ${speciesMap.size} species → ${OUT_PATH}`);
+  const entries = [];
+  for (const [species, baseSpeed] of speciesMap.entries()) {
+    for (const spread of SPREADS) {
+      const speedStat = calcStat(gen, "spe", baseSpeed, 31, spread.ev, 50, spread.nature);
+      entries.push({ pokemon: species, baseSpeed, spread: spread.label, speedStat });
+    }
+  }
+
+  entries.sort((a, b) => {
+    if (b.speedStat !== a.speedStat) return b.speedStat - a.speedStat;
+    return a.pokemon.localeCompare(b.pokemon);
+  });
+
+  const today = new Date().toISOString().slice(0, 10);
+  const output = {
+    regulation: reg,
+    generatedAt: today,
+    speciesCount: speciesMap.size,
+    entries,
+  };
+
+  const outPath = resolve(OUT_DIR, `speedTiers-reg${reg}.json`);
+  writeFileSync(outPath, JSON.stringify(output, null, 2) + "\n");
+  console.log(`Wrote ${entries.length} rows for ${speciesMap.size} species → ${outPath}`);
+}
+
+const regs = discoverRegulations();
+if (regs.length === 0) {
+  console.error(`No regulation files found in ${REG_SPECIES_DIR}`);
+  process.exit(1);
+}
+for (const r of regs) generateRegulation(r);
