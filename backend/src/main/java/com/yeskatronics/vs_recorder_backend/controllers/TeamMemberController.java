@@ -5,6 +5,8 @@ import com.yeskatronics.vs_recorder_backend.dto.TeamMemberDTO;
 import com.yeskatronics.vs_recorder_backend.entities.TeamMember;
 import com.yeskatronics.vs_recorder_backend.mappers.TeamMemberMapper;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.Permission;
 import com.yeskatronics.vs_recorder_backend.services.TeamMemberService;
 import com.yeskatronics.vs_recorder_backend.services.TeamService;
 import jakarta.validation.Valid;
@@ -30,6 +32,7 @@ public class TeamMemberController {
     private final TeamMemberService teamMemberService;
     private final TeamMemberMapper teamMemberMapper;
     private final TeamService teamService;
+    private final TeamAccessService teamAccessService;
     private final CustomUserDetailsService userDetailsService;
 
     private Long getCurrentUserId(Authentication authentication) {
@@ -37,9 +40,12 @@ public class TeamMemberController {
         return userDetailsService.getUserIdByUsername(username);
     }
 
-    private void verifyTeamOwnership(Long teamId, Long userId) {
-        teamService.getTeamByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found or access denied"));
+    private void verifyTeamAccess(Long teamId, Long userId) {
+        teamAccessService.resolve(teamId, userId);
+    }
+
+    private void verifyTeamPermission(Long teamId, Long userId, Permission permission) {
+        teamAccessService.requirePermission(teamId, userId, permission);
     }
 
     /**
@@ -53,7 +59,7 @@ public class TeamMemberController {
             @Valid @RequestBody TeamMemberDTO.CreateRequest request) {
 
         Long userId = getCurrentUserId(authentication);
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.EDIT_TEAM_DETAILS);
 
         TeamMember teamMember = teamMemberMapper.toEntity(request);
         TeamMember saved = teamMemberService.createTeamMember(teamMember, teamId);
@@ -71,7 +77,7 @@ public class TeamMemberController {
             Authentication authentication) {
 
         Long userId = getCurrentUserId(authentication);
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<TeamMember> members = teamMemberService.getTeamMembersByTeamId(teamId);
         return ResponseEntity.ok(teamMemberMapper.toResponseList(members));
@@ -91,7 +97,18 @@ public class TeamMemberController {
 
         TeamMember existing = teamMemberService.getTeamMemberById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Team member not found"));
-        verifyTeamOwnership(existing.getTeam().getId(), userId);
+        Long teamId = existing.getTeam().getId();
+
+        // Gate notes and calcs separately — frontend disables whichever the caller can't edit.
+        if (request.getNotes() != null) {
+            verifyTeamPermission(teamId, userId, Permission.EDIT_TEAM_MEMBER_NOTES);
+        }
+        if (request.getCalcs() != null) {
+            verifyTeamPermission(teamId, userId, Permission.EDIT_TEAM_MEMBER_CALCS);
+        }
+        if (request.getNotes() == null && request.getCalcs() == null) {
+            verifyTeamAccess(teamId, userId);
+        }
 
         TeamMember updates = new TeamMember();
         teamMemberMapper.updateEntityFromDto(request, updates);
@@ -115,7 +132,7 @@ public class TeamMemberController {
             Authentication authentication) {
 
         Long userId = getCurrentUserId(authentication);
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.EDIT_TEAM_DETAILS);
 
         TeamService.SyncResult result = teamService.syncTeamMembersFromPokepaste(teamId, userId);
 
@@ -142,7 +159,7 @@ public class TeamMemberController {
 
         TeamMember existing = teamMemberService.getTeamMemberById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Team member not found"));
-        verifyTeamOwnership(existing.getTeam().getId(), userId);
+        verifyTeamPermission(existing.getTeam().getId(), userId, Permission.EDIT_TEAM_DETAILS);
 
         teamMemberService.deleteTeamMember(id);
         return ResponseEntity.noContent().build();

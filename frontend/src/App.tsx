@@ -23,6 +23,8 @@ import TypeChartPage from "./pages/Team/TypeChartPage";
 import SpeedTiersPage from "./pages/Team/SpeedTiersPage";
 import RootRoute from "./components/auth/RootRoute";
 import PublicRoute from "./components/auth/PublicRoute";
+import SharedHubPage from "./pages/Collaboration/SharedHubPage";
+import AcceptInvitePage from "./pages/Collaboration/AcceptInvitePage";
 import * as pokemonService from "./services/pokemonService";
 
 export default function App() {
@@ -73,6 +75,8 @@ export default function App() {
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
+          <Route path="shared" element={<SharedHubPage />} />
+          <Route path="invites/:token" element={<AcceptInvitePage />} />
           <Route path="team/:teamId" element={<TeamLayout />}>
             <Route index element={<Navigate to="replays" replace />} />
             <Route path="replays" element={<ReplaysPage />} />

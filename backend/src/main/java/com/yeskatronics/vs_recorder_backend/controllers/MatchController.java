@@ -6,7 +6,8 @@ import com.yeskatronics.vs_recorder_backend.entities.Match;
 import com.yeskatronics.vs_recorder_backend.mappers.MatchMapper;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.MatchService;
-import com.yeskatronics.vs_recorder_backend.services.TeamService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.Permission;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,23 +33,20 @@ public class MatchController {
 
     private final MatchService matchService;
     private final MatchMapper matchMapper;
-    private final TeamService teamService;
+    private final TeamAccessService teamAccessService;
     private final CustomUserDetailsService userDetailsService;
 
-    /**
-     * Helper method to get user ID from authentication
-     */
     private Long getCurrentUserId(Authentication authentication) {
         String username = authentication.getName();
         return userDetailsService.getUserIdByUsername(username);
     }
 
-    /**
-     * Helper method to verify team ownership
-     */
-    private void verifyTeamOwnership(Long teamId, Long userId) {
-        teamService.getTeamByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found or access denied"));
+    private void verifyTeamAccess(Long teamId, Long userId) {
+        teamAccessService.resolve(teamId, userId);
+    }
+
+    private void verifyTeamPermission(Long teamId, Long userId, Permission permission) {
+        teamAccessService.requirePermission(teamId, userId, permission);
     }
 
     /**
@@ -69,8 +67,7 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.info("Creating new match for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.ADD_REPLAYS);
 
         Match match = matchMapper.toEntity(request);
         Match savedMatch = matchService.createMatch(match, teamId);
@@ -98,8 +95,12 @@ public class MatchController {
 
         return matchService.getMatchById(id)
                 .filter(match -> {
-                    // Verify user owns the team this match belongs to
-                    return teamService.getTeamByIdAndUserId(match.getTeam().getId(), userId).isPresent();
+                    try {
+                        teamAccessService.resolve(match.getTeam().getId(), userId);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
                 })
                 .map(match -> {
                     MatchService.MatchStats stats = matchService.getMatchStats(match.getId());
@@ -125,8 +126,7 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching matches for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<MatchDTO.Summary> matches = matchService.getMatchesByTeamIdOrderedByDate(teamId).stream()
                 .map(match -> {
@@ -154,8 +154,7 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching matches with replays for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<MatchDTO.Response> matches = matchService.getMatchesWithReplays(teamId).stream()
                 .map(match -> {
@@ -185,8 +184,7 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching matches for team: {} against opponent: {}", teamId, opponent);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<MatchDTO.Summary> matches = matchService.getMatchesByTeamIdAndOpponent(teamId, opponent).stream()
                 .map(match -> {
@@ -216,8 +214,7 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching matches for team: {} with tag: {}", teamId, tag);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<MatchDTO.Summary> matches = matchService.getMatchesByTeamIdAndTag(teamId, tag).stream()
                 .map(match -> {
@@ -247,11 +244,10 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.info("Updating match: {}", id);
 
-        // Verify ownership through match's team
         Match existingMatch = matchService.getMatchById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
         Long teamId = existingMatch.getTeam().getId();
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.EDIT_REPLAY_NOTES);
 
         Match updates = matchMapper.toEntity(request);
         Match updatedMatch = matchService.updateMatch(id, teamId, updates);
@@ -279,11 +275,10 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.info("Adding tag '{}' to match: {}", request.getTag(), id);
 
-        // Verify ownership through match's team
         Match existingMatch = matchService.getMatchById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
         Long teamId = existingMatch.getTeam().getId();
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.EDIT_REPLAY_NOTES);
 
         Match updatedMatch = matchService.addTag(id, teamId, request.getTag());
         MatchService.MatchStats stats = matchService.getMatchStats(updatedMatch.getId());
@@ -310,11 +305,10 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.info("Removing tag '{}' from match: {}", tag, id);
 
-        // Verify ownership through match's team
         Match existingMatch = matchService.getMatchById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
         Long teamId = existingMatch.getTeam().getId();
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.EDIT_REPLAY_NOTES);
 
         Match updatedMatch = matchService.removeTag(id, teamId, tag);
         MatchService.MatchStats stats = matchService.getMatchStats(updatedMatch.getId());
@@ -339,11 +333,10 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.info("Deleting match: {}", id);
 
-        // Verify ownership through match's team
         Match existingMatch = matchService.getMatchById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
         Long teamId = existingMatch.getTeam().getId();
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.DELETE_REPLAYS);
 
         matchService.deleteMatch(id, teamId);
         return ResponseEntity.noContent().build();
@@ -365,10 +358,9 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching statistics for match: {}", id);
 
-        // Verify ownership through match's team
         Match existingMatch = matchService.getMatchById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
-        verifyTeamOwnership(existingMatch.getTeam().getId(), userId);
+        verifyTeamAccess(existingMatch.getTeam().getId(), userId);
 
         MatchService.MatchStats stats = matchService.getMatchStats(id);
         MatchDTO.MatchStats response = matchMapper.toStatsDTO(stats);
@@ -392,8 +384,7 @@ public class MatchController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching team match statistics for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         MatchService.TeamMatchStats stats = matchService.getTeamMatchStats(teamId);
         MatchDTO.TeamMatchStatsResponse response = matchMapper.toDTO(stats);
