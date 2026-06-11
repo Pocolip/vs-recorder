@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-06-10-team-collaborators",
+    "date": "2026-06-10",
+    "title": "New: Team Collaborators",
+    "message": "You can now invite teammates to share a team with you (no more exporting copies back and forth). Open Manage Collaborators in the team sidebar, send an email invite, and pick what they can do — add replays, edit notes/calcs, edit team details, edit game plans. Shared teams show up in the new Shared tab below Home. Collaborators can still export a copy if they want to fork their own version."
+  },
+  {
     "id": "2026-05-24-recent-tour",
     "date": "2026-05-24",
     "title": "New: Recent Tour Imports",
