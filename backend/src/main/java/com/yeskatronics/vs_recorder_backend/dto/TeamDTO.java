@@ -69,6 +69,10 @@ public class TeamDTO {
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private TeamStats stats;
+        /** "OWNER" or "COLLABORATOR" — derived per-request from the caller's access. */
+        private String role;
+        /** Permission set the caller has on this team. Owners get all booleans true. */
+        private Permissions permissions;
     }
 
     /**
@@ -88,6 +92,24 @@ public class TeamDTO {
         private int replayCount;
         private int matchCount;
         private Double winRate;
+        /** "OWNER" or "COLLABORATOR" */
+        private String role;
+    }
+
+    /**
+     * Per-collaborator permission flags. Owners receive this with every flag true.
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Permissions {
+        private boolean canAddReplays;
+        private boolean canDeleteReplays;
+        private boolean canEditReplayNotes;
+        private boolean canEditTeamMemberNotes;
+        private boolean canEditTeamMemberCalcs;
+        private boolean canEditTeamDetails;
+        private boolean canEditGamePlans;
     }
 
     /**

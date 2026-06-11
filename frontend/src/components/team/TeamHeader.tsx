@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Plus, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, ChevronUp, ChevronDown, Users } from "lucide-react";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonTeam from "../pokemon/PokemonTeam";
+import PermissionGate from "../auth/PermissionGate";
 import AddReplayModal from "../modals/AddReplayModal";
 import { formatShortDate } from "../../utils/timeUtils";
 
@@ -76,14 +77,16 @@ const TeamHeader: React.FC = () => {
             <div className="flex-1" />
 
             {/* Add Replay button */}
-            <button
-              type="button"
-              onClick={() => setShowAddReplay(true)}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white hover:bg-brand-600"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Replay</span>
-            </button>
+            <PermissionGate perm="canAddReplays">
+              <button
+                type="button"
+                onClick={() => setShowAddReplay(true)}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white hover:bg-brand-600"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Replay</span>
+              </button>
+            </PermissionGate>
 
             {/* Expand */}
             <button
@@ -125,14 +128,25 @@ const TeamHeader: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowAddReplay(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white hover:bg-brand-600"
-            >
-              <Plus className="h-4 w-4" />
-              Add Replay
-            </button>
+            {team?.role === "COLLABORATOR" && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
+                title="This team is shared with you by another user"
+              >
+                <Users className="h-3 w-3" />
+                Shared
+              </span>
+            )}
+            <PermissionGate perm="canAddReplays">
+              <button
+                type="button"
+                onClick={() => setShowAddReplay(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white hover:bg-brand-600"
+              >
+                <Plus className="h-4 w-4" />
+                Add Replay
+              </button>
+            </PermissionGate>
 
             <button
               type="button"

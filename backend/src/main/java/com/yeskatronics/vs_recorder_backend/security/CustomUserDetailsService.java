@@ -47,4 +47,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         return user.getId();
     }
+
+    /**
+     * Get user email by ID
+     */
+    public String getUserEmailById(Long userId) {
+        return userRepository.findById(userId)
+                .map(User::getEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userId));
+    }
 }

@@ -1,6 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.controllers;
 
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
+import com.yeskatronics.vs_recorder_backend.exceptions.TeamAccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +62,26 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(error);
+    }
+
+    /**
+     * Handle team access denied (collaborator missing permission, or non-member access).
+     */
+    @ExceptionHandler(TeamAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleTeamAccessDenied(
+            TeamAccessDeniedException ex,
+            WebRequest request) {
+
+        log.warn("Team access denied: {}", ex.getMessage());
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     /**

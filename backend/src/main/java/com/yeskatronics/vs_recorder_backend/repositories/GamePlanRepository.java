@@ -52,6 +52,12 @@ public interface GamePlanRepository extends JpaRepository<GamePlan, Long> {
     Optional<GamePlan> findFirstByTeamIdAndUserId(Long teamId, Long userId);
 
     /**
+     * Find any game plan attached to the team, regardless of creator. Used when serving
+     * collaborators: the team has a single shared plan, not one per user.
+     */
+    Optional<GamePlan> findFirstByTeamId(Long teamId);
+
+    /**
      * Check if a game plan already exists for a team and user
      * @param teamId the team ID
      * @param userId the user ID

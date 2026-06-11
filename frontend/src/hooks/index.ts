@@ -8,3 +8,5 @@ export { default as useTeamMembers } from "./useTeamMembers";
 export { default as useTeamPokemon } from "./useTeamPokemon";
 export { useOpponentTeams } from "./useOpponentTeams";
 export { useDamageCalc } from "./useDamageCalc";
+export { useTeamPermissions } from "./useTeamPermissions";
+export type { Permission as TeamPermission, TeamPermissionsHelpers } from "./useTeamPermissions";

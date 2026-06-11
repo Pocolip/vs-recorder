@@ -7,7 +7,8 @@ import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.mappers.ReplayMapper;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.ReplayService;
-import com.yeskatronics.vs_recorder_backend.services.TeamService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.Permission;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class ReplayController {
 
     private final ReplayService replayService;
     private final ReplayMapper replayMapper;
-    private final TeamService teamService;
+    private final TeamAccessService teamAccessService;
     private final CustomUserDetailsService userDetailsService;
 
     /**
@@ -45,11 +46,17 @@ public class ReplayController {
     }
 
     /**
-     * Helper method to verify team ownership
+     * Verify the caller can read the team (owner or accepted collaborator).
      */
-    private void verifyTeamOwnership(Long teamId, Long userId) {
-        teamService.getTeamByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found or access denied"));
+    private void verifyTeamAccess(Long teamId, Long userId) {
+        teamAccessService.resolve(teamId, userId);
+    }
+
+    /**
+     * Verify the caller can perform a specific action on the team.
+     */
+    private void verifyTeamPermission(Long teamId, Long userId, Permission permission) {
+        teamAccessService.requirePermission(teamId, userId, permission);
     }
 
     /**
@@ -70,8 +77,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Creating replay from URL for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.ADD_REPLAYS);
 
         Replay savedReplay = replayService.createReplayFromUrl(teamId, request.getUrl());
 
@@ -113,8 +119,7 @@ public class ReplayController {
 
         Long userId = getCurrentUserId(authentication);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.ADD_REPLAYS);
 
         ShowdownDTO.ReplayPreview preview = replayService.previewReplayFromUrl(teamId, request.getUrl());
         return ResponseEntity.ok(preview);
@@ -138,8 +143,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Creating replay for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamPermission(teamId, userId, Permission.ADD_REPLAYS);
 
         Replay replay = replayMapper.toEntity(request);
         Replay savedReplay = replayService.createReplay(replay, teamId);
@@ -166,8 +170,12 @@ public class ReplayController {
 
         return replayService.getReplayById(id)
                 .filter(replay -> {
-                    // Verify user owns the team this replay belongs to
-                    return teamService.getTeamByIdAndUserId(replay.getTeam().getId(), userId).isPresent();
+                    try {
+                        teamAccessService.resolve(replay.getTeam().getId(), userId);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
                 })
                 .map(replayMapper::toDTO)
                 .map(ResponseEntity::ok)
@@ -190,8 +198,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdOrderedByDate(teamId).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -216,8 +223,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching standalone replays for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getStandaloneReplays(teamId).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -244,10 +250,10 @@ public class ReplayController {
 
         List<Replay> replays = replayService.getReplaysByMatchId(matchId);
 
-        // Verify ownership via first replay's team (all replays in a match belong to same team)
+        // Verify access via first replay's team (all replays in a match belong to same team)
         if (!replays.isEmpty()) {
             Long teamId = replays.get(0).getTeam().getId();
-            verifyTeamOwnership(teamId, userId);
+            verifyTeamAccess(teamId, userId);
         }
 
         List<ReplayDTO.Summary> response = replays.stream()
@@ -275,8 +281,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays with filters for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysWithFilters(
                         teamId,
@@ -310,8 +315,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for team: {} with result: {}", teamId, result);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdAndResult(teamId, result).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -338,8 +342,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching replays for team: {} against opponent: {}", teamId, opponent);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdAndOpponent(teamId, opponent).stream()
                 .map(replayMapper::toSummaryDTO)
@@ -366,10 +369,9 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Updating replay: {}", id);
 
-        // Verify ownership through replay's team
         Replay existingReplay = replayService.getReplayById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
-        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
+        verifyTeamPermission(existingReplay.getTeam().getId(), userId, Permission.EDIT_REPLAY_NOTES);
 
         Replay updates = replayMapper.toEntity(request);
         Replay updatedReplay = replayService.updateReplay(id, updates);
@@ -396,10 +398,9 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Associating replay: {} with match: {}", id, request.getMatchId());
 
-        // Verify ownership through replay's team
         Replay existingReplay = replayService.getReplayById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
-        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
+        verifyTeamPermission(existingReplay.getTeam().getId(), userId, Permission.EDIT_REPLAY_NOTES);
 
         Replay updatedReplay = replayService.associateReplayWithMatch(id, request.getMatchId());
         ReplayDTO.Summary response = replayMapper.toSummaryDTO(updatedReplay);
@@ -423,10 +424,9 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Dissociating replay: {} from its match", id);
 
-        // Verify ownership through replay's team
         Replay existingReplay = replayService.getReplayById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
-        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
+        verifyTeamPermission(existingReplay.getTeam().getId(), userId, Permission.EDIT_REPLAY_NOTES);
 
         Replay updatedReplay = replayService.dissociateReplayFromMatch(id);
         ReplayDTO.Summary response = replayMapper.toSummaryDTO(updatedReplay);
@@ -450,10 +450,9 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Deleting replay: {}", id);
 
-        // Verify ownership through replay's team
         Replay existingReplay = replayService.getReplayById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Replay not found"));
-        verifyTeamOwnership(existingReplay.getTeam().getId(), userId);
+        verifyTeamPermission(existingReplay.getTeam().getId(), userId, Permission.DELETE_REPLAYS);
 
         replayService.deleteReplay(id);
         return ResponseEntity.noContent().build();
@@ -490,8 +489,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Calculating win rate for team: {}", teamId);
 
-        // Verify team ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         double winRate = replayService.calculateWinRate(teamId);
         return ResponseEntity.ok(winRate);

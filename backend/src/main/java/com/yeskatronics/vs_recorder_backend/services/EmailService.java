@@ -50,6 +50,20 @@ public class EmailService {
         log.info("Password changed confirmation sent to: {}***", maskEmail(toEmail));
     }
 
+    /**
+     * Send a team collaboration invite. {@code acceptUrl} is the deep link to the accept
+     * page (e.g. {frontend-url}/invites/{token}); the page lets the recipient sign in or
+     * create an account before accepting.
+     */
+    public void sendCollaborationInvite(String toEmail, String ownerUsername, String teamName,
+                                        String acceptUrl) {
+        String subject = appName + " - " + ownerUsername + " invited you to collaborate on " + teamName;
+        String htmlBody = buildCollaborationInviteHtmlEmail(ownerUsername, teamName, acceptUrl);
+
+        sendEmail(toEmail, subject, htmlBody);
+        log.info("Collaboration invite for team '{}' sent to: {}***", teamName, maskEmail(toEmail));
+    }
+
     private void sendEmail(String toEmail, String subject, String htmlBody) {
         try {
             CreateEmailOptions options = CreateEmailOptions.builder()
@@ -125,6 +139,55 @@ public class EmailService {
             </body>
             </html>
             """.formatted(username, resetUrl, resetUrl, resetUrl);
+    }
+
+    private String buildCollaborationInviteHtmlEmail(String ownerUsername, String teamName, String acceptUrl) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\s
+                         line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);\s
+                            padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 28px;">VS Recorder</h1>
+                </div>
+                <div style="background: #ffffff; padding: 30px; border: 1px solid #e0e0e0;\s
+                            border-top: none; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #333; margin-top: 0;">You've been invited to collaborate</h2>
+                    <p><strong>%s</strong> invited you to collaborate on the VS Recorder team\s
+                       <strong>%s</strong>. You'll be able to view replays, stats, notes, and damage calcs,
+                       and add to the team based on the permissions %s grants you.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="%s"\s
+                           style="background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);\s
+                                  color: white; padding: 14px 30px; text-decoration: none;\s
+                                  border-radius: 5px; font-weight: bold; display: inline-block;">
+                            Accept invite
+                        </a>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">
+                        This invite expires in <strong>7 days</strong>. If you don't have a VS Recorder
+                        account yet, you'll be prompted to sign up — your invite will accept automatically.
+                    </p>
+                    <p style="color: #666; font-size: 14px;">
+                        If you weren't expecting this, you can ignore the email — no action is required.
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+                    <p style="color: #999; font-size: 12px; text-align: center;">
+                        If the button doesn't work, copy and paste this link into your browser:<br>
+                        <a href="%s" style="color: #667eea; word-break: break-all;">%s</a>
+                    </p>
+                </div>
+                <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
+                    VS Recorder - Pokemon VGC Replay Analysis
+                </p>
+            </body>
+            </html>
+            """.formatted(ownerUsername, teamName, ownerUsername, acceptUrl, acceptUrl, acceptUrl);
     }
 
     private String buildPasswordChangedHtmlEmail(String username) {

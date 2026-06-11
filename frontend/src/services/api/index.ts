@@ -7,3 +7,5 @@ export { analyticsApi } from "./analyticsApi";
 export { gamePlanApi } from "./gamePlanApi";
 export { exportApi } from "./exportApi";
 export { teamMemberApi } from "./teamMemberApi";
+export { collaboratorApi } from "./collaboratorApi";
+export type { InvitePayload } from "./collaboratorApi";

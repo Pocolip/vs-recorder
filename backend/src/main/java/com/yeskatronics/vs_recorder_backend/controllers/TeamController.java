@@ -5,6 +5,10 @@ import com.yeskatronics.vs_recorder_backend.dto.TeamDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.mappers.TeamMapper;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.Permission;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.Role;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.TeamAccess;
 import com.yeskatronics.vs_recorder_backend.services.TeamService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,7 @@ import java.util.stream.Collectors;
 public class TeamController {
 
     private final TeamService teamService;
+    private final TeamAccessService teamAccessService;
     private final TeamMapper teamMapper;
     private final CustomUserDetailsService userDetailsService;
 
@@ -41,6 +46,36 @@ public class TeamController {
     private Long getCurrentUserId(Authentication authentication) {
         String username = authentication.getName();
         return userDetailsService.getUserIdByUsername(username);
+    }
+
+    /**
+     * Attach role + permissions to a Response based on the caller's resolved access.
+     */
+    private void applyAccessToDto(TeamDTO.Response response, TeamAccess access) {
+        response.setRole(access.getRole().name());
+        TeamDTO.Permissions perms = new TeamDTO.Permissions();
+        perms.setCanAddReplays(teamAccessService.has(access, Permission.ADD_REPLAYS));
+        perms.setCanDeleteReplays(teamAccessService.has(access, Permission.DELETE_REPLAYS));
+        perms.setCanEditReplayNotes(teamAccessService.has(access, Permission.EDIT_REPLAY_NOTES));
+        perms.setCanEditTeamMemberNotes(teamAccessService.has(access, Permission.EDIT_TEAM_MEMBER_NOTES));
+        perms.setCanEditTeamMemberCalcs(teamAccessService.has(access, Permission.EDIT_TEAM_MEMBER_CALCS));
+        perms.setCanEditTeamDetails(teamAccessService.has(access, Permission.EDIT_TEAM_DETAILS));
+        perms.setCanEditGamePlans(teamAccessService.has(access, Permission.EDIT_GAME_PLANS));
+        response.setPermissions(perms);
+    }
+
+    /**
+     * Build a Summary DTO for a team and tag it with the caller's role. Owners get OWNER;
+     * accepted collaborators get COLLABORATOR. Used by list endpoints.
+     */
+    private TeamDTO.Summary toSummaryDtoWithRole(Team team, Long userId) {
+        int replayCount = team.getReplays() != null ? team.getReplays().size() : 0;
+        int matchCount = team.getMatches() != null ? team.getMatches().size() : 0;
+        double winRate = teamService.getTeamStats(team.getId()).winRate();
+        TeamDTO.Summary summary = teamMapper.toSummaryDTO(team, replayCount, matchCount, winRate);
+        boolean isOwner = team.getUser() != null && userId.equals(team.getUser().getId());
+        summary.setRole(isOwner ? Role.OWNER.name() : Role.COLLABORATOR.name());
+        return summary;
     }
 
     /**
@@ -63,6 +98,8 @@ public class TeamController {
         Team savedTeam = teamService.createTeam(team, userId);
         TeamService.TeamStats stats = teamService.getTeamStats(savedTeam.getId());
         TeamDTO.Response response = teamMapper.toDTO(savedTeam, stats);
+        TeamAccess access = teamAccessService.resolve(savedTeam.getId(), userId);
+        applyAccessToDto(response, access);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -83,13 +120,11 @@ public class TeamController {
         log.debug("Fetching team by ID: {}", id);
         Long userId = getCurrentUserId(authentication);
 
-        return teamService.getTeamByIdAndUserId(id, userId)
-                .map(team -> {
-                    TeamService.TeamStats stats = teamService.getTeamStats(team.getId());
-                    return teamMapper.toDTO(team, stats);
-                })
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        TeamAccess access = teamAccessService.resolve(id, userId);
+        TeamService.TeamStats stats = teamService.getTeamStats(access.getTeam().getId());
+        TeamDTO.Response response = teamMapper.toDTO(access.getTeam(), stats);
+        applyAccessToDto(response, access);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -102,16 +137,11 @@ public class TeamController {
     @GetMapping
     public ResponseEntity<List<TeamDTO.Summary>> getTeamsByUserId(Authentication authentication) {
         Long userId = getCurrentUserId(authentication);
-        log.debug("Fetching teams for user: {}", userId);
+        log.debug("Fetching accessible teams for user: {}", userId);
 
-        List<Team> teams = teamService.getTeamsByUserId(userId);
+        List<Team> teams = teamService.getAccessibleTeams(userId);
         List<TeamDTO.Summary> summaries = teams.stream()
-                .map(team -> {
-                    int replayCount = team.getReplays() != null ? team.getReplays().size() : 0;
-                    int matchCount = team.getMatches() != null ? team.getMatches().size() : 0;
-                    double winRate = teamService.getTeamStats(team.getId()).winRate();
-                    return teamMapper.toSummaryDTO(team, replayCount, matchCount, winRate);
-                })
+                .map(team -> toSummaryDtoWithRole(team, userId))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(summaries);
@@ -135,12 +165,7 @@ public class TeamController {
 
         List<Team> teams = teamService.getTeamsByUserIdAndRegulation(userId, regulation);
         List<TeamDTO.Summary> summaries = teams.stream()
-                .map(team -> {
-                    int replayCount = team.getReplays() != null ? team.getReplays().size() : 0;
-                    int matchCount = team.getMatches() != null ? team.getMatches().size() : 0;
-                    double winRate = teamService.getTeamStats(team.getId()).winRate();
-                    return teamMapper.toSummaryDTO(team, replayCount, matchCount, winRate);
-                })
+                .map(team -> toSummaryDtoWithRole(team, userId))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(summaries);
@@ -164,10 +189,13 @@ public class TeamController {
         Long userId = getCurrentUserId(authentication);
         log.info("Updating team: {} for user: {}", id, userId);
 
+        TeamAccess access = teamAccessService.requirePermission(id, userId, Permission.EDIT_TEAM_DETAILS);
+
         Team updates = teamMapper.toEntity(request);
         Team updatedTeam = teamService.updateTeam(id, userId, updates);
         TeamService.TeamStats stats = teamService.getTeamStats(updatedTeam.getId());
         TeamDTO.Response response = teamMapper.toDTO(updatedTeam, stats);
+        applyAccessToDto(response, access);
 
         return ResponseEntity.ok(response);
     }
@@ -188,6 +216,7 @@ public class TeamController {
         Long userId = getCurrentUserId(authentication);
         log.info("Deleting team: {} for user: {}", id, userId);
 
+        teamAccessService.requireOwner(id, userId);
         teamService.deleteTeam(id, userId);
         return ResponseEntity.noContent().build();
     }
@@ -208,10 +237,7 @@ public class TeamController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching statistics for team: {}", id);
 
-        // Verify ownership
-        if (!teamService.getTeamByIdAndUserId(id, userId).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+        teamAccessService.resolve(id, userId);
 
         TeamService.TeamStats stats = teamService.getTeamStats(id);
         TeamDTO.TeamStats response = teamMapper.toStatsDTO(stats);
@@ -237,9 +263,11 @@ public class TeamController {
         Long userId = getCurrentUserId(authentication);
         log.info("Adding showdown username '{}' to team: {}", request.getUsername(), id);
 
+        TeamAccess access = teamAccessService.requirePermission(id, userId, Permission.EDIT_TEAM_DETAILS);
         Team updatedTeam = teamService.addShowdownUsername(id, userId, request.getUsername());
         TeamService.TeamStats stats = teamService.getTeamStats(updatedTeam.getId());
         TeamDTO.Response response = teamMapper.toDTO(updatedTeam, stats);
+        applyAccessToDto(response, access);
 
         return ResponseEntity.ok(response);
     }
@@ -262,9 +290,11 @@ public class TeamController {
         Long userId = getCurrentUserId(authentication);
         log.info("Removing showdown username '{}' from team: {}", username, id);
 
+        TeamAccess access = teamAccessService.requirePermission(id, userId, Permission.EDIT_TEAM_DETAILS);
         Team updatedTeam = teamService.removeShowdownUsername(id, userId, username);
         TeamService.TeamStats stats = teamService.getTeamStats(updatedTeam.getId());
         TeamDTO.Response response = teamMapper.toDTO(updatedTeam, stats);
+        applyAccessToDto(response, access);
 
         return ResponseEntity.ok(response);
     }
@@ -281,6 +311,7 @@ public class TeamController {
 
         Long userId = getCurrentUserId(authentication);
         log.info("Adding team {} to folder {}", id, folderId);
+        teamAccessService.resolve(id, userId); // any access — folders are per-caller
         teamService.addTeamToFolder(id, folderId, userId);
         return ResponseEntity.ok().build();
     }
@@ -297,6 +328,7 @@ public class TeamController {
 
         Long userId = getCurrentUserId(authentication);
         log.info("Removing team {} from folder {}", id, folderId);
+        teamAccessService.resolve(id, userId); // any access
         teamService.removeTeamFromFolder(id, folderId, userId);
         return ResponseEntity.noContent().build();
     }

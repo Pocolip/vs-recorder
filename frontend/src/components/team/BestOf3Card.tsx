@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ExternalLink, Edit3, Save, Tag, Trophy, CheckCircle2, AlertCircle, MessageSquare } from "lucide-react";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import PokemonSprite from "../pokemon/PokemonSprite";
+import PermissionGate from "../auth/PermissionGate";
 import TagInput from "../form/TagInput";
 import { cleanPokemonName } from "../../utils/pokemonNameUtils";
 import { formatTimeAgo } from "../../utils/timeUtils";
@@ -294,14 +295,16 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
             Tags
           </h4>
           {!isEditingTags && (
-            <button
-              type="button"
-              onClick={() => setIsEditingTags(true)}
-              className="rounded p-1 text-gray-400 transition-colors hover:text-blue-600 dark:hover:text-blue-400"
-              title="Edit tags"
-            >
-              <Edit3 className="h-3 w-3" />
-            </button>
+            <PermissionGate perm="canEditReplayNotes">
+              <button
+                type="button"
+                onClick={() => setIsEditingTags(true)}
+                className="rounded p-1 text-gray-400 transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+                title="Edit tags"
+              >
+                <Edit3 className="h-3 w-3" />
+              </button>
+            </PermissionGate>
           )}
         </div>
 
@@ -361,14 +364,16 @@ export default function BestOf3Card({ match, onUpdateNotes, onUpdateTags }: Best
             Match Notes
           </h4>
           {!isEditingNotes && (
-            <button
-              type="button"
-              onClick={() => setIsEditingNotes(true)}
-              className="rounded p-1 text-gray-400 transition-colors hover:text-blue-600 dark:hover:text-blue-400"
-              title="Edit notes"
-            >
-              <Edit3 className="h-3 w-3" />
-            </button>
+            <PermissionGate perm="canEditReplayNotes">
+              <button
+                type="button"
+                onClick={() => setIsEditingNotes(true)}
+                className="rounded p-1 text-gray-400 transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+                title="Edit notes"
+              >
+                <Edit3 className="h-3 w-3" />
+              </button>
+            </PermissionGate>
           )}
         </div>
 

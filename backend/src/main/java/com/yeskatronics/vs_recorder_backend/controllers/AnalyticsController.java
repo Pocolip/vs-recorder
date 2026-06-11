@@ -4,7 +4,7 @@ import com.yeskatronics.vs_recorder_backend.dto.AnalyticsDTO;
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.AnalyticsService;
-import com.yeskatronics.vs_recorder_backend.services.TeamService;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.*;
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
-    private final TeamService teamService;
+    private final TeamAccessService teamAccessService;
     private final CustomUserDetailsService userDetailsService;
 
     /**
@@ -46,11 +46,10 @@ public class AnalyticsController {
     }
 
     /**
-     * Helper method to verify team ownership
+     * Verify the caller can read the team (owner or accepted collaborator).
      */
-    private void verifyTeamOwnership(Long teamId, Long userId) {
-        teamService.getTeamByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found or access denied"));
+    private void verifyTeamAccess(Long teamId, Long userId) {
+        teamAccessService.resolve(teamId, userId);
     }
 
     /**
@@ -87,8 +86,7 @@ public class AnalyticsController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching usage stats for team: {} (user: {})", teamId, userId);
 
-        // Verify ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         AnalyticsDTO.UsageStatsResponse stats = analyticsService.getUsageStats(teamId);
         return ResponseEntity.ok(stats);
@@ -128,8 +126,7 @@ public class AnalyticsController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching matchup stats for team: {} (user: {})", teamId, userId);
 
-        // Verify ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         AnalyticsDTO.MatchupStatsResponse stats = analyticsService.getMatchupStats(teamId);
         return ResponseEntity.ok(stats);
@@ -176,8 +173,7 @@ public class AnalyticsController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Analyzing custom matchup for team: {} against: {}", teamId, request.getOpponentPokemon());
 
-        // Verify ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         // Validate request
         if (request.getOpponentPokemon() == null ||
@@ -224,8 +220,7 @@ public class AnalyticsController {
         Long userId = getCurrentUserId(authentication);
         log.debug("Fetching move usage stats for team: {} (user: {})", teamId, userId);
 
-        // Verify ownership
-        verifyTeamOwnership(teamId, userId);
+        verifyTeamAccess(teamId, userId);
 
         AnalyticsDTO.MoveUsageResponse stats = analyticsService.getMoveUsageStats(teamId);
         return ResponseEntity.ok(stats);

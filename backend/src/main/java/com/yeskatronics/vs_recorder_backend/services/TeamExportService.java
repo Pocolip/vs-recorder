@@ -35,6 +35,7 @@ public class TeamExportService {
     private final MatchRepository matchRepository;
     private final GamePlanRepository gamePlanRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final TeamAccessService teamAccessService;
     private final ObjectMapper objectMapper;
 
     // Rate limiting: 10 codes per user per day
@@ -54,9 +55,8 @@ public class TeamExportService {
     public ExportDTO.ExportData compileExportData(Long teamId, Long userId, ExportDTO.ExportOptions options) {
         log.info("Compiling export data for team ID: {} with options: {}", teamId, options);
 
-        // Fetch team and verify ownership
-        Team team = teamRepository.findByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found or not owned by user"));
+        // Allow any caller with team access to export (collaborators can fork into their own copy).
+        Team team = teamAccessService.resolve(teamId, userId).getTeam();
 
         // Build team data
         ExportDTO.TeamData teamData = ExportDTO.TeamData.builder()
