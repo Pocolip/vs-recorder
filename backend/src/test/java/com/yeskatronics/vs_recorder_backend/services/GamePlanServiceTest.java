@@ -3,6 +3,7 @@ package com.yeskatronics.vs_recorder_backend.services;
 import com.yeskatronics.vs_recorder_backend.entities.GamePlan;
 import com.yeskatronics.vs_recorder_backend.entities.GamePlanTeam;
 import com.yeskatronics.vs_recorder_backend.entities.User;
+import com.yeskatronics.vs_recorder_backend.exceptions.TeamAccessDeniedException;
 import com.yeskatronics.vs_recorder_backend.repositories.GamePlanRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.GamePlanTeamRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.UserRepository;
@@ -544,7 +545,7 @@ class GamePlanServiceTest {
         updates.setName("Hacked Name");
 
         // User2 tries to update User1's plan
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(TeamAccessDeniedException.class, () -> {
             gamePlanService.updateGamePlan(saved.getId(), testUser2.getId(), updates);
         }, "User should not update another user's game plan");
     }
@@ -556,7 +557,7 @@ class GamePlanServiceTest {
         GamePlan saved = gamePlanService.createGamePlan(gamePlan, testUser1.getId());
 
         // User2 tries to delete User1's plan
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(TeamAccessDeniedException.class, () -> {
             gamePlanService.deleteGamePlan(saved.getId(), testUser2.getId());
         }, "User should not delete another user's game plan");
     }

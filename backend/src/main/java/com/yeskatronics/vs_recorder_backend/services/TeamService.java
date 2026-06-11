@@ -129,6 +129,16 @@ public class TeamService {
     }
 
     /**
+     * All teams the user can access: those they own plus those shared with them as an
+     * accepted collaborator.
+     */
+    @Transactional(readOnly = true)
+    public List<Team> getAccessibleTeams(Long userId) {
+        log.debug("Fetching all accessible teams for user ID: {}", userId);
+        return teamRepository.findAllAccessibleByUserId(userId);
+    }
+
+    /**
      * Get teams by user and regulation
      *
      * @param userId the user ID
@@ -163,11 +173,11 @@ public class TeamService {
      * @throws IllegalArgumentException if team not found or not owned by user
      */
     public Team updateTeam(Long id, Long userId, Team updates) {
-        log.info("Updating team ID: {} for user ID: {}", id, userId);
+        log.info("Updating team ID: {} (caller: {})", id, userId);
 
-        Team existingTeam = teamRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Team not found with ID: " + id + " for user: " + userId));
+        // Authorization happens in the controller via TeamAccessService; here we just load the team.
+        Team existingTeam = teamRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + id));
 
         // Update fields if provided
         if (updates.getName() != null && !updates.getName().isEmpty()) {
@@ -208,11 +218,10 @@ public class TeamService {
      * @return the updated team
      */
     public Team addShowdownUsername(Long teamId, Long userId, String username) {
-        log.info("Adding showdown username '{}' to team ID: {}", username, teamId);
+        log.info("Adding showdown username '{}' to team ID: {} (caller: {})", username, teamId, userId);
 
-        Team team = teamRepository.findByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Team not found with ID: " + teamId + " for user: " + userId));
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         team.addShowdownUsername(username);
         Team savedTeam = teamRepository.save(team);
@@ -229,11 +238,10 @@ public class TeamService {
      * @return the updated team
      */
     public Team removeShowdownUsername(Long teamId, Long userId, String username) {
-        log.info("Removing showdown username '{}' from team ID: {}", username, teamId);
+        log.info("Removing showdown username '{}' from team ID: {} (caller: {})", username, teamId, userId);
 
-        Team team = teamRepository.findByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Team not found with ID: " + teamId + " for user: " + userId));
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         team.removeShowdownUsername(username);
         Team savedTeam = teamRepository.save(team);
@@ -249,11 +257,10 @@ public class TeamService {
      * @throws IllegalArgumentException if team not found or not owned by user
      */
     public void deleteTeam(Long id, Long userId) {
-        log.info("Deleting team ID: {} for user ID: {}", id, userId);
+        log.info("Deleting team ID: {} (caller: {})", id, userId);
 
-        if (!teamRepository.existsByIdAndUserId(id, userId)) {
-            throw new IllegalArgumentException(
-                    "Team not found with ID: " + id + " for user: " + userId);
+        if (!teamRepository.existsById(id)) {
+            throw new IllegalArgumentException("Team not found with ID: " + id);
         }
 
         teamRepository.deleteById(id);
@@ -321,11 +328,10 @@ public class TeamService {
      * @return SyncResult with the updated member list and change details
      */
     public SyncResult syncTeamMembersFromPokepaste(Long teamId, Long userId) {
-        log.info("Syncing team members from pokepaste for team ID: {} user ID: {}", teamId, userId);
+        log.info("Syncing team members from pokepaste for team ID: {} (caller: {})", teamId, userId);
 
-        Team team = teamRepository.findByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Team not found with ID: " + teamId + " for user: " + userId));
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         if (team.getPokepaste() == null || team.getPokepaste().isEmpty()) {
             throw new IllegalArgumentException("Team has no pokepaste URL");
@@ -414,9 +420,8 @@ public class TeamService {
     public Team addTeamToFolder(Long teamId, Long folderId, Long userId) {
         log.info("Adding team {} to folder {} for user {}", teamId, folderId, userId);
 
-        Team team = teamRepository.findByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Team not found with ID: " + teamId + " for user: " + userId));
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         Folder folder = folderRepository.findByIdAndUserId(folderId, userId)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -432,9 +437,8 @@ public class TeamService {
     public Team removeTeamFromFolder(Long teamId, Long folderId, Long userId) {
         log.info("Removing team {} from folder {} for user {}", teamId, folderId, userId);
 
-        Team team = teamRepository.findByIdAndUserId(teamId, userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Team not found with ID: " + teamId + " for user: " + userId));
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         Folder folder = folderRepository.findByIdAndUserId(folderId, userId)
                 .orElseThrow(() -> new IllegalArgumentException(

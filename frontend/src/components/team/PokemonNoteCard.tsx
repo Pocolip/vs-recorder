@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Save, MessageSquare, ChevronDown, X } from "lucide-react";
 import PokemonSprite from "../pokemon/PokemonSprite";
+import PermissionGate from "../auth/PermissionGate";
+import { useTeamPermissions } from "../../hooks/useTeamPermissions";
 import type { TeamMember } from "../../types";
 
 const CALC_BG_DEFAULT =
@@ -48,6 +50,8 @@ const PokemonNoteCard: React.FC<PokemonNoteCardProps> = ({
   const [isNoteExpanded, setIsNoteExpanded] = useState(true);
   const [isCalcsExpanded, setIsCalcsExpanded] = useState(true);
   const [calcInput, setCalcInput] = useState("");
+  const { can } = useTeamPermissions();
+  const canEditCalcs = can("canEditTeamMemberCalcs");
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]">
@@ -66,14 +70,16 @@ const PokemonNoteCard: React.FC<PokemonNoteCardProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={() => onStartEditingNote(member)}
-          disabled={isEditingNote || isSavingNote}
-          className="rounded p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
-          title="Edit notes"
-        >
-          <MessageSquare className="h-4 w-4" />
-        </button>
+        <PermissionGate perm="canEditTeamMemberNotes">
+          <button
+            onClick={() => onStartEditingNote(member)}
+            disabled={isEditingNote || isSavingNote}
+            className="rounded p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+            title="Edit notes"
+          >
+            <MessageSquare className="h-4 w-4" />
+          </button>
+        </PermissionGate>
       </div>
 
       {/* Collapsible Notes */}
@@ -183,30 +189,34 @@ const PokemonNoteCard: React.FC<PokemonNoteCardProps> = ({
                 <span className="flex-1 break-words text-sm text-gray-700 dark:text-gray-300">
                   {calc}
                 </span>
-                <button
-                  onClick={() => onRemoveCalc(member.id, index)}
-                  className="flex-shrink-0 p-0.5 text-gray-400 opacity-0 transition-all hover:text-red-500 group-hover/calc:opacity-100 dark:text-gray-500 dark:hover:text-red-400"
-                  title="Remove calc"
-                >
-                  <X className="h-3 w-3" />
-                </button>
+                {canEditCalcs && (
+                  <button
+                    onClick={() => onRemoveCalc(member.id, index)}
+                    className="flex-shrink-0 p-0.5 text-gray-400 opacity-0 transition-all hover:text-red-500 group-hover/calc:opacity-100 dark:text-gray-500 dark:hover:text-red-400"
+                    title="Remove calc"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
             ))}
 
-            <input
-              type="text"
-              value={calcInput}
-              onChange={(e) => setCalcInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && calcInput.trim()) {
-                  e.preventDefault();
-                  onAddCalc(member.id, calcInput.trim());
-                  setCalcInput("");
-                }
-              }}
-              placeholder="Paste a calc result and press Enter..."
-              className="w-full rounded border border-gray-200 bg-gray-50 px-2 py-1.5 text-xs text-gray-800 placeholder-gray-400 transition-colors focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder-gray-500"
-            />
+            {canEditCalcs && (
+              <input
+                type="text"
+                value={calcInput}
+                onChange={(e) => setCalcInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && calcInput.trim()) {
+                    e.preventDefault();
+                    onAddCalc(member.id, calcInput.trim());
+                    setCalcInput("");
+                  }
+                }}
+                placeholder="Paste a calc result and press Enter..."
+                className="w-full rounded border border-gray-200 bg-gray-50 px-2 py-1.5 text-xs text-gray-800 placeholder-gray-400 transition-colors focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder-gray-500"
+              />
+            )}
           </div>
         )}
       </div>

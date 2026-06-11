@@ -8,6 +8,7 @@ import com.yeskatronics.vs_recorder_backend.exceptions.RateLimitExceededExceptio
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.security.JwtUtil;
 import com.yeskatronics.vs_recorder_backend.services.PasswordResetService;
+import com.yeskatronics.vs_recorder_backend.services.TeamCollaboratorService;
 import com.yeskatronics.vs_recorder_backend.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +48,7 @@ public class AuthController {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordResetService passwordResetService;
+    private final TeamCollaboratorService collaboratorService;
 
     /**
      * Register a new user
@@ -84,6 +86,14 @@ public class AuthController {
 
             // Save user
             User savedUser = userService.createUser(user);
+
+            // If this user was invited to any teams (by email) before they registered, auto-accept now.
+            try {
+                collaboratorService.autoAcceptOnSignup(savedUser.getId(), savedUser.getEmail());
+            } catch (RuntimeException e) {
+                log.warn("Auto-accept of pending collaboration invites failed for user {}: {}",
+                        savedUser.getId(), e.getMessage());
+            }
 
             // Generate JWT tokens
             UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getUsername());

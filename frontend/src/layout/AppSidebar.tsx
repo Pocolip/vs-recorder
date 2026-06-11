@@ -11,6 +11,8 @@ import {
   MoreHorizontal,
   Check,
   X,
+  Users,
+  UserPlus,
 } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -22,6 +24,7 @@ import { useActiveTeam } from "../context/ActiveTeamContext";
 import { useFolderContext } from "../context/FolderContext";
 import EditTeamModal from "../components/modals/EditTeamModal";
 import ExportTeamModal from "../components/modals/ExportTeamModal";
+import ManageCollaboratorsModal from "../components/modals/ManageCollaboratorsModal";
 import ConfirmationModal from "../components/modals/ConfirmationModal";
 import * as teamService from "../services/teamService";
 import type { Team, Folder } from "../types";
@@ -201,6 +204,7 @@ const AppSidebar: React.FC = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -216,6 +220,7 @@ const AppSidebar: React.FC = () => {
   const activeFolderId = searchParams.get("folder") ? Number(searchParams.get("folder")) : null;
   const isHomePage = location.pathname === "/" && !activeFolderId;
   const isDashboard = location.pathname === "/";
+  const isSharedPage = location.pathname === "/shared";
 
   useEffect(() => {
     if (creatingFolder && newFolderRef.current) newFolderRef.current.focus();
@@ -308,7 +313,24 @@ const AppSidebar: React.FC = () => {
         { name: "Type Chart", path: `/team/${team.id}/type-chart`, dividerAfter: true },
         { name: "Edit Team", onClick: () => setShowEditModal(true), icon: <Pencil className="h-3 w-3" /> },
         { name: "Export Team", onClick: () => setShowExportModal(true), icon: <Share2 className="h-3 w-3" /> },
-        { name: "Delete Team", onClick: () => setShowDeleteModal(true), icon: <Trash2 className="h-3 w-3" /> },
+        ...(team.role !== "COLLABORATOR"
+          ? [
+              {
+                name: "Manage Collaborators",
+                onClick: () => setShowCollaboratorsModal(true),
+                icon: <UserPlus className="h-3 w-3" />,
+              } as SubItem,
+            ]
+          : []),
+        ...(team.role !== "COLLABORATOR"
+          ? [
+              {
+                name: "Delete Team",
+                onClick: () => setShowDeleteModal(true),
+                icon: <Trash2 className="h-3 w-3" />,
+              } as SubItem,
+            ]
+          : []),
       ]
     : [];
 
@@ -363,6 +385,25 @@ const AppSidebar: React.FC = () => {
                   {/* Home (droppable) */}
                   <li>
                     <DroppableHomeItem isActive={isHomePage} isVisible={isVisible} />
+                  </li>
+
+                  {/* Shared/Collab teams hub */}
+                  <li>
+                    <Link
+                      to="/shared"
+                      className={`menu-item group ${
+                        isSharedPage ? "menu-item-active" : "menu-item-inactive"
+                      }`}
+                    >
+                      <span
+                        className={`menu-item-icon-size ${
+                          isSharedPage ? "menu-item-icon-active" : "menu-item-icon-inactive"
+                        }`}
+                      >
+                        <Users className="h-5 w-5" />
+                      </span>
+                      {isVisible && <span className="menu-item-text">Shared</span>}
+                    </Link>
                   </li>
 
                   {/* Folders section (dashboard only) */}
@@ -503,6 +544,11 @@ const AppSidebar: React.FC = () => {
             isOpen={showExportModal}
             team={team}
             onClose={() => setShowExportModal(false)}
+          />
+          <ManageCollaboratorsModal
+            isOpen={showCollaboratorsModal}
+            team={team}
+            onClose={() => setShowCollaboratorsModal(false)}
           />
           <ConfirmationModal
             isOpen={showDeleteModal}

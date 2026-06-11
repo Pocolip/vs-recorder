@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ExternalLink, ChevronDown, MessageSquare, Save, CheckCircle2, Circle } from "lucide-react";
 import PokemonSprite from "../pokemon/PokemonSprite";
+import PermissionGate from "../auth/PermissionGate";
 import { cleanPokemonName } from "../../utils/pokemonNameUtils";
 import { getResultDisplay } from "../../utils/resultUtils";
 import { formatTimeAgo } from "../../utils/timeUtils";
@@ -166,24 +167,26 @@ export default function GameCard({
               Replay
             </a>
             {onToggleReviewed && (
-              <button
-                type="button"
-                onClick={() => onToggleReviewed(replay)}
-                disabled={isTogglingReviewed}
-                title={replay.reviewed ? "Mark as unreviewed" : "Mark as reviewed"}
-                className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs transition-colors disabled:opacity-50 ${
-                  replay.reviewed
-                    ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-500/20 dark:text-green-400 dark:hover:bg-green-500/30"
-                    : "border border-gray-300 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
-                }`}
-              >
-                {replay.reviewed ? (
-                  <CheckCircle2 className="h-3 w-3" />
-                ) : (
-                  <Circle className="h-3 w-3" />
-                )}
-                Reviewed
-              </button>
+              <PermissionGate perm="canEditReplayNotes">
+                <button
+                  type="button"
+                  onClick={() => onToggleReviewed(replay)}
+                  disabled={isTogglingReviewed}
+                  title={replay.reviewed ? "Mark as unreviewed" : "Mark as reviewed"}
+                  className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs transition-colors disabled:opacity-50 ${
+                    replay.reviewed
+                      ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-500/20 dark:text-green-400 dark:hover:bg-green-500/30"
+                      : "border border-gray-300 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {replay.reviewed ? (
+                    <CheckCircle2 className="h-3 w-3" />
+                  ) : (
+                    <Circle className="h-3 w-3" />
+                  )}
+                  Reviewed
+                </button>
+              </PermissionGate>
             )}
           </div>
         </div>
@@ -334,14 +337,16 @@ export default function GameCard({
           ) : (
             <div className="flex-1" />
           )}
-          <button
-            type="button"
-            onClick={() => onStartEditNote(replay)}
-            className="shrink-0 rounded p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-600/10 dark:hover:text-blue-400"
-            title="Edit notes"
-          >
-            <MessageSquare className="h-3.5 w-3.5" />
-          </button>
+          <PermissionGate perm="canEditReplayNotes">
+            <button
+              type="button"
+              onClick={() => onStartEditNote(replay)}
+              className="shrink-0 rounded p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-600/10 dark:hover:text-blue-400"
+              title="Edit notes"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+            </button>
+          </PermissionGate>
         </div>
       )}
 

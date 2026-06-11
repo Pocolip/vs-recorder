@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Trash2, Save, MessageSquare, ExternalLink, ChevronDown } from "lucide-react";
 import PokemonTeam from "../pokemon/PokemonTeam";
+import PermissionGate from "../auth/PermissionGate";
 import { getResultDisplay } from "../../utils/resultUtils";
 import { formatTimeAgo } from "../../utils/timeUtils";
 import { getOpponentPokemonFromReplay } from "../../utils/pokemonNameUtils";
@@ -98,29 +99,33 @@ const CompactReplayCard: React.FC<CompactReplayCardProps> = ({
 
         {/* Action Buttons */}
         <div className="ml-3 flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onStartEditNote(replay)}
-            disabled={isEditingNote || isSavingNote}
-            className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
-            title="Edit notes"
-          >
-            <MessageSquare className="h-3.5 w-3.5" />
-          </button>
+          <PermissionGate perm="canEditReplayNotes">
+            <button
+              type="button"
+              onClick={() => onStartEditNote(replay)}
+              disabled={isEditingNote || isSavingNote}
+              className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+              title="Edit notes"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+            </button>
+          </PermissionGate>
 
-          <button
-            type="button"
-            onClick={() => onDelete(replay.id)}
-            disabled={isDeleting || isEditingNote}
-            className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-            title="Delete replay"
-          >
-            {isDeleting ? (
-              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent dark:border-gray-600" />
-            ) : (
-              <Trash2 className="h-3.5 w-3.5" />
-            )}
-          </button>
+          <PermissionGate perm="canDeleteReplays">
+            <button
+              type="button"
+              onClick={() => onDelete(replay.id)}
+              disabled={isDeleting || isEditingNote}
+              className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+              title="Delete replay"
+            >
+              {isDeleting ? (
+                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-transparent dark:border-gray-600" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </PermissionGate>
         </div>
       </div>
 

@@ -65,4 +65,12 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     @Query("SELECT t FROM Team t JOIN t.folders f WHERE f.id = :folderId")
     List<Team> findByFolderId(Long folderId);
+
+    /**
+     * All teams the user can access: those they own plus those they are an accepted collaborator on.
+     */
+    @Query("SELECT DISTINCT t FROM Team t WHERE t.user.id = :userId " +
+           "OR EXISTS (SELECT 1 FROM TeamCollaborator c " +
+           "           WHERE c.team = t AND c.user.id = :userId AND c.status = 'ACCEPTED')")
+    List<Team> findAllAccessibleByUserId(Long userId);
 }

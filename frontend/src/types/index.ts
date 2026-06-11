@@ -1,5 +1,13 @@
 export type { User, LoginCredentials, RegisterCredentials, AuthResponse } from "./auth";
-export type { Team } from "./team";
+export type { Team, TeamSummary } from "./team";
+export type {
+  TeamRole,
+  TeamPermissions,
+  Collaborator,
+  CollaboratorStatus,
+  InvitePreview,
+} from "./collaborator";
+export { ALL_PERMISSIONS_FALSE, ALL_PERMISSIONS_TRUE } from "./collaborator";
 export type { Folder } from "./folder";
 export type { Replay, BattleData } from "./replay";
 export type { Match, MatchStats } from "./match";

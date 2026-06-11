@@ -3,9 +3,11 @@ package com.yeskatronics.vs_recorder_backend.services;
 import com.yeskatronics.vs_recorder_backend.entities.GamePlan;
 import com.yeskatronics.vs_recorder_backend.entities.GamePlanTeam;
 import com.yeskatronics.vs_recorder_backend.entities.User;
+import com.yeskatronics.vs_recorder_backend.exceptions.TeamAccessDeniedException;
 import com.yeskatronics.vs_recorder_backend.repositories.GamePlanRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.GamePlanTeamRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.UserRepository;
+import com.yeskatronics.vs_recorder_backend.services.TeamAccessService.Permission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,36 @@ public class GamePlanService {
     private final GamePlanTeamRepository gamePlanTeamRepository;
     private final UserRepository userRepository;
     private final TeamService teamService;
+    private final TeamAccessService teamAccessService;
+
+    /**
+     * Resolve a game plan and verify the caller can access it.
+     *
+     * Access rules (a) the caller created the plan, OR (b) the plan is attached to a
+     * team and the caller is owner/accepted-collaborator of that team. For mutations
+     * (requireEdit=true) collaborators must additionally have {@link Permission#EDIT_GAME_PLANS}.
+     */
+    private GamePlan requirePlanAccess(Long planId, Long userId, boolean requireEdit) {
+        GamePlan plan = gamePlanRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("Game plan not found"));
+
+        boolean isCreator = plan.getUser() != null && userId.equals(plan.getUser().getId());
+        if (isCreator) {
+            return plan;
+        }
+
+        Long teamId = plan.getTeamId();
+        if (teamId == null) {
+            throw new TeamAccessDeniedException("Game plan not accessible to user " + userId);
+        }
+
+        if (requireEdit) {
+            teamAccessService.requirePermission(teamId, userId, Permission.EDIT_GAME_PLANS);
+        } else {
+            teamAccessService.resolve(teamId, userId);
+        }
+        return plan;
+    }
 
     /**
      * Bump the team's updatedAt when a matchup-planner edit lands. Safe no-op
@@ -87,7 +119,11 @@ public class GamePlanService {
     @Transactional(readOnly = true)
     public Optional<GamePlan> getGamePlanByIdAndUserId(Long id, Long userId) {
         log.debug("Fetching game plan by ID: {} for user: {}", id, userId);
-        return gamePlanRepository.findByIdAndUserId(id, userId);
+        try {
+            return Optional.of(requirePlanAccess(id, userId, false));
+        } catch (IllegalArgumentException | TeamAccessDeniedException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -114,8 +150,7 @@ public class GamePlanService {
     public GamePlan updateGamePlan(Long id, Long userId, GamePlan updates) {
         log.info("Updating game plan ID: {}", id);
 
-        GamePlan existingPlan = gamePlanRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan existingPlan = requirePlanAccess(id, userId, true);
 
         // Update fields
         if (updates.getName() != null) {
@@ -142,9 +177,7 @@ public class GamePlanService {
     public void deleteGamePlan(Long id, Long userId) {
         log.info("Deleting game plan ID: {}", id);
 
-        GamePlan gamePlan = gamePlanRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
-
+        GamePlan gamePlan = requirePlanAccess(id, userId, true);
         gamePlanRepository.delete(gamePlan);
         log.info("Game plan deleted successfully: {}", id);
     }
@@ -169,8 +202,10 @@ public class GamePlanService {
      */
     @Transactional(readOnly = true)
     public Optional<GamePlan> getGamePlanByTeamIdAndUserId(Long teamId, Long userId) {
-        log.debug("Fetching game plan for team ID: {} and user ID: {}", teamId, userId);
-        return gamePlanRepository.findFirstByTeamIdAndUserId(teamId, userId);
+        log.debug("Fetching game plan for team ID: {} (caller: {})", teamId, userId);
+        // Shared semantics: any caller with team access sees the team's plan, not their own.
+        teamAccessService.resolve(teamId, userId);
+        return gamePlanRepository.findFirstByTeamId(teamId);
     }
 
     /**
@@ -184,16 +219,18 @@ public class GamePlanService {
      * @return the existing or newly created game plan
      */
     public GamePlan getOrCreateGamePlanForTeam(Long teamId, Long userId, String defaultName) {
-        log.info("Getting or creating game plan for team ID: {} and user ID: {}", teamId, userId);
+        log.info("Getting or creating game plan for team ID: {} (caller: {})", teamId, userId);
 
-        // Check if a game plan already exists for this team
-        Optional<GamePlan> existingPlan = gamePlanRepository.findFirstByTeamIdAndUserId(teamId, userId);
+        // Reading is gated on team access; creating additionally requires EDIT_GAME_PLANS for collaborators.
+        Optional<GamePlan> existingPlan = gamePlanRepository.findFirstByTeamId(teamId);
         if (existingPlan.isPresent()) {
+            teamAccessService.resolve(teamId, userId);
             log.info("Found existing game plan ID: {} for team ID: {}", existingPlan.get().getId(), teamId);
             return existingPlan.get();
         }
 
-        // Create a new game plan
+        teamAccessService.requirePermission(teamId, userId, Permission.EDIT_GAME_PLANS);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
@@ -221,8 +258,7 @@ public class GamePlanService {
     public GamePlanTeam addTeamToGamePlan(Long gamePlanId, Long userId, GamePlanTeam team) {
         log.info("Adding team to game plan ID: {}", gamePlanId);
 
-        GamePlan gamePlan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan gamePlan = requirePlanAccess(gamePlanId, userId, true);
 
         // New teams go to position 0; shift existing teams down by 1.
         List<GamePlanTeam> existing = gamePlanTeamRepository.findByGamePlanIdOrderByPositionAscIdAsc(gamePlanId);
@@ -280,8 +316,7 @@ public class GamePlanService {
     public void reorderTeams(Long gamePlanId, Long userId, List<Long> orderedIds) {
         log.info("Reordering {} teams for game plan ID: {}", orderedIds.size(), gamePlanId);
 
-        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan plan = requirePlanAccess(gamePlanId, userId, true);
 
         List<GamePlanTeam> teams = gamePlanTeamRepository.findByGamePlanIdOrderByPositionAscIdAsc(gamePlanId);
         if (teams.size() != orderedIds.size()) {
@@ -317,8 +352,7 @@ public class GamePlanService {
     public GamePlanTeam updateGamePlanTeam(Long id, Long gamePlanId, Long userId, GamePlanTeam updates) {
         log.info("Updating game plan team ID: {}", id);
 
-        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan plan = requirePlanAccess(gamePlanId, userId, true);
 
         GamePlanTeam existingTeam = gamePlanTeamRepository.findByIdAndGamePlanId(id, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -352,8 +386,7 @@ public class GamePlanService {
     public void deleteGamePlanTeam(Long id, Long gamePlanId, Long userId) {
         log.info("Deleting game plan team ID: {}", id);
 
-        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan plan = requirePlanAccess(gamePlanId, userId, true);
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(id, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -379,8 +412,7 @@ public class GamePlanService {
                                        GamePlanTeam.TeamComposition composition) {
         log.info("Adding composition to game plan team ID: {}", teamId);
 
-        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan plan = requirePlanAccess(gamePlanId, userId, true);
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(teamId, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -409,8 +441,7 @@ public class GamePlanService {
                                           int index, GamePlanTeam.TeamComposition composition) {
         log.info("Updating composition {} in game plan team ID: {}", index, teamId);
 
-        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan plan = requirePlanAccess(gamePlanId, userId, true);
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(teamId, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
@@ -441,8 +472,7 @@ public class GamePlanService {
     public GamePlanTeam deleteComposition(Long teamId, Long gamePlanId, Long userId, int index) {
         log.info("Deleting composition {} from game plan team ID: {}", index, teamId);
 
-        GamePlan plan = gamePlanRepository.findByIdAndUserId(gamePlanId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Game plan not found or not owned by user"));
+        GamePlan plan = requirePlanAccess(gamePlanId, userId, true);
 
         GamePlanTeam team = gamePlanTeamRepository.findByIdAndGamePlanId(teamId, gamePlanId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found in this game plan"));
