@@ -45,13 +45,20 @@ function lookupBaseSpeed(species) {
   return null;
 }
 
+// "-Mega-Z" forms (Absol-Mega-Z, Garchomp-Mega-Z, Lucario-Mega-Z) aren't
+// available in Pokemon Champions yet, so drop them even though @smogon/calc
+// lists them in its Gen 9 dex.
+function isZMega(name) {
+  return /-Mega-Z$/.test(name);
+}
+
 // Collect every mega forme @smogon/calc knows of, keyed by base species, so we
 // can auto-include all megas of any species in the regulation list (the list
 // itself only names the base species — Charizard implies Mega-X and Mega-Y).
 const megasByBase = new Map();
 for (const s of gen.species) {
   const idx = s.name.indexOf("-Mega");
-  if (idx > 0) {
+  if (idx > 0 && !isZMega(s.name)) {
     const base = s.name.slice(0, idx);
     if (!megasByBase.has(base)) megasByBase.set(base, []);
     megasByBase.get(base).push(s.name);
@@ -68,6 +75,7 @@ function discoverRegulations() {
 function buildSpeciesMap(speciesList) {
   const speciesMap = new Map(); // species -> baseSpeed
   function addSpecies(name, explicitSpeed) {
+    if (isZMega(name)) return;
     const speed = explicitSpeed != null ? explicitSpeed : lookupBaseSpeed(name);
     if (speed == null) {
       console.warn(`[skip] ${name}: not in @smogon/calc and no override base speed`);

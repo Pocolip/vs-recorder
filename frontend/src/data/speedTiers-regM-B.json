@@ -1,13 +1,271 @@
 {
   "regulation": "M-B",
-  "generatedAt": "2026-06-10",
-  "speciesCount": 3,
+  "generatedAt": "2026-06-17",
+  "speciesCount": 298,
   "entries": [
+    {
+      "pokemon": "Aerodactyl-Mega",
+      "baseSpeed": 150,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 222
+    },
+    {
+      "pokemon": "Alakazam-Mega",
+      "baseSpeed": 150,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 222
+    },
+    {
+      "pokemon": "Beedrill-Mega",
+      "baseSpeed": 145,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 216
+    },
+    {
+      "pokemon": "Sceptile-Mega",
+      "baseSpeed": 145,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 216
+    },
+    {
+      "pokemon": "Dragapult",
+      "baseSpeed": 142,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 213
+    },
+    {
+      "pokemon": "Greninja-Mega",
+      "baseSpeed": 142,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 213
+    },
+    {
+      "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 205
+    },
+    {
+      "pokemon": "Manectric-Mega",
+      "baseSpeed": 135,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 205
+    },
+    {
+      "pokemon": "Delphox-Mega",
+      "baseSpeed": 134,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 204
+    },
+    {
+      "pokemon": "Aerodactyl-Mega",
+      "baseSpeed": 150,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 202
+    },
+    {
+      "pokemon": "Alakazam-Mega",
+      "baseSpeed": 150,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 202
+    },
+    {
+      "pokemon": "Aerodactyl",
+      "baseSpeed": 130,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 200
+    },
+    {
+      "pokemon": "Gengar-Mega",
+      "baseSpeed": 130,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 200
+    },
+    {
+      "pokemon": "Jolteon",
+      "baseSpeed": 130,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 200
+    },
     {
       "pokemon": "Raichu-Mega-Y",
       "baseSpeed": 130,
       "spread": "32 SPs / +Spe",
       "speedStat": 200
+    },
+    {
+      "pokemon": "Beedrill-Mega",
+      "baseSpeed": 145,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 197
+    },
+    {
+      "pokemon": "Sceptile-Mega",
+      "baseSpeed": 145,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 197
+    },
+    {
+      "pokemon": "Pyroar-Mega",
+      "baseSpeed": 126,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 195
+    },
+    {
+      "pokemon": "Talonflame",
+      "baseSpeed": 126,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 195
+    },
+    {
+      "pokemon": "Dragapult",
+      "baseSpeed": 142,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 194
+    },
+    {
+      "pokemon": "Greninja-Mega",
+      "baseSpeed": 142,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 194
+    },
+    {
+      "pokemon": "Weavile",
+      "baseSpeed": 125,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 194
+    },
+    {
+      "pokemon": "Meowscarada",
+      "baseSpeed": 123,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 192
+    },
+    {
+      "pokemon": "Noivern",
+      "baseSpeed": 123,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 192
+    },
+    {
+      "pokemon": "Greninja",
+      "baseSpeed": 122,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 191
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 190
+    },
+    {
+      "pokemon": "Alakazam",
+      "baseSpeed": 120,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 189
+    },
+    {
+      "pokemon": "Froslass-Mega",
+      "baseSpeed": 120,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 189
+    },
+    {
+      "pokemon": "Sceptile",
+      "baseSpeed": 120,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 189
+    },
+    {
+      "pokemon": "Sneasler",
+      "baseSpeed": 120,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 189
+    },
+    {
+      "pokemon": "Starmie-Mega",
+      "baseSpeed": 120,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 189
+    },
+    {
+      "pokemon": "Hawlucha",
+      "baseSpeed": 118,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 187
+    },
+    {
+      "pokemon": "Hawlucha-Mega",
+      "baseSpeed": 118,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 187
+    },
+    {
+      "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 187
+    },
+    {
+      "pokemon": "Manectric-Mega",
+      "baseSpeed": 135,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 187
+    },
+    {
+      "pokemon": "Delphox-Mega",
+      "baseSpeed": 134,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 186
+    },
+    {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 185
+    },
+    {
+      "pokemon": "Whimsicott",
+      "baseSpeed": 116,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 184
+    },
+    {
+      "pokemon": "Absol-Mega",
+      "baseSpeed": 115,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 183
+    },
+    {
+      "pokemon": "Houndoom-Mega",
+      "baseSpeed": 115,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 183
+    },
+    {
+      "pokemon": "Starmie",
+      "baseSpeed": 115,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 183
+    },
+    {
+      "pokemon": "Aerodactyl",
+      "baseSpeed": 130,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 182
+    },
+    {
+      "pokemon": "Gengar-Mega",
+      "baseSpeed": 130,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 182
+    },
+    {
+      "pokemon": "Jolteon",
+      "baseSpeed": 130,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 182
     },
     {
       "pokemon": "Raichu-Mega-Y",
@@ -16,7 +274,85 @@
       "speedStat": 182
     },
     {
+      "pokemon": "Serperior",
+      "baseSpeed": 113,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 181
+    },
+    {
+      "pokemon": "Lucario-Mega",
+      "baseSpeed": 112,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 180
+    },
+    {
+      "pokemon": "Lycanroc",
+      "baseSpeed": 112,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 180
+    },
+    {
+      "pokemon": "Scolipede",
+      "baseSpeed": 112,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 180
+    },
+    {
+      "pokemon": "Maushold",
+      "baseSpeed": 111,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 179
+    },
+    {
+      "pokemon": "Maushold-Four",
+      "baseSpeed": 111,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 179
+    },
+    {
+      "pokemon": "Espeon",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Froslass",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Gallade-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Gengar",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Metagross-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Pyroar-Mega",
+      "baseSpeed": 126,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 178
+    },
+    {
       "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Raichu-Alola",
       "baseSpeed": 110,
       "spread": "32 SPs / +Spe",
       "speedStat": 178
@@ -28,7 +364,511 @@
       "speedStat": 178
     },
     {
+      "pokemon": "Skarmory-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Staraptor-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Talonflame",
+      "baseSpeed": 126,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Zoroark-Hisui",
+      "baseSpeed": 110,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 178
+    },
+    {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 177
+    },
+    {
+      "pokemon": "Ninetales-Alola",
+      "baseSpeed": 109,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 177
+    },
+    {
+      "pokemon": "Weavile",
+      "baseSpeed": 125,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 177
+    },
+    {
+      "pokemon": "Infernape",
+      "baseSpeed": 108,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 176
+    },
+    {
+      "pokemon": "Meowscarada",
+      "baseSpeed": 123,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 175
+    },
+    {
+      "pokemon": "Noivern",
+      "baseSpeed": 123,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 175
+    },
+    {
+      "pokemon": "Greninja",
+      "baseSpeed": 122,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 174
+    },
+    {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 173
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 173
+    },
+    {
+      "pokemon": "Pyroar",
+      "baseSpeed": 106,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 173
+    },
+    {
+      "pokemon": "Alakazam",
+      "baseSpeed": 120,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Froslass-Mega",
+      "baseSpeed": 120,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Lopunny",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Manectric",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Pinsir-Mega",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Sceptile",
+      "baseSpeed": 120,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Sneasler",
+      "baseSpeed": 120,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Starmie-Mega",
+      "baseSpeed": 120,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Zoroark",
+      "baseSpeed": 105,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 172
+    },
+    {
+      "pokemon": "Delphox",
+      "baseSpeed": 104,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 171
+    },
+    {
+      "pokemon": "Meowstic",
+      "baseSpeed": 104,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 171
+    },
+    {
+      "pokemon": "Aerodactyl-Mega",
+      "baseSpeed": 150,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 170
+    },
+    {
+      "pokemon": "Alakazam-Mega",
+      "baseSpeed": 150,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 170
+    },
+    {
+      "pokemon": "Emolga",
+      "baseSpeed": 103,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 170
+    },
+    {
+      "pokemon": "Excadrill-Mega",
+      "baseSpeed": 103,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 170
+    },
+    {
+      "pokemon": "Hawlucha",
+      "baseSpeed": 118,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 170
+    },
+    {
+      "pokemon": "Hawlucha-Mega",
+      "baseSpeed": 118,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 170
+    },
+    {
+      "pokemon": "Furfrou",
+      "baseSpeed": 102,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 169
+    },
+    {
+      "pokemon": "Garchomp",
+      "baseSpeed": 102,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 169
+    },
+    {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 169
+    },
+    {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Glimmora-Mega",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Whimsicott",
+      "baseSpeed": 116,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 168
+    },
+    {
+      "pokemon": "Absol-Mega",
+      "baseSpeed": 115,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Blaziken-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Charizard",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Charizard-Mega-X",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Charizard-Mega-Y",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Dragonite-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Falinks-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Gardevoir-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Houndoom-Mega",
+      "baseSpeed": 115,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Medicham-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Ninetales",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Staraptor",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Starmie",
+      "baseSpeed": 115,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Typhlosion",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Volcarona",
+      "baseSpeed": 100,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 167
+    },
+    {
+      "pokemon": "Beedrill-Mega",
+      "baseSpeed": 145,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 165
+    },
+    {
+      "pokemon": "Hydreigon",
+      "baseSpeed": 98,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 165
+    },
+    {
+      "pokemon": "Sceptile-Mega",
+      "baseSpeed": 145,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 165
+    },
+    {
+      "pokemon": "Serperior",
+      "baseSpeed": 113,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 165
+    },
+    {
+      "pokemon": "Lucario-Mega",
+      "baseSpeed": 112,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 164
+    },
+    {
+      "pokemon": "Lycanroc",
+      "baseSpeed": 112,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 164
+    },
+    {
+      "pokemon": "Scolipede",
+      "baseSpeed": 112,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 164
+    },
+    {
+      "pokemon": "Maushold",
+      "baseSpeed": 111,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 163
+    },
+    {
+      "pokemon": "Maushold-Four",
+      "baseSpeed": 111,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 163
+    },
+    {
+      "pokemon": "Morpeko",
+      "baseSpeed": 97,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 163
+    },
+    {
+      "pokemon": "Dragapult",
+      "baseSpeed": 142,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Espeon",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Froslass",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Gallade-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Gengar",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Greninja-Mega",
+      "baseSpeed": 142,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Metagross-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Mimikyu",
+      "baseSpeed": 96,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 162
+    },
+    {
       "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Raichu-Alola",
       "baseSpeed": 110,
       "spread": "32 SPs / Neutral",
       "speedStat": 162
@@ -38,6 +878,534 @@
       "baseSpeed": 110,
       "spread": "32 SPs / Neutral",
       "speedStat": 162
+    },
+    {
+      "pokemon": "Skarmory-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Staraptor-Mega",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Zoroark-Hisui",
+      "baseSpeed": 110,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 162
+    },
+    {
+      "pokemon": "Arcanine",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Gliscor",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Houndoom",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Leafeon",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Ninetales-Alola",
+      "baseSpeed": 109,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Typhlosion-Hisui",
+      "baseSpeed": 95,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 161
+    },
+    {
+      "pokemon": "Infernape",
+      "baseSpeed": 108,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 160
+    },
+    {
+      "pokemon": "Tinkaton",
+      "baseSpeed": 94,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 160
+    },
+    {
+      "pokemon": "Floette-Eternal",
+      "baseSpeed": 92,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 158
+    },
+    {
+      "pokemon": "Garchomp-Mega",
+      "baseSpeed": 92,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 158
+    },
+    {
+      "pokemon": "Krookodile",
+      "baseSpeed": 92,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 158
+    },
+    {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 158
+    },
+    {
+      "pokemon": "Pyroar",
+      "baseSpeed": 106,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 158
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Lopunny",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Manectric",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Pinsir-Mega",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Rotom",
+      "baseSpeed": 91,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Zoroark",
+      "baseSpeed": 105,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 157
+    },
+    {
+      "pokemon": "Annihilape",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Arcanine-Hisui",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Chandelure-Mega",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Delphox",
+      "baseSpeed": 104,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Kangaskhan",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Lucario",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Meowstic",
+      "baseSpeed": 104,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Pikachu",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 156
+    },
+    {
+      "pokemon": "Emolga",
+      "baseSpeed": 103,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 155
+    },
+    {
+      "pokemon": "Excadrill-Mega",
+      "baseSpeed": 103,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 155
+    },
+    {
+      "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 155
+    },
+    {
+      "pokemon": "Manectric-Mega",
+      "baseSpeed": 135,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 155
+    },
+    {
+      "pokemon": "Vivillon",
+      "baseSpeed": 89,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 155
+    },
+    {
+      "pokemon": "Barbaracle-Mega",
+      "baseSpeed": 88,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 154
+    },
+    {
+      "pokemon": "Delphox-Mega",
+      "baseSpeed": 134,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 154
+    },
+    {
+      "pokemon": "Excadrill",
+      "baseSpeed": 88,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 154
+    },
+    {
+      "pokemon": "Furfrou",
+      "baseSpeed": 102,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 154
+    },
+    {
+      "pokemon": "Garchomp",
+      "baseSpeed": 102,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 154
+    },
+    {
+      "pokemon": "Malamar-Mega",
+      "baseSpeed": 88,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 154
+    },
+    {
+      "pokemon": "Aerodactyl-Mega",
+      "baseSpeed": 150,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Alakazam-Mega",
+      "baseSpeed": 150,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Glimmora-Mega",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 153
+    },
+    {
+      "pokemon": "Blaziken-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Charizard",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Charizard-Mega-X",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Charizard-Mega-Y",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Dragonite-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Falinks-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Gardevoir-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Medicham-Mega",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Ninetales",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Staraptor",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Typhlosion",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Volcarona",
+      "baseSpeed": 100,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 152
+    },
+    {
+      "pokemon": "Glimmora",
+      "baseSpeed": 86,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 151
+    },
+    {
+      "pokemon": "Rotom-Heat",
+      "baseSpeed": 86,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 151
+    },
+    {
+      "pokemon": "Rotom-Wash",
+      "baseSpeed": 86,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 151
+    },
+    {
+      "pokemon": "Aerodactyl",
+      "baseSpeed": 130,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Archaludon",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Ceruledge",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Gengar-Mega",
+      "baseSpeed": 130,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Heracross",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Hydreigon",
+      "baseSpeed": 98,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Jolteon",
+      "baseSpeed": 130,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Kleavor",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Kommo-o",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Overqwil",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Pinsir",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Quaquaval",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Qwilfish",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
     },
     {
       "pokemon": "Raichu-Mega-Y",
@@ -46,13 +1414,1099 @@
       "speedStat": 150
     },
     {
+      "pokemon": "Samurott-Hisui",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 150
+    },
+    {
+      "pokemon": "Gholdengo",
+      "baseSpeed": 84,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 149
+    },
+    {
+      "pokemon": "Gourgeist",
+      "baseSpeed": 84,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 149
+    },
+    {
+      "pokemon": "Morpeko",
+      "baseSpeed": 97,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 149
+    },
+    {
+      "pokemon": "Beedrill-Mega",
+      "baseSpeed": 145,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 148
+    },
+    {
+      "pokemon": "Mimikyu",
+      "baseSpeed": 96,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 148
+    },
+    {
+      "pokemon": "Sceptile-Mega",
+      "baseSpeed": 145,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 148
+    },
+    {
+      "pokemon": "Arcanine",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 147
+    },
+    {
+      "pokemon": "Gliscor",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 147
+    },
+    {
+      "pokemon": "Houndoom",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 147
+    },
+    {
+      "pokemon": "Leafeon",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 147
+    },
+    {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 147
+    },
+    {
+      "pokemon": "Typhlosion-Hisui",
+      "baseSpeed": 95,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 147
+    },
+    {
+      "pokemon": "Gyarados",
+      "baseSpeed": 81,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 146
+    },
+    {
+      "pokemon": "Gyarados-Mega",
+      "baseSpeed": 81,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 146
+    },
+    {
+      "pokemon": "Milotic",
+      "baseSpeed": 81,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 146
+    },
+    {
+      "pokemon": "Pyroar-Mega",
+      "baseSpeed": 126,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 146
+    },
+    {
+      "pokemon": "Talonflame",
+      "baseSpeed": 126,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 146
+    },
+    {
+      "pokemon": "Tinkaton",
+      "baseSpeed": 94,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 146
+    },
+    {
+      "pokemon": "Altaria",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Altaria-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Blaziken",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Chandelure",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Dragapult",
+      "baseSpeed": 142,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Dragonite",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Eelektross-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Gallade",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Gardevoir",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Glalie",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Goodra",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Greninja-Mega",
+      "baseSpeed": 142,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Mamoswine",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Meganium",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Passimian",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Venusaur",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Venusaur-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Weavile",
+      "baseSpeed": 125,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 145
+    },
+    {
+      "pokemon": "Floette-Eternal",
+      "baseSpeed": 92,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 144
+    },
+    {
+      "pokemon": "Garchomp-Mega",
+      "baseSpeed": 92,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 144
+    },
+    {
+      "pokemon": "Krookodile",
+      "baseSpeed": 92,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 144
+    },
+    {
+      "pokemon": "Vanilluxe",
+      "baseSpeed": 79,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 144
+    },
+    {
+      "pokemon": "Basculegion",
+      "baseSpeed": 78,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Blastoise",
+      "baseSpeed": 78,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Blastoise-Mega",
+      "baseSpeed": 78,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Diggersby",
+      "baseSpeed": 78,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Feraligatr",
+      "baseSpeed": 78,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Feraligatr-Mega",
+      "baseSpeed": 78,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Meowscarada",
+      "baseSpeed": 123,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Noivern",
+      "baseSpeed": 123,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Rotom",
+      "baseSpeed": 91,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 143
+    },
+    {
+      "pokemon": "Annihilape",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Arcanine-Hisui",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Chandelure-Mega",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Greninja",
+      "baseSpeed": 122,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Kangaskhan",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Lucario",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Pikachu",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 142
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 141
+    },
+    {
+      "pokemon": "Vivillon",
+      "baseSpeed": 89,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 141
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 141
+    },
+    {
+      "pokemon": "Alakazam",
+      "baseSpeed": 120,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Barbaracle-Mega",
+      "baseSpeed": 88,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Excadrill",
+      "baseSpeed": 88,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Froslass-Mega",
+      "baseSpeed": 120,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Malamar-Mega",
+      "baseSpeed": 88,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Sceptile",
+      "baseSpeed": 120,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Sneasler",
+      "baseSpeed": 120,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Starmie-Mega",
+      "baseSpeed": 120,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 140
+    },
+    {
+      "pokemon": "Absol",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Armarouge",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Beedrill",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Falinks",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Florges",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Garbodor",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Heracross-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Klefki",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Lopunny-Mega",
+      "baseSpeed": 135,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Manectric-Mega",
+      "baseSpeed": 135,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Scizor-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Scovillain",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Scovillain-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 139
+    },
+    {
+      "pokemon": "Delphox-Mega",
+      "baseSpeed": 134,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 138
+    },
+    {
+      "pokemon": "Glimmora",
+      "baseSpeed": 86,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 138
+    },
+    {
+      "pokemon": "Hawlucha",
+      "baseSpeed": 118,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 138
+    },
+    {
+      "pokemon": "Hawlucha-Mega",
+      "baseSpeed": 118,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 138
+    },
+    {
+      "pokemon": "Rotom-Heat",
+      "baseSpeed": 86,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 138
+    },
+    {
+      "pokemon": "Rotom-Wash",
+      "baseSpeed": 86,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 138
+    },
+    {
+      "pokemon": "Archaludon",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Ceruledge",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Heracross",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Kleavor",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Kommo-o",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Malamar",
+      "baseSpeed": 73,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Overqwil",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Pinsir",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Quaquaval",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Qwilfish",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Samurott-Hisui",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 137
+    },
+    {
+      "pokemon": "Gholdengo",
+      "baseSpeed": 84,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 136
+    },
+    {
+      "pokemon": "Gourgeist",
+      "baseSpeed": 84,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 136
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 136
+    },
+    {
+      "pokemon": "Tsareena",
+      "baseSpeed": 72,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 136
+    },
+    {
+      "pokemon": "Whimsicott",
+      "baseSpeed": 116,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 136
+    },
+    {
+      "pokemon": "Absol-Mega",
+      "baseSpeed": 115,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Aerodactyl",
+      "baseSpeed": 130,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Gengar-Mega",
+      "baseSpeed": 130,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Houndoom-Mega",
+      "baseSpeed": 115,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Jolteon",
+      "baseSpeed": 130,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 135
+    },
+    {
       "pokemon": "Raichu-Mega-Y",
       "baseSpeed": 130,
       "spread": "0 SPs / -Spe",
       "speedStat": 135
     },
     {
+      "pokemon": "Sandaconda",
+      "baseSpeed": 71,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Starmie",
+      "baseSpeed": 115,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Tyranitar-Mega",
+      "baseSpeed": 71,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Tyrantrum",
+      "baseSpeed": 71,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 135
+    },
+    {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Clefable-Mega",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Decidueye",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Luxray",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Metagross",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Politoed",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Polteageist",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Samurott",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Sinistcha",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Skarmory",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Swampert-Mega",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Victreebel",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Victreebel-Mega",
+      "baseSpeed": 70,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 134
+    },
+    {
+      "pokemon": "Gyarados",
+      "baseSpeed": 81,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 133
+    },
+    {
+      "pokemon": "Gyarados-Mega",
+      "baseSpeed": 81,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 133
+    },
+    {
+      "pokemon": "Milotic",
+      "baseSpeed": 81,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 133
+    },
+    {
+      "pokemon": "Serperior",
+      "baseSpeed": 113,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 133
+    },
+    {
+      "pokemon": "Altaria",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Altaria-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Barbaracle",
+      "baseSpeed": 68,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Blaziken",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Chandelure",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Dragonite",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Eelektross-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Gallade",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Gardevoir",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Glalie",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Goodra",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Houndstone",
+      "baseSpeed": 68,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Lucario-Mega",
+      "baseSpeed": 112,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Lycanroc",
+      "baseSpeed": 112,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Mamoswine",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Meganium",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Passimian",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Scolipede",
+      "baseSpeed": 112,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Scrafty-Mega",
+      "baseSpeed": 68,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Venusaur",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Venusaur-Mega",
+      "baseSpeed": 80,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 132
+    },
+    {
+      "pokemon": "Maushold",
+      "baseSpeed": 111,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 131
+    },
+    {
+      "pokemon": "Maushold-Four",
+      "baseSpeed": 111,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 131
+    },
+    {
+      "pokemon": "Pyroar-Mega",
+      "baseSpeed": 126,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 131
+    },
+    {
+      "pokemon": "Talonflame",
+      "baseSpeed": 126,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 131
+    },
+    {
+      "pokemon": "Vanilluxe",
+      "baseSpeed": 79,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 131
+    },
+    {
+      "pokemon": "Basculegion",
+      "baseSpeed": 78,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Blastoise",
+      "baseSpeed": 78,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Blastoise-Mega",
+      "baseSpeed": 78,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Corviknight",
+      "baseSpeed": 67,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Diggersby",
+      "baseSpeed": 78,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Espeon",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Feraligatr",
+      "baseSpeed": 78,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Feraligatr-Mega",
+      "baseSpeed": 78,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Froslass",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Gallade-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Gengar",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Metagross-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
       "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Raichu-Alola",
       "baseSpeed": 110,
       "spread": "0 SPs / Neutral",
       "speedStat": 130
@@ -64,7 +2518,997 @@
       "speedStat": 130
     },
     {
+      "pokemon": "Skarmory-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Staraptor-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Weavile",
+      "baseSpeed": 125,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Zoroark-Hisui",
+      "baseSpeed": 110,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 130
+    },
+    {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 129
+    },
+    {
+      "pokemon": "Ninetales-Alola",
+      "baseSpeed": 109,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 129
+    },
+    {
+      "pokemon": "Skeledirge",
+      "baseSpeed": 66,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 129
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 129
+    },
+    {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Emboar",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Flareon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Glaceon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Infernape",
+      "baseSpeed": 108,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Meowscarada",
+      "baseSpeed": 123,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Noivern",
+      "baseSpeed": 123,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Orthworm",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Pelipper",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Scizor",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Umbreon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Vaporeon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 128
+    },
+    {
+      "pokemon": "Absol",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Alcremie",
+      "baseSpeed": 64,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Armarouge",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Beedrill",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Chesnaught",
+      "baseSpeed": 64,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Falinks",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Florges",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Garbodor",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Greninja",
+      "baseSpeed": 122,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Heracross-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Klefki",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Scizor-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Scovillain",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Scovillain-Mega",
+      "baseSpeed": 75,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 127
+    },
+    {
+      "pokemon": "Alakazam",
+      "baseSpeed": 120,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Froslass-Mega",
+      "baseSpeed": 120,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Pidgeot-Mega",
+      "baseSpeed": 121,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Pyroar",
+      "baseSpeed": 106,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Sceptile",
+      "baseSpeed": 120,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Sneasler",
+      "baseSpeed": 120,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Starmie-Mega",
+      "baseSpeed": 120,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 126
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Lopunny",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Malamar",
+      "baseSpeed": 73,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Manectric",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Pinsir-Mega",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Scolipede-Mega",
+      "baseSpeed": 62,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Zoroark",
+      "baseSpeed": 105,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 125
+    },
+    {
+      "pokemon": "Delphox",
+      "baseSpeed": 104,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Hawlucha",
+      "baseSpeed": 118,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Hawlucha-Mega",
+      "baseSpeed": 118,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Meowstic",
+      "baseSpeed": 104,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Tsareena",
+      "baseSpeed": 72,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Tyranitar",
+      "baseSpeed": 61,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 124
+    },
+    {
+      "pokemon": "Abomasnow",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Aegislash-Shield",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Clefable",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Decidueye-Hisui",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Emolga",
+      "baseSpeed": 103,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Empoleon",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Excadrill-Mega",
+      "baseSpeed": 103,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Farigiraf",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Goodra-Hisui",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Grimmsnarl",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Incineroar",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Oranguru",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Primarina",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Salazzle",
+      "baseSpeed": 117,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Sandaconda",
+      "baseSpeed": 71,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Swampert",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Sylveon",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Toucannon",
+      "baseSpeed": 60,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Tyranitar-Mega",
+      "baseSpeed": 71,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Tyrantrum",
+      "baseSpeed": 71,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 123
+    },
+    {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Clawitzer",
+      "baseSpeed": 59,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Clefable-Mega",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Decidueye",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Furfrou",
+      "baseSpeed": 102,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Garchomp",
+      "baseSpeed": 102,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Luxray",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Metagross",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Politoed",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Polteageist",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Samurott",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Sinistcha",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Skarmory",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Swampert-Mega",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Victreebel",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Victreebel-Mega",
+      "baseSpeed": 70,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Whimsicott",
+      "baseSpeed": 116,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 122
+    },
+    {
+      "pokemon": "Absol-Mega",
+      "baseSpeed": 115,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Aurorus",
+      "baseSpeed": 58,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Glimmora-Mega",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Houndoom-Mega",
+      "baseSpeed": 115,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Scrafty",
+      "baseSpeed": 58,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Starmie",
+      "baseSpeed": 115,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 121
+    },
+    {
+      "pokemon": "Barbaracle",
+      "baseSpeed": 68,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Blaziken-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Charizard",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Charizard-Mega-X",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Charizard-Mega-Y",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Dragonite-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Falinks-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Gardevoir-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Houndstone",
+      "baseSpeed": 68,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Medicham-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Ninetales",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Scrafty-Mega",
+      "baseSpeed": 68,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Staraptor",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Typhlosion",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Volcarona",
+      "baseSpeed": 100,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 120
+    },
+    {
+      "pokemon": "Corviknight",
+      "baseSpeed": 67,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 119
+    },
+    {
+      "pokemon": "Serperior",
+      "baseSpeed": 113,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 119
+    },
+    {
+      "pokemon": "Hydreigon",
+      "baseSpeed": 98,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Lucario-Mega",
+      "baseSpeed": 112,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Lycanroc",
+      "baseSpeed": 112,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Scolipede",
+      "baseSpeed": 112,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Skeledirge",
+      "baseSpeed": 66,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Torterra",
+      "baseSpeed": 56,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Trevenant",
+      "baseSpeed": 56,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 118
+    },
+    {
+      "pokemon": "Ampharos",
+      "baseSpeed": 55,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Emboar",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Espeon",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Flareon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Froslass",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Gallade-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Gengar",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Glaceon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Golurk",
+      "baseSpeed": 55,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Golurk-Mega",
+      "baseSpeed": 55,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Maushold",
+      "baseSpeed": 111,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Maushold-Four",
+      "baseSpeed": 111,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Metagross-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Morpeko",
+      "baseSpeed": 97,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Orthworm",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Pelipper",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
       "pokemon": "Raichu",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Raichu-Alola",
       "baseSpeed": 110,
       "spread": "0 SPs / -Spe",
       "speedStat": 117
@@ -74,6 +3518,3642 @@
       "baseSpeed": 110,
       "spread": "0 SPs / -Spe",
       "speedStat": 117
+    },
+    {
+      "pokemon": "Scizor",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Skarmory-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Staraptor-Mega",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Tauros",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Umbreon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Vaporeon",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Zoroark-Hisui",
+      "baseSpeed": 110,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 117
+    },
+    {
+      "pokemon": "Alcremie",
+      "baseSpeed": 64,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 116
+    },
+    {
+      "pokemon": "Chesnaught",
+      "baseSpeed": 64,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 116
+    },
+    {
+      "pokemon": "Heliolisk",
+      "baseSpeed": 109,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 116
+    },
+    {
+      "pokemon": "Mimikyu",
+      "baseSpeed": 96,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 116
+    },
+    {
+      "pokemon": "Ninetales-Alola",
+      "baseSpeed": 109,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 116
+    },
+    {
+      "pokemon": "Arcanine",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Gliscor",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Houndoom",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Infernape",
+      "baseSpeed": 108,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Leafeon",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Typhlosion-Hisui",
+      "baseSpeed": 95,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 115
+    },
+    {
+      "pokemon": "Scolipede-Mega",
+      "baseSpeed": 62,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 114
+    },
+    {
+      "pokemon": "Tinkaton",
+      "baseSpeed": 94,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 114
+    },
+    {
+      "pokemon": "Liepard",
+      "baseSpeed": 106,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 113
+    },
+    {
+      "pokemon": "Pyroar",
+      "baseSpeed": 106,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 113
+    },
+    {
+      "pokemon": "Tyranitar",
+      "baseSpeed": 61,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 113
+    },
+    {
+      "pokemon": "Abomasnow",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Aegislash-Shield",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Aggron",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Aggron-Mega",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Audino",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Audino-Mega",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Azumarill",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Clefable",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Decidueye-Hisui",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Eelektross",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Empoleon",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Espathra",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Farigiraf",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Floette-Eternal",
+      "baseSpeed": 92,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Garchomp-Mega",
+      "baseSpeed": 92,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Goodra-Hisui",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Grimmsnarl",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Incineroar",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Kingambit",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Krookodile",
+      "baseSpeed": 92,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Lopunny",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Manectric",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Mawile",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Mawile-Mega",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Oranguru",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Pinsir-Mega",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Primarina",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Sableye",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Sharpedo-Mega",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Swampert",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Sylveon",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Toucannon",
+      "baseSpeed": 60,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Vileplume",
+      "baseSpeed": 50,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Zoroark",
+      "baseSpeed": 105,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 112
+    },
+    {
+      "pokemon": "Clawitzer",
+      "baseSpeed": 59,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 111
+    },
+    {
+      "pokemon": "Delphox",
+      "baseSpeed": 104,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 111
+    },
+    {
+      "pokemon": "Meowstic",
+      "baseSpeed": 104,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 111
+    },
+    {
+      "pokemon": "Rotom",
+      "baseSpeed": 91,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 111
+    },
+    {
+      "pokemon": "Annihilape",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Arcanine-Hisui",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Aurorus",
+      "baseSpeed": 58,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Chandelure-Mega",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Ditto",
+      "baseSpeed": 48,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Emolga",
+      "baseSpeed": 103,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Excadrill-Mega",
+      "baseSpeed": 103,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Kangaskhan",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Lucario",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Pikachu",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Scrafty",
+      "baseSpeed": 58,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 110
+    },
+    {
+      "pokemon": "Furfrou",
+      "baseSpeed": 102,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 109
+    },
+    {
+      "pokemon": "Garchomp",
+      "baseSpeed": 102,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 109
+    },
+    {
+      "pokemon": "Vivillon",
+      "baseSpeed": 89,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 109
+    },
+    {
+      "pokemon": "Barbaracle-Mega",
+      "baseSpeed": 88,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Blaziken-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Charizard",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Charizard-Mega-X",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Charizard-Mega-Y",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Dedenne",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Dragonite-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Excadrill",
+      "baseSpeed": 88,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Falinks-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Gardevoir-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Glalie-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Glimmora-Mega",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Hippowdon",
+      "baseSpeed": 47,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Kangaskhan-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Malamar-Mega",
+      "baseSpeed": 88,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Medicham-Mega",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Ninetales",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Palafin",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Pidgeot",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Simipour",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Simisage",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Simisear",
+      "baseSpeed": 101,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Staraptor",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Tauros-Paldea-Aqua",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Tauros-Paldea-Blaze",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Tauros-Paldea-Combat",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Torterra",
+      "baseSpeed": 56,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Trevenant",
+      "baseSpeed": 56,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Typhlosion",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Volcarona",
+      "baseSpeed": 100,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 108
+    },
+    {
+      "pokemon": "Ampharos",
+      "baseSpeed": 55,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 107
+    },
+    {
+      "pokemon": "Golurk",
+      "baseSpeed": 55,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 107
+    },
+    {
+      "pokemon": "Golurk-Mega",
+      "baseSpeed": 55,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 107
+    },
+    {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 107
+    },
+    {
+      "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Bellibolt",
+      "baseSpeed": 45,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Conkeldurr",
+      "baseSpeed": 45,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Glimmora",
+      "baseSpeed": 86,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Hydreigon",
+      "baseSpeed": 98,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Rotom-Heat",
+      "baseSpeed": 86,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Rotom-Wash",
+      "baseSpeed": 86,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 106
+    },
+    {
+      "pokemon": "Archaludon",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Ceruledge",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Chesnaught-Mega",
+      "baseSpeed": 44,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Dragalge",
+      "baseSpeed": 44,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Dragalge-Mega",
+      "baseSpeed": 44,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Heracross",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Hydrapple",
+      "baseSpeed": 44,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Kleavor",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Kommo-o",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Morpeko",
+      "baseSpeed": 97,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Overqwil",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Pinsir",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Quaquaval",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Qwilfish",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Samurott-Hisui",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 105
+    },
+    {
+      "pokemon": "Crabominable",
+      "baseSpeed": 43,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 104
+    },
+    {
+      "pokemon": "Gholdengo",
+      "baseSpeed": 84,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 104
+    },
+    {
+      "pokemon": "Gourgeist",
+      "baseSpeed": 84,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 104
+    },
+    {
+      "pokemon": "Mimikyu",
+      "baseSpeed": 96,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 104
+    },
+    {
+      "pokemon": "Araquanid",
+      "baseSpeed": 42,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Arcanine",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Gliscor",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Houndoom",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Leafeon",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Sharpedo",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Typhlosion-Hisui",
+      "baseSpeed": 95,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 103
+    },
+    {
+      "pokemon": "Aggron",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Aggron-Mega",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Audino",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Audino-Mega",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Azumarill",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Eelektross",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Kingambit",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Mawile",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Mawile-Mega",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Sableye",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Tinkaton",
+      "baseSpeed": 94,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Vileplume",
+      "baseSpeed": 50,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 102
+    },
+    {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Gyarados",
+      "baseSpeed": 81,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Gyarados-Mega",
+      "baseSpeed": 81,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Milotic",
+      "baseSpeed": 81,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Rhyperior",
+      "baseSpeed": 40,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 101
+    },
+    {
+      "pokemon": "Altaria",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Altaria-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Blaziken",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Chandelure",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Ditto",
+      "baseSpeed": 48,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Dragonite",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Eelektross-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Floette-Eternal",
+      "baseSpeed": 92,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Gallade",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Garchomp-Mega",
+      "baseSpeed": 92,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Gardevoir",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Glalie",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Goodra",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Krookodile",
+      "baseSpeed": 92,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Mamoswine",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Meganium",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Passimian",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Venusaur",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Venusaur-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 100
+    },
+    {
+      "pokemon": "Annihilape",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Arcanine-Hisui",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Chandelure-Mega",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Hippowdon",
+      "baseSpeed": 47,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Kangaskhan",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Lucario",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Pikachu",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Roserade",
+      "baseSpeed": 90,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Rotom",
+      "baseSpeed": 91,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Vanilluxe",
+      "baseSpeed": 79,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 99
+    },
+    {
+      "pokemon": "Basculegion",
+      "baseSpeed": 78,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Blastoise",
+      "baseSpeed": 78,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Blastoise-Mega",
+      "baseSpeed": 78,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Diggersby",
+      "baseSpeed": 78,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Feraligatr",
+      "baseSpeed": 78,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Feraligatr-Mega",
+      "baseSpeed": 78,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Vivillon",
+      "baseSpeed": 89,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 98
+    },
+    {
+      "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Barbaracle-Mega",
+      "baseSpeed": 88,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Bellibolt",
+      "baseSpeed": 45,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Conkeldurr",
+      "baseSpeed": 45,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Excadrill",
+      "baseSpeed": 88,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Malamar-Mega",
+      "baseSpeed": 88,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 97
+    },
+    {
+      "pokemon": "Chesnaught-Mega",
+      "baseSpeed": 44,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 96
+    },
+    {
+      "pokemon": "Dragalge",
+      "baseSpeed": 44,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 96
+    },
+    {
+      "pokemon": "Dragalge-Mega",
+      "baseSpeed": 44,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 96
+    },
+    {
+      "pokemon": "Drampa",
+      "baseSpeed": 36,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 96
+    },
+    {
+      "pokemon": "Drampa-Mega",
+      "baseSpeed": 36,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 96
+    },
+    {
+      "pokemon": "Hydrapple",
+      "baseSpeed": 44,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 96
+    },
+    {
+      "pokemon": "Absol",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Armarouge",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Beedrill",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Crabominable",
+      "baseSpeed": 43,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Falinks",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Florges",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Garbodor",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Garganacl",
+      "baseSpeed": 35,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Glimmora",
+      "baseSpeed": 86,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Heracross-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Klefki",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Mudsdale",
+      "baseSpeed": 35,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Rotom-Heat",
+      "baseSpeed": 86,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Rotom-Wash",
+      "baseSpeed": 86,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Scizor-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Scovillain",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Scovillain-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Spiritomb",
+      "baseSpeed": 35,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Toxapex",
+      "baseSpeed": 35,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 95
+    },
+    {
+      "pokemon": "Araquanid",
+      "baseSpeed": 42,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Archaludon",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Ceruledge",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Heracross",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Kleavor",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Kommo-o",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Overqwil",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Pinsir",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Quaquaval",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Qwilfish",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Samurott-Hisui",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Toxicroak",
+      "baseSpeed": 85,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 94
+    },
+    {
+      "pokemon": "Crabominable-Mega",
+      "baseSpeed": 33,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 93
+    },
+    {
+      "pokemon": "Gholdengo",
+      "baseSpeed": 84,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 93
+    },
+    {
+      "pokemon": "Gourgeist",
+      "baseSpeed": 84,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 93
+    },
+    {
+      "pokemon": "Malamar",
+      "baseSpeed": 73,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 93
+    },
+    {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Rhyperior",
+      "baseSpeed": 40,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Stunfisk",
+      "baseSpeed": 32,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Stunfisk-Galar",
+      "baseSpeed": 32,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Tsareena",
+      "baseSpeed": 72,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 92
+    },
+    {
+      "pokemon": "Sandaconda",
+      "baseSpeed": 71,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 91
+    },
+    {
+      "pokemon": "Tyranitar-Mega",
+      "baseSpeed": 71,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 91
+    },
+    {
+      "pokemon": "Tyrantrum",
+      "baseSpeed": 71,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 91
+    },
+    {
+      "pokemon": "Abomasnow-Mega",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Altaria",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Altaria-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Appletun",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Arbok",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Blaziken",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Chandelure",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Clefable-Mega",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Decidueye",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Dragonite",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Eelektross-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Gallade",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Gardevoir",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Glalie",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Goodra",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Gyarados",
+      "baseSpeed": 81,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Gyarados-Mega",
+      "baseSpeed": 81,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Luxray",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Mamoswine",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Medicham",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Meganium",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Meganium-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Metagross",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Milotic",
+      "baseSpeed": 81,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Passimian",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Politoed",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Polteageist",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Reuniclus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Runerigus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Samurott",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Sinistcha",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Skarmory",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Slowbro",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Slowbro-Galar",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Slowbro-Mega",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Slowking",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Snorlax",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Steelix",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Steelix-Mega",
+      "baseSpeed": 30,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Swampert-Mega",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Venusaur",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Venusaur-Mega",
+      "baseSpeed": 80,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Victreebel",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Victreebel-Mega",
+      "baseSpeed": 70,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 90
+    },
+    {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 89
+    },
+    {
+      "pokemon": "Hatterene",
+      "baseSpeed": 29,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 89
+    },
+    {
+      "pokemon": "Musharna",
+      "baseSpeed": 29,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 89
+    },
+    {
+      "pokemon": "Vanilluxe",
+      "baseSpeed": 79,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 89
+    },
+    {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Barbaracle",
+      "baseSpeed": 68,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Basculegion",
+      "baseSpeed": 78,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Blastoise",
+      "baseSpeed": 78,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Blastoise-Mega",
+      "baseSpeed": 78,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Diggersby",
+      "baseSpeed": 78,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Drampa",
+      "baseSpeed": 36,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Drampa-Mega",
+      "baseSpeed": 36,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Feraligatr",
+      "baseSpeed": 78,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Feraligatr-Mega",
+      "baseSpeed": 78,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Houndstone",
+      "baseSpeed": 68,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Scrafty-Mega",
+      "baseSpeed": 68,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 88
+    },
+    {
+      "pokemon": "Corviknight",
+      "baseSpeed": 67,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 87
+    },
+    {
+      "pokemon": "Garganacl",
+      "baseSpeed": 35,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 87
+    },
+    {
+      "pokemon": "Mudsdale",
+      "baseSpeed": 35,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 87
+    },
+    {
+      "pokemon": "Spiritomb",
+      "baseSpeed": 35,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 87
+    },
+    {
+      "pokemon": "Toxapex",
+      "baseSpeed": 35,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 87
+    },
+    {
+      "pokemon": "Watchog",
+      "baseSpeed": 77,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 87
+    },
+    {
+      "pokemon": "Skeledirge",
+      "baseSpeed": 66,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 86
+    },
+    {
+      "pokemon": "Absol",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Armarouge",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Banette-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Beedrill",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Crabominable-Mega",
+      "baseSpeed": 33,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Emboar",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Emboar-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Falinks",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Flareon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Florges",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Garbodor",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Glaceon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Heracross-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Klefki",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Orthworm",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Pelipper",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Scizor",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Scizor-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Scovillain",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Scovillain-Mega",
+      "baseSpeed": 75,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Umbreon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Vaporeon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 85
+    },
+    {
+      "pokemon": "Alcremie",
+      "baseSpeed": 64,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 84
+    },
+    {
+      "pokemon": "Chesnaught",
+      "baseSpeed": 64,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 84
+    },
+    {
+      "pokemon": "Stunfisk",
+      "baseSpeed": 32,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 84
+    },
+    {
+      "pokemon": "Stunfisk-Galar",
+      "baseSpeed": 32,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 84
+    },
+    {
+      "pokemon": "Malamar",
+      "baseSpeed": 73,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 83
+    },
+    {
+      "pokemon": "Abomasnow-Mega",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Appletun",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Reuniclus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Runerigus",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Scolipede-Mega",
+      "baseSpeed": 62,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slowbro",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slowbro-Galar",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slowbro-Mega",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slowking",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Slurpuff",
+      "baseSpeed": 72,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Snorlax",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Steelix",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Steelix-Mega",
+      "baseSpeed": 30,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Tsareena",
+      "baseSpeed": 72,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 82
+    },
+    {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Castform",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Clefable-Mega",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Decidueye",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Flapple",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Hatterene",
+      "baseSpeed": 29,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Luxray",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Metagross",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Musharna",
+      "baseSpeed": 29,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Politoed",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Polteageist",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Samurott",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Sandaconda",
+      "baseSpeed": 71,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Sinistcha",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Skarmory",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Swampert-Mega",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Tyranitar",
+      "baseSpeed": 61,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Tyranitar-Mega",
+      "baseSpeed": 71,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Tyrantrum",
+      "baseSpeed": 71,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Victreebel",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Victreebel-Mega",
+      "baseSpeed": 70,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 81
+    },
+    {
+      "pokemon": "Abomasnow",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Aegislash-Shield",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Clefable",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Decidueye-Hisui",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Empoleon",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Farigiraf",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Goodra-Hisui",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Grimmsnarl",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Incineroar",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Oranguru",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Primarina",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Swampert",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Sylveon",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Toucannon",
+      "baseSpeed": 60,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 80
+    },
+    {
+      "pokemon": "Barbaracle",
+      "baseSpeed": 68,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Clawitzer",
+      "baseSpeed": 59,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Houndstone",
+      "baseSpeed": 68,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Sableye-Mega",
+      "baseSpeed": 20,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Scrafty-Mega",
+      "baseSpeed": 68,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Torkoal",
+      "baseSpeed": 20,
+      "spread": "32 SPs / +Spe",
+      "speedStat": 79
+    },
+    {
+      "pokemon": "Aurorus",
+      "baseSpeed": 58,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 78
+    },
+    {
+      "pokemon": "Corviknight",
+      "baseSpeed": 67,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 78
+    },
+    {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 78
+    },
+    {
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 78
+    },
+    {
+      "pokemon": "Scrafty",
+      "baseSpeed": 58,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 78
+    },
+    {
+      "pokemon": "Skeledirge",
+      "baseSpeed": 66,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 77
+    },
+    {
+      "pokemon": "Banette",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Chimecho",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Chimecho-Mega",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Emboar",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Flareon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Glaceon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Orthworm",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Pelipper",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Scizor",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Torterra",
+      "baseSpeed": 56,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Trevenant",
+      "baseSpeed": 56,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Umbreon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Vaporeon",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Wyrdeer",
+      "baseSpeed": 65,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 76
+    },
+    {
+      "pokemon": "Alcremie",
+      "baseSpeed": 64,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 75
+    },
+    {
+      "pokemon": "Ampharos",
+      "baseSpeed": 55,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 75
+    },
+    {
+      "pokemon": "Chesnaught",
+      "baseSpeed": 64,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 75
+    },
+    {
+      "pokemon": "Golurk",
+      "baseSpeed": 55,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 75
+    },
+    {
+      "pokemon": "Golurk-Mega",
+      "baseSpeed": 55,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 75
+    },
+    {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 75
+    },
+    {
+      "pokemon": "Scolipede-Mega",
+      "baseSpeed": 62,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 73
+    },
+    {
+      "pokemon": "Abomasnow",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Aegislash-Shield",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Clefable",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Decidueye-Hisui",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Empoleon",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Farigiraf",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Goodra-Hisui",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Grimmsnarl",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Incineroar",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Oranguru",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Primarina",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Sableye-Mega",
+      "baseSpeed": 20,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Swampert",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Sylveon",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Torkoal",
+      "baseSpeed": 20,
+      "spread": "32 SPs / Neutral",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Toucannon",
+      "baseSpeed": 60,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Tyranitar",
+      "baseSpeed": 61,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 72
+    },
+    {
+      "pokemon": "Clawitzer",
+      "baseSpeed": 59,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 71
+    },
+    {
+      "pokemon": "Aggron",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Aggron-Mega",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Audino",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Audino-Mega",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Aurorus",
+      "baseSpeed": 58,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Azumarill",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Eelektross",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Kingambit",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Mawile",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Mawile-Mega",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Pangoro",
+      "baseSpeed": 58,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Rampardos",
+      "baseSpeed": 58,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Sableye",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Scrafty",
+      "baseSpeed": 58,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Vileplume",
+      "baseSpeed": 50,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 70
+    },
+    {
+      "pokemon": "Ditto",
+      "baseSpeed": 48,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 68
+    },
+    {
+      "pokemon": "Torterra",
+      "baseSpeed": 56,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 68
+    },
+    {
+      "pokemon": "Trevenant",
+      "baseSpeed": 56,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 68
+    },
+    {
+      "pokemon": "Ampharos",
+      "baseSpeed": 55,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 67
+    },
+    {
+      "pokemon": "Golurk",
+      "baseSpeed": 55,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 67
+    },
+    {
+      "pokemon": "Golurk-Mega",
+      "baseSpeed": 55,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 67
+    },
+    {
+      "pokemon": "Hippowdon",
+      "baseSpeed": 47,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 67
+    },
+    {
+      "pokemon": "Machamp",
+      "baseSpeed": 55,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 67
+    },
+    {
+      "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 65
+    },
+    {
+      "pokemon": "Bellibolt",
+      "baseSpeed": 45,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 65
+    },
+    {
+      "pokemon": "Conkeldurr",
+      "baseSpeed": 45,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 65
+    },
+    {
+      "pokemon": "Chesnaught-Mega",
+      "baseSpeed": 44,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 64
+    },
+    {
+      "pokemon": "Dragalge",
+      "baseSpeed": 44,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 64
+    },
+    {
+      "pokemon": "Dragalge-Mega",
+      "baseSpeed": 44,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 64
+    },
+    {
+      "pokemon": "Hydrapple",
+      "baseSpeed": 44,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 64
+    },
+    {
+      "pokemon": "Aggron",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Aggron-Mega",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Audino",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Audino-Mega",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Azumarill",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Beartic",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Crabominable",
+      "baseSpeed": 43,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Eelektross",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Kingambit",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Mawile",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Mawile-Mega",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Sableye",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Vileplume",
+      "baseSpeed": 50,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 63
+    },
+    {
+      "pokemon": "Araquanid",
+      "baseSpeed": 42,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 62
+    },
+    {
+      "pokemon": "Ditto",
+      "baseSpeed": 48,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 61
+    },
+    {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Hippowdon",
+      "baseSpeed": 47,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Rhyperior",
+      "baseSpeed": 40,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 60
+    },
+    {
+      "pokemon": "Ampharos-Mega",
+      "baseSpeed": 45,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 58
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 58
+    },
+    {
+      "pokemon": "Bellibolt",
+      "baseSpeed": 45,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 58
+    },
+    {
+      "pokemon": "Conkeldurr",
+      "baseSpeed": 45,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 58
+    },
+    {
+      "pokemon": "Chesnaught-Mega",
+      "baseSpeed": 44,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 57
+    },
+    {
+      "pokemon": "Dragalge",
+      "baseSpeed": 44,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 57
+    },
+    {
+      "pokemon": "Dragalge-Mega",
+      "baseSpeed": 44,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 57
+    },
+    {
+      "pokemon": "Hydrapple",
+      "baseSpeed": 44,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 57
+    },
+    {
+      "pokemon": "Crabominable",
+      "baseSpeed": 43,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 56
+    },
+    {
+      "pokemon": "Drampa",
+      "baseSpeed": 36,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 56
+    },
+    {
+      "pokemon": "Drampa-Mega",
+      "baseSpeed": 36,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 56
+    },
+    {
+      "pokemon": "Araquanid",
+      "baseSpeed": 42,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 55
+    },
+    {
+      "pokemon": "Garganacl",
+      "baseSpeed": 35,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 55
+    },
+    {
+      "pokemon": "Mudsdale",
+      "baseSpeed": 35,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 55
+    },
+    {
+      "pokemon": "Spiritomb",
+      "baseSpeed": 35,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 55
+    },
+    {
+      "pokemon": "Toxapex",
+      "baseSpeed": 35,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 55
+    },
+    {
+      "pokemon": "Ariados",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
+      "pokemon": "Camerupt",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
+      "pokemon": "Forretress",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
+      "pokemon": "Rhyperior",
+      "baseSpeed": 40,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 54
+    },
+    {
+      "pokemon": "Crabominable-Mega",
+      "baseSpeed": 33,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 53
+    },
+    {
+      "pokemon": "Avalugg-Hisui",
+      "baseSpeed": 38,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 52
+    },
+    {
+      "pokemon": "Stunfisk",
+      "baseSpeed": 32,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 52
+    },
+    {
+      "pokemon": "Stunfisk-Galar",
+      "baseSpeed": 32,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 52
+    },
+    {
+      "pokemon": "Abomasnow-Mega",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Appletun",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Drampa",
+      "baseSpeed": 36,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Drampa-Mega",
+      "baseSpeed": 36,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Reuniclus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Runerigus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Slowbro",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Slowbro-Galar",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Slowbro-Mega",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Slowking",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Snorlax",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Steelix",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Steelix-Mega",
+      "baseSpeed": 30,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 50
+    },
+    {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Garganacl",
+      "baseSpeed": 35,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Hatterene",
+      "baseSpeed": 29,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Mudsdale",
+      "baseSpeed": 35,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Musharna",
+      "baseSpeed": 29,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Spiritomb",
+      "baseSpeed": 35,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Toxapex",
+      "baseSpeed": 35,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 49
+    },
+    {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 48
+    },
+    {
+      "pokemon": "Crabominable-Mega",
+      "baseSpeed": 33,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 47
+    },
+    {
+      "pokemon": "Stunfisk",
+      "baseSpeed": 32,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 46
+    },
+    {
+      "pokemon": "Stunfisk-Galar",
+      "baseSpeed": 32,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 46
+    },
+    {
+      "pokemon": "Abomasnow-Mega",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Appletun",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Bastiodon",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Cofagrigus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Reuniclus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Runerigus",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Slowbro",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Slowbro-Galar",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Slowbro-Mega",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Slowking",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Slowking-Galar",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Snorlax",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Steelix",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Steelix-Mega",
+      "baseSpeed": 30,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 45
+    },
+    {
+      "pokemon": "Aromatisse",
+      "baseSpeed": 29,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 44
+    },
+    {
+      "pokemon": "Hatterene",
+      "baseSpeed": 29,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 44
+    },
+    {
+      "pokemon": "Musharna",
+      "baseSpeed": 29,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 44
+    },
+    {
+      "pokemon": "Avalugg",
+      "baseSpeed": 28,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 43
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 40
+    },
+    {
+      "pokemon": "Sableye-Mega",
+      "baseSpeed": 20,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 40
+    },
+    {
+      "pokemon": "Torkoal",
+      "baseSpeed": 20,
+      "spread": "0 SPs / Neutral",
+      "speedStat": 40
+    },
+    {
+      "pokemon": "Camerupt-Mega",
+      "baseSpeed": 20,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 36
+    },
+    {
+      "pokemon": "Sableye-Mega",
+      "baseSpeed": 20,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 36
+    },
+    {
+      "pokemon": "Torkoal",
+      "baseSpeed": 20,
+      "spread": "0 SPs / -Spe",
+      "speedStat": 36
     }
   ]
 }
