@@ -235,7 +235,7 @@ Hand-edit the relevant `scripts/regulation-species/regM-*.json` (add/remove spec
 
 ### Automated weekly refresh
 
-`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`), regenerates the speed tier JSONs from the per-regulation species lists, and pulls the latest LabMaus tournament teams. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged. Speed-tier diffs only appear when a regulation species list was hand-edited or `@smogon/calc` base stats shifted.
+`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`) and pulls the latest LabMaus tournament teams. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged. Speed tier JSONs are not auto-refreshed — regenerate them locally when a regulation species list changes.
 
 ## Important Notes
 

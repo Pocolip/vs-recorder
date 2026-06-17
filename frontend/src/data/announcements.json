@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-06-17-reg-m-b-speed-tiers",
+    "date": "2026-06-17",
+    "title": "Regulation M-B Speed Tiers",
+    "message": "Speed Tiers now includes a Regulation M-B option with the full updated species pool. Switch via the Regulation dropdown on the Speed Tiers tab."
+  },
+  {
     "id": "2026-06-10-team-collaborators",
     "date": "2026-06-10",
     "title": "New: Team Collaborators",

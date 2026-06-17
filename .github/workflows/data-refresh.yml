@@ -1,7 +1,9 @@
 name: Weekly Data Refresh
 
 # Pulls the latest NCP gen-10 setdex and LabMaus top-teams data once a week
-# and opens a single create-or-update PR against develop for review.
+# and opens a single create-or-update PR against develop for review. Speed
+# tier JSONs are not refreshed here — regenerate them locally when a
+# regulation species list changes (see CLAUDE.md "Speed Tier Data").
 
 on:
   schedule:
@@ -33,9 +35,6 @@ jobs:
       - name: Refresh NCP setdex (gen 10)
         run: node scripts/update-setdex-gen10.js
 
-      - name: Regenerate speed tiers
-        run: node scripts/generate-speed-tiers.js
-
       - name: Prep CA bundle for labmaus.net
         # labmaus.net's TLS server only sends its leaf cert. macOS curl does
         # AIA fetching of the missing intermediate; Linux curl does not. Pull
@@ -65,7 +64,6 @@ jobs:
 
             **Possible changes:**
             - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js) (used by the damage calculator's preset-sets dropdown)
-            - `frontend/src/data/speedTiers-reg*.json` — regenerated from `scripts/regulation-species/regM-*.json` (only diffs when a regulation list was hand-edited or `@smogon/calc` base stats change)
             - `frontend/src/data/tournamentTeams-regM-A.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-A)
 
             If none of the upstream sources changed, this PR will not be opened.
@@ -73,8 +71,6 @@ jobs:
             > Auto-created PRs do not trigger CI by default. To run the frontend build against these changes, close and reopen the PR, or push an empty commit.
           add-paths: |
             frontend/src/data/setdex-gen10.ts
-            frontend/src/data/speedTiers-regM-A.json
-            frontend/src/data/speedTiers-regM-B.json
             frontend/src/data/tournamentTeams-regM-A.json
           labels: |
             automated
