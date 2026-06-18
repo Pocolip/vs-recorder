@@ -1,26 +1,8 @@
 {
   "regulation": "M-A",
-  "generatedAt": "2026-06-10",
-  "speciesCount": 265,
+  "generatedAt": "2026-06-17",
+  "speciesCount": 262,
   "entries": [
-    {
-      "pokemon": "Absol-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "32 SPs / +Spe",
-      "speedStat": 223
-    },
-    {
-      "pokemon": "Garchomp-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "32 SPs / +Spe",
-      "speedStat": 223
-    },
-    {
-      "pokemon": "Lucario-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "32 SPs / +Spe",
-      "speedStat": 223
-    },
     {
       "pokemon": "Aerodactyl-Mega",
       "baseSpeed": 150,
@@ -68,24 +50,6 @@
       "baseSpeed": 134,
       "spread": "32 SPs / +Spe",
       "speedStat": 204
-    },
-    {
-      "pokemon": "Absol-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 203
-    },
-    {
-      "pokemon": "Garchomp-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 203
-    },
-    {
-      "pokemon": "Lucario-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "32 SPs / Neutral",
-      "speedStat": 203
     },
     {
       "pokemon": "Aerodactyl-Mega",
@@ -496,27 +460,9 @@
       "speedStat": 172
     },
     {
-      "pokemon": "Absol-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 171
-    },
-    {
       "pokemon": "Delphox",
       "baseSpeed": 104,
       "spread": "32 SPs / +Spe",
-      "speedStat": 171
-    },
-    {
-      "pokemon": "Garchomp-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "0 SPs / Neutral",
-      "speedStat": 171
-    },
-    {
-      "pokemon": "Lucario-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "0 SPs / Neutral",
       "speedStat": 171
     },
     {
@@ -1084,12 +1030,6 @@
       "speedStat": 154
     },
     {
-      "pokemon": "Absol-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "0 SPs / -Spe",
-      "speedStat": 153
-    },
-    {
       "pokemon": "Aerodactyl-Mega",
       "baseSpeed": 150,
       "spread": "0 SPs / -Spe",
@@ -1108,21 +1048,9 @@
       "speedStat": 153
     },
     {
-      "pokemon": "Garchomp-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "0 SPs / -Spe",
-      "speedStat": 153
-    },
-    {
       "pokemon": "Glimmora-Mega",
       "baseSpeed": 101,
       "spread": "32 SPs / Neutral",
-      "speedStat": 153
-    },
-    {
-      "pokemon": "Lucario-Mega-Z",
-      "baseSpeed": 151,
-      "spread": "0 SPs / -Spe",
       "speedStat": 153
     },
     {
