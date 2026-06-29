@@ -316,8 +316,8 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
                 <span className="font-medium text-gray-700 dark:text-gray-300">
                   {teamRegulation || "this regulation"}
                 </span>{" "}
-                yet. We currently have data for Regulation M-A — check back later
-                as more formats are added.
+                yet. We currently have data for Regulation M-A and M-B — check
+                back later as more formats are added.
               </p>
             </div>
           </div>
