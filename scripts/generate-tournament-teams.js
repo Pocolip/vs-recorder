@@ -10,6 +10,7 @@
  *
  * Writes:
  *   - frontend/src/data/tournamentTeams-regM-A.json
+ *   - frontend/src/data/tournamentTeams-regM-B.json
  *
  * Usage: node scripts/generate-tournament-teams.js
  *        (or: cd frontend && npm run generate:tournament-teams)
@@ -33,6 +34,7 @@ const LABMAUS_TOKEN = "X:F3mz5e4SP6Rcl3co!ou:8y";
 // coverage to other formats.
 const REGULATIONS = [
   { code: "M-A", labmaus: "Regulation Set M-A" },
+  { code: "M-B", labmaus: "Regulation Set M-B" },
 ];
 
 const WINDOW_DAYS = 60;

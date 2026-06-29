@@ -65,6 +65,7 @@ jobs:
             **Possible changes:**
             - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js) (used by the damage calculator's preset-sets dropdown)
             - `frontend/src/data/tournamentTeams-regM-A.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-A)
+            - `frontend/src/data/tournamentTeams-regM-B.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-B)
 
             If none of the upstream sources changed, this PR will not be opened.
 
@@ -72,6 +73,7 @@ jobs:
           add-paths: |
             frontend/src/data/setdex-gen10.ts
             frontend/src/data/tournamentTeams-regM-A.json
+            frontend/src/data/tournamentTeams-regM-B.json
           labels: |
             automated
             data-refresh

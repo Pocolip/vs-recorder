@@ -1,4 +1,5 @@
 import maData from "./tournamentTeams-regM-A.json";
+import mbData from "./tournamentTeams-regM-B.json";
 
 export interface TournamentInnerTeam {
   name: string;
@@ -35,6 +36,7 @@ export interface TournamentTeamsData {
 // trailing regulation code rather than an exact equality check.
 const REGISTRY: Array<{ match: RegExp; data: TournamentTeamsData }> = [
   { match: /Regulation\s+M-A\b/i, data: maData as TournamentTeamsData },
+  { match: /Regulation\s+M-B\b/i, data: mbData as TournamentTeamsData },
 ];
 
 export function getTournamentTeamsForRegulation(
