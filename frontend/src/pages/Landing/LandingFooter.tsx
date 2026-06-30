@@ -23,6 +23,12 @@ export default function LandingFooter() {
               About
             </Link>
             <Link
+              to="/resources"
+              className="transition-colors hover:text-gray-700 dark:hover:text-gray-300"
+            >
+              Resources
+            </Link>
+            <Link
               to="/announcements"
               className="transition-colors hover:text-gray-700 dark:hover:text-gray-300"
             >
