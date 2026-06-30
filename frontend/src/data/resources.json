@@ -56,7 +56,7 @@
       {
         "name": "VGC Matchup Lab",
         "url": "https://brophy.website/vgc/matchuplab/",
-        "description": "Restricted (mega/legendary) matchup table paired with usage statistics."
+        "description": "Mega Pokémon matchup table paired with usage statistics."
       }
     ]
   },
@@ -84,7 +84,7 @@
       {
         "name": "Cut Explorer",
         "url": "https://cut-explorer.stalruth.dev/",
-        "description": "Predicts and analyzes whether a given record makes Day 2 cut."
+        "description": "View stats and details for high-placing teams from recent events."
       },
       {
         "name": "NA CP Leaderboard",
@@ -154,7 +154,7 @@
       {
         "name": "teamsheet.gg",
         "url": "https://teamsheet.gg",
-        "description": "Build and format official-style team sheets."
+        "description": "Browse and create team reports."
       },
       {
         "name": "Team List Creator",
