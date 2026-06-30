@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Github, Info, Megaphone } from "lucide-react";
+import { Github, Info, Megaphone, Library } from "lucide-react";
 
 export default function Footer() {
   const version = import.meta.env.VITE_APP_VERSION ?? "dev";
@@ -37,6 +37,13 @@ export default function Footer() {
             >
               <Info className="h-3 w-3" />
               About
+            </Link>
+            <Link
+              to="/resources"
+              className="flex items-center gap-1.5 rounded px-3 py-1.5 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+            >
+              <Library className="h-3 w-3" />
+              Resources
             </Link>
             <Link
               to="/announcements"

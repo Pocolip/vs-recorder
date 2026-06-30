@@ -1,0 +1,241 @@
+[
+  {
+    "id": "damage-calculators",
+    "label": "Damage Calculators",
+    "icon": "Calculator",
+    "color": "text-blue-500 bg-blue-50 dark:bg-blue-500/10",
+    "resources": [
+      {
+        "name": "VGC MultiCalc",
+        "url": "https://vgcmulticalc.com/",
+        "description": "Advanced damage calculator for working out spreads against multiple Pokémon at once."
+      }
+    ]
+  },
+  {
+    "id": "usage-stats",
+    "label": "Usage Stats & Data",
+    "icon": "BarChart3",
+    "color": "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10",
+    "resources": [
+      {
+        "name": "Pikalytics",
+        "url": "https://www.pikalytics.com/",
+        "description": "Usage stats, movesets, and common teammates across the current metagame."
+      },
+      {
+        "name": "StatCrusher",
+        "url": "https://statcrusher.com/",
+        "description": "Battle records and usage broken down by Elo tier, format (Bo1/Bo3), and season."
+      },
+      {
+        "name": "MunchStats",
+        "url": "https://www.munchstats.com/",
+        "description": "VGC usage statistics and metagame data."
+      },
+      {
+        "name": "MunchStats Replays",
+        "url": "https://munchstats.com/replays/",
+        "description": "Searchable database of VGC replays."
+      },
+      {
+        "name": "ARC VGC",
+        "url": "https://arcvgc.com/",
+        "description": "Analytics platform built on all public Showdown replays — browse aggregated data and metagame insights."
+      },
+      {
+        "name": "Pokédata",
+        "url": "https://pokedata.ovh/",
+        "description": "Standings tracking, player history, and team comparison tools across formats."
+      },
+      {
+        "name": "Nimbasa City Post",
+        "url": "https://www.nimbasacitypost.com/",
+        "description": "VGC news and metagame/data analysis."
+      },
+      {
+        "name": "VGC Matchup Lab",
+        "url": "https://brophy.website/vgc/matchuplab/",
+        "description": "Mega Pokémon matchup table paired with usage statistics."
+      }
+    ]
+  },
+  {
+    "id": "tournament-standings",
+    "label": "Tournament Standings & Brackets",
+    "icon": "Trophy",
+    "color": "text-amber-500 bg-amber-50 dark:bg-amber-500/10",
+    "resources": [
+      {
+        "name": "Limitless",
+        "url": "https://play.limitlesstcg.com/tournaments/?game=VGC",
+        "description": "Online tournament hosting with brackets and live standings."
+      },
+      {
+        "name": "RK9",
+        "url": "https://rk9.gg/tournaments",
+        "description": "Official event registration, pairings, and standings."
+      },
+      {
+        "name": "Reportworm Standings",
+        "url": "https://standings.reportworm.com/",
+        "description": "Live tournament standings tracker."
+      },
+      {
+        "name": "Cut Explorer",
+        "url": "https://cut-explorer.stalruth.dev/",
+        "description": "View stats and details for high-placing teams from recent events."
+      },
+      {
+        "name": "NA CP Leaderboard",
+        "url": "https://lepotatochip.github.io/index.html",
+        "description": "Live leaderboard for North America Championship Point standings."
+      }
+    ]
+  },
+  {
+    "id": "tournament-info",
+    "label": "Tournament Info & Official",
+    "icon": "CalendarDays",
+    "color": "text-purple-500 bg-purple-50 dark:bg-purple-500/10",
+    "resources": [
+      {
+        "name": "Victory Road",
+        "url": "https://victoryroad.pro/",
+        "description": "VGC rules, schedules, Championship Point tracking, and guides."
+      },
+      {
+        "name": "Pokémon Events",
+        "url": "https://events.pokemon.com/en-us/events",
+        "description": "Official Play! Pokémon event locator."
+      }
+    ]
+  },
+  {
+    "id": "paste-databases",
+    "label": "Team Paste Databases",
+    "icon": "Database",
+    "color": "text-pink-500 bg-pink-50 dark:bg-pink-500/10",
+    "resources": [
+      {
+        "name": "VGC Pastes",
+        "url": "https://x.com/VGCPastes",
+        "description": "Large community archive of tournament team pastes.",
+        "links": [
+          { "label": "Spreadsheet", "url": "https://t.co/abV0elif3q" }
+        ]
+      },
+      {
+        "name": "PASRS",
+        "url": "https://docs.google.com/spreadsheets/d/1HdwhV6AlRP-El7WdfHoLwz315zov2O9BSeoyMG37NHo/copy?usp=sharing",
+        "description": "Palkia Academy Showdown Reporting Spreadsheet — log replays and track game-by-game, matchup, and move stats.",
+        "note": "Your data stays in your own Google Drive.",
+        "links": [
+          { "label": "@BauerdadVGC", "url": "https://x.com/BauerdadVGC" }
+        ]
+      },
+      {
+        "name": "SPAMS",
+        "url": "https://docs.google.com/spreadsheets/d/1b6NYv3NwytQ8D_oWTwprq0TNlZVz5q_s0TpJ0NR5Bgk/edit?gid=275325505",
+        "description": "Sableye's Planning and Analysis of Matchups Spreadsheet — build gameplans and matchup summaries you fully own.",
+        "note": "Your data stays in your own Google Drive.",
+        "links": [
+          { "label": "@SableyeVGC", "url": "https://x.com/SableyeVGC" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "team-building",
+    "label": "Team Building & Tools",
+    "icon": "Wrench",
+    "color": "text-cyan-500 bg-cyan-50 dark:bg-cyan-500/10",
+    "resources": [
+      {
+        "name": "teamsheet.gg",
+        "url": "https://teamsheet.gg",
+        "description": "Browse and create team reports."
+      },
+      {
+        "name": "Team List Creator",
+        "url": "https://dhsufi.github.io/PokemonTeamListCreator/",
+        "description": "Generates printable tournament team lists."
+      },
+      {
+        "name": "Marriland Team Builder",
+        "url": "https://marriland.com/tools/team-builder/",
+        "description": "Check a team's defensive weakness/resistance spread and offensive coverage."
+      }
+    ]
+  },
+  {
+    "id": "guides",
+    "label": "Guides & Learning",
+    "icon": "GraduationCap",
+    "color": "text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10",
+    "resources": [
+      {
+        "name": "VGC Guide",
+        "url": "https://www.vgcguide.com/",
+        "description": "Older but still-valuable text guides on strategy, teambuilding, catching/breeding, and circuit info."
+      }
+    ]
+  },
+  {
+    "id": "data-references",
+    "label": "Data References",
+    "icon": "BookOpen",
+    "color": "text-teal-500 bg-teal-50 dark:bg-teal-500/10",
+    "resources": [
+      {
+        "name": "Serebii",
+        "url": "https://serebii.net/",
+        "description": "Pokémon news plus a complete Pokédex, move, and item database."
+      },
+      {
+        "name": "PokémonDB",
+        "url": "https://pokemondb.net/",
+        "description": "Clean Pokédex, movesets, type charts, and breeding/data reference."
+      }
+    ]
+  },
+  {
+    "id": "built-on",
+    "label": "Built on / Powered by",
+    "icon": "Link2",
+    "color": "text-brand-500 bg-brand-50 dark:bg-brand-500/10",
+    "intro": "VS Recorder is built on top of these excellent tools and data sources.",
+    "resources": [
+      {
+        "name": "Pokémon Showdown",
+        "url": "https://replay.pokemonshowdown.com",
+        "description": "Battle simulator whose replays power VS Recorder's import and analysis."
+      },
+      {
+        "name": "Pokepaste",
+        "url": "https://pokepast.es",
+        "description": "Team paste hosting used for importing teams."
+      },
+      {
+        "name": "Pokebin",
+        "url": "https://pokebin.com",
+        "description": "Team paste hosting used for importing teams."
+      },
+      {
+        "name": "VR Pastes",
+        "url": "https://vrpastes.com",
+        "description": "Team paste hosting used for importing teams."
+      },
+      {
+        "name": "LabMaus",
+        "url": "https://labmaus.net",
+        "description": "Tournament team data behind the recent-tournament team importer."
+      },
+      {
+        "name": "NCP VGC Damage Calculator",
+        "url": "https://nerd-of-now.github.io/NCP-VGC-Damage-Calculator/",
+        "description": "Nerd of Now's calculator; its set data powers the in-app calculator's preset sets."
+      }
+    ]
+  }
+]
