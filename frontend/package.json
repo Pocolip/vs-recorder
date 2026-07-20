@@ -1,7 +1,7 @@
 {
   "name": "vs-recorder-frontend",
   "private": true,
-  "version": "1.0.59",
+  "version": "1.0.60",
   "type": "module",
   "scripts": {
     "dev": "vite",
