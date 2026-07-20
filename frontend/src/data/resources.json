@@ -152,6 +152,11 @@
     "color": "text-cyan-500 bg-cyan-50 dark:bg-cyan-500/10",
     "resources": [
       {
+        "name": "crob.at",
+        "url": "https://crob.at/",
+        "description": "Create visual, shareable team pages from Pokémon Showdown exports and PokePaste links."
+      },
+      {
         "name": "teamsheet.gg",
         "url": "https://teamsheet.gg",
         "description": "Browse and create team reports."
