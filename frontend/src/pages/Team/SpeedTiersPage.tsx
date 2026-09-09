@@ -12,6 +12,7 @@ import {
 import { getMegaForme, getItemSpeedMultiplier } from "../../utils/megaStones";
 import speedTiersMA from "../../data/speedTiers-regM-A.json";
 import speedTiersMB from "../../data/speedTiers-regM-B.json";
+import speedTiersMC from "../../data/speedTiers-regM-C.json";
 
 interface SpeedTierRow {
   pokemon: string;
@@ -28,10 +29,16 @@ interface RegulationData {
   entries: SpeedTierRow[];
 }
 
+// Newest regulation goes last — the default selection is derived from the
+// insertion order, so a new entry becomes the default without a second edit.
 const REGULATIONS: Record<string, RegulationData> = {
   "M-A": speedTiersMA as RegulationData,
   "M-B": speedTiersMB as RegulationData,
+  "M-C": speedTiersMC as RegulationData,
 };
+
+const REGULATION_KEYS = Object.keys(REGULATIONS);
+const DEFAULT_REGULATION = REGULATION_KEYS[REGULATION_KEYS.length - 1];
 
 function getSpeEvFromPaste(p: PasteData): number {
   return p.evs?.Spe ?? p.evs?.spe ?? 0;
@@ -89,7 +96,7 @@ export default function SpeedTiersPage() {
   const { team } = useActiveTeam();
   const [teamPaste, setTeamPaste] = useState<PasteData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [regulation, setRegulation] = useState<string>("M-A");
+  const [regulation, setRegulation] = useState<string>(DEFAULT_REGULATION);
   const [tailwind, setTailwind] = useState(false);
   const [trickRoom, setTrickRoom] = useState(false);
   const [scarfedKeys, setScarfedKeys] = useState<Set<string>>(new Set());

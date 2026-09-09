@@ -24,6 +24,7 @@ interface PendingWarning {
 }
 
 const REGULATIONS = [
+  "VGC 2026 Regulation M-C",
   "VGC 2026 Regulation M-B",
   "VGC 2026 Regulation M-A",
   "VGC 2025 Regulation J",
