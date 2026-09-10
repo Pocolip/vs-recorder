@@ -200,11 +200,13 @@ The Speed Tiers page (`frontend/src/pages/Team/SpeedTiersPage.tsx`) loads a per-
 
 - `frontend/src/data/speedTiers-regM-A.json` — generated, checked in
 - `frontend/src/data/speedTiers-regM-B.json` — generated, checked in
+- `frontend/src/data/speedTiers-regM-C.json` — generated, checked in
 
 Each regulation's species list is the source of truth, kept in `scripts/regulation-species/`:
 
 - `scripts/regulation-species/regM-A.json` — flat array of canonical `@smogon/calc` Gen 9 species names allowed in Reg M-A (seeded from Serebii's M-A page)
 - `scripts/regulation-species/regM-B.json` — same shape for Reg M-B
+- `scripts/regulation-species/regM-C.json` — same shape for Reg M-C (superset of M-B)
 
 Regenerate with:
 
@@ -223,7 +225,9 @@ Each species gets four rows (252+, 252 neutral, 0 neutral, 0 -Spe). Mega formes 
 
 ### Adding a new regulation
 
-Drop a new `scripts/regulation-species/regM-{X}.json` with the allowed species list, run the generator, then import the new `speedTiers-reg{X}.json` and add it to the `REGULATIONS` map in `SpeedTiersPage.tsx`. If it's a Champions-era regulation, add it to `CHAMPIONS_REGULATIONS` in `generate-speed-tiers.js` so the spread labels read `SPs` instead of `EVs`.
+Drop a new `scripts/regulation-species/regM-{X}.json` with the allowed species list, run the generator, then import the new `speedTiers-reg{X}.json` and add it to the `REGULATIONS` map in `SpeedTiersPage.tsx`. If it's a Champions-era regulation, add it to `CHAMPIONS_REGULATIONS` in `generate-speed-tiers.js` so the spread labels read `SPs` instead of `EVs`. The newest regulation goes **last** in the `REGULATIONS` map — `SpeedTiersPage.tsx` derives its default selection from insertion order.
+
+`-Mega-Z` formes (Absol/Garchomp/Lucario) are gated by `Z_MEGA_REGULATIONS` in `generate-speed-tiers.js`: they became legal in Reg M-C, so only regulations listed in that set include them. Regulations before M-C must stay out of it or their checked-in JSON will gain rows.
 
 ### Editing an existing regulation
 

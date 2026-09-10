@@ -220,12 +220,13 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
     } else {
       // Plain species selection
       const species = normalizeSpeciesName(option.value);
-      const info = getSpeciesInfo(species);
-      const abilities = info?.abilities ? Object.values(info.abilities).filter(Boolean) : [];
+      // Via getAbilitiesForSpecies, not the raw dex, so species with corrected
+      // ability data (the Z-Mega formes) default to the right ability.
+      const abilities = getAbilitiesForSpecies(species);
       const teraDefaults = getTeraDefaults(species);
       onChange({
         species,
-        ability: (abilities[0] as string) || "",
+        ability: abilities[0] || "",
         ...(teraDefaults ? { teraType: teraDefaults.teraType, item: teraDefaults.item || "" } : {}),
       });
     }

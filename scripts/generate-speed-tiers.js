@@ -35,7 +35,13 @@ const OUT_DIR = resolve(ROOT, "frontend/src/data");
 // Champions-era regulations (M-A and onward) display Stat Points instead of
 // EVs in the UI. 32 SPs ≡ 252 EVs (formula: sps*8-4), 0 SPs ≡ 0 EVs, so the
 // computed speed stat is identical — only the labels change.
-const CHAMPIONS_REGULATIONS = new Set(["M-A", "M-B"]);
+const CHAMPIONS_REGULATIONS = new Set(["M-A", "M-B", "M-C"]);
+
+// "-Mega-Z" formes (Absol-Mega-Z, Garchomp-Mega-Z, Lucario-Mega-Z) became legal
+// in Regulation M-C. Earlier regulations must keep excluding them even though
+// @smogon/calc has listed them in its Gen 9 dex all along, so the filter is
+// scoped per regulation rather than applied globally.
+const Z_MEGA_REGULATIONS = new Set(["M-C"]);
 
 // Look up the base speed of a species. Returns null if unknown.
 function lookupBaseSpeed(species) {
@@ -45,9 +51,6 @@ function lookupBaseSpeed(species) {
   return null;
 }
 
-// "-Mega-Z" forms (Absol-Mega-Z, Garchomp-Mega-Z, Lucario-Mega-Z) aren't
-// available in Pokemon Champions yet, so drop them even though @smogon/calc
-// lists them in its Gen 9 dex.
 function isZMega(name) {
   return /-Mega-Z$/.test(name);
 }
@@ -58,7 +61,7 @@ function isZMega(name) {
 const megasByBase = new Map();
 for (const s of gen.species) {
   const idx = s.name.indexOf("-Mega");
-  if (idx > 0 && !isZMega(s.name)) {
+  if (idx > 0) {
     const base = s.name.slice(0, idx);
     if (!megasByBase.has(base)) megasByBase.set(base, []);
     megasByBase.get(base).push(s.name);
@@ -72,10 +75,10 @@ function discoverRegulations() {
     .sort((a, b) => a.reg.localeCompare(b.reg));
 }
 
-function buildSpeciesMap(speciesList) {
+function buildSpeciesMap(speciesList, { allowZMega }) {
   const speciesMap = new Map(); // species -> baseSpeed
   function addSpecies(name, explicitSpeed) {
-    if (isZMega(name)) return;
+    if (!allowZMega && isZMega(name)) return;
     const speed = explicitSpeed != null ? explicitSpeed : lookupBaseSpeed(name);
     if (speed == null) {
       console.warn(`[skip] ${name}: not in @smogon/calc and no override base speed`);
@@ -99,7 +102,9 @@ function buildSpeciesMap(speciesList) {
 function generateRegulation({ file, reg }) {
   const path = resolve(REG_SPECIES_DIR, file);
   const speciesList = JSON.parse(readFileSync(path, "utf8"));
-  const speciesMap = buildSpeciesMap(speciesList);
+  const speciesMap = buildSpeciesMap(speciesList, {
+    allowZMega: Z_MEGA_REGULATIONS.has(reg),
+  });
 
   const usesSps = CHAMPIONS_REGULATIONS.has(reg);
   const STAT_UNIT = usesSps ? "SPs" : "EVs";

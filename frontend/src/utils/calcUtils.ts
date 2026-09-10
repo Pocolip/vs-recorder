@@ -31,6 +31,10 @@ export const DEFAULT_BOOSTS: BoostSpread = { atk: 0, def: 0, spa: 0, spd: 0, spe
 
 export const CHAMPIONS_GEN = 10;
 
+// Mega Lucario Z's ability, new in Regulation M-C: halves the damage the
+// Pokemon takes from contact moves. Not present in @smogon/calc's dex.
+export const AURA_GUARD = "Aura Guard";
+
 // Convert Champions Stat Points to legacy EVs for the Gen 9 calc engine.
 // Formula from Nerd of Now's damage_MASTER.js: max(0, sps * 8 - 4).
 // Accepts a possibly-undefined input — older snapshots may lack `sps`.
@@ -383,7 +387,26 @@ export function getItemList(): string[] {
   return _itemListCache;
 }
 
+// @smogon/calc 0.11.0 (published 2026-03-11, the newest release) predates
+// Regulation M-C and ships the wrong ability for all three Z-Mega formes —
+// it lists the base mega's ability instead. Official abilities per
+// https://asia-press.portal-pokemon.com/press-release/pokemon-champions_20260830/
+//
+// Sharpness and Levitate already exist in the calc's mechanics, so naming them
+// here is enough to make those two behave correctly. Aura Guard is new in
+// Champions and has no implementation upstream — see applyAuraGuard in
+// hooks/useDamageCalc.ts.
+//
+// Delete an entry once upstream ships the correct data for it.
+const ABILITY_OVERRIDES: Record<string, string[]> = {
+  "Absol-Mega-Z": ["Sharpness"],
+  "Garchomp-Mega-Z": ["Levitate"],
+  "Lucario-Mega-Z": [AURA_GUARD],
+};
+
 export function getAbilitiesForSpecies(species: string): string[] {
+  const override = ABILITY_OVERRIDES[species];
+  if (override) return override;
   const info = getSpeciesInfo(species);
   if (!info || !info.abilities) return [];
   return Object.values(info.abilities).filter(Boolean) as string[];

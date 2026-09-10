@@ -8,6 +8,7 @@ One file per regulation under `frontend/src/data/`:
 
 - `speedTiers-regM-A.json`
 - `speedTiers-regM-B.json`
+- `speedTiers-regM-C.json`
 - (future regulations follow the same `speedTiers-reg{X}.json` pattern)
 
 Each file:
@@ -75,7 +76,7 @@ The script prints `[skip] <species>: not in @smogon/calc and no override base sp
 
 1. Create `scripts/regulation-species/regM-{X}.json` with the allowed species list.
 2. Run the generator.
-3. Import the new `speedTiers-reg{X}.json` in `frontend/src/pages/Team/SpeedTiersPage.tsx` and add it to the `REGULATIONS` map.
+3. Import the new `speedTiers-reg{X}.json` in `frontend/src/pages/Team/SpeedTiersPage.tsx` and add it to the `REGULATIONS` map. Put it **last** — the page's default regulation is derived from insertion order.
 4. If it's a Champions-era regulation, add `"M-{X}"` to `CHAMPIONS_REGULATIONS` in `generate-speed-tiers.js` so spread labels read `SPs`.
 5. Add the new output path to `add-paths` in `.github/workflows/data-refresh.yml`.
 
