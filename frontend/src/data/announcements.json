@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-09-09-reg-m-c-speed-tiers",
+    "date": "2026-09-09",
+    "title": "Regulation M-C Speed Tiers",
+    "message": "Speed Tiers now includes a Regulation M-C option with the full updated species pool, including the new Mega Absol Z, Mega Garchomp Z, Mega Lucario Z, Mega Salamence, Mega Golisopod and Mega Baxcalibur. It's now the default on the Speed Tiers tab — switch regulations via the dropdown."
+  },
+  {
     "id": "2026-06-30-resources-page",
     "date": "2026-06-30",
     "title": "New: Resources Page",
