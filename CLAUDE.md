@@ -241,6 +241,8 @@ Hand-edit the relevant `scripts/regulation-species/regM-*.json` (add/remove spec
 
 `.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`) and pulls the latest LabMaus tournament teams. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged. Speed tier JSONs are not auto-refreshed — regenerate them locally when a regulation species list changes.
 
+Tournament teams are pulled per regulation — the list lives in `REGULATIONS` in `scripts/generate-tournament-teams.js`, and each entry writes `frontend/src/data/tournamentTeams-reg{X}.json`. To add a regulation: add the entry (the LabMaus string is `Regulation Set {X}`), run the script, import the new JSON in `frontend/src/data/tournamentTeamsByRegulation.ts`, and add the file to `add-paths` in `.github/workflows/data-refresh.yml`. LabMaus only lists a regulation once a tournament has been tagged with it, so a newly-legal regulation returns nothing for a while — organizers file those tournaments under `Custom format` in the meantime. A regulation entry can set `fallback: CUSTOM_FORMAT` to use that bucket when its own query comes back empty; the output JSON then carries `isFallbackSource: true` and `RecentTourModal` shows a caveat banner, since `Custom format` also catches unrelated custom events. Only the newest regulation should carry a `fallback`, and it should be dropped once LabMaus lists the regulation for real (the primary query takes over automatically at that point).
+
 ## Important Notes
 
 ### Backend
