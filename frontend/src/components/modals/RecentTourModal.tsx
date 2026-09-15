@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Check,
   Info,
+  AlertTriangle,
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 import PokemonSprite from "../pokemon/PokemonSprite";
@@ -252,6 +253,27 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
 
         {data ? (
           <>
+            {data.isFallbackSource && (
+              /*
+                LabMaus hasn't added this regulation to their filter list yet,
+                so the generator pulled their "Custom format" bucket instead.
+                Most of it is this regulation's tournaments, but not all — say
+                so rather than passing it off as a clean per-regulation cut.
+              */
+              <div className="mx-5 mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-500/30 dark:bg-amber-500/10 sm:mx-7">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <p className="text-xs text-amber-800 dark:text-amber-200">
+                  labmaus.net hasn't added Regulation {data.regulation} to their
+                  filters yet, so these teams come from their{" "}
+                  <span className="font-medium">Custom format</span> bucket —
+                  where organizers are filing {data.regulation} tournaments in
+                  the meantime. Most entries are {data.regulation}, but the
+                  bucket also catches other custom events, so treat the
+                  win rates and usage as indicative rather than exact.
+                </p>
+              </div>
+            )}
+
             {/* Tab bar */}
             <div className="flex gap-1 border-b border-gray-200 px-5 pt-3 dark:border-gray-700 sm:px-7">
               {COMP_SIZES.map((size) => {

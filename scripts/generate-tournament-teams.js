@@ -11,6 +11,7 @@
  * Writes:
  *   - frontend/src/data/tournamentTeams-regM-A.json
  *   - frontend/src/data/tournamentTeams-regM-B.json
+ *   - frontend/src/data/tournamentTeams-regM-C.json
  *
  * Usage: node scripts/generate-tournament-teams.js
  *        (or: cd frontend && npm run generate:tournament-teams)
@@ -30,11 +31,27 @@ const ROOT = resolve(__dirname, "..");
 // new value from their bundle (`Discord.Api_Key`) and re-run.
 const LABMAUS_TOKEN = "X:F3mz5e4SP6Rcl3co!ou:8y";
 
+// LabMaus only exposes a regulation once a tournament has been tagged with
+// it (see GET /api/all_vgc_regulations), so a newly-legal regulation returns
+// an empty array for a while even though tournaments are being played and
+// reported — organizers file them under "Custom format" until LabMaus adds
+// the option.
+//
+// `fallback` opts a regulation into using that bucket when its own query
+// comes back empty. It is deliberately only set on the newest regulation:
+// "Custom format" is a mixed bag (it also holds gimmick tournaments and
+// events under older rules), so the data is indicative, not authoritative.
+// When the fallback is used the output JSON carries `isFallbackSource: true`
+// and the modal shows a warning. Drop the `fallback` once LabMaus lists the
+// regulation for real — the primary query wins automatically from then on.
+const CUSTOM_FORMAT = "Custom format";
+
 // (Code → LabMaus regulation string). Add entries here when expanding
 // coverage to other formats.
 const REGULATIONS = [
   { code: "M-A", labmaus: "Regulation Set M-A" },
   { code: "M-B", labmaus: "Regulation Set M-B" },
+  { code: "M-C", labmaus: "Regulation Set M-C", fallback: CUSTOM_FORMAT },
 ];
 
 const WINDOW_DAYS = 60;
@@ -126,32 +143,58 @@ function fetchTopTeams(labmausRegulation, dateRange) {
   return JSON.parse(stdout);
 }
 
-function generateForRegulation({ code, labmaus }) {
-  const dateRange = computeDateRange();
-  console.log(`Fetching ${labmaus} (${dateRange.from} → ${dateRange.to})…`);
-  const raw = fetchTopTeams(labmaus, dateRange);
-
+function buildCompositions(raw, code) {
   if (!Array.isArray(raw)) {
     throw new Error(`Unexpected top-level shape for ${code}: expected array`);
   }
 
-  const compositions = raw
+  return raw
     .map((bucket) => ({
       size: bucket.composition,
       clusters: Array.isArray(bucket.teams) ? bucket.teams.map(trimCluster) : [],
     }))
     .filter((c) => typeof c.size === "number")
     .sort((a, b) => a.size - b.size);
+}
 
-  const totalClusters = compositions.reduce((n, c) => n + c.clusters.length, 0);
-  const totalInnerTeams = compositions.reduce(
+function countClusters(compositions) {
+  return compositions.reduce((n, c) => n + c.clusters.length, 0);
+}
+
+function countInnerTeams(compositions) {
+  return compositions.reduce(
     (n, c) => n + c.clusters.reduce((m, k) => m + k.teams.length, 0),
     0,
   );
+}
+
+function generateForRegulation({ code, labmaus, fallback }) {
+  const dateRange = computeDateRange();
+  console.log(`Fetching ${labmaus} (${dateRange.from} → ${dateRange.to})…`);
+
+  let source = labmaus;
+  let isFallbackSource = false;
+  let compositions = buildCompositions(fetchTopTeams(labmaus, dateRange), code);
+
+  if (countClusters(compositions) === 0 && fallback) {
+    console.log(`  No data under "${labmaus}" — falling back to "${fallback}"…`);
+    const fallbackCompositions = buildCompositions(
+      fetchTopTeams(fallback, dateRange),
+      code,
+    );
+    if (countClusters(fallbackCompositions) > 0) {
+      source = fallback;
+      isFallbackSource = true;
+      compositions = fallbackCompositions;
+    }
+  }
 
   const output = {
     regulation: code,
-    labmausRegulation: labmaus,
+    labmausRegulation: source,
+    // Omitted rather than written as `false` so regulations sourced normally
+    // keep the original file shape — no churn in the weekly refresh PR.
+    ...(isFallbackSource ? { isFallbackSource: true } : {}),
     dateRange,
     generatedAt: isoDate(new Date()),
     compositions,
@@ -160,9 +203,18 @@ function generateForRegulation({ code, labmaus }) {
   const outPath = resolve(ROOT, `frontend/src/data/tournamentTeams-reg${code}.json`);
   writeFileSync(outPath, JSON.stringify(output, null, 2) + "\n");
 
+  const totalClusters = countClusters(compositions);
   console.log(
-    `  Wrote ${totalClusters} clusters / ${totalInnerTeams} teams → ${outPath}`,
+    `  Wrote ${totalClusters} clusters / ${countInnerTeams(compositions)} teams` +
+      `${isFallbackSource ? ` (from "${source}")` : ""} → ${outPath}`,
   );
+
+  if (totalClusters === 0) {
+    console.warn(
+      `  ⚠ No data returned for "${labmaus}"${fallback ? ` or "${fallback}"` : ""}. ` +
+        `LabMaus may not have any tournaments under this regulation yet.`,
+    );
+  }
 }
 
 function main() {
