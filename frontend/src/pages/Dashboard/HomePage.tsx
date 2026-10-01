@@ -299,7 +299,7 @@ export default function HomePage() {
 
         {/* Team Grid */}
         {!loading && filteredTeams.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filteredTeams.map((team) => (
               <DraggableTeamCard
                 key={team.id}
@@ -381,10 +381,10 @@ function DraggableTeamCard({
       >
         {/* Team Name & Regulation */}
         <div className="mb-3 flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-gray-800 group-hover:text-brand-600 dark:text-white/90 dark:group-hover:text-brand-400">
+          <h3 className="min-w-0 break-words font-semibold text-gray-800 group-hover:text-brand-600 dark:text-white/90 dark:group-hover:text-brand-400">
             {team.name}
           </h3>
-          <div className="flex items-center gap-1.5">
+          <div className="flex shrink-0 items-center gap-1.5">
             {team.regulation && (
               <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
                 {shortRegulation(team.regulation)}
