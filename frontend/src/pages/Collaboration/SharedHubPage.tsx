@@ -140,16 +140,16 @@ export default function SharedHubPage() {
         ) : shared.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">No teams are shared with you yet.</p>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {shared.map((t) => (
               <li key={t.id}>
                 <Link
                   to={`/team/${t.id}`}
                   className="block rounded-lg border border-gray-200 px-4 py-3 hover:border-brand-400 hover:bg-brand-50/40 dark:border-gray-700 dark:hover:border-brand-500 dark:hover:bg-brand-500/10"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-800 dark:text-gray-100">{t.name}</span>
-                    <ExternalLink className="h-4 w-4 text-gray-400" />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{t.name}</span>
+                    <ExternalLink className="h-4 w-4 shrink-0 text-gray-400" />
                   </div>
                   <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {t.regulation || "Unknown reg"} · {t.replayCount} replay{t.replayCount === 1 ? "" : "s"} · {t.matchCount} match{t.matchCount === 1 ? "" : "es"}
@@ -171,16 +171,16 @@ export default function SharedHubPage() {
             You aren't sharing any teams yet. Open a team's "Manage Collaborators" to invite someone.
           </p>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {sharing.map((t) => (
               <li key={t.id}>
                 <Link
                   to={`/team/${t.id}`}
                   className="block rounded-lg border border-gray-200 px-4 py-3 hover:border-brand-400 hover:bg-brand-50/40 dark:border-gray-700 dark:hover:border-brand-500 dark:hover:bg-brand-500/10"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-800 dark:text-gray-100">{t.name}</span>
-                    <ExternalLink className="h-4 w-4 text-gray-400" />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 break-words font-medium text-gray-800 dark:text-gray-100">{t.name}</span>
+                    <ExternalLink className="h-4 w-4 shrink-0 text-gray-400" />
                   </div>
                   <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {t.regulation || "Unknown reg"} · open Manage Collaborators from the sidebar

@@ -58,23 +58,18 @@ const PokemonTeam: React.FC<PokemonTeamProps> = ({
 
   return (
     <div className="flex flex-row items-center gap-1">
-      {slots.map((name, i) =>
-        loading ? (
-          <div
-            key={i}
-            className="animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
-            style={{ width: px, height: px }}
-          />
-        ) : name ? (
-          <PokemonSprite key={`${name}-${i}`} name={name} size={size} />
-        ) : (
-          <div
-            key={i}
-            className="rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600"
-            style={{ width: px, height: px }}
-          />
-        )
-      )}
+      {/* Each slot is px wide but may shrink so the row fits narrow containers */}
+      {slots.map((name, i) => (
+        <div key={loading ? i : `${name}-${i}`} className="min-w-0" style={{ width: px }}>
+          {loading ? (
+            <div className="aspect-square w-full animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+          ) : name ? (
+            <PokemonSprite name={name} size={size} fluid />
+          ) : (
+            <div className="aspect-square w-full rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600" />
+          )}
+        </div>
+      ))}
     </div>
   );
 };
