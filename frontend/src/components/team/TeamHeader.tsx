@@ -10,7 +10,7 @@ import { formatShortDate } from "../../utils/timeUtils";
 const STORAGE_KEY = "vs-recorder-team-header-collapsed";
 
 function shortRegulation(reg: string): string {
-  const match = reg.match(/Regulation\s+([A-Z])$/);
+  const match = reg.match(/Regulation\s+([A-Z](?:-[A-Z])?)$/);
   return match ? `Reg ${match[1]}` : reg;
 }
 
@@ -116,8 +116,8 @@ const TeamHeader: React.FC = () => {
       <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
         {/* Top row: Name + Regulation + Actions */}
         <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+          <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
+            <h2 className="min-w-0 break-words text-xl font-semibold text-gray-800 dark:text-white/90">
               {team.name}
             </h2>
             {team.regulation && (
@@ -127,7 +127,7 @@ const TeamHeader: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {team?.role === "COLLABORATOR" && (
               <span
                 className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
