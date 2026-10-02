@@ -41,7 +41,7 @@ public class UserService {
         }
 
         // Validate email uniqueness
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists: " + user.getEmail());
         }
 
@@ -117,7 +117,9 @@ public class UserService {
 
         // Update email if provided and different
         if (updates.getEmail() != null && !updates.getEmail().equals(existingUser.getEmail())) {
-            if (userRepository.existsByEmail(updates.getEmail())) {
+            boolean takenByOther = userRepository.findAllByEmailIgnoreCase(updates.getEmail()).stream()
+                    .anyMatch(u -> !u.getId().equals(existingUser.getId()));
+            if (takenByOther) {
                 throw new IllegalArgumentException("Email already exists: " + updates.getEmail());
             }
             existingUser.setEmail(updates.getEmail());

@@ -19,6 +19,12 @@ export default function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (username.includes("@")) {
+      setError("Username cannot contain '@'");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {

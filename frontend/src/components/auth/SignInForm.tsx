@@ -28,7 +28,7 @@ export default function SignInForm() {
       navigate("/");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Invalid username or password"
+        err instanceof Error ? err.message : "Invalid username/email or password"
       );
     } finally {
       setIsSubmitting(false);
@@ -53,7 +53,7 @@ export default function SignInForm() {
               Sign In
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your username and password to sign in!
+              Enter your username or email and password to sign in!
             </p>
           </div>
           <div>
@@ -66,11 +66,11 @@ export default function SignInForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Username <span className="text-error-500">*</span>
+                    Username or email <span className="text-error-500">*</span>
                   </Label>
                   <Input
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder="Enter your username or email"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
