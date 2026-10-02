@@ -131,7 +131,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(
             summary = "Login user",
-            description = "Authenticate with username and password to receive a JWT token"
+            description = "Authenticate with username or email and password to receive a JWT token"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -189,7 +189,7 @@ public class AuthController {
 
         } catch (AuthenticationException e) {
             log.warn("Login failed for user: {}", request.getUsername());
-            throw new IllegalArgumentException("Invalid username or password");
+            throw new IllegalArgumentException("Invalid username/email or password");
         }
     }
 

@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-10-02-login-with-email",
+    "date": "2026-10-02",
+    "title": "Sign In With Your Email",
+    "message": "You can now sign in with either your username or the email address on your account. Nothing changes if you prefer your username."
+  },
+  {
     "id": "2026-10-01-maintenance-mobile-fixes",
     "date": "2026-10-01",
     "title": "Under-the-Hood Updates & Mobile Fixes",

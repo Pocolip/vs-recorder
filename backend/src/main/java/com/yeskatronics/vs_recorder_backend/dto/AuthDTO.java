@@ -2,6 +2,7 @@ package com.yeskatronics.vs_recorder_backend.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,8 @@ public class AuthDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequest {
-        @NotBlank(message = "Username is required")
+        // Accepts either a username or an email address; field name kept for API compatibility
+        @NotBlank(message = "Username or email is required")
         private String username;
 
         @NotBlank(message = "Password is required")
@@ -35,6 +37,7 @@ public class AuthDTO {
     public static class RegisterRequest {
         @NotBlank(message = "Username is required")
         @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+        @Pattern(regexp = "^[^@]+$", message = "Username cannot contain '@'")
         private String username;
 
         @NotBlank(message = "Password is required")
