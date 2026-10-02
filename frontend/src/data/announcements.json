@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-10-01-maintenance-mobile-fixes",
+    "date": "2026-10-01",
+    "title": "Under-the-Hood Updates & Mobile Fixes",
+    "message": "We made some tweaks under the hood to keep things secure and up to date, and fixed a few mobile layout issues: long team names no longer stretch the dashboard, the regulation badge no longer hides behind the Add Replay button, and opponent team sprites now fit inside match cards on smaller screens."
+  },
+  {
     "id": "2026-09-09-reg-m-c-speed-tiers",
     "date": "2026-09-09",
     "title": "Regulation M-C Speed Tiers",
