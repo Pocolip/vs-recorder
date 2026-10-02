@@ -20,7 +20,7 @@ import { formatTimeAgo } from "../../utils/timeUtils";
 import type { Team } from "../../types";
 
 function shortRegulation(reg: string): string {
-  const match = reg.match(/Regulation\s+([A-Z])$/);
+  const match = reg.match(/Regulation\s+([A-Z](?:-[A-Z])?)$/);
   return match ? `Reg ${match[1]}` : reg;
 }
 
