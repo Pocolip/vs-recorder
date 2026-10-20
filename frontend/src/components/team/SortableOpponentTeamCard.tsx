@@ -19,6 +19,7 @@ interface OpponentTeam {
 }
 
 interface SortableOpponentTeamCardProps {
+  replaySection?: React.ReactNode;
   opponentTeam: OpponentTeam;
   myTeamPokemon: string[];
   dragDisabled?: boolean;

@@ -1,0 +1,1200 @@
+{
+  "aliases": {
+    "taurospaldeacombatbreed": "taurospaldeacombat",
+    "taurospaldea": "taurospaldeacombat",
+    "taurospaldeablazebreed": "taurospaldeablaze",
+    "taurospaldeaaquabreed": "taurospaldeaaqua",
+    "giratinaaltered": "giratina",
+    "tornadusincarnate": "tornadus",
+    "thundurusincarnate": "thundurus",
+    "landorusincarnate": "landorus",
+    "floetteeternalflower": "floetteeternal",
+    "meowsticm": "meowstic",
+    "meowsticmale": "meowstic",
+    "meowsticfemale": "meowsticf",
+    "necrozmadusk": "necrozmaduskmane",
+    "necrozmadawn": "necrozmadawnwings",
+    "toxtricityamped": "toxtricity",
+    "indeedeem": "indeedee",
+    "indeedeemale": "indeedee",
+    "indeedeefemale": "indeedeef",
+    "zacianhero": "zacian",
+    "zaciancrownedsword": "zaciancrowned",
+    "zamazentahero": "zamazenta",
+    "zamazentacrownedshield": "zamazentacrowned",
+    "urshifusinglestrike": "urshifu",
+    "calyrexicerider": "calyrexice",
+    "calyrexshadowrider": "calyrexshadow",
+    "basculegionm": "basculegion",
+    "basculegionmale": "basculegion",
+    "basculegionfemale": "basculegionf",
+    "enamorusincarnate": "enamorus",
+    "oinkolognem": "oinkologne",
+    "oinkolognemale": "oinkologne",
+    "oinkolognefemale": "oinkolognef",
+    "mausholdfamilyofthree": "maushold",
+    "mausholdthree": "maushold",
+    "mausholdfamilyoffour": "mausholdfour",
+    "palafinzero": "palafin",
+    "tatsugiricurly": "tatsugiri",
+    "dudunsparcetwosegment": "dudunsparce",
+    "ogerponteal": "ogerpon",
+    "ogerpontealmask": "ogerpon",
+    "ogerponwellspringmask": "ogerponwellspring",
+    "ogerponhearthflamemask": "ogerponhearthflame",
+    "ogerponcornerstonemask": "ogerponcornerstone"
+  },
+  "formBases": {
+    "venusaurmega": "venusaur",
+    "venusaurgmax": "venusaur",
+    "charizardmegax": "charizard",
+    "charizardmegay": "charizard",
+    "charizardgmax": "charizard",
+    "blastoisemega": "blastoise",
+    "blastoisegmax": "blastoise",
+    "butterfreegmax": "butterfree",
+    "beedrillmega": "beedrill",
+    "pidgeotmega": "pidgeot",
+    "rattataalola": "rattata",
+    "raticatealola": "raticate",
+    "raticatealolatotem": "raticate",
+    "pikachucosplay": "pikachu",
+    "pikachurockstar": "pikachu",
+    "pikachubelle": "pikachu",
+    "pikachupopstar": "pikachu",
+    "pikachuphd": "pikachu",
+    "pikachulibre": "pikachu",
+    "pikachuoriginal": "pikachu",
+    "pikachuhoenn": "pikachu",
+    "pikachusinnoh": "pikachu",
+    "pikachuunova": "pikachu",
+    "pikachukalos": "pikachu",
+    "pikachualola": "pikachu",
+    "pikachupartner": "pikachu",
+    "pikachustarter": "pikachu",
+    "pikachugmax": "pikachu",
+    "pikachuworld": "pikachu",
+    "raichualola": "raichu",
+    "raichumegax": "raichu",
+    "raichumegay": "raichu",
+    "sandshrewalola": "sandshrew",
+    "sandslashalola": "sandslash",
+    "clefablemega": "clefable",
+    "vulpixalola": "vulpix",
+    "ninetalesalola": "ninetales",
+    "diglettalola": "diglett",
+    "dugtrioalola": "dugtrio",
+    "meowthalola": "meowth",
+    "meowthgalar": "meowth",
+    "meowthgmax": "meowth",
+    "persianalola": "persian",
+    "growlithehisui": "growlithe",
+    "arcaninehisui": "arcanine",
+    "alakazammega": "alakazam",
+    "machampgmax": "machamp",
+    "victreebelmega": "victreebel",
+    "geodudealola": "geodude",
+    "graveleralola": "graveler",
+    "golemalola": "golem",
+    "ponytagalar": "ponyta",
+    "rapidashgalar": "rapidash",
+    "slowpokegalar": "slowpoke",
+    "slowbromega": "slowbro",
+    "slowbrogalar": "slowbro",
+    "farfetchdgalar": "farfetchd",
+    "grimeralola": "grimer",
+    "mukalola": "muk",
+    "gengarmega": "gengar",
+    "gengargmax": "gengar",
+    "kinglergmax": "kingler",
+    "voltorbhisui": "voltorb",
+    "electrodehisui": "electrode",
+    "exeggutoralola": "exeggutor",
+    "marowakalola": "marowak",
+    "marowakalolatotem": "marowak",
+    "weezinggalar": "weezing",
+    "kangaskhanmega": "kangaskhan",
+    "starmiemega": "starmie",
+    "mrmimegalar": "mrmime",
+    "pinsirmega": "pinsir",
+    "taurospaldeacombat": "tauros",
+    "taurospaldeablaze": "tauros",
+    "taurospaldeaaqua": "tauros",
+    "gyaradosmega": "gyarados",
+    "laprasgmax": "lapras",
+    "eeveestarter": "eevee",
+    "eeveegmax": "eevee",
+    "aerodactylmega": "aerodactyl",
+    "snorlaxgmax": "snorlax",
+    "articunogalar": "articuno",
+    "zapdosgalar": "zapdos",
+    "moltresgalar": "moltres",
+    "dragonitemega": "dragonite",
+    "mewtwomegax": "mewtwo",
+    "mewtwomegay": "mewtwo",
+    "meganiummega": "meganium",
+    "typhlosionhisui": "typhlosion",
+    "feraligatrmega": "feraligatr",
+    "pichuspikyeared": "pichu",
+    "ampharosmega": "ampharos",
+    "wooperpaldea": "wooper",
+    "slowkinggalar": "slowking",
+    "steelixmega": "steelix",
+    "qwilfishhisui": "qwilfish",
+    "scizormega": "scizor",
+    "heracrossmega": "heracross",
+    "sneaselhisui": "sneasel",
+    "corsolagalar": "corsola",
+    "skarmorymega": "skarmory",
+    "houndoommega": "houndoom",
+    "tyranitarmega": "tyranitar",
+    "sceptilemega": "sceptile",
+    "blazikenmega": "blaziken",
+    "swampertmega": "swampert",
+    "zigzagoongalar": "zigzagoon",
+    "linoonegalar": "linoone",
+    "gardevoirmega": "gardevoir",
+    "sableyemega": "sableye",
+    "mawilemega": "mawile",
+    "aggronmega": "aggron",
+    "medichammega": "medicham",
+    "manectricmega": "manectric",
+    "sharpedomega": "sharpedo",
+    "cameruptmega": "camerupt",
+    "altariamega": "altaria",
+    "castformsunny": "castform",
+    "castformrainy": "castform",
+    "castformsnowy": "castform",
+    "banettemega": "banette",
+    "chimechomega": "chimecho",
+    "absolmega": "absol",
+    "absolmegaz": "absol",
+    "glaliemega": "glalie",
+    "salamencemega": "salamence",
+    "metagrossmega": "metagross",
+    "latiasmega": "latias",
+    "latiosmega": "latios",
+    "kyogreprimal": "kyogre",
+    "groudonprimal": "groudon",
+    "rayquazamega": "rayquaza",
+    "deoxysattack": "deoxys",
+    "deoxysdefense": "deoxys",
+    "deoxysspeed": "deoxys",
+    "staraptormega": "staraptor",
+    "burmysandy": "burmy",
+    "burmytrash": "burmy",
+    "wormadamsandy": "wormadam",
+    "wormadamtrash": "wormadam",
+    "cherrimsunshine": "cherrim",
+    "shelloseast": "shellos",
+    "gastrodoneast": "gastrodon",
+    "lopunnymega": "lopunny",
+    "garchompmega": "garchomp",
+    "garchompmegaz": "garchomp",
+    "lucariomega": "lucario",
+    "lucariomegaz": "lucario",
+    "abomasnowmega": "abomasnow",
+    "gallademega": "gallade",
+    "froslassmega": "froslass",
+    "rotomheat": "rotom",
+    "rotomwash": "rotom",
+    "rotomfrost": "rotom",
+    "rotomfan": "rotom",
+    "rotommow": "rotom",
+    "dialgaorigin": "dialga",
+    "palkiaorigin": "palkia",
+    "heatranmega": "heatran",
+    "giratinaorigin": "giratina",
+    "darkraimega": "darkrai",
+    "shayminsky": "shaymin",
+    "arceusbug": "arceus",
+    "arceusdark": "arceus",
+    "arceusdragon": "arceus",
+    "arceuselectric": "arceus",
+    "arceusfairy": "arceus",
+    "arceusfighting": "arceus",
+    "arceusfire": "arceus",
+    "arceusflying": "arceus",
+    "arceusghost": "arceus",
+    "arceusgrass": "arceus",
+    "arceusground": "arceus",
+    "arceusice": "arceus",
+    "arceuspoison": "arceus",
+    "arceuspsychic": "arceus",
+    "arceusrock": "arceus",
+    "arceussteel": "arceus",
+    "arceuswater": "arceus",
+    "emboarmega": "emboar",
+    "samurotthisui": "samurott",
+    "excadrillmega": "excadrill",
+    "audinomega": "audino",
+    "scolipedemega": "scolipede",
+    "lilliganthisui": "lilligant",
+    "basculinbluestriped": "basculin",
+    "basculinwhitestriped": "basculin",
+    "darumakagalar": "darumaka",
+    "darmanitanzen": "darmanitan",
+    "darmanitangalar": "darmanitan",
+    "darmanitangalarzen": "darmanitan",
+    "scraftymega": "scrafty",
+    "yamaskgalar": "yamask",
+    "garbodorgmax": "garbodor",
+    "zoruahisui": "zorua",
+    "zoroarkhisui": "zoroark",
+    "deerlingsummer": "deerling",
+    "deerlingautumn": "deerling",
+    "deerlingwinter": "deerling",
+    "eelektrossmega": "eelektross",
+    "chandeluremega": "chandelure",
+    "stunfiskgalar": "stunfisk",
+    "golurkmega": "golurk",
+    "braviaryhisui": "braviary",
+    "tornadustherian": "tornadus",
+    "thundurustherian": "thundurus",
+    "landorustherian": "landorus",
+    "kyuremblack": "kyurem",
+    "kyuremwhite": "kyurem",
+    "keldeoresolute": "keldeo",
+    "meloettapirouette": "meloetta",
+    "genesectdouse": "genesect",
+    "genesectshock": "genesect",
+    "genesectburn": "genesect",
+    "genesectchill": "genesect",
+    "chesnaughtmega": "chesnaught",
+    "delphoxmega": "delphox",
+    "greninjabond": "greninja",
+    "greninjaash": "greninja",
+    "greninjamega": "greninja",
+    "vivillonicysnow": "vivillon",
+    "vivillonpolar": "vivillon",
+    "vivillontundra": "vivillon",
+    "vivilloncontinental": "vivillon",
+    "vivillongarden": "vivillon",
+    "vivillonelegant": "vivillon",
+    "vivillonmodern": "vivillon",
+    "vivillonmarine": "vivillon",
+    "vivillonarchipelago": "vivillon",
+    "vivillonhighplains": "vivillon",
+    "vivillonsandstorm": "vivillon",
+    "vivillonriver": "vivillon",
+    "vivillonmonsoon": "vivillon",
+    "vivillonsavanna": "vivillon",
+    "vivillonsun": "vivillon",
+    "vivillonocean": "vivillon",
+    "vivillonjungle": "vivillon",
+    "vivillonfancy": "vivillon",
+    "vivillonpokeball": "vivillon",
+    "pyroarmega": "pyroar",
+    "floetteeternal": "floette",
+    "floettemega": "floette",
+    "meowsticf": "meowstic",
+    "meowsticmmega": "meowstic",
+    "meowsticfmega": "meowstic",
+    "aegislashblade": "aegislash",
+    "malamarmega": "malamar",
+    "barbaraclemega": "barbaracle",
+    "dragalgemega": "dragalge",
+    "hawluchamega": "hawlucha",
+    "sliggoohisui": "sliggoo",
+    "goodrahisui": "goodra",
+    "pumpkaboosmall": "pumpkaboo",
+    "pumpkaboolarge": "pumpkaboo",
+    "pumpkaboosuper": "pumpkaboo",
+    "gourgeistsmall": "gourgeist",
+    "gourgeistlarge": "gourgeist",
+    "gourgeistsuper": "gourgeist",
+    "avalugghisui": "avalugg",
+    "xerneasneutral": "xerneas",
+    "zygarde10": "zygarde",
+    "zygardecomplete": "zygarde",
+    "zygardemega": "zygarde",
+    "dianciemega": "diancie",
+    "hoopaunbound": "hoopa",
+    "decidueyehisui": "decidueye",
+    "gumshoostotem": "gumshoos",
+    "vikavolttotem": "vikavolt",
+    "crabominablemega": "crabominable",
+    "oricoriopompom": "oricorio",
+    "oricoriopau": "oricorio",
+    "oricoriosensu": "oricorio",
+    "ribombeetotem": "ribombee",
+    "rockruffdusk": "rockruff",
+    "lycanrocmidnight": "lycanroc",
+    "lycanrocdusk": "lycanroc",
+    "wishiwashischool": "wishiwashi",
+    "araquanidtotem": "araquanid",
+    "lurantistotem": "lurantis",
+    "salazzletotem": "salazzle",
+    "golisopodmega": "golisopod",
+    "silvallybug": "silvally",
+    "silvallydark": "silvally",
+    "silvallydragon": "silvally",
+    "silvallyelectric": "silvally",
+    "silvallyfairy": "silvally",
+    "silvallyfighting": "silvally",
+    "silvallyfire": "silvally",
+    "silvallyflying": "silvally",
+    "silvallyghost": "silvally",
+    "silvallygrass": "silvally",
+    "silvallyground": "silvally",
+    "silvallyice": "silvally",
+    "silvallypoison": "silvally",
+    "silvallypsychic": "silvally",
+    "silvallyrock": "silvally",
+    "silvallysteel": "silvally",
+    "silvallywater": "silvally",
+    "miniororange": "minior",
+    "minioryellow": "minior",
+    "miniorgreen": "minior",
+    "miniorblue": "minior",
+    "miniorindigo": "minior",
+    "miniorviolet": "minior",
+    "miniormeteor": "minior",
+    "togedemarutotem": "togedemaru",
+    "mimikyubusted": "mimikyu",
+    "mimikyutotem": "mimikyu",
+    "mimikyubustedtotem": "mimikyu",
+    "drampamega": "drampa",
+    "kommoototem": "kommoo",
+    "necrozmaduskmane": "necrozma",
+    "necrozmadawnwings": "necrozma",
+    "necrozmaultra": "necrozma",
+    "magearnaoriginal": "magearna",
+    "magearnamega": "magearna",
+    "magearnaoriginalmega": "magearna",
+    "zeraoramega": "zeraora",
+    "melmetalgmax": "melmetal",
+    "rillaboomgmax": "rillaboom",
+    "cinderacegmax": "cinderace",
+    "inteleongmax": "inteleon",
+    "corviknightgmax": "corviknight",
+    "orbeetlegmax": "orbeetle",
+    "drednawgmax": "drednaw",
+    "coalossalgmax": "coalossal",
+    "flapplegmax": "flapple",
+    "appletungmax": "appletun",
+    "sandacondagmax": "sandaconda",
+    "cramorantgulping": "cramorant",
+    "cramorantgorging": "cramorant",
+    "toxtricitylowkey": "toxtricity",
+    "toxtricitygmax": "toxtricity",
+    "toxtricitylowkeygmax": "toxtricity",
+    "centiskorchgmax": "centiskorch",
+    "sinisteaantique": "sinistea",
+    "polteageistantique": "polteageist",
+    "hatterenegmax": "hatterene",
+    "grimmsnarlgmax": "grimmsnarl",
+    "alcremierubycream": "alcremie",
+    "alcremiematchacream": "alcremie",
+    "alcremiemintcream": "alcremie",
+    "alcremielemoncream": "alcremie",
+    "alcremierubyswirl": "alcremie",
+    "alcremiecaramelswirl": "alcremie",
+    "alcremierainbowswirl": "alcremie",
+    "alcremiegmax": "alcremie",
+    "falinksmega": "falinks",
+    "eiscuenoice": "eiscue",
+    "indeedeef": "indeedee",
+    "morpekohangry": "morpeko",
+    "copperajahgmax": "copperajah",
+    "duraludongmax": "duraludon",
+    "zaciancrowned": "zacian",
+    "zamazentacrowned": "zamazenta",
+    "eternatuseternamax": "eternatus",
+    "urshifurapidstrike": "urshifu",
+    "urshifugmax": "urshifu",
+    "urshifurapidstrikegmax": "urshifu",
+    "zarudedada": "zarude",
+    "calyrexice": "calyrex",
+    "calyrexshadow": "calyrex",
+    "ursalunabloodmoon": "ursaluna",
+    "basculegionf": "basculegion",
+    "enamorustherian": "enamorus",
+    "oinkolognef": "oinkologne",
+    "mausholdfour": "maushold",
+    "squawkabillyblue": "squawkabilly",
+    "squawkabillyyellow": "squawkabilly",
+    "squawkabillywhite": "squawkabilly",
+    "scovillainmega": "scovillain",
+    "palafinhero": "palafin",
+    "glimmoramega": "glimmora",
+    "tatsugiridroopy": "tatsugiri",
+    "tatsugiristretchy": "tatsugiri",
+    "tatsugiricurlymega": "tatsugiri",
+    "tatsugiridroopymega": "tatsugiri",
+    "tatsugiristretchymega": "tatsugiri",
+    "dudunsparcethreesegment": "dudunsparce",
+    "baxcaliburmega": "baxcalibur",
+    "gimmighoulroaming": "gimmighoul",
+    "poltchageistartisan": "poltchageist",
+    "sinistchamasterpiece": "sinistcha",
+    "ogerponwellspring": "ogerpon",
+    "ogerponhearthflame": "ogerpon",
+    "ogerponcornerstone": "ogerpon",
+    "ogerpontealtera": "ogerpon",
+    "ogerponwellspringtera": "ogerpon",
+    "ogerponhearthflametera": "ogerpon",
+    "ogerponcornerstonetera": "ogerpon",
+    "terapagosterastal": "terapagos",
+    "terapagosstellar": "terapagos",
+    "crucibellemega": "crucibelle",
+    "venomiconepilogue": "venomicon",
+    "ramnarokradiant": "ramnarok",
+    "pokestarufo2": "pokestarufo",
+    "pokestarufopropu2": "pokestarufo"
+  },
+  "itemRules": {
+    "abomasite": {
+      "species": [
+        "abomasnow"
+      ],
+      "formes": {
+        "abomasnow": "abomasnowmega"
+      }
+    },
+    "absolite": {
+      "species": [
+        "absol"
+      ],
+      "formes": {
+        "absol": "absolmega"
+      }
+    },
+    "absolitez": {
+      "species": [
+        "absol"
+      ],
+      "formes": {
+        "absol": "absolmegaz"
+      }
+    },
+    "aerodactylite": {
+      "species": [
+        "aerodactyl"
+      ],
+      "formes": {
+        "aerodactyl": "aerodactylmega"
+      }
+    },
+    "aggronite": {
+      "species": [
+        "aggron"
+      ],
+      "formes": {
+        "aggron": "aggronmega"
+      }
+    },
+    "alakazite": {
+      "species": [
+        "alakazam"
+      ],
+      "formes": {
+        "alakazam": "alakazammega"
+      }
+    },
+    "altarianite": {
+      "species": [
+        "altaria"
+      ],
+      "formes": {
+        "altaria": "altariamega"
+      }
+    },
+    "ampharosite": {
+      "species": [
+        "ampharos"
+      ],
+      "formes": {
+        "ampharos": "ampharosmega"
+      }
+    },
+    "audinite": {
+      "species": [
+        "audino"
+      ],
+      "formes": {
+        "audino": "audinomega"
+      }
+    },
+    "banettite": {
+      "species": [
+        "banette"
+      ],
+      "formes": {
+        "banette": "banettemega"
+      }
+    },
+    "barbaracite": {
+      "species": [
+        "barbaracle"
+      ],
+      "formes": {
+        "barbaracle": "barbaraclemega"
+      }
+    },
+    "baxcalibrite": {
+      "species": [
+        "baxcalibur"
+      ],
+      "formes": {
+        "baxcalibur": "baxcaliburmega"
+      }
+    },
+    "beedrillite": {
+      "species": [
+        "beedrill"
+      ],
+      "formes": {
+        "beedrill": "beedrillmega"
+      }
+    },
+    "blastoisinite": {
+      "species": [
+        "blastoise"
+      ],
+      "formes": {
+        "blastoise": "blastoisemega"
+      }
+    },
+    "blazikenite": {
+      "species": [
+        "blaziken"
+      ],
+      "formes": {
+        "blaziken": "blazikenmega"
+      }
+    },
+    "cameruptite": {
+      "species": [
+        "camerupt"
+      ],
+      "formes": {
+        "camerupt": "cameruptmega"
+      }
+    },
+    "chandelurite": {
+      "species": [
+        "chandelure"
+      ],
+      "formes": {
+        "chandelure": "chandeluremega"
+      }
+    },
+    "charizarditex": {
+      "species": [
+        "charizard"
+      ],
+      "formes": {
+        "charizard": "charizardmegax"
+      }
+    },
+    "charizarditey": {
+      "species": [
+        "charizard"
+      ],
+      "formes": {
+        "charizard": "charizardmegay"
+      }
+    },
+    "chesnaughtite": {
+      "species": [
+        "chesnaught"
+      ],
+      "formes": {
+        "chesnaught": "chesnaughtmega"
+      }
+    },
+    "chimechite": {
+      "species": [
+        "chimecho"
+      ],
+      "formes": {
+        "chimecho": "chimechomega"
+      }
+    },
+    "clefablite": {
+      "species": [
+        "clefable"
+      ],
+      "formes": {
+        "clefable": "clefablemega"
+      }
+    },
+    "crabominite": {
+      "species": [
+        "crabominable"
+      ],
+      "formes": {
+        "crabominable": "crabominablemega"
+      }
+    },
+    "darkranite": {
+      "species": [
+        "darkrai"
+      ],
+      "formes": {
+        "darkrai": "darkraimega"
+      }
+    },
+    "delphoxite": {
+      "species": [
+        "delphox"
+      ],
+      "formes": {
+        "delphox": "delphoxmega"
+      }
+    },
+    "diancite": {
+      "species": [
+        "diancie"
+      ],
+      "formes": {
+        "diancie": "dianciemega"
+      }
+    },
+    "dragalgite": {
+      "species": [
+        "dragalge"
+      ],
+      "formes": {
+        "dragalge": "dragalgemega"
+      }
+    },
+    "dragoninite": {
+      "species": [
+        "dragonite"
+      ],
+      "formes": {
+        "dragonite": "dragonitemega"
+      }
+    },
+    "drampanite": {
+      "species": [
+        "drampa"
+      ],
+      "formes": {
+        "drampa": "drampamega"
+      }
+    },
+    "eelektrossite": {
+      "species": [
+        "eelektross"
+      ],
+      "formes": {
+        "eelektross": "eelektrossmega"
+      }
+    },
+    "emboarite": {
+      "species": [
+        "emboar"
+      ],
+      "formes": {
+        "emboar": "emboarmega"
+      }
+    },
+    "excadrite": {
+      "species": [
+        "excadrill"
+      ],
+      "formes": {
+        "excadrill": "excadrillmega"
+      }
+    },
+    "falinksite": {
+      "species": [
+        "falinks"
+      ],
+      "formes": {
+        "falinks": "falinksmega"
+      }
+    },
+    "feraligite": {
+      "species": [
+        "feraligatr"
+      ],
+      "formes": {
+        "feraligatr": "feraligatrmega"
+      }
+    },
+    "floettite": {
+      "species": [
+        "floetteeternal"
+      ],
+      "formes": {
+        "floetteeternal": "floettemega"
+      }
+    },
+    "froslassite": {
+      "species": [
+        "froslass"
+      ],
+      "formes": {
+        "froslass": "froslassmega"
+      }
+    },
+    "galladite": {
+      "species": [
+        "gallade"
+      ],
+      "formes": {
+        "gallade": "gallademega"
+      }
+    },
+    "garchompite": {
+      "species": [
+        "garchomp"
+      ],
+      "formes": {
+        "garchomp": "garchompmega"
+      }
+    },
+    "garchompitez": {
+      "species": [
+        "garchomp"
+      ],
+      "formes": {
+        "garchomp": "garchompmegaz"
+      }
+    },
+    "gardevoirite": {
+      "species": [
+        "gardevoir"
+      ],
+      "formes": {
+        "gardevoir": "gardevoirmega"
+      }
+    },
+    "gengarite": {
+      "species": [
+        "gengar"
+      ],
+      "formes": {
+        "gengar": "gengarmega"
+      }
+    },
+    "glalitite": {
+      "species": [
+        "glalie"
+      ],
+      "formes": {
+        "glalie": "glaliemega"
+      }
+    },
+    "glimmoranite": {
+      "species": [
+        "glimmora"
+      ],
+      "formes": {
+        "glimmora": "glimmoramega"
+      }
+    },
+    "golisopite": {
+      "species": [
+        "golisopod"
+      ],
+      "formes": {
+        "golisopod": "golisopodmega"
+      }
+    },
+    "golurkite": {
+      "species": [
+        "golurk"
+      ],
+      "formes": {
+        "golurk": "golurkmega"
+      }
+    },
+    "greninjite": {
+      "species": [
+        "greninja"
+      ],
+      "formes": {
+        "greninja": "greninjamega"
+      }
+    },
+    "gyaradosite": {
+      "species": [
+        "gyarados"
+      ],
+      "formes": {
+        "gyarados": "gyaradosmega"
+      }
+    },
+    "hawluchanite": {
+      "species": [
+        "hawlucha"
+      ],
+      "formes": {
+        "hawlucha": "hawluchamega"
+      }
+    },
+    "heatranite": {
+      "species": [
+        "heatran"
+      ],
+      "formes": {
+        "heatran": "heatranmega"
+      }
+    },
+    "heracronite": {
+      "species": [
+        "heracross"
+      ],
+      "formes": {
+        "heracross": "heracrossmega"
+      }
+    },
+    "houndoominite": {
+      "species": [
+        "houndoom"
+      ],
+      "formes": {
+        "houndoom": "houndoommega"
+      }
+    },
+    "kangaskhanite": {
+      "species": [
+        "kangaskhan"
+      ],
+      "formes": {
+        "kangaskhan": "kangaskhanmega"
+      }
+    },
+    "latiasite": {
+      "species": [
+        "latias"
+      ],
+      "formes": {
+        "latias": "latiasmega"
+      }
+    },
+    "latiosite": {
+      "species": [
+        "latios"
+      ],
+      "formes": {
+        "latios": "latiosmega"
+      }
+    },
+    "lopunnite": {
+      "species": [
+        "lopunny"
+      ],
+      "formes": {
+        "lopunny": "lopunnymega"
+      }
+    },
+    "lucarionite": {
+      "species": [
+        "lucario"
+      ],
+      "formes": {
+        "lucario": "lucariomega"
+      }
+    },
+    "lucarionitez": {
+      "species": [
+        "lucario"
+      ],
+      "formes": {
+        "lucario": "lucariomegaz"
+      }
+    },
+    "magearnite": {
+      "species": [
+        "magearna",
+        "magearnaoriginal"
+      ],
+      "formes": {
+        "magearna": "magearnamega",
+        "magearnaoriginal": "magearnaoriginalmega"
+      }
+    },
+    "malamarite": {
+      "species": [
+        "malamar"
+      ],
+      "formes": {
+        "malamar": "malamarmega"
+      }
+    },
+    "manectite": {
+      "species": [
+        "manectric"
+      ],
+      "formes": {
+        "manectric": "manectricmega"
+      }
+    },
+    "mawilite": {
+      "species": [
+        "mawile"
+      ],
+      "formes": {
+        "mawile": "mawilemega"
+      }
+    },
+    "medichamite": {
+      "species": [
+        "medicham"
+      ],
+      "formes": {
+        "medicham": "medichammega"
+      }
+    },
+    "meganiumite": {
+      "species": [
+        "meganium"
+      ],
+      "formes": {
+        "meganium": "meganiummega"
+      }
+    },
+    "meowsticite": {
+      "species": [
+        "meowstic",
+        "meowsticf"
+      ],
+      "formes": {
+        "meowstic": "meowsticmmega",
+        "meowsticf": "meowsticfmega"
+      }
+    },
+    "metagrossite": {
+      "species": [
+        "metagross"
+      ],
+      "formes": {
+        "metagross": "metagrossmega"
+      }
+    },
+    "mewtwonitex": {
+      "species": [
+        "mewtwo"
+      ],
+      "formes": {
+        "mewtwo": "mewtwomegax"
+      }
+    },
+    "mewtwonitey": {
+      "species": [
+        "mewtwo"
+      ],
+      "formes": {
+        "mewtwo": "mewtwomegay"
+      }
+    },
+    "pidgeotite": {
+      "species": [
+        "pidgeot"
+      ],
+      "formes": {
+        "pidgeot": "pidgeotmega"
+      }
+    },
+    "pinsirite": {
+      "species": [
+        "pinsir"
+      ],
+      "formes": {
+        "pinsir": "pinsirmega"
+      }
+    },
+    "pyroarite": {
+      "species": [
+        "pyroar"
+      ],
+      "formes": {
+        "pyroar": "pyroarmega"
+      }
+    },
+    "raichunitex": {
+      "species": [
+        "raichu"
+      ],
+      "formes": {
+        "raichu": "raichumegax"
+      }
+    },
+    "raichunitey": {
+      "species": [
+        "raichu"
+      ],
+      "formes": {
+        "raichu": "raichumegay"
+      }
+    },
+    "sablenite": {
+      "species": [
+        "sableye"
+      ],
+      "formes": {
+        "sableye": "sableyemega"
+      }
+    },
+    "salamencite": {
+      "species": [
+        "salamence"
+      ],
+      "formes": {
+        "salamence": "salamencemega"
+      }
+    },
+    "sceptilite": {
+      "species": [
+        "sceptile"
+      ],
+      "formes": {
+        "sceptile": "sceptilemega"
+      }
+    },
+    "scizorite": {
+      "species": [
+        "scizor"
+      ],
+      "formes": {
+        "scizor": "scizormega"
+      }
+    },
+    "scolipite": {
+      "species": [
+        "scolipede"
+      ],
+      "formes": {
+        "scolipede": "scolipedemega"
+      }
+    },
+    "scovillainite": {
+      "species": [
+        "scovillain"
+      ],
+      "formes": {
+        "scovillain": "scovillainmega"
+      }
+    },
+    "scraftinite": {
+      "species": [
+        "scrafty"
+      ],
+      "formes": {
+        "scrafty": "scraftymega"
+      }
+    },
+    "sharpedonite": {
+      "species": [
+        "sharpedo"
+      ],
+      "formes": {
+        "sharpedo": "sharpedomega"
+      }
+    },
+    "skarmorite": {
+      "species": [
+        "skarmory"
+      ],
+      "formes": {
+        "skarmory": "skarmorymega"
+      }
+    },
+    "slowbronite": {
+      "species": [
+        "slowbro"
+      ],
+      "formes": {
+        "slowbro": "slowbromega"
+      }
+    },
+    "staraptite": {
+      "species": [
+        "staraptor"
+      ],
+      "formes": {
+        "staraptor": "staraptormega"
+      }
+    },
+    "starminite": {
+      "species": [
+        "starmie"
+      ],
+      "formes": {
+        "starmie": "starmiemega"
+      }
+    },
+    "steelixite": {
+      "species": [
+        "steelix"
+      ],
+      "formes": {
+        "steelix": "steelixmega"
+      }
+    },
+    "swampertite": {
+      "species": [
+        "swampert"
+      ],
+      "formes": {
+        "swampert": "swampertmega"
+      }
+    },
+    "tatsugirinite": {
+      "species": [
+        "tatsugiri",
+        "tatsugiridroopy",
+        "tatsugiristretchy"
+      ],
+      "formes": {
+        "tatsugiri": "tatsugiricurlymega",
+        "tatsugiridroopy": "tatsugiridroopymega",
+        "tatsugiristretchy": "tatsugiristretchymega"
+      }
+    },
+    "tyranitarite": {
+      "species": [
+        "tyranitar"
+      ],
+      "formes": {
+        "tyranitar": "tyranitarmega"
+      }
+    },
+    "venusaurite": {
+      "species": [
+        "venusaur"
+      ],
+      "formes": {
+        "venusaur": "venusaurmega"
+      }
+    },
+    "victreebelite": {
+      "species": [
+        "victreebel"
+      ],
+      "formes": {
+        "victreebel": "victreebelmega"
+      }
+    },
+    "zeraorite": {
+      "species": [
+        "zeraora"
+      ],
+      "formes": {
+        "zeraora": "zeraoramega"
+      }
+    },
+    "zygardite": {
+      "species": [
+        "zygardecomplete"
+      ],
+      "formes": {
+        "zygardecomplete": "zygardemega"
+      }
+    },
+    "crucibellite": {
+      "species": [
+        "crucibelle"
+      ],
+      "formes": {
+        "crucibelle": "crucibellemega"
+      }
+    }
+  }
+}

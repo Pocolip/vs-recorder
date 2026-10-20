@@ -4,14 +4,18 @@ import PageMeta from "../../components/common/PageMeta";
 import { PokemonPanel, FieldPanel, MoveResults, MainResult, GenerationPicker } from "../../components/calc";
 import { useDamageCalc } from "../../hooks/useDamageCalc";
 import useTeamMembers from "../../hooks/useTeamMembers";
-import * as pokepasteService from "../../services/pokepasteService";
-import type { PokemonData as PokemonFromPaste } from "../../services/pokepasteService";
+import { useCalcTeamSets } from "../../hooks/useCalcTeamSets";
 import { createDefaultPokemonState, createDefaultFieldState } from "../../utils/calcUtils";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useCalcState } from "../../context/CalcStateContext";
 import type { PokemonState, FieldState } from "../../types";
 
 export default function CalculatorPage() {
+  const { team } = useActiveTeam();
+  return <CalculatorSession key={team?.id ?? "none"} />;
+}
+
+function CalculatorSession() {
   const { team } = useActiveTeam();
   const calcStore = useCalcState();
   const teamId = team?.id ?? null;
@@ -25,14 +29,16 @@ export default function CalculatorPage() {
   const [selectedP1Move, setSelectedP1Move] = useState(snapshot?.selectedP1Move ?? 0);
   const [selectedP2Move, setSelectedP2Move] = useState(snapshot?.selectedP2Move ?? 0);
   const [activeSide, setActiveSide] = useState<"p1" | "p2">(snapshot?.activeSide ?? "p1");
-  const [teamPokemon, setTeamPokemon] = useState<PokemonFromPaste[]>(snapshot?.teamPokemon ?? []);
   const [gen, setGen] = useState<number>(snapshot?.gen ?? 10);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  const teamSets = useCalcTeamSets(team?.pokepaste || null, gen, snapshot, setP1);
+  const { teamPokemon, sourcePaste, selectedTeamMember } = teamSets;
+
   // Keep refs in sync for the unmount save
-  const stateRef = useRef({ p1, p2, field, selectedP1Move, selectedP2Move, activeSide, teamPokemon, gen });
-  stateRef.current = { p1, p2, field, selectedP1Move, selectedP2Move, activeSide, teamPokemon, gen };
+  const stateRef = useRef({ p1, p2, field, selectedP1Move, selectedP2Move, activeSide, sourcePaste, selectedTeamMember, gen });
+  stateRef.current = { p1, p2, field, selectedP1Move, selectedP2Move, activeSide, sourcePaste, selectedTeamMember, gen };
 
   // Save state to context on unmount
   useEffect(() => {
@@ -45,25 +51,6 @@ export default function CalculatorPage() {
 
   const { teamMembers, updateMemberCalcs } = useTeamMembers(teamId, team?.pokepaste);
   const calcResults = useDamageCalc(p1, p2, field, gen);
-
-  // Load team paste on mount (skip if we already have it from snapshot)
-  useEffect(() => {
-    if (!team?.pokepaste) return;
-    if (teamPokemon.length > 0) return; // Already have data from snapshot
-    let cancelled = false;
-
-    pokepasteService
-      .fetchAndParse(team.pokepaste)
-      .then((parsed) => {
-        if (cancelled) return;
-        setTeamPokemon(parsed);
-      })
-      .catch((err) => console.error("Failed to parse team paste:", err));
-
-    return () => {
-      cancelled = true;
-    };
-  }, [team?.pokepaste]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleP1Change = useCallback((changes: Partial<PokemonState>) => {
     setP1((prev) => ({ ...prev, ...changes }));
@@ -141,6 +128,14 @@ export default function CalculatorPage() {
         </a>
       </div>
 
+      {teamSets.loading && <p role="status" className="text-sm text-gray-500">Loading team sets...</p>}
+      {teamSets.error && (
+        <div role="alert" className="text-sm text-red-500">
+          Could not load team sets: {teamSets.error}{" "}
+          <button type="button" onClick={teamSets.retry} className="underline">Retry</button>
+        </div>
+      )}
+
       {/* Save message toast */}
       {saveMessage && (
         <div
@@ -197,6 +192,8 @@ export default function CalculatorPage() {
             state={p1}
             onChange={handleP1Change}
             teamPokemon={teamPokemon}
+            onTeamSelect={teamSets.selectMember}
+            onPresetSelect={teamSets.clearSelection}
             side="p1"
             weather={field.weather}
             terrain={field.terrain}

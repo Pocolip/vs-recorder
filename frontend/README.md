@@ -53,7 +53,21 @@ Dev server starts on `http://localhost:3000` and proxies `/api` requests to the 
 npm run build     # TypeScript check + Vite production build → dist/
 npm run preview   # Preview the production build locally
 npm run lint      # ESLint
+npm test          # Vitest regression tests (jsdom + React Testing Library)
 ```
+
+### Matchup replay matching
+
+The planner compares the six opponent Pokémon and team-defining items, with separate
+confirmed and possible matches when a replay does not reveal enough information.
+Replay summaries supply the evidence; no replay reupload or database migration is needed.
+
+Run `npm run generate:matchup-data` after updating `@pkmn/dex` or the Pokémon registry.
+This regenerates the checked-in species aliases and Mega Stone mappings. Add future
+item families to `MATCHUP_ITEM_RULES` in `src/utils/matchupMatching.ts`, using normalized
+Showdown item/species IDs. Each rule lists applicable species; optional `formes` map
+base species to the forme produced by that item. Add a matching regression case with
+each new rule.
 
 ### Docker
 
