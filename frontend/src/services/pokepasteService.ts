@@ -10,8 +10,8 @@ const POKEPASTE_PATTERN = /^https?:\/\/(www\.)?pokepast\.es\/([a-zA-Z0-9]+)/;
 const POKEBIN_PATTERN = /^https?:\/\/(www\.)?pokebin\.com\/([a-zA-Z0-9]+)/;
 const VRPASTES_PATTERN = /^https?:\/\/(www\.)?vrpastes\.com\/([a-zA-Z0-9]+)/;
 
-// Cache configuration — v3 to invalidate old-format entries from original frontend
-const CACHE_KEY = "pokepaste_cache_v3";
+// v4 preserves spreads from proxied pastes and fixes unnicknamed species.
+const CACHE_KEY = "pokepaste_cache_v4";
 const CACHE_EXPIRY_HOURS = 24;
 
 interface PasteServiceType {
@@ -141,6 +141,9 @@ async function fetchViaBackend(
       params: { url: originalUrl },
     }) as Record<string, unknown>;
 
+    if (typeof data.rawText === "string" && data.rawText.trim()) {
+      return parsePokepasteText(data.rawText, { maxPokemon });
+    }
     const pokemon = data.pokemon as Record<string, unknown>[] | undefined;
     if (pokemon && pokemon.length > 0) {
       // Backend returns { species, nickname, item, ability, teraType, moves }
@@ -154,8 +157,6 @@ async function fetchViaBackend(
         tera_type: (p.teraType as string) || undefined,
         moves: (p.moves as string[]) || [],
       }));
-    } else if (data.rawText) {
-      return parsePokepasteText(data.rawText as string, { maxPokemon });
     } else {
       throw new Error("Invalid response from paste API");
     }
@@ -279,7 +280,7 @@ function parseNameLine(line: string): {
   gender?: string;
 } {
   let name = line.trim();
-  let species = name;
+  let species: string;
   let nickname: string | undefined;
   let gender: string | undefined;
 
@@ -302,6 +303,7 @@ function parseNameLine(line: string): {
   }
 
   // Extract nickname and species
+  species = name;
   if (name.includes(" (") && name.includes(")")) {
     const match = name.match(/^(.+?)\s*\((.+?)\)$/);
     if (match) {

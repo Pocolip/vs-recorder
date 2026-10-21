@@ -1,6 +1,7 @@
 import { useMemo, useRef, useEffect } from "react";
 import Select, { type SingleValue } from "react-select";
 import SidebarSlots from "./SidebarSlots";
+import { pasteToCalc } from "../../utils/pasteToCalc";
 import StatTable from "./StatTable";
 import MoveSlot from "./MoveSlot";
 import {
@@ -51,6 +52,8 @@ interface PokemonPanelProps {
   state: PokemonState;
   onChange: (changes: Partial<PokemonState>) => void;
   teamPokemon: PokemonFromPaste[] | null;
+  onTeamSelect?: (mon: PokemonFromPaste) => void;
+  onPresetSelect?: () => void;
   hasOppositeSidebar?: boolean;
   side: "p1" | "p2";
   weather?: string;
@@ -62,6 +65,8 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   state,
   onChange,
   teamPokemon,
+  onTeamSelect,
+  onPresetSelect,
   hasOppositeSidebar = false,
   side,
   weather = "",
@@ -180,6 +185,7 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   };
 
   const handleSpeciesSelect = (option: SingleValue<SetdexOption>) => {
+    onPresetSelect?.();
     if (!option) {
       onChange({ species: "", ability: "", item: "", nature: "Hardy", teraType: null });
       return;
@@ -233,64 +239,8 @@ const PokemonPanel: React.FC<PokemonPanelProps> = ({
   };
 
   const handleTeamSlotSelect = (mon: PokemonFromPaste) => {
-    const species = normalizeSpeciesName(mon.name);
-    const teraDefaults = getTeraDefaults(species);
-    const changes: Partial<PokemonState> = {
-      species,
-      ability: mon.ability || "",
-      item: mon.item || "",
-      nature: mon.nature || "Hardy",
-      teraType: teraDefaults ? teraDefaults.teraType : (mon.tera_type || null),
-      status: statusForItem(mon.item),
-      level: 50,
-      moves: (mon.moves || []).slice(0, 4).map((name) => ({
-        name: typeof name === "string" ? name : "",
-        crit: false,
-        bpOverride: null,
-      })),
-    };
-
-    // Pad moves to 4
-    while (changes.moves!.length < 4) {
-      changes.moves!.push({ name: "", crit: false, bpOverride: null });
-    }
-
-    // Pokepaste still labels the line "EVs:" in Champions, but the numbers are SPs.
-    const pasteStatValues = {
-      hp: mon.evs?.HP ?? mon.evs?.hp ?? 0,
-      atk: mon.evs?.Atk ?? mon.evs?.atk ?? 0,
-      def: mon.evs?.Def ?? mon.evs?.def ?? 0,
-      spa: mon.evs?.SpA ?? mon.evs?.spa ?? 0,
-      spd: mon.evs?.SpD ?? mon.evs?.spd ?? 0,
-      spe: mon.evs?.Spe ?? mon.evs?.spe ?? 0,
-    };
-
-    if (isChampions) {
-      changes.evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-      changes.ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-      changes.sps = pasteStatValues;
-    } else {
-      changes.evs = pasteStatValues;
-      changes.ivs = {
-        hp: mon.ivs?.HP ?? mon.ivs?.hp ?? 31,
-        atk: mon.ivs?.Atk ?? mon.ivs?.atk ?? 31,
-        def: mon.ivs?.Def ?? mon.ivs?.def ?? 31,
-        spa: mon.ivs?.SpA ?? mon.ivs?.spa ?? 31,
-        spd: mon.ivs?.SpD ?? mon.ivs?.spd ?? 31,
-        spe: mon.ivs?.Spe ?? mon.ivs?.spe ?? 31,
-      };
-      changes.sps = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-    }
-
-    // Auto-compute boostedStat if Booster Energy + Proto/Quark
-    const ability = changes.ability || "";
-    if (changes.item === "Booster Energy" && (ability === "Protosynthesis" || ability === "Quark Drive")) {
-      changes.boostedStat = computeHighestStat(species, changes.evs!, changes.ivs!, changes.level || 50, changes.nature || "Hardy") ?? null;
-    } else {
-      changes.boostedStat = null;
-    }
-
-    onChange(changes);
+    if (onTeamSelect) onTeamSelect(mon);
+    else onChange(pasteToCalc(mon, gen));
   };
 
   const handleMoveChange = (index: number, newMove: MoveState) => {

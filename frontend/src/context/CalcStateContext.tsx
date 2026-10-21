@@ -1,15 +1,15 @@
-import { createContext, useCallback, useContext, useRef } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import type { PokemonState, FieldState } from "../types";
-import type { PokemonData as PokemonFromPaste } from "../services/pokepasteService";
 
-interface CalcSnapshot {
+export interface CalcSnapshot {
   p1: PokemonState;
   p2: PokemonState;
   field: FieldState;
   selectedP1Move: number;
   selectedP2Move: number;
   activeSide: "p1" | "p2";
-  teamPokemon: PokemonFromPaste[];
+  sourcePaste: string | null;
+  selectedTeamMember: string | null;
   gen: number;
 }
 
@@ -33,9 +33,10 @@ export const CalcStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const set = useCallback((teamId: number, snapshot: CalcSnapshot) => {
     store.current.set(teamId, snapshot);
   }, []);
+  const value = useMemo(() => ({ get, set }), [get, set]);
 
   return (
-    <CalcStateContext.Provider value={{ get, set }}>
+    <CalcStateContext.Provider value={value}>
       {children}
     </CalcStateContext.Provider>
   );

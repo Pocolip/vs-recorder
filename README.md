@@ -38,7 +38,7 @@ VS Recorder helps Pokemon VGC (Video Game Championships) players improve through
 ### Prerequisites
 
 - Java 17+, Maven 3.6+
-- Node.js 18+, npm
+- Node.js 24 LTS, npm
 
 ### Run Locally
 

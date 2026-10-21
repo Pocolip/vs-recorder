@@ -26,11 +26,20 @@ public class ReplayDTO {
         private String userPlayer; // "p1" or "p2"
         private String opponentPlayer; // "p1" or "p2"
         private Map<String, List<String>> teams; // "p1" -> [pokemon], "p2" -> [pokemon]
+        private Map<String, List<TeamMemberDetails>> teamDetails;
         private Map<String, List<String>> actualPicks; // "p1" -> [pokemon brought], "p2" -> [pokemon brought]
         private Map<String, List<TeraEvent>> teraEvents; // "p1" -> [tera events], "p2" -> [tera events]
         private Map<String, List<MegaEvent>> megaEvents; // "p1" -> [mega evolution events]
         private Map<String, EloChange> eloChanges; // "p1" -> elo data, "p2" -> elo data
         private Map<String, Map<String, Map<String, Integer>>> moveUsage; // "p1" -> {pokemon -> {move -> count}}
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TeamMemberDetails {
+        private String species;
+        private String item; // null = unknown, "" = known empty
     }
 
     /**

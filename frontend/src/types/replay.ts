@@ -1,6 +1,7 @@
 export interface BattleData {
   raw?: string;
   teams?: Record<string, string[]>;
+  teamDetails?: Record<string, { species: string; item: string | null }[]>;
   opponentPlayer?: string;
   userPlayer?: string;
   actualPicks?: Record<string, string[]>;

@@ -170,6 +170,7 @@ public class ReplayMatcher {
         private String winner;
         private Map<String, String> players; // "p1" -> "Username", "p2" -> "Username"
         private Map<String, List<String>> teams; // "p1" -> [pokemon], "p2" -> [pokemon]
+        private Map<String, List<ReplayTeamDetailsParser.Member>> teamDetails;
         private Map<String, List<String>> actualPicks; // "p1" -> [pokemon brought to battle]
         private Map<String, List<TeraEvent>> teraEvents; // "p1" -> [tera events]
         private Map<String, List<MegaEvent>> megaEvents; // "p1" -> [mega evolution events]
@@ -294,7 +295,7 @@ public class ReplayMatcher {
                 }
                 // Parse open team sheet (|showteam|) to resolve hidden formes (e.g., Urshifu-*)
                 else if (line.startsWith("|showteam|")) {
-                    String[] parts = line.split("\\|");
+                    String[] parts = line.split("\\|", 4);
                     if (parts.length >= 4) {
                         String player = parts[2];
                         String teamData = parts[3];
@@ -303,20 +304,16 @@ public class ReplayMatcher {
                         String[] pokemons = teamData.split("\\]");
                         List<String> team = data.getTeams().get(player);
                         if (team != null) {
+                            List<String> revealed = new ArrayList<>();
                             for (String pokeData : pokemons) {
-                                String otsName = pokeData.split("\\|")[0].trim();
-                                if (otsName.isEmpty()) continue;
-
-                                // Replace wildcard entries (e.g., "Urshifu-*") with resolved forme
-                                for (int i = 0; i < team.size(); i++) {
-                                    if (team.get(i).contains("-*")) {
-                                        String baseName = team.get(i).replace("-*", "");
-                                        if (otsName.startsWith(baseName)) {
-                                            team.set(i, otsName);
-                                            break;
-                                        }
-                                    }
-                                }
+                                String[] fields = pokeData.split("\\|", -1);
+                                if (fields.length < 3) continue;
+                                String species = fields[1].isBlank() ? fields[0] : fields[1];
+                                if (!species.isBlank()) revealed.add(species.trim());
+                            }
+                            if (revealed.size() == team.size()) {
+                                team.clear();
+                                team.addAll(revealed);
                             }
                         }
                     }
@@ -372,6 +369,7 @@ public class ReplayMatcher {
                         if (newSpecies.endsWith("-Mega")
                                 || newSpecies.endsWith("-Mega-X")
                                 || newSpecies.endsWith("-Mega-Y")
+                                || newSpecies.endsWith("-Mega-Z")
                                 || newSpecies.endsWith("-Primal")) {
                             String teamEntry = positionToSpecies.getOrDefault(position, "Unknown");
                             data.getMegaEvents().get(player).add(new MegaEvent(teamEntry, newSpecies));
@@ -443,6 +441,7 @@ public class ReplayMatcher {
                     }
                 }
             }
+            data.setTeamDetails(ReplayTeamDetailsParser.parse(logText, data.getTeams()));
 
         } catch (Exception e) {
             log.error("Error extracting battle data: {}", e.getMessage());

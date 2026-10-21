@@ -6,6 +6,10 @@ type TeamLike = { id: number; pokepaste?: string | null };
 const useTeamPokemon = (teams: TeamLike[]) => {
   const [teamPokemon, setTeamPokemon] = useState<Record<number, string[]>>({});
   const [loading, setLoading] = useState(false);
+  const [teamSets, setTeamSets] = useState<Record<number, pokepasteService.PokemonData[]>>({});
+  const [errors, setErrors] = useState<Record<number, string>>({});
+  const [loadedKey, setLoadedKey] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   // Create a stable key based on team IDs and pokepaste URLs
   const teamsKey = useMemo(() => {
@@ -16,6 +20,10 @@ const useTeamPokemon = (teams: TeamLike[]) => {
   useEffect(() => {
     if (!teams || teams.length === 0) {
       setTeamPokemon({});
+      setTeamSets({});
+      setErrors({});
+      setLoading(false);
+      setLoadedKey("");
       return;
     }
 
@@ -26,22 +34,30 @@ const useTeamPokemon = (teams: TeamLike[]) => {
 
       const results = await Promise.allSettled(
         teams.map(async (team) => {
-          if (!team.pokepaste) return { teamId: team.id, names: [] as string[] };
-          const names = await pokepasteService.getPokemonNames(team.pokepaste, 6);
-          return { teamId: team.id, names };
+          if (!team.pokepaste) return { teamId: team.id, members: [] };
+          const members = await pokepasteService.fetchAndParse(team.pokepaste, { maxPokemon: 6 });
+          return { teamId: team.id, members };
         }),
       );
 
       if (cancelled) return;
 
       const pokemon: Record<number, string[]> = {};
-      for (const result of results) {
+      const sets: Record<number, pokepasteService.PokemonData[]> = {};
+      const failed: Record<number, string> = {};
+      for (const [index, result] of results.entries()) {
         if (result.status === "fulfilled") {
-          pokemon[result.value.teamId] = result.value.names;
+          pokemon[result.value.teamId] = result.value.members.map((m) => m.name);
+          sets[result.value.teamId] = result.value.members;
+        } else {
+          failed[teams[index].id] = "Could not load matchup Pokémon.";
         }
       }
 
       setTeamPokemon(pokemon);
+      setTeamSets(sets);
+      setErrors(failed);
+      setLoadedKey(teamsKey);
       setLoading(false);
     };
 
@@ -50,9 +66,16 @@ const useTeamPokemon = (teams: TeamLike[]) => {
     return () => {
       cancelled = true;
     };
-  }, [teamsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [teamsKey, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { teamPokemon, loading };
+  const current = loadedKey === teamsKey;
+  return {
+    teamPokemon: current ? teamPokemon : {},
+    teamSets: current ? teamSets : {},
+    errors: current ? errors : {},
+    loading: loading || !current,
+    retry: () => setAttempt((n) => n + 1),
+  };
 };
 
 export default useTeamPokemon;
