@@ -72,6 +72,14 @@ public abstract class ReplayMapper {
             ReplayDTO.BattleData battleData = new ReplayDTO.BattleData();
             battleData.setWinner(rawData.getWinner());
             battleData.setTeams(rawData.getTeams());
+            if (rawData.getTeamDetails() != null) {
+                Map<String, List<ReplayDTO.TeamMemberDetails>> details = new HashMap<>();
+                rawData.getTeamDetails().forEach((player, members) ->
+                    details.put(player, members.stream()
+                        .map(m -> new ReplayDTO.TeamMemberDetails(m.getSpecies(), m.getItem()))
+                        .collect(Collectors.toList())));
+                battleData.setTeamDetails(details);
+            }
             battleData.setActualPicks(rawData.getActualPicks());
 
             // Convert tera events

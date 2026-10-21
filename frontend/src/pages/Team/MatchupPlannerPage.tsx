@@ -38,9 +38,12 @@ import { useCollapsedOpponentTeams } from "../../hooks/useCollapsedOpponentTeams
 import useTeamPokemon from "../../hooks/useTeamPokemon";
 import * as pokepasteService from "../../services/pokepasteService";
 import { matchesPokemonTags } from "../../utils/pokemonNameUtils";
+import { useMatchupReplays } from "../../hooks/useMatchupReplays";
+import MatchupReplays from "../../components/team/MatchupReplays";
 
 export default function MatchupPlannerPage() {
-  const { team } = useActiveTeam();
+  const { team, statsVersion } = useActiveTeam();
+  const replayCollection = useMatchupReplays(team?.id ?? null, statsVersion);
   const [myTeamPokemon, setMyTeamPokemon] = useState<string[]>([]);
   const [parsingPokepaste, setParsingPokepaste] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
@@ -102,7 +105,7 @@ export default function MatchupPlannerPage() {
     [activeDragId, opponentTeams],
   );
 
-  const { teamPokemon } = useTeamPokemon(opponentTeams);
+  const { teamPokemon, teamSets, loading: loadingSets, errors: pasteErrors, retry: retryPastes } = useTeamPokemon(opponentTeams);
 
   const filteredOpponentTeams = useMemo(() => {
     if (searchTags.length === 0) return opponentTeams;
@@ -455,6 +458,19 @@ export default function MatchupPlannerPage() {
                           onUpdateComposition={updateComposition}
                           onDeleteComposition={deleteComposition}
                           onDeleteTeam={handleDeleteOpponentTeam}
+                          replaySection={
+                            <MatchupReplays
+                              key={`${team?.id}:${opponentTeam.id}:${opponentTeam.pokepaste}`}
+                              pokemon={teamSets[opponentTeam.id] ?? []}
+                              replays={replayCollection.replays}
+                              loading={loadingSets || replayCollection.loading}
+                              error={pasteErrors[opponentTeam.id] ?? replayCollection.error}
+                              onRetry={() => {
+                                if (pasteErrors[opponentTeam.id]) retryPastes();
+                                if (replayCollection.error) replayCollection.retry();
+                              }}
+                            />
+                          }
                         />
                       ))}
                     </div>

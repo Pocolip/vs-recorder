@@ -44,6 +44,7 @@ export interface OpponentTeam {
 }
 
 interface OpponentTeamCardProps {
+  replaySection?: React.ReactNode;
   opponentTeam: OpponentTeam;
   myTeamPokemon: string[];
   onUpdateNotes: (
@@ -77,6 +78,7 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
   dragHandleProps,
   isExpanded = true,
   onToggleExpand,
+  replaySection,
 }) => {
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [editedNotes, setEditedNotes] = useState(opponentTeam.notes || "");
@@ -382,6 +384,8 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
         </div>
       </div>
       )}
+
+      {isExpanded && replaySection}
 
       {/* Delete Plan Modal */}
       <ConfirmationModal

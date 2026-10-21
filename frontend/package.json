@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "vitest run",
+    "generate:matchup-data": "node ../scripts/generate-matchup-data.js",
     "preview": "vite preview",
     "generate:speed-tiers": "node ../scripts/generate-speed-tiers.js",
     "generate:tournament-teams": "node ../scripts/generate-tournament-teams.js",
@@ -33,6 +35,7 @@
     "@eslint/js": "^9.19.0",
     "@pkmn/dex": "^0.10.7",
     "@tailwindcss/postcss": "^4.0.8",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
@@ -40,12 +43,14 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.2",
     "tailwindcss": "^4.0.8",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.1.0",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "vitest": "^3.2.7"
   },
   "overrides": {
     "react-helmet-async": {
