@@ -35,7 +35,7 @@ Built on [TailAdmin](https://tailadmin.com) — a production-ready, mobile-first
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24 LTS
 - Backend server running on port 8080 (see `/backend`)
 
 ### Run
