@@ -39,7 +39,7 @@ export default function MatchupReplays({ pokemon, replays, loading, error, onRet
           {groups.confirmed.length} confirmed · {groups.possible.length} possible
         </span>}
       </button>
-      <div id={id} hidden={!expanded} className="mt-3 space-y-4 text-sm">
+      <div id={id} hidden={!expanded} className="mt-3 space-y-4 text-sm text-gray-600 dark:text-gray-400">
         {loading ? <p role="status">Loading matching replays...</p> :
           error ? <p role="alert">{error} <button type="button" onClick={onRetry} className="text-brand-500 underline">Retry</button></p> :
           pokemon.length !== 6 ? <p>A complete six-Pokémon matchup paste is needed to match replays.</p> :
