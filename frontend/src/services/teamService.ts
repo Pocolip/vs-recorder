@@ -135,6 +135,6 @@ export async function exists(id: number): Promise<boolean> {
 /**
  * Get team statistics
  */
-export async function getStats(id: number): Promise<Record<string, unknown>> {
+export async function getStats(id: number): Promise<import("../types/team").TeamStats> {
   return await teamApi.getStats(id);
 }

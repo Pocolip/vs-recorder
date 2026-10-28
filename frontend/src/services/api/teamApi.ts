@@ -1,12 +1,12 @@
 import apiClient from "./client";
-import type { Team } from "../../types";
+import type { Team, TeamDetail, TeamStats } from "../../types/team";
 
 export const teamApi = {
   getAll: () =>
     apiClient.get("/api/teams") as Promise<Team[]>,
 
   getById: (id: number) =>
-    apiClient.get(`/api/teams/${id}`) as Promise<Team>,
+    apiClient.get(`/api/teams/${id}`) as Promise<TeamDetail>,
 
   getByRegulation: (regulation: string) =>
     apiClient.get(`/api/teams/regulation/${regulation}`) as Promise<Team[]>,
@@ -21,7 +21,7 @@ export const teamApi = {
     apiClient.delete(`/api/teams/${id}`) as Promise<void>,
 
   getStats: (id: number) =>
-    apiClient.get(`/api/teams/${id}/stats`) as Promise<Record<string, unknown>>,
+    apiClient.get(`/api/teams/${id}/stats`) as Promise<TeamStats>,
 
   addShowdownUsername: (id: number, username: string) =>
     apiClient.post(`/api/teams/${id}/showdown-usernames`, { username }) as Promise<Team>,

@@ -15,6 +15,7 @@ export interface Team {
   permissions?: TeamPermissions;
   // Counted server-side on list responses (GET /api/teams) so the dashboard
   // doesn't have to fetch every team's replays.
+  stats?: TeamStats;
   replayCount?: number;
   wins?: number;
   losses?: number;
@@ -34,4 +35,15 @@ export interface TeamSummary {
   losses: number;
   winRate: number | null;
   role?: TeamRole;
+}
+
+export interface TeamStats {
+  totalGames: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+}
+
+export interface TeamDetail extends Team {
+  stats: TeamStats;
 }

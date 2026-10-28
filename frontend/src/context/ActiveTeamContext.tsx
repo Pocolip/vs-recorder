@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState, useEffect, useRef } from "react";
+import { teamApi } from "../services/api/teamApi";
 import type { Team } from "../types";
 
 type ActiveTeamContextType = {
@@ -26,6 +27,18 @@ export const ActiveTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   const [team, setTeam] = useState<Team | null>(null);
   const [statsVersion, setStatsVersion] = useState(0);
   const bumpStatsVersion = useCallback(() => setStatsVersion((v) => v + 1), []);
+
+  const refreshedVersion = useRef(statsVersion);
+  useEffect(() => {
+    if (!team || refreshedVersion.current === statsVersion) return;
+    refreshedVersion.current = statsVersion;
+    let cancelled = false;
+    const id = team.id;
+    teamApi.getStats(id).then((stats) => {
+      if (!cancelled) setTeam((current) => current?.id === id ? { ...current, stats } : current);
+    }).catch((error) => console.error("Failed to refresh team statistics:", error));
+    return () => { cancelled = true; };
+  }, [team?.id, statsVersion]);
 
   return (
     <ActiveTeamContext.Provider value={{ team, setTeam, statsVersion, bumpStatsVersion }}>

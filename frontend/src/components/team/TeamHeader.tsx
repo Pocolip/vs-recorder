@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, ChevronUp, ChevronDown, Users } from "lucide-react";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
-import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import PermissionGate from "../auth/PermissionGate";
 import AddReplayModal from "../modals/AddReplayModal";
@@ -16,14 +15,8 @@ function shortRegulation(reg: string): string {
 
 const TeamHeader: React.FC = () => {
   const { team, bumpStatsVersion } = useActiveTeam();
-  const {
-    gamesPlayed,
-    wins,
-    losses,
-    winRate,
-    loading: statsLoading,
-    refreshStats,
-  } = useTeamStats(team?.id ?? null);
+  const { totalGames: gamesPlayed = 0, wins = 0, losses = 0, winRate = 0 } = team?.stats ?? {};
+  const statsLoading = !team?.stats;
 
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -46,7 +39,6 @@ const TeamHeader: React.FC = () => {
   if (!team) return null;
 
   const handleReplayAdded = () => {
-    refreshStats();
     bumpStatsVersion();
   };
 
