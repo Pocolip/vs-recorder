@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,9 +50,12 @@ public class FolderController {
         Long userId = getCurrentUserId(authentication);
         List<Folder> folders = folderService.getFoldersByUserId(userId);
 
+        Map<Long, Integer> counts = teamRepository.countTeamsByFolderForUser(userId).stream()
+                .collect(Collectors.toMap(TeamRepository.FolderTeamCount::getFolderId,
+                        TeamRepository.FolderTeamCount::getTeamCount));
         List<FolderDTO.Response> responses = folders.stream()
                 .map(folder -> {
-                    int teamCount = teamRepository.countByFolderId(folder.getId());
+                    int teamCount = counts.getOrDefault(folder.getId(), 0);
                     return folderMapper.toResponse(folder, teamCount);
                 })
                 .collect(Collectors.toList());
