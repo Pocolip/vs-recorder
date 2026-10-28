@@ -10,6 +10,7 @@ export interface Match {
   notes: string;
   tags: string[];
   replays: Replay[];
+  stats: { complete: boolean; matchResult: string; wins: number; losses: number; replayCount: number };
   createdAt: string;
   updatedAt: string;
 }

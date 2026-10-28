@@ -47,13 +47,12 @@ export default function MatchByMatchPage() {
       setLoading(true);
       setError(null);
 
-      const [matchesData, statsData] = await Promise.all([
-        matchService.getEnhancedMatches(teamId),
-        matchService.getMatchStats(teamId),
-      ]);
-
+      const matchesData = await matchService.getEnhancedMatches(teamId);
+      const complete = matchesData.filter((match) => match.stats.complete);
+      const wins = complete.filter((match) => match.stats.matchResult === "win").length;
       setMatches(matchesData);
-      setStats(statsData);
+      setStats({ totalMatches: matchesData.length, wins, losses: complete.length - wins,
+        winRate: complete.length ? Math.round(wins / complete.length * 1000) / 10 : 0 });
     } catch (err) {
       console.error("Error loading matches:", err);
       setError(err instanceof Error ? err.message : "Failed to load matches");
