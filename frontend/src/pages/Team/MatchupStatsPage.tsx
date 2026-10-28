@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState } from "react";
 import { Target, TrendingUp, TrendingDown, Users, UserCheck, Search, X } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
@@ -23,16 +23,10 @@ interface OpponentPokemonStats {
 }
 
 export default function MatchupStatsPage() {
-  const { team, statsVersion } = useActiveTeam();
-  const { replays, loading, refreshStats } = useTeamStats(team?.id ?? null);
+  const { team } = useActiveTeam();
+  const { replays, loading } = useTeamStats(team?.id ?? null);
 
-  const prevVersion = useRef(statsVersion);
-  useEffect(() => {
-    if (statsVersion !== prevVersion.current) {
-      prevVersion.current = statsVersion;
-      refreshStats();
-    }
-  }, [statsVersion, refreshStats]);
+
 
   const [selectedPokemon, setSelectedPokemon] = useState<string[]>(Array(6).fill(""));
   const [searchQuery, setSearchQuery] = useState("");

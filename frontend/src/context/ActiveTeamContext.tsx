@@ -1,8 +1,10 @@
 import { createContext, useCallback, useContext, useState, useEffect, useRef } from "react";
+import { createTeamReplayStore } from "../hooks/teamReplayStore";
 import { teamApi } from "../services/api/teamApi";
 import type { Team } from "../types";
 
 type ActiveTeamContextType = {
+  getReplayStore: (id: number | null) => ReturnType<typeof createTeamReplayStore>;
   team: Team | null;
   setTeam: (team: Team | null) => void;
   statsVersion: number;
@@ -26,7 +28,16 @@ export const ActiveTeamProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [team, setTeam] = useState<Team | null>(null);
   const [statsVersion, setStatsVersion] = useState(0);
-  const bumpStatsVersion = useCallback(() => setStatsVersion((v) => v + 1), []);
+  const stores = useRef(new Map<number | null, ReturnType<typeof createTeamReplayStore>>());
+  const getReplayStore = useCallback((id: number | null) => {
+    let entry = stores.current.get(id);
+    if (!entry) { entry = createTeamReplayStore(); stores.current.set(id, entry); }
+    return entry;
+  }, []);
+  const bumpStatsVersion = useCallback(() => {
+    if (team) getReplayStore(team.id).invalidate(team.id);
+    setStatsVersion((v) => v + 1);
+  }, [team?.id, getReplayStore]);
 
   const refreshedVersion = useRef(statsVersion);
   useEffect(() => {
@@ -41,7 +52,7 @@ export const ActiveTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [team?.id, statsVersion]);
 
   return (
-    <ActiveTeamContext.Provider value={{ team, setTeam, statsVersion, bumpStatsVersion }}>
+    <ActiveTeamContext.Provider value={{ getReplayStore, team, setTeam, statsVersion, bumpStatsVersion }}>
       {children}
     </ActiveTeamContext.Provider>
   );

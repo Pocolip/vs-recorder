@@ -1,103 +1,19 @@
-import { useState, useEffect } from "react";
-import * as replayService from "../services/replayService";
+import { useEffect, useCallback, useSyncExternalStore } from "react";
+import { useActiveTeam } from "../context/ActiveTeamContext";
 import { getResultStats } from "../utils/resultUtils";
-import type { Replay } from "../types";
 
-interface TeamStatsData {
-  gamesPlayed: number;
-  wins: number;
-  losses: number;
-  unknown: number;
-  winRate: number;
-  replays: Replay[];
-}
-
-interface UseTeamStatsOptions {
-  autoLoad?: boolean;
-}
-
-const DEFAULT_STATS: TeamStatsData = {
-  gamesPlayed: 0,
-  wins: 0,
-  losses: 0,
-  unknown: 0,
-  winRate: 0,
-  replays: [],
-};
-
-export const useTeamStats = (teamId: number | null, options: UseTeamStatsOptions = {}) => {
-  const { autoLoad = true } = options;
-
-  const [stats, setStats] = useState<TeamStatsData>(DEFAULT_STATS);
-  const [loading, setLoading] = useState(autoLoad);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-
-  const loadStats = async (teamIdToLoad: number | null = teamId) => {
-    if (!teamIdToLoad) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const replays = await replayService.getByTeamId(teamIdToLoad);
-      const results = replays.map((replay) => replay.result);
-      const resultStats = getResultStats(results);
-
-      setStats({
-        gamesPlayed: resultStats.total,
-        wins: resultStats.wins,
-        losses: resultStats.losses,
-        unknown: resultStats.unknown,
-        winRate: resultStats.winRate,
-        replays,
-      });
-
-      setLastUpdated(new Date());
-    } catch (err) {
-      console.error("Error loading team stats:", err);
-      setError(err instanceof Error ? err.message : "Failed to load team statistics");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const refreshStats = () => {
-    loadStats(teamId);
-  };
-
-  const updateReplaysLocal = (
-    updates: { id: number; changes: Partial<Replay> }[]
-  ) => {
-    if (updates.length === 0) return;
-    setStats((prev) => {
-      const map = new Map(updates.map((u) => [u.id, u.changes]));
-      return {
-        ...prev,
-        replays: prev.replays.map((r) =>
-          map.has(r.id) ? { ...r, ...map.get(r.id)! } : r
-        ),
-      };
-    });
-  };
-
-  const resetStats = () => {
-    setStats(DEFAULT_STATS);
-    setError(null);
-    setLastUpdated(null);
-  };
-
-  useEffect(() => {
-    if (autoLoad && teamId) {
-      loadStats(teamId);
-    } else if (!teamId) {
-      resetStats();
-      setLoading(false);
-    }
-  }, [teamId, autoLoad]); // eslint-disable-line react-hooks/exhaustive-deps
+export const useTeamStats = (teamId: number | null, options: { autoLoad?: boolean } = {}) => {
+  const { getReplayStore } = useActiveTeam();
+  const store = getReplayStore(teamId);
+  const { replays, loading, error, lastUpdated } = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const autoLoad = options.autoLoad ?? true;
+  useEffect(() => { if (teamId && autoLoad) void store.load(teamId); }, [store, teamId, autoLoad]);
+  const refreshStats = useCallback(() => { if (teamId) store.invalidate(teamId); }, [store, teamId]);
+  const loadStats = refreshStats;
+  const resetStats = refreshStats;
+  const updateReplaysLocal = store.update;
+  const results = getResultStats(replays.map((replay) => replay.result));
+  const stats = { ...results, gamesPlayed: results.total, replays };
 
   const hasGames = stats.gamesPlayed > 0;
   const lossRate = hasGames ? Math.round((stats.losses / stats.gamesPlayed) * 100) : 0;

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo } from "react";
 import { Calendar, Filter, SortAsc, SortDesc, CheckCircle2, RotateCcw } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
@@ -11,16 +11,10 @@ import { isMegaRegulation } from "../../utils/regulationUtils";
 import type { Replay } from "../../types";
 
 export default function GameByGamePage() {
-  const { team, statsVersion } = useActiveTeam();
+  const { team } = useActiveTeam();
   const { replays, loading, refreshStats, updateReplaysLocal } = useTeamStats(team?.id ?? null);
 
-  const prevVersion = useRef(statsVersion);
-  useEffect(() => {
-    if (statsVersion !== prevVersion.current) {
-      prevVersion.current = statsVersion;
-      refreshStats();
-    }
-  }, [statsVersion, refreshStats]);
+
 
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");

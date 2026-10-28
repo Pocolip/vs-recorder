@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo } from "react";
 import { Calendar, Copy, Check } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
@@ -10,17 +10,11 @@ import { matchesPokemonTags, getOpponentPokemonFromReplay } from "../../utils/po
 import type { Replay } from "../../types";
 
 export default function ReplaysPage() {
-  const { team, statsVersion, bumpStatsVersion } = useActiveTeam();
+  const { team, bumpStatsVersion } = useActiveTeam();
   const { replays, loading, refreshStats } = useTeamStats(team?.id ?? null);
 
   // Refresh when another component (e.g. TeamHeader) bumps the version
-  const prevVersion = useRef(statsVersion);
-  useEffect(() => {
-    if (statsVersion !== prevVersion.current) {
-      prevVersion.current = statsVersion;
-      refreshStats();
-    }
-  }, [statsVersion, refreshStats]);
+
 
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [deletingReplayId, setDeletingReplayId] = useState<number | null>(null);
@@ -40,7 +34,6 @@ export default function ReplaysPage() {
     try {
       setDeletingReplayId(replayId);
       await replayService.deleteReplay(replayId);
-      refreshStats();
       bumpStatsVersion();
     } catch (error) {
       console.error("Error deleting replay:", error);
