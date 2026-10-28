@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -68,11 +69,19 @@ public class TeamController {
      * Build a Summary DTO for a team and tag it with the caller's role. Owners get OWNER;
      * accepted collaborators get COLLABORATOR. Used by list endpoints.
      */
-    private TeamDTO.Summary toSummaryDtoWithRole(Team team, Long userId) {
-        int replayCount = team.getReplays() != null ? team.getReplays().size() : 0;
-        int matchCount = team.getMatches() != null ? team.getMatches().size() : 0;
-        double winRate = teamService.getTeamStats(team.getId()).winRate();
-        TeamDTO.Summary summary = teamMapper.toSummaryDTO(team, replayCount, matchCount, winRate);
+    private List<TeamDTO.Summary> toSummaryDtosWithRole(List<Team> teams, Long userId) {
+        Map<Long, TeamService.TeamCounts> counts = teamService.getTeamCounts(
+                teams.stream().map(Team::getId).toList());
+        return teams.stream()
+                .map(team -> toSummaryDtoWithRole(team, counts.get(team.getId()), userId))
+                .collect(Collectors.toList());
+    }
+
+    private TeamDTO.Summary toSummaryDtoWithRole(Team team, TeamService.TeamCounts counts, Long userId) {
+        TeamDTO.Summary summary = teamMapper.toSummaryDTO(
+                team, counts.replayCount(), counts.matchCount(), counts.winRate());
+        summary.setWins(counts.wins());
+        summary.setLosses(counts.losses());
         boolean isOwner = team.getUser() != null && userId.equals(team.getUser().getId());
         summary.setRole(isOwner ? Role.OWNER.name() : Role.COLLABORATOR.name());
         return summary;
@@ -140,9 +149,7 @@ public class TeamController {
         log.debug("Fetching accessible teams for user: {}", userId);
 
         List<Team> teams = teamService.getAccessibleTeams(userId);
-        List<TeamDTO.Summary> summaries = teams.stream()
-                .map(team -> toSummaryDtoWithRole(team, userId))
-                .collect(Collectors.toList());
+        List<TeamDTO.Summary> summaries = toSummaryDtosWithRole(teams, userId);
 
         return ResponseEntity.ok(summaries);
     }
@@ -164,9 +171,7 @@ public class TeamController {
         log.debug("Fetching teams for user: {} with regulation: {}", userId, regulation);
 
         List<Team> teams = teamService.getTeamsByUserIdAndRegulation(userId, regulation);
-        List<TeamDTO.Summary> summaries = teams.stream()
-                .map(team -> toSummaryDtoWithRole(team, userId))
-                .collect(Collectors.toList());
+        List<TeamDTO.Summary> summaries = toSummaryDtosWithRole(teams, userId);
 
         return ResponseEntity.ok(summaries);
     }

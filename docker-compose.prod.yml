@@ -39,14 +39,16 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
-      - JAVA_TOOL_OPTIONS=-Xmx256m -Xms128m -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+      # Non-heap (metaspace + code cache) runs ~145MB, plus ~50MB native/GC overhead,
+      # so the container limit must stay well above Xmx + 200MB or the cgroup OOM-kills the JVM.
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=64m -XX:MaxDirectMemorySize=32m -Xss512k
     expose:
       - "8080"
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 576M
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -65,14 +67,14 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET_BETA}
       - RESEND_API_KEY=${RESEND_API_KEY}
-      - JAVA_TOOL_OPTIONS=-Xmx256m -Xms128m -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx192m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=64m -XX:MaxDirectMemorySize=32m -Xss512k
     expose:
       - "8080"
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 448M
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
       interval: 30s

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -132,4 +133,22 @@ public interface ReplayRepository extends JpaRepository<Replay, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    /**
+     * Count replays and results per team without loading replay rows (battle logs are large).
+     * @param teamIds the team IDs
+     * @return one row per team that has at least one replay
+     */
+    @Query("SELECT r.team.id AS teamId, COUNT(r) AS total, " +
+            "SUM(CASE WHEN LOWER(r.result) = 'win' THEN 1 ELSE 0 END) AS wins, " +
+            "SUM(CASE WHEN LOWER(r.result) = 'loss' THEN 1 ELSE 0 END) AS losses " +
+            "FROM Replay r WHERE r.team.id IN :teamIds GROUP BY r.team.id")
+    List<TeamResultCounts> countResultsByTeamIds(@Param("teamIds") Collection<Long> teamIds);
+
+    interface TeamResultCounts {
+        Long getTeamId();
+        Long getTotal();
+        Long getWins();
+        Long getLosses();
+    }
 }

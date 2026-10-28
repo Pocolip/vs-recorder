@@ -233,7 +233,6 @@ public class PokepasteService {
 
             PokepasteDTO.PasteData pasteData = new PokepasteDTO.PasteData();
             pasteData.setSource("vrpastes");
-            pasteData.setRawText(jsonResponse);
 
             String title = root.path("title").asText(null);
             if (title != null && !title.isEmpty()) {
@@ -245,6 +244,9 @@ public class PokepasteService {
             if (!teamsNode.isArray()) {
                 throw new IllegalArgumentException("Invalid VR Pastes response - missing 'teams' array");
             }
+
+            // The frontend prefers rawText (it carries spreads), so it must be Showdown text, not the JSON
+            StringBuilder showdownText = new StringBuilder();
 
             for (JsonNode memberNode : teamsNode) {
                 PokepasteDTO.PokemonData pokemon = new PokepasteDTO.PokemonData();
@@ -284,7 +286,10 @@ public class PokepasteService {
                 }
 
                 pasteData.getPokemon().add(pokemon);
+                showdownText.append(toShowdownSet(memberNode, pokemon)).append("\n");
             }
+
+            pasteData.setRawText(showdownText.toString().trim());
 
             log.info("Successfully fetched VR Pastes with {} Pokemon", pasteData.getPokemon().size());
             return pasteData;
@@ -295,6 +300,71 @@ public class PokepasteService {
             log.error("Error fetching VR Pastes data: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Failed to fetch or parse VR Pastes data: " + e.getMessage());
         }
+    }
+
+    private static final String[][] STAT_LABELS = {
+            {"hp", "HP"}, {"atk", "Atk"}, {"def", "Def"}, {"spa", "SpA"}, {"spd", "SpD"}, {"spe", "Spe"}
+    };
+
+    /**
+     * Render one VR Pastes team member as a Showdown export set
+     */
+    private String toShowdownSet(JsonNode memberNode, PokepasteDTO.PokemonData pokemon) {
+        StringBuilder set = new StringBuilder();
+
+        set.append(pokemon.getNickname() != null
+                ? pokemon.getNickname() + " (" + pokemon.getSpecies() + ")"
+                : pokemon.getSpecies());
+        String gender = memberNode.path("gender").asText("");
+        if (gender.equals("M") || gender.equals("F")) {
+            set.append(" (").append(gender).append(")");
+        }
+        if (pokemon.getItem() != null) {
+            set.append(" @ ").append(pokemon.getItem());
+        }
+        set.append("\n");
+
+        if (pokemon.getAbility() != null) {
+            set.append("Ability: ").append(pokemon.getAbility()).append("\n");
+        }
+        if (memberNode.path("level").isNumber()) {
+            set.append("Level: ").append(memberNode.path("level").asInt()).append("\n");
+        }
+        if (pokemon.getTeraType() != null) {
+            set.append("Tera Type: ").append(pokemon.getTeraType()).append("\n");
+        }
+        String evs = formatStatLine(memberNode.path("evs"));
+        if (!evs.isEmpty()) {
+            set.append("EVs: ").append(evs).append("\n");
+        }
+        String nature = memberNode.path("nature").asText("");
+        if (!nature.isEmpty()) {
+            set.append(nature).append(" Nature\n");
+        }
+        String ivs = formatStatLine(memberNode.path("ivs"));
+        if (!ivs.isEmpty()) {
+            set.append("IVs: ").append(ivs).append("\n");
+        }
+        for (String move : pokemon.getMoves()) {
+            set.append("- ").append(move).append("\n");
+        }
+
+        return set.toString();
+    }
+
+    /**
+     * Format a VR Pastes stat object ({"hp":4,"spa":252}) as "4 HP / 252 SpA"
+     */
+    private String formatStatLine(JsonNode statsNode) {
+        if (!statsNode.isObject()) return "";
+        List<String> parts = new ArrayList<>();
+        for (String[] stat : STAT_LABELS) {
+            JsonNode value = statsNode.path(stat[0]);
+            if (value.isNumber()) {
+                parts.add(value.asInt() + " " + stat[1]);
+            }
+        }
+        return String.join(" / ", parts);
     }
 
     /**
