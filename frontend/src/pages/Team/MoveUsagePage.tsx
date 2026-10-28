@@ -35,64 +35,40 @@ export default function MoveUsagePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadMoveData = async () => {
-      if (!team) return;
+    if (!team) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setTeamMovesets({});
+    setMoveUsageStats({});
 
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Load team movesets from Pokepaste
-        let pokepasteMovesets: Record<string, string[]> = {};
-        if (team.pokepaste) {
-          try {
-            const parsed = await pokepasteService.fetchAndParse(team.pokepaste);
-            pokepasteMovesets = parsed.reduce<Record<string, string[]>>((acc, pokemon) => {
-              const pokemonName = pokemon.name ? resolveAnalyticsKey(pokemon.name) : "";
-              if (pokemonName && pokemon.moves) {
-                if (acc[pokemonName]) {
-                  const existingMoves = new Set(acc[pokemonName]);
-                  pokemon.moves.forEach((move) => {
-                    if (move?.trim()) existingMoves.add(move.trim());
-                  });
-                  acc[pokemonName] = Array.from(existingMoves);
-                } else {
-                  acc[pokemonName] = pokemon.moves.filter((move) => move?.trim());
-                }
-              }
-              return acc;
-            }, {});
-          } catch (pokepasteError) {
-            console.warn("Failed to load Pokepaste movesets:", pokepasteError);
-          }
+    // Neither request depends on the other. Publish analytics even while the paste waits.
+    if (team.pokepaste) {
+      pokepasteService.fetchAndParse(team.pokepaste).then((parsed) => {
+        const movesets: Record<string, string[]> = {};
+        for (const pokemon of parsed) {
+          if (!pokemon.name) continue;
+          const key = resolveAnalyticsKey(pokemon.name);
+          movesets[key] = [...new Set([...(movesets[key] ?? []), ...(pokemon.moves ?? [])]
+            .map((move) => move.trim()).filter(Boolean))];
         }
-
-        // Fetch move usage from backend
-        const backendMoveData = await analyticsApi.getMoveUsage(team.id);
-        const usageStats: Record<string, Record<string, number>> = {};
-        if (backendMoveData?.pokemonMoves) {
-          backendMoveData.pokemonMoves.forEach(({ pokemon, moves }) => {
-            const key = resolveAnalyticsKey(pokemon);
-            if (!usageStats[key]) usageStats[key] = {};
-            moves.forEach((moveEntry) => {
-              // Handle both possible field names from backend
-              const timesUsed = (moveEntry as Record<string, unknown>).timesUsed as number | undefined;
-              usageStats[key][moveEntry.move] = timesUsed ?? moveEntry.count ?? 0;
-            });
-          });
+        if (!cancelled) setTeamMovesets(movesets);
+      }).catch((error) => console.warn("Failed to load Pokepaste movesets:", error));
+    }
+    analyticsApi.getMoveUsage(team.id).then((data) => {
+      const usage: Record<string, Record<string, number>> = {};
+      for (const { pokemon, moves } of data?.pokemonMoves ?? []) {
+        const key = resolveAnalyticsKey(pokemon);
+        usage[key] ??= {};
+        for (const entry of moves) {
+          usage[key][entry.move] = (entry as { timesUsed?: number }).timesUsed ?? entry.count ?? 0;
         }
-
-        setTeamMovesets(pokepasteMovesets);
-        setMoveUsageStats(usageStats);
-      } catch (err) {
-        console.error("Error loading move data:", err);
-        setError(err instanceof Error ? err.message : "Failed to load move data");
-      } finally {
-        setLoading(false);
       }
-    };
-
-    loadMoveData();
+      if (!cancelled) setMoveUsageStats(usage);
+    }).catch((error: unknown) => {
+      if (!cancelled) setError(error instanceof Error ? error.message : "Failed to load move data");
+    }).finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [team?.id, team?.pokepaste]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const chartData = useMemo(() => {
