@@ -214,4 +214,39 @@ class PokepasteServiceTest {
         assertEquals("Orichalcum Pulse", result.getPokemon().get(5).getAbility());
         assertEquals("Fire", result.getPokemon().get(5).getTeraType());
     }
+
+    @Test
+    void testVRPastesRawTextIsShowdownFormat(){
+        String json = loadTestFile("vrpastes.json");
+        when(restTemplate.getForObject(anyString(), eq(String.class)))
+                .thenReturn(json);
+
+        PokepasteDTO.PasteData result = pokepasteService.fetchPasteData(
+                "https://vrpastes.com/EYYJRWgk");
+
+        assertNotNull(result);
+        assertEquals(2, result.getPokemon().size());
+        assertEquals("""
+                Zamazenta-Crowned @ Rusted Shield
+                Ability: Dauntless Shield
+                Tera Type: Grass
+                EVs: 204 HP / 4 Atk / 180 Def / 28 SpD / 92 Spe
+                Impish Nature
+                - Body Press
+                - Heavy Slam
+                - Wide Guard
+                - Protect
+
+                Raging Bolt @ Booster Energy
+                Ability: Protosynthesis
+                Level: 50
+                Tera Type: Electric
+                EVs: 196 HP / 4 Def / 252 SpA / 36 SpD / 20 Spe
+                Modest Nature
+                IVs: 20 Atk
+                - Thunderbolt
+                - Draco Meteor
+                - Thunderclap
+                - Protect""", result.getRawText());
+    }
 }
