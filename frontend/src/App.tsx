@@ -1,31 +1,32 @@
-import { useEffect } from "react";
+import FeatureBoundary from "./components/common/FeatureBoundary";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
-import SignIn from "./pages/AuthPages/SignIn";
-import SignUp from "./pages/AuthPages/SignUp";
-import ForgotPassword from "./pages/AuthPages/ForgotPassword";
-import ResetPassword from "./pages/AuthPages/ResetPassword";
-import NotFound from "./pages/OtherPage/NotFound";
+const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
+const SignUp = lazy(() => import("./pages/AuthPages/SignUp"));
+const ForgotPassword = lazy(() => import("./pages/AuthPages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/AuthPages/ResetPassword"));
+const NotFound = lazy(() => import("./pages/OtherPage/NotFound"));
 import TeamLayout from "./layout/TeamLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import HomePage from "./pages/Dashboard/HomePage";
-import AboutPage from "./pages/AboutPage";
-import ResourcesPage from "./pages/ResourcesPage";
-import AnnouncementsPage from "./pages/Announcements/AnnouncementsPage";
-import ReplaysPage from "./pages/Team/ReplaysPage";
-import GameByGamePage from "./pages/Team/GameByGamePage";
-import MatchByMatchPage from "./pages/Team/MatchByMatchPage";
-import UsageStatsPage from "./pages/Team/UsageStatsPage";
-import MatchupStatsPage from "./pages/Team/MatchupStatsPage";
-import MoveUsagePage from "./pages/Team/MoveUsagePage";
-import MatchupPlannerPage from "./pages/Team/MatchupPlannerPage";
-import PokemonNotesPage from "./pages/Team/PokemonNotesPage";
-import CalculatorPage from "./pages/Team/CalculatorPage";
-import TypeChartPage from "./pages/Team/TypeChartPage";
-import SpeedTiersPage from "./pages/Team/SpeedTiersPage";
+const HomePage = lazy(() => import("./pages/Dashboard/HomePage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
+const AnnouncementsPage = lazy(() => import("./pages/Announcements/AnnouncementsPage"));
+const ReplaysPage = lazy(() => import("./pages/Team/ReplaysPage"));
+const GameByGamePage = lazy(() => import("./pages/Team/GameByGamePage"));
+const MatchByMatchPage = lazy(() => import("./pages/Team/MatchByMatchPage"));
+const UsageStatsPage = lazy(() => import("./pages/Team/UsageStatsPage"));
+const MatchupStatsPage = lazy(() => import("./pages/Team/MatchupStatsPage"));
+const MoveUsagePage = lazy(() => import("./pages/Team/MoveUsagePage"));
+const MatchupPlannerPage = lazy(() => import("./pages/Team/MatchupPlannerPage"));
+const PokemonNotesPage = lazy(() => import("./pages/Team/PokemonNotesPage"));
+const CalculatorPage = lazy(() => import("./pages/Team/CalculatorPage"));
+const TypeChartPage = lazy(() => import("./pages/Team/TypeChartPage"));
+const SpeedTiersPage = lazy(() => import("./pages/Team/SpeedTiersPage"));
 import RootRoute from "./components/auth/RootRoute";
 import PublicRoute from "./components/auth/PublicRoute";
-import SharedHubPage from "./pages/Collaboration/SharedHubPage";
-import AcceptInvitePage from "./pages/Collaboration/AcceptInvitePage";
+const SharedHubPage = lazy(() => import("./pages/Collaboration/SharedHubPage"));
+const AcceptInvitePage = lazy(() => import("./pages/Collaboration/AcceptInvitePage"));
 import * as pokemonService from "./services/pokemonService";
 
 export default function App() {
@@ -36,6 +37,8 @@ export default function App() {
   return (
     <Router>
       <ScrollToTop />
+      <FeatureBoundary>
+      <Suspense fallback={<div role="status" className="p-8 text-center">Loading page…</div>}>
       <Routes>
         {/* Auth (no dashboard layout) */}
         <Route
@@ -98,6 +101,8 @@ export default function App() {
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
+      </FeatureBoundary>
     </Router>
   );
 }

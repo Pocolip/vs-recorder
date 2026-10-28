@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Trophy,
   ChevronDown,
@@ -185,10 +185,21 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
   teamRegulation,
   onImport,
 }) => {
-  const data = useMemo(
-    () => getTournamentTeamsForRegulation(teamRegulation),
-    [teamRegulation],
-  );
+  const [data, setData] = useState<import("../../data/tournamentTeamsByRegulation").TournamentTeamsData | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    setData(null);
+    setLoadError(false);
+    setLoading(true);
+    getTournamentTeamsForRegulation(teamRegulation).then((data) => {
+      if (!cancelled) setData(data);
+    }).catch(() => { if (!cancelled) setLoadError(true); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [isOpen, teamRegulation]);
   const [activeSize, setActiveSize] = useState<CompSize>(6);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [importedUrls, setImportedUrls] = useState<Set<string>>(new Set());
@@ -229,7 +240,7 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
             <Trophy className="h-5 w-5 text-brand-500" />
             Recent Tournament Teams
           </h2>
-          {data ? (
+          {loading ? <p role="status" className="p-6">Loading tournament teams…</p> : loadError ? <p role="alert" className="p-6">Could not load tournament teams. Close and reopen to retry.</p> : data ? (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
               Regulation {data.regulation} · {data.dateRange.from} – {data.dateRange.to} ·{" "}
               <span>
@@ -251,7 +262,7 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
           )}
         </div>
 
-        {data ? (
+        {loading ? <p role="status" className="p-6">Loading tournament teams…</p> : loadError ? <p role="alert" className="p-6">Could not load tournament teams. Close and reopen to retry.</p> : data ? (
           <>
             {data.isFallbackSource && (
               /*

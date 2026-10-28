@@ -10,9 +10,6 @@ import {
   normalizeSpeciesName,
 } from "../../utils/calcUtils";
 import { getMegaForme, getItemSpeedMultiplier } from "../../utils/megaStones";
-import speedTiersMA from "../../data/speedTiers-regM-A.json";
-import speedTiersMB from "../../data/speedTiers-regM-B.json";
-import speedTiersMC from "../../data/speedTiers-regM-C.json";
 
 interface SpeedTierRow {
   pokemon: string;
@@ -31,10 +28,10 @@ interface RegulationData {
 
 // Newest regulation goes last — the default selection is derived from the
 // insertion order, so a new entry becomes the default without a second edit.
-const REGULATIONS: Record<string, RegulationData> = {
-  "M-A": speedTiersMA as RegulationData,
-  "M-B": speedTiersMB as RegulationData,
-  "M-C": speedTiersMC as RegulationData,
+const REGULATIONS: Record<string, () => Promise<{ default: RegulationData }>> = {
+  "M-A": () => import("../../data/speedTiers-regM-A.json"),
+  "M-B": () => import("../../data/speedTiers-regM-B.json"),
+  "M-C": () => import("../../data/speedTiers-regM-C.json"),
 };
 
 const REGULATION_KEYS = Object.keys(REGULATIONS);
@@ -134,7 +131,17 @@ export default function SpeedTiersPage() {
     };
   }, [team?.pokepaste]);
 
-  const regulationData = REGULATIONS[regulation];
+  const [regulationData, setRegulationData] = useState<RegulationData | null>(null);
+  const [dataError, setDataError] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    setRegulationData(null);
+    setDataError(false);
+    REGULATIONS[regulation]().then(({ default: data }) => {
+      if (!cancelled) setRegulationData(data);
+    }).catch(() => { if (!cancelled) setDataError(true); });
+    return () => { cancelled = true; };
+  }, [regulation]);
 
   const teamRows = useMemo<SpeedTierRow[]>(() => {
     if (teamPaste.length === 0) return [];
@@ -189,7 +196,7 @@ export default function SpeedTiersPage() {
   // Sort by the un-scarfed speed so per-row Scarf toggles don't shuffle rows.
   // Tailwind and Trick Room are global and intentionally re-sort.
   const sortedRows = useMemo<(SpeedTierRow & { key: string; sortSpeed: number })[]>(() => {
-    const all: SpeedTierRow[] = [...regulationData.entries, ...teamRows];
+    const all: SpeedTierRow[] = [...(regulationData?.entries ?? []), ...teamRows];
     const rows = all.map((r) => ({
       ...r,
       key: rowKey(r),
@@ -249,7 +256,7 @@ export default function SpeedTiersPage() {
           )}
         </div>
 
-        {loading ? (
+        {dataError ? <p role="alert">Could not load speed tiers. Select another regulation or reload to retry.</p> : loading || !regulationData ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-brand-500" />
           </div>

@@ -1,9 +1,10 @@
+import { lazy } from "react";
 import React, { useState, useEffect } from "react";
 import { Plus, ChevronUp, ChevronDown, Users } from "lucide-react";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import PermissionGate from "../auth/PermissionGate";
-import AddReplayModal from "../modals/AddReplayModal";
+const AddReplayModal = lazy(() => import("../modals/AddReplayModal"));
 import { formatShortDate } from "../../utils/timeUtils";
 
 const STORAGE_KEY = "vs-recorder-team-header-collapsed";
@@ -92,12 +93,12 @@ const TeamHeader: React.FC = () => {
           </div>
         </div>
 
-        <AddReplayModal
+        {showAddReplay && <AddReplayModal
           isOpen={showAddReplay}
           onClose={() => setShowAddReplay(false)}
           onAdded={handleReplayAdded}
           teamId={team.id}
-        />
+        />}
       </>
     );
   }
@@ -197,12 +198,12 @@ const TeamHeader: React.FC = () => {
         </div>
       </div>
 
-      <AddReplayModal
+      {showAddReplay && <AddReplayModal
         isOpen={showAddReplay}
         onClose={() => setShowAddReplay(false)}
         onAdded={handleReplayAdded}
         teamId={team.id}
-      />
+      />}
     </>
   );
 };

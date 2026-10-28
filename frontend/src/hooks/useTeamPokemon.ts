@@ -60,7 +60,7 @@ const useTeamPokemon = (teams: TeamLike[], preferStored = false) => {
   }, [teamsKey, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = loadedKey === teamsKey;
-  const stored = preferStored ? Object.fromEntries(teams.filter((t) => t.pokemonNames?.length)
+  const stored: Record<number, string[]> = preferStored ? Object.fromEntries(teams.filter((t) => t.pokemonNames?.length)
     .map((t) => [t.id, t.pokemonNames!])) : {};
   return {
     teamPokemon: { ...stored, ...(current ? teamPokemon : {}) },
