@@ -48,6 +48,9 @@ jobs:
           cat /etc/ssl/certs/ca-certificates.crt /tmp/sectigo-intermediate.pem > /tmp/ca-bundle.pem
           echo "CURL_CA_BUNDLE=/tmp/ca-bundle.pem" >> "$GITHUB_ENV"
 
+      - name: Validate LabMaus ingestion
+        run: node --test scripts/generate-tournament-teams.test.js
+
       - name: Refresh tournament teams (LabMaus)
         run: node scripts/generate-tournament-teams.js
 
@@ -65,17 +68,13 @@ jobs:
 
             **Possible changes:**
             - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js) (used by the damage calculator's preset-sets dropdown)
-            - `frontend/src/data/tournamentTeams-regM-A.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-A)
-            - `frontend/src/data/tournamentTeams-regM-B.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-B)
-            - `frontend/src/data/tournamentTeams-regM-C.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-C; currently sourced from their `Custom format` bucket — see `isFallbackSource` in the JSON)
+            - `frontend/src/data/tournamentTeams-regM-C.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-C)
 
             If none of the upstream sources changed, this PR will not be opened.
 
             > Auto-created PRs do not trigger CI by default. To run the frontend build against these changes, close and reopen the PR, or push an empty commit.
           add-paths: |
             frontend/src/data/setdex-gen10.ts
-            frontend/src/data/tournamentTeams-regM-A.json
-            frontend/src/data/tournamentTeams-regM-B.json
             frontend/src/data/tournamentTeams-regM-C.json
           labels: |
             automated
