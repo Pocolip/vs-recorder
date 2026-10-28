@@ -9,8 +9,6 @@
  * supported regulation.
  *
  * Writes:
- *   - frontend/src/data/tournamentTeams-regM-A.json
- *   - frontend/src/data/tournamentTeams-regM-B.json
  *   - frontend/src/data/tournamentTeams-regM-C.json
  *
  * Usage: node scripts/generate-tournament-teams.js
@@ -31,27 +29,9 @@ const ROOT = resolve(__dirname, "..");
 // new value from their bundle (`Discord.Api_Key`) and re-run.
 const LABMAUS_TOKEN = "X:F3mz5e4SP6Rcl3co!ou:8y";
 
-// LabMaus only exposes a regulation once a tournament has been tagged with
-// it (see GET /api/all_vgc_regulations), so a newly-legal regulation returns
-// an empty array for a while even though tournaments are being played and
-// reported — organizers file them under "Custom format" until LabMaus adds
-// the option.
-//
-// `fallback` opts a regulation into using that bucket when its own query
-// comes back empty. It is deliberately only set on the newest regulation:
-// "Custom format" is a mixed bag (it also holds gimmick tournaments and
-// events under older rules), so the data is indicative, not authoritative.
-// When the fallback is used the output JSON carries `isFallbackSource: true`
-// and the modal shows a warning. Drop the `fallback` once LabMaus lists the
-// regulation for real — the primary query wins automatically from then on.
-const CUSTOM_FORMAT = "Custom format";
-
-// (Code → LabMaus regulation string). Add entries here when expanding
-// coverage to other formats.
+// Refresh only the active regulation; older snapshots remain available in the UI.
 const REGULATIONS = [
-  { code: "M-A", labmaus: "Regulation Set M-A" },
-  { code: "M-B", labmaus: "Regulation Set M-B" },
-  { code: "M-C", labmaus: "Regulation Set M-C", fallback: CUSTOM_FORMAT },
+  { code: "M-C", labmaus: "Regulation Set M-C" },
 ];
 
 const WINDOW_DAYS = 60;
@@ -90,6 +70,46 @@ function normalizeNames(names) {
   return Array.isArray(names) ? names.map(normalizePokemonName) : [];
 }
 
+// Reject schema drift before it can replace a usable dataset with empty or
+// malformed entries. Extra upstream fields are fine; validate what we consume.
+export function validateTopTeams(raw) {
+  function expect(condition, path, shape) {
+    if (!condition) throw new Error(`Invalid LabMaus response at ${path}: expected ${shape}`);
+  }
+  const strings = (value, size) => Array.isArray(value) && value.length === size &&
+    value.every((entry) => typeof entry === "string" && entry.trim().length > 0);
+  const count = (value) => Number.isInteger(value) && value >= 0;
+  expect(Array.isArray(raw) && raw.length > 0, "$", "non-empty composition array");
+  const sizes = new Set();
+  let usableTeams = 0;
+  raw.forEach((bucket, i) => {
+    const path = `$[${i}]`;
+    expect(bucket && [4, 5, 6].includes(bucket.composition), path, "composition 4, 5, or 6");
+    expect(!sizes.has(bucket.composition), path, "unique composition");
+    sizes.add(bucket.composition);
+    expect(Array.isArray(bucket.teams), `${path}.teams`, "cluster array");
+    bucket.teams.forEach((cluster, j) => {
+      const cp = `${path}.teams[${j}]`;
+      expect(cluster && strings(cluster.pokemon, bucket.composition), `${cp}.pokemon`, "composition-sized Pokémon ID array");
+      expect(strings(cluster.pokemon_names, bucket.composition), `${cp}.pokemon_names`, "composition-sized Pokémon name array");
+      for (const field of ["wins", "losses"]) {
+        expect(count(cluster[field]), `${cp}.${field}`, "non-negative integer");
+      }
+      expect(Array.isArray(cluster.teams), `${cp}.teams`, "team array");
+      cluster.teams.forEach((team, k) => {
+        const tp = `${cp}.teams[${k}]`;
+        expect(team && strings(team.pokemon_names, 6), `${tp}.pokemon_names`, "six Pokémon names");
+        for (const field of ["name", "record", "tournament_name", "team_url"]) {
+          expect(team[field] == null || typeof team[field] === "string", `${tp}.${field}`, "string or null");
+        }
+        expect(team.placement == null || count(team.placement), `${tp}.placement`, "integer or null");
+        if (isPokepasteUrl(team.team_url)) usableTeams++;
+      });
+    });
+  });
+  expect(usableTeams > 0, "$", "at least one team with a Poképaste URL (refusing to overwrite with empty data)");
+}
+
 function trimInnerTeam(team) {
   return {
     name: team.name ?? "",
@@ -101,7 +121,7 @@ function trimInnerTeam(team) {
   };
 }
 
-function trimCluster(cluster) {
+export function trimCluster(cluster) {
   const teams = Array.isArray(cluster.teams)
     ? cluster.teams
         .filter((t) => isPokepasteUrl(t.team_url))
@@ -143,10 +163,8 @@ function fetchTopTeams(labmausRegulation, dateRange) {
   return JSON.parse(stdout);
 }
 
-function buildCompositions(raw, code) {
-  if (!Array.isArray(raw)) {
-    throw new Error(`Unexpected top-level shape for ${code}: expected array`);
-  }
+function buildCompositions(raw) {
+  validateTopTeams(raw);
 
   return raw
     .map((bucket) => ({
@@ -168,33 +186,14 @@ function countInnerTeams(compositions) {
   );
 }
 
-function generateForRegulation({ code, labmaus, fallback }) {
+function generateForRegulation({ code, labmaus }) {
   const dateRange = computeDateRange();
   console.log(`Fetching ${labmaus} (${dateRange.from} → ${dateRange.to})…`);
-
-  let source = labmaus;
-  let isFallbackSource = false;
-  let compositions = buildCompositions(fetchTopTeams(labmaus, dateRange), code);
-
-  if (countClusters(compositions) === 0 && fallback) {
-    console.log(`  No data under "${labmaus}" — falling back to "${fallback}"…`);
-    const fallbackCompositions = buildCompositions(
-      fetchTopTeams(fallback, dateRange),
-      code,
-    );
-    if (countClusters(fallbackCompositions) > 0) {
-      source = fallback;
-      isFallbackSource = true;
-      compositions = fallbackCompositions;
-    }
-  }
+  const compositions = buildCompositions(fetchTopTeams(labmaus, dateRange));
 
   const output = {
     regulation: code,
-    labmausRegulation: source,
-    // Omitted rather than written as `false` so regulations sourced normally
-    // keep the original file shape — no churn in the weekly refresh PR.
-    ...(isFallbackSource ? { isFallbackSource: true } : {}),
+    labmausRegulation: labmaus,
     dateRange,
     generatedAt: isoDate(new Date()),
     compositions,
@@ -203,18 +202,9 @@ function generateForRegulation({ code, labmaus, fallback }) {
   const outPath = resolve(ROOT, `frontend/src/data/tournamentTeams-reg${code}.json`);
   writeFileSync(outPath, JSON.stringify(output, null, 2) + "\n");
 
-  const totalClusters = countClusters(compositions);
   console.log(
-    `  Wrote ${totalClusters} clusters / ${countInnerTeams(compositions)} teams` +
-      `${isFallbackSource ? ` (from "${source}")` : ""} → ${outPath}`,
+    `  Wrote ${countClusters(compositions)} clusters / ${countInnerTeams(compositions)} teams → ${outPath}`,
   );
-
-  if (totalClusters === 0) {
-    console.warn(
-      `  ⚠ No data returned for "${labmaus}"${fallback ? ` or "${fallback}"` : ""}. ` +
-        `LabMaus may not have any tournaments under this regulation yet.`,
-    );
-  }
 }
 
 function main() {
@@ -223,9 +213,11 @@ function main() {
   }
 }
 
-try {
-  main();
-} catch (err) {
-  console.error(err);
-  process.exit(1);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    main();
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
 }
