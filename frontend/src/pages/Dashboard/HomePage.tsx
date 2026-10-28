@@ -12,7 +12,6 @@ import Alert from "../../components/ui/alert/Alert";
 import Toast from "../../components/ui/toast/Toast";
 import announcements from "../../data/announcements.json";
 import { useTeams } from "../../hooks/useTeams";
-import { useMultipleTeamStats } from "../../hooks/useTeamStats";
 import useTeamPokemon from "../../hooks/useTeamPokemon";
 import { useFolderContext } from "../../context/FolderContext";
 import { teamApi } from "../../services/api/teamApi";
@@ -24,6 +23,26 @@ function shortRegulation(reg: string): string {
   return match ? `Reg ${match[1]}` : reg;
 }
 
+const winRatePercent = (wins: number, total: number) =>
+  total > 0 ? Math.round((wins / total) * 100) : 0;
+
+function summarizeTeamStats(teams: Team[]) {
+  const teamStats: Record<number, NonNullable<TeamCardProps["stats"]>> = {};
+  let totalGames = 0;
+  let totalWins = 0;
+  for (const team of teams) {
+    const total = team.replayCount ?? 0;
+    const wins = team.wins ?? 0;
+    teamStats[team.id] = { wins, losses: team.losses ?? 0, total, winRate: winRatePercent(wins, total) };
+    totalGames += total;
+    totalWins += wins;
+  }
+  return {
+    teamStats,
+    overallStats: { totalGames, totalWins, overallWinRate: winRatePercent(totalWins, totalGames) },
+  };
+}
+
 export default function HomePage() {
   const { teams, loading, refresh } = useTeams();
   const { folders, dataVersion, refreshFolders, bumpDataVersion } = useFolderContext();
@@ -31,8 +50,8 @@ export default function HomePage() {
   const activeFolderId = searchParams.get("folder") ? Number(searchParams.get("folder")) : null;
   const activeFolder = activeFolderId ? folders.find((f) => f.id === activeFolderId) : null;
 
-  const teamIds = useMemo(() => teams.map((t) => t.id), [teams]);
-  const { teamStats, overallStats, loading: statsLoading } = useMultipleTeamStats(teamIds);
+  const { teamStats, overallStats } = useMemo(() => summarizeTeamStats(teams), [teams]);
+  const statsLoading = loading;
   const { teamPokemon, loading: pokemonLoading } = useTeamPokemon(teams);
 
   const [searchTags, setSearchTags] = useState<string[]>([]);

@@ -91,6 +91,8 @@ public class TeamDTO {
         private List<Long> folderIds;
         private int replayCount;
         private int matchCount;
+        private int wins;
+        private int losses;
         private Double winRate;
         /** "OWNER" or "COLLABORATOR" */
         private String role;

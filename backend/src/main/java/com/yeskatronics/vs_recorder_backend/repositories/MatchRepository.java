@@ -3,8 +3,10 @@ package com.yeskatronics.vs_recorder_backend.repositories;
 import com.yeskatronics.vs_recorder_backend.entities.Match;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,4 +78,18 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
      */
     @Query("SELECT m FROM Match m WHERE m.team.id = :teamId AND :tag MEMBER OF m.tags")
     List<Match> findByTeamIdAndTag(Long teamId, String tag);
+
+    /**
+     * Count matches per team without loading match rows.
+     * @param teamIds the team IDs
+     * @return one row per team that has at least one match
+     */
+    @Query("SELECT m.team.id AS teamId, COUNT(m) AS total FROM Match m " +
+            "WHERE m.team.id IN :teamIds GROUP BY m.team.id")
+    List<TeamMatchCount> countByTeamIds(@Param("teamIds") Collection<Long> teamIds);
+
+    interface TeamMatchCount {
+        Long getTeamId();
+        Long getTotal();
+    }
 }
