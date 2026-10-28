@@ -28,6 +28,10 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      * @param userId the user ID
      * @return Optional containing the team if found and owned by user
      */
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM Team t WHERE t.id = :id")
+    Optional<Team> findByIdForUpdate(Long id);
+
     Optional<Team> findByIdAndUserId(Long id, Long userId);
 
     /**

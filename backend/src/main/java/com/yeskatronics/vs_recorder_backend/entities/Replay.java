@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * Each replay belongs to a team and optionally to a match (Bo3 set).
  */
 @Entity
-@Table(name = "replays", uniqueConstraints = {
+@Table(name = "replays", indexes = @Index(name = "idx_replay_team_showdown_match", columnList = "team_id,showdown_match_id"), uniqueConstraints = {
     @UniqueConstraint(name = "uk_replay_url_team", columnNames = {"url", "team_id"})
 })
 @Data
@@ -73,6 +73,19 @@ public class Replay {
      * 1 = Game 1, 2 = Game 2, 3 = Game 3
      * null = Bo1 (standalone game not part of a match)
      */
+    @Column(name = "showdown_match_id")
+    private String showdownMatchId;
+
+    @ColumnDefault("0")
+    private Integer matchIdentifierVersion;
+
+    @PrePersist
+    public void extractMatchIdentifier() {
+        showdownMatchId = battleLog == null ? null :
+                com.yeskatronics.vs_recorder_backend.utils.ReplayMatcher.getMatchId(battleLog);
+        matchIdentifierVersion = 1;
+    }
+
     @Column(name = "game_number")
     private Integer gameNumber;
 

@@ -51,7 +51,7 @@ public class ReplayService {
         log.info("Creating new replay for team ID: {}", teamId);
 
         // Verify team exists
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdForUpdate(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         // Check for duplicate URL within the same team
@@ -103,7 +103,7 @@ public class ReplayService {
             throw new IllegalArgumentException("Replay URL already exists in this team: " + url);
         }
 
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdForUpdate(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         // Fetch battle log from Showdown
@@ -573,14 +573,9 @@ public class ReplayService {
         log.debug("Handling Bo3 match for replay ID: {}, matchId: {}", replay.getId(), matchId);
 
         // Find sibling replays with the same matchId
-        List<Replay> siblings = replayRepository.findByTeamId(team.getId()).stream()
-                .filter(r -> !r.getId().equals(replay.getId())) // Exclude self
-                .filter(r -> r.getBattleLog() != null)
-                .filter(r -> {
-                    String siblingMatchId = ReplayMatcher.getMatchId(r.getBattleLog());
-                    return matchId.equals(siblingMatchId);
-                })
-                .toList();
+        if (matchId == null) return;
+        List<Replay> siblings = replayRepository.findByTeamIdAndShowdownMatchIdAndIdNot(
+                team.getId(), matchId, replay.getId());
 
         if (siblings.isEmpty()) {
             // First game in this Bo3 set - create new match

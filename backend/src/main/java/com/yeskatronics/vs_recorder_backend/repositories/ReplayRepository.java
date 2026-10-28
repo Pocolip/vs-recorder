@@ -25,6 +25,11 @@ public interface ReplayRepository extends JpaRepository<Replay, Long> {
      */
     List<Replay> findByTeamId(Long teamId);
 
+    List<Replay> findByTeamIdAndShowdownMatchIdAndIdNot(Long teamId, String showdownMatchId, Long id);
+
+    @Query("SELECT r FROM Replay r WHERE r.matchIdentifierVersion IS NULL OR r.matchIdentifierVersion < 1 ORDER BY r.id")
+    List<Replay> findWithoutMatchIdentifier(org.springframework.data.domain.Pageable page);
+
     /**
      * Find all replays for a specific match
      * @param matchId the match ID
