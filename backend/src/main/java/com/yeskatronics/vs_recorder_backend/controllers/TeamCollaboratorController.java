@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -107,9 +108,7 @@ public class TeamCollaboratorController {
     public ResponseEntity<List<TeamDTO.Summary>> sharedWithMe(Authentication authentication) {
         Long userId = getCurrentUserId(authentication);
         List<Team> teams = collaboratorService.listSharedTeams(userId);
-        List<TeamDTO.Summary> response = teams.stream()
-                .map(team -> toSummaryWithRole(team, /*owner*/ false))
-                .collect(Collectors.toList());
+        List<TeamDTO.Summary> response = toSummariesWithRole(teams, /*owner*/ false);
         return ResponseEntity.ok(response);
     }
 
@@ -117,9 +116,7 @@ public class TeamCollaboratorController {
     public ResponseEntity<List<TeamDTO.Summary>> teamsIAmSharing(Authentication authentication) {
         Long userId = getCurrentUserId(authentication);
         List<Team> teams = collaboratorService.listTeamsOwnerIsSharing(userId);
-        List<TeamDTO.Summary> response = teams.stream()
-                .map(team -> toSummaryWithRole(team, /*owner*/ true))
-                .collect(Collectors.toList());
+        List<TeamDTO.Summary> response = toSummariesWithRole(teams, /*owner*/ true);
         return ResponseEntity.ok(response);
     }
 
@@ -164,12 +161,16 @@ public class TeamCollaboratorController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    private TeamDTO.Summary toSummaryWithRole(Team team, boolean isOwner) {
-        int replayCount = team.getReplays() != null ? team.getReplays().size() : 0;
-        int matchCount = team.getMatches() != null ? team.getMatches().size() : 0;
-        double winRate = teamService.getTeamStats(team.getId()).winRate();
-        TeamDTO.Summary summary = teamMapper.toSummaryDTO(team, replayCount, matchCount, winRate);
-        summary.setRole(isOwner ? "OWNER" : "COLLABORATOR");
-        return summary;
+    private List<TeamDTO.Summary> toSummariesWithRole(List<Team> teams, boolean isOwner) {
+        Map<Long, TeamService.TeamCounts> counts = teamService.getTeamCounts(
+                teams.stream().map(Team::getId).toList());
+        return teams.stream().map(team -> {
+            TeamService.TeamCounts c = counts.get(team.getId());
+            TeamDTO.Summary summary = teamMapper.toSummaryDTO(team, c.replayCount(), c.matchCount(), c.winRate());
+            summary.setWins(c.wins());
+            summary.setLosses(c.losses());
+            summary.setRole(isOwner ? "OWNER" : "COLLABORATOR");
+            return summary;
+        }).collect(Collectors.toList());
     }
 }

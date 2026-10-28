@@ -13,6 +13,11 @@ export interface Team {
   // Optional for compatibility with cached older payloads.
   role?: TeamRole;
   permissions?: TeamPermissions;
+  // Counted server-side on list responses (GET /api/teams) so the dashboard
+  // doesn't have to fetch every team's replays.
+  replayCount?: number;
+  wins?: number;
+  losses?: number;
 }
 
 export interface TeamSummary {
@@ -25,6 +30,8 @@ export interface TeamSummary {
   folderIds: number[];
   replayCount: number;
   matchCount: number;
+  wins: number;
+  losses: number;
   winRate: number | null;
   role?: TeamRole;
 }

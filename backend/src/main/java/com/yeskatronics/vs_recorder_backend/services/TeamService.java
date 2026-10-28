@@ -2,11 +2,12 @@ package com.yeskatronics.vs_recorder_backend.services;
 
 import com.yeskatronics.vs_recorder_backend.dto.PokepasteDTO;
 import com.yeskatronics.vs_recorder_backend.entities.Folder;
-import com.yeskatronics.vs_recorder_backend.entities.Replay;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.entities.TeamMember;
 import com.yeskatronics.vs_recorder_backend.entities.User;
 import com.yeskatronics.vs_recorder_backend.repositories.FolderRepository;
+import com.yeskatronics.vs_recorder_backend.repositories.MatchRepository;
+import com.yeskatronics.vs_recorder_backend.repositories.ReplayRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamMemberRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.UserRepository;
@@ -34,6 +35,8 @@ public class TeamService {
     private final TeamMemberRepository teamMemberRepository;
     private final FolderRepository folderRepository;
     private final UserRepository userRepository;
+    private final ReplayRepository replayRepository;
+    private final MatchRepository matchRepository;
     private final ReplayService replayService;
     private final PokepasteService pokepasteService;
     private final EntityManager entityManager;
@@ -277,23 +280,40 @@ public class TeamService {
     public TeamStats getTeamStats(Long teamId) {
         log.debug("Calculating statistics for team ID: {}", teamId);
 
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
+        if (!teamRepository.existsById(teamId)) {
+            throw new IllegalArgumentException("Team not found with ID: " + teamId);
+        }
 
-        // Force load replays
-        List<Replay> replays = team.getReplays();
+        TeamCounts counts = getTeamCounts(List.of(teamId)).get(teamId);
+        return new TeamStats(teamId, counts.replayCount(), counts.wins(), counts.losses(), counts.winRate());
+    }
 
-        int totalGames = replays.size();
-        long wins = replays.stream()
-                .filter(Replay::isWin)
-                .count();
-        long losses = replays.stream()
-                .filter(Replay::isLoss)
-                .count();
+    /**
+     * Replay/match/result counts for many teams in two aggregate queries,
+     * without loading replay rows or their battle logs.
+     *
+     * @param teamIds the team IDs
+     * @return counts keyed by team ID; teams with no replays get zeroes
+     */
+    @Transactional(readOnly = true)
+    public Map<Long, TeamCounts> getTeamCounts(Collection<Long> teamIds) {
+        Map<Long, TeamCounts> counts = new HashMap<>();
+        if (teamIds.isEmpty()) return counts;
 
-        double winRate = totalGames > 0 ? (double) wins / totalGames * 100 : 0.0;
+        Map<Long, Integer> matchCounts = matchRepository.countByTeamIds(teamIds).stream()
+                .collect(Collectors.toMap(MatchRepository.TeamMatchCount::getTeamId, c -> c.getTotal().intValue()));
+        Map<Long, ReplayRepository.TeamResultCounts> resultCounts = replayRepository.countResultsByTeamIds(teamIds).stream()
+                .collect(Collectors.toMap(ReplayRepository.TeamResultCounts::getTeamId, c -> c));
 
-        return new TeamStats(teamId, totalGames, (int) wins, (int) losses, winRate);
+        for (Long teamId : teamIds) {
+            ReplayRepository.TeamResultCounts r = resultCounts.get(teamId);
+            counts.put(teamId, new TeamCounts(
+                    r != null ? r.getTotal().intValue() : 0,
+                    matchCounts.getOrDefault(teamId, 0),
+                    r != null ? r.getWins().intValue() : 0,
+                    r != null ? r.getLosses().intValue() : 0));
+        }
+        return counts;
     }
 
     /**
@@ -451,6 +471,12 @@ public class TeamService {
     /**
      * Inner class to hold team statistics
      */
+    public record TeamCounts(int replayCount, int matchCount, int wins, int losses) {
+        public double winRate() {
+            return replayCount > 0 ? (double) wins / replayCount * 100 : 0.0;
+        }
+    }
+
     public record TeamStats(
             Long teamId,
             int totalGames,
