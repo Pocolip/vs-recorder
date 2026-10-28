@@ -4,6 +4,7 @@ export interface Team {
   id: number;
   name: string;
   pokepaste: string;
+  pokemonNames?: string[];
   regulation: string;
   showdownUsernames: string[];
   folderIds: number[];
@@ -25,6 +26,7 @@ export interface TeamSummary {
   id: number;
   name: string;
   pokepaste: string;
+  pokemonNames?: string[];
   regulation: string;
   createdAt: string;
   updatedAt: string;

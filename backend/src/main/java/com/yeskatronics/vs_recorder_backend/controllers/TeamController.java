@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TeamController {
 
+    private final com.yeskatronics.vs_recorder_backend.repositories.TeamMemberRepository teamMemberRepository;
     private final TeamService teamService;
     private final TeamAccessService teamAccessService;
     private final TeamMapper teamMapper;
@@ -72,8 +73,16 @@ public class TeamController {
     private List<TeamDTO.Summary> toSummaryDtosWithRole(List<Team> teams, Long userId) {
         Map<Long, TeamService.TeamCounts> counts = teamService.getTeamCounts(
                 teams.stream().map(Team::getId).toList());
+        Map<Long, List<String>> species = teams.isEmpty() ? Map.of() : teamMemberRepository
+                .findSpeciesByTeamIds(teams.stream().map(Team::getId).toList()).stream()
+                .collect(Collectors.groupingBy(row -> row.getTeamId(),
+                        Collectors.mapping(row -> row.getPokemonName(), Collectors.toList())));
         return teams.stream()
-                .map(team -> toSummaryDtoWithRole(team, counts.get(team.getId()), userId))
+                .map(team -> {
+                    TeamDTO.Summary summary = toSummaryDtoWithRole(team, counts.get(team.getId()), userId);
+                    summary.setPokemonNames(species.getOrDefault(team.getId(), List.of()));
+                    return summary;
+                })
                 .collect(Collectors.toList());
     }
 

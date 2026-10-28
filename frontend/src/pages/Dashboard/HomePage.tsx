@@ -52,7 +52,10 @@ export default function HomePage() {
 
   const { teamStats, overallStats } = useMemo(() => summarizeTeamStats(teams), [teams]);
   const statsLoading = loading;
-  const { teamPokemon, loading: pokemonLoading } = useTeamPokemon(teams);
+  const prioritizedTeams = useMemo(() => [...teams].sort((a, b) =>
+    Number(Boolean(activeFolderId && b.folderIds?.includes(activeFolderId))) -
+    Number(Boolean(activeFolderId && a.folderIds?.includes(activeFolderId)))), [teams, activeFolderId]);
+  const { teamPokemon, loading: pokemonLoading } = useTeamPokemon(prioritizedTeams, true);
 
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [regulationFilter, setRegulationFilter] = useState("");
@@ -311,7 +314,7 @@ export default function HomePage() {
         {!loading && teams.length > 0 && filteredTeams.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {activeFolderId ? "No teams in this folder." : "No teams match your filters."}
+              {pokemonLoading && searchTags.length ? "Searching team rosters…" : activeFolderId ? "No teams in this folder." : "No teams match your filters."}
             </p>
           </div>
         )}
@@ -324,7 +327,7 @@ export default function HomePage() {
                 key={team.id}
                 team={team}
                 pokemonNames={teamPokemon[team.id]}
-                pokemonLoading={pokemonLoading}
+                pokemonLoading={pokemonLoading && !teamPokemon[team.id]}
                 stats={teamStats[team.id]}
                 statsLoading={statsLoading}
                 activeFolderId={activeFolderId}
