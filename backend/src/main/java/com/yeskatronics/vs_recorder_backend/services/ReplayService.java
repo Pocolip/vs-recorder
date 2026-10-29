@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class ReplayService {
 
+    private final ReplayMetadataService replayMetadata;
     private final ReplayRepository replayRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
@@ -69,6 +70,7 @@ public class ReplayService {
             }
         }
 
+        replayMetadata.index(replay);
         Replay savedReplay = replayRepository.save(replay);
 
         // Handle Bo3 match association if applicable
@@ -443,6 +445,8 @@ public class ReplayService {
 
                 String winner = showdownService.extractWinner(logText);
                 String result = showdownService.determineResult(userPlayer, winner);
+
+                replayMetadata.index(replay);
 
                 // Check if anything changed
                 boolean changed = !Objects.equals(replay.getOpponent(), opponent)

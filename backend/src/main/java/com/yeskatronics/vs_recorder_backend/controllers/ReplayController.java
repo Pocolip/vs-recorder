@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 public class ReplayController {
 
     private final com.yeskatronics.vs_recorder_backend.services.ReplayImportService replayImports;
+    private final com.yeskatronics.vs_recorder_backend.services.ReplayBrowseService browse;
     private final ReplayService replayService;
     private final ReplayMapper replayMapper;
     private final TeamAccessService teamAccessService;
@@ -183,11 +184,30 @@ public class ReplayController {
 
         verifyTeamAccess(teamId, userId);
 
-        List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdOrderedByDate(teamId).stream()
-                .map(replayMapper::toSummaryDTO)
-                .collect(Collectors.toList());
+        List<ReplayDTO.Summary> replays = browse.all(teamId);
 
         return ResponseEntity.ok(replays);
+    }
+
+    @GetMapping("/browse")
+    public ReplayDTO.BrowsePage browse(@RequestParam Long teamId, Authentication authentication,
+                                      @ModelAttribute ReplayDTO.BrowseRequest filter) {
+        verifyTeamAccess(teamId, getCurrentUserId(authentication));
+        return browse.page(teamId, filter);
+    }
+
+    @GetMapping("/urls")
+    public List<String> urls(@RequestParam Long teamId, Authentication authentication,
+                             @ModelAttribute ReplayDTO.BrowseRequest filter) {
+        verifyTeamAccess(teamId, getCurrentUserId(authentication));
+        return browse.urls(teamId, filter);
+    }
+
+    @PatchMapping("/reviewed")
+    public int setReviewed(@RequestParam Long teamId, @RequestParam boolean reviewed,
+                           Authentication authentication, @RequestBody ReplayDTO.BrowseRequest filter) {
+        verifyTeamPermission(teamId, getCurrentUserId(authentication), Permission.EDIT_REPLAY_NOTES);
+        return browse.setReviewed(teamId, filter, reviewed);
     }
 
     /**

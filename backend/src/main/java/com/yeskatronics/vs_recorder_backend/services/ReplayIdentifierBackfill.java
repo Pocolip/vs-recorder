@@ -13,6 +13,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 @RequiredArgsConstructor
 public class ReplayIdentifierBackfill implements ApplicationRunner {
+    private final ReplayMetadataService metadata;
     private final ReplayRepository replays;
     private final PlatformTransactionManager transactions;
 
@@ -20,8 +21,8 @@ public class ReplayIdentifierBackfill implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         TransactionTemplate transaction = new TransactionTemplate(transactions);
         while (Boolean.TRUE.equals(transaction.execute(status -> {
-            var batch = replays.findWithoutMatchIdentifier(PageRequest.of(0, 100));
-            batch.forEach(replay -> replay.extractMatchIdentifier());
+            var batch = replays.findWithoutMetadata(PageRequest.of(0, 100));
+            batch.forEach(metadata::index);
             replays.flush();
             return !batch.isEmpty();
         }))) {

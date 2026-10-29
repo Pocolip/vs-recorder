@@ -26,6 +26,7 @@ public class TeamImportService {
 
     private final TeamExportService teamExportService;
     private final TeamRepository teamRepository;
+    private final ReplayMetadataService replayMetadata;
     private final ReplayRepository replayRepository;
     private final MatchRepository matchRepository;
     private final GamePlanRepository gamePlanRepository;
@@ -259,6 +260,7 @@ public class TeamImportService {
         replay.setDate(replayData.getDate());
         replay.setNotes(sanitizeString(replayData.getNotes(), MAX_NOTES_LENGTH));
 
+        replayMetadata.index(replay);
         return replayRepository.save(replay);
     }
 

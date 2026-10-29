@@ -156,4 +156,11 @@ public interface ReplayRepository extends JpaRepository<Replay, Long> {
         Long getWins();
         Long getLosses();
     }
+
+    @Query("SELECT r.id FROM Replay r WHERE r.team.id = :teamId AND " +
+            "(r.metadataVersion IS NULL OR r.metadataVersion < 1 OR r.identificationKey IS NULL OR r.identificationKey <> :key) ORDER BY r.id")
+    List<Long> findStaleMetadataIds(Long teamId, String key, org.springframework.data.domain.Pageable page);
+
+    @Query("SELECT r FROM Replay r WHERE r.metadataVersion IS NULL OR r.metadataVersion < 1 OR r.identificationKey IS NULL ORDER BY r.id")
+    List<Replay> findWithoutMetadata(org.springframework.data.domain.Pageable page);
 }
