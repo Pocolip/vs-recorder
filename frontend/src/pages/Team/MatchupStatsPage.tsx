@@ -26,8 +26,6 @@ export default function MatchupStatsPage() {
   const { team } = useActiveTeam();
   const { replays, loading } = useTeamStats(team?.id ?? null);
 
-
-
   const [selectedPokemon, setSelectedPokemon] = useState<string[]>(Array(6).fill(""));
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);

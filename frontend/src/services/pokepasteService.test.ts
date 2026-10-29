@@ -34,3 +34,30 @@ describe("paste providers", () => {
       .toMatchObject({ name: "Pikachu", species: "Pikachu", item: "Light Ball", gender: "F" });
   });
 });
+
+it("deduplicates in-flight pastes and caps cold-cache concurrency", async () => {
+  localStorage.clear();
+  let active = 0;
+  let peak = 0;
+  const release: Array<() => void> = [];
+  const fetcher = vi.fn(() => {
+    active++; peak = Math.max(peak, active);
+    return new Promise((resolve) => release.push(() => {
+      active--;
+      resolve({ ok: true, text: async () => raw });
+    }));
+  });
+  vi.stubGlobal("fetch", fetcher);
+  const requests = Array.from({ length: 10 }, (_, i) => fetchAndParse(`https://pokepast.es/perf${i}`));
+  requests.push(fetchAndParse("https://pokepast.es/perf0"));
+  await vi.waitFor(() => expect(fetcher).toHaveBeenCalledTimes(4));
+  while (fetcher.mock.calls.length < 10 || release.length) {
+    release.splice(0).forEach((finish) => finish());
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  await Promise.all(requests);
+  expect(peak).toBe(4);
+  expect(fetcher).toHaveBeenCalledTimes(10);
+  const cache = JSON.parse(localStorage.getItem("pokepaste_cache_v4")!);
+  expect(Object.keys(cache)).toHaveLength(10);
+});

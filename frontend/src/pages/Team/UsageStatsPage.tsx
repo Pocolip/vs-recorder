@@ -44,8 +44,6 @@ export default function UsageStatsPage() {
   const { team } = useActiveTeam();
   const { replays, loading: replaysLoading } = useTeamStats(team?.id ?? null);
 
-
-
   const [teamPokemon, setTeamPokemon] = useState<string[]>([]);
   const [pokemonLoading, setPokemonLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

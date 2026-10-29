@@ -15,7 +15,7 @@ const useTeamPokemon = (teams: TeamLike[], preferStored = false) => {
   const teamsKey = useMemo(() => {
     if (!teams || teams.length === 0) return "";
     return teams.map((t) => `${t.id}:${t.pokepaste || ""}:${preferStored ? t.pokemonNames?.join(",") : ""}`).join("|");
-  }, [teams]);
+  }, [teams, preferStored]);
 
   useEffect(() => {
     if (!teams || teams.length === 0) {

@@ -12,10 +12,12 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
+    public RestTemplate restTemplate(
+            @org.springframework.beans.factory.annotation.Value("${external-http.connect-timeout:5s}") java.time.Duration connectTimeout,
+            @org.springframework.beans.factory.annotation.Value("${external-http.read-timeout:15s}") java.time.Duration readTimeout) {
         var factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(java.time.Duration.ofSeconds(5));
-        factory.setReadTimeout(java.time.Duration.ofSeconds(15));
+        factory.setConnectTimeout(connectTimeout);
+        factory.setReadTimeout(readTimeout);
         return new RestTemplate(factory);
     }
 }

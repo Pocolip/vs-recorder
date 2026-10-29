@@ -14,9 +14,6 @@ import type { Replay } from "../../types";
 export default function GameByGamePage() {
   const { team } = useActiveTeam();
 
-
-
-
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [filterResult, setFilterResult] = useState("all");

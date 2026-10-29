@@ -14,9 +14,6 @@ export default function ReplaysPage() {
   const { team, bumpStatsVersion } = useActiveTeam();
 
 
-  // Refresh when another component (e.g. TeamHeader) bumps the version
-
-
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [deletingReplayId, setDeletingReplayId] = useState<number | null>(null);
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
