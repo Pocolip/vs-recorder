@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ReplayController {
 
+    private final com.yeskatronics.vs_recorder_backend.services.ReplayImportService replayImports;
+    private final com.yeskatronics.vs_recorder_backend.services.ReplayBrowseService browse;
     private final ReplayService replayService;
     private final ReplayMapper replayMapper;
     private final TeamAccessService teamAccessService;
@@ -77,23 +79,7 @@ public class ReplayController {
         Long userId = getCurrentUserId(authentication);
         log.info("Creating replay from URL for team: {}", teamId);
 
-        verifyTeamPermission(teamId, userId, Permission.ADD_REPLAYS);
-
-        Replay savedReplay = replayService.createReplayFromUrl(teamId, request.getUrl());
-
-        // Apply optional fields (notes, reviewed) via partial update
-        boolean hasNotes = request.getNotes() != null && !request.getNotes().isEmpty();
-        boolean hasReviewed = Boolean.TRUE.equals(request.getReviewed());
-        if (hasNotes || hasReviewed) {
-            Replay updates = new Replay();
-            if (hasNotes) {
-                updates.setNotes(request.getNotes());
-            }
-            if (hasReviewed) {
-                updates.setReviewed(true);
-            }
-            savedReplay = replayService.updateReplay(savedReplay.getId(), updates);
-        }
+        Replay savedReplay = replayImports.create(teamId, userId, request);
 
         ReplayDTO.Summary response = replayMapper.toSummaryDTO(savedReplay);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -119,9 +105,7 @@ public class ReplayController {
 
         Long userId = getCurrentUserId(authentication);
 
-        verifyTeamPermission(teamId, userId, Permission.ADD_REPLAYS);
-
-        ShowdownDTO.ReplayPreview preview = replayService.previewReplayFromUrl(teamId, request.getUrl());
+        ShowdownDTO.ReplayPreview preview = replayImports.preview(teamId, userId, request.getUrl());
         return ResponseEntity.ok(preview);
     }
 
@@ -200,11 +184,30 @@ public class ReplayController {
 
         verifyTeamAccess(teamId, userId);
 
-        List<ReplayDTO.Summary> replays = replayService.getReplaysByTeamIdOrderedByDate(teamId).stream()
-                .map(replayMapper::toSummaryDTO)
-                .collect(Collectors.toList());
+        List<ReplayDTO.Summary> replays = browse.all(teamId);
 
         return ResponseEntity.ok(replays);
+    }
+
+    @GetMapping("/browse")
+    public ReplayDTO.BrowsePage browse(@RequestParam Long teamId, Authentication authentication,
+                                      @ModelAttribute ReplayDTO.BrowseRequest filter) {
+        verifyTeamAccess(teamId, getCurrentUserId(authentication));
+        return browse.page(teamId, filter);
+    }
+
+    @GetMapping("/urls")
+    public List<String> urls(@RequestParam Long teamId, Authentication authentication,
+                             @ModelAttribute ReplayDTO.BrowseRequest filter) {
+        verifyTeamAccess(teamId, getCurrentUserId(authentication));
+        return browse.urls(teamId, filter);
+    }
+
+    @PatchMapping("/reviewed")
+    public int setReviewed(@RequestParam Long teamId, @RequestParam boolean reviewed,
+                           Authentication authentication, @RequestBody ReplayDTO.BrowseRequest filter) {
+        verifyTeamPermission(teamId, getCurrentUserId(authentication), Permission.EDIT_REPLAY_NOTES);
+        return browse.setReviewed(teamId, filter, reviewed);
     }
 
     /**

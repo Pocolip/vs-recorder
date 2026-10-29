@@ -71,7 +71,7 @@ public class MatchController {
 
         Match match = matchMapper.toEntity(request);
         Match savedMatch = matchService.createMatch(match, teamId);
-        MatchService.MatchStats stats = matchService.getMatchStats(savedMatch.getId());
+        MatchService.MatchStats stats = matchService.getLoadedMatchStats(savedMatch);
         MatchDTO.Response response = matchMapper.toDTO(savedMatch, stats);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -103,7 +103,7 @@ public class MatchController {
                     }
                 })
                 .map(match -> {
-                    MatchService.MatchStats stats = matchService.getMatchStats(match.getId());
+                    MatchService.MatchStats stats = matchService.getLoadedMatchStats(match);
                     return matchMapper.toDTO(match, stats);
                 })
                 .map(ResponseEntity::ok)
@@ -128,9 +128,10 @@ public class MatchController {
 
         verifyTeamAccess(teamId, userId);
 
+        var counts = matchService.getMatchStatsByTeamId(teamId);
         List<MatchDTO.Summary> matches = matchService.getMatchesByTeamIdOrderedByDate(teamId).stream()
                 .map(match -> {
-                    MatchService.MatchStats stats = matchService.getMatchStats(match.getId());
+                    MatchService.MatchStats stats = counts.get(match.getId());
                     return matchMapper.toSummaryDTO(match, stats);
                 })
                 .collect(Collectors.toList());
@@ -158,7 +159,7 @@ public class MatchController {
 
         List<MatchDTO.Response> matches = matchService.getMatchesWithReplays(teamId).stream()
                 .map(match -> {
-                    MatchService.MatchStats stats = matchService.getMatchStats(match.getId());
+                    MatchService.MatchStats stats = matchService.getLoadedMatchStats(match);
                     return matchMapper.toDTO(match, stats);
                 })
                 .collect(Collectors.toList());
@@ -186,9 +187,10 @@ public class MatchController {
 
         verifyTeamAccess(teamId, userId);
 
+        var counts = matchService.getMatchStatsByTeamId(teamId);
         List<MatchDTO.Summary> matches = matchService.getMatchesByTeamIdAndOpponent(teamId, opponent).stream()
                 .map(match -> {
-                    MatchService.MatchStats stats = matchService.getMatchStats(match.getId());
+                    MatchService.MatchStats stats = counts.get(match.getId());
                     return matchMapper.toSummaryDTO(match, stats);
                 })
                 .collect(Collectors.toList());
@@ -216,9 +218,10 @@ public class MatchController {
 
         verifyTeamAccess(teamId, userId);
 
+        var counts = matchService.getMatchStatsByTeamId(teamId);
         List<MatchDTO.Summary> matches = matchService.getMatchesByTeamIdAndTag(teamId, tag).stream()
                 .map(match -> {
-                    MatchService.MatchStats stats = matchService.getMatchStats(match.getId());
+                    MatchService.MatchStats stats = counts.get(match.getId());
                     return matchMapper.toSummaryDTO(match, stats);
                 })
                 .collect(Collectors.toList());
@@ -251,7 +254,7 @@ public class MatchController {
 
         Match updates = matchMapper.toEntity(request);
         Match updatedMatch = matchService.updateMatch(id, teamId, updates);
-        MatchService.MatchStats stats = matchService.getMatchStats(updatedMatch.getId());
+        MatchService.MatchStats stats = matchService.getLoadedMatchStats(updatedMatch);
         MatchDTO.Response response = matchMapper.toDTO(updatedMatch, stats);
 
         return ResponseEntity.ok(response);
@@ -281,7 +284,7 @@ public class MatchController {
         verifyTeamPermission(teamId, userId, Permission.EDIT_REPLAY_NOTES);
 
         Match updatedMatch = matchService.addTag(id, teamId, request.getTag());
-        MatchService.MatchStats stats = matchService.getMatchStats(updatedMatch.getId());
+        MatchService.MatchStats stats = matchService.getLoadedMatchStats(updatedMatch);
         MatchDTO.Response response = matchMapper.toDTO(updatedMatch, stats);
 
         return ResponseEntity.ok(response);
@@ -311,7 +314,7 @@ public class MatchController {
         verifyTeamPermission(teamId, userId, Permission.EDIT_REPLAY_NOTES);
 
         Match updatedMatch = matchService.removeTag(id, teamId, tag);
-        MatchService.MatchStats stats = matchService.getMatchStats(updatedMatch.getId());
+        MatchService.MatchStats stats = matchService.getLoadedMatchStats(updatedMatch);
         MatchDTO.Response response = matchMapper.toDTO(updatedMatch, stats);
 
         return ResponseEntity.ok(response);

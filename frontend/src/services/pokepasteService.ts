@@ -72,14 +72,39 @@ export function detectPasteService(url: string): PasteServiceType | null {
 /**
  * Fetch and parse a pokepaste URL
  */
-export async function fetchAndParse(
+// Share remote requests across cards and cap cold-cache fan-out across hook instances.
+const inFlight = new Map<string, Promise<PokemonData[]>>();
+let activeRequests = 0;
+const waiters: Array<() => void> = [];
+async function withRequestSlot<T>(fetcher: () => Promise<T>): Promise<T> {
+  if (activeRequests >= 4) await new Promise<void>((resolve) => waiters.push(resolve));
+  else activeRequests++;
+  try { return await fetcher(); }
+  finally {
+    const next = waiters.shift();
+    if (next) next();
+    else activeRequests--;
+  }
+}
+
+export async function fetchAndParse(pasteUrl: string, options?: ParseOptions): Promise<PokemonData[]> {
+  const key = `${pasteUrl}:${options?.maxPokemon ?? 6}`;
+  let request = inFlight.get(key);
+  if (!request) {
+    request = fetchAndParseUncached(pasteUrl, options).finally(() => inFlight.delete(key));
+    inFlight.set(key, request);
+  }
+  return request;
+}
+
+async function fetchAndParseUncached(
   pasteUrl: string,
   options?: ParseOptions
 ): Promise<PokemonData[]> {
   // Check cache first
   const cached = await getCachedPokepaste(pasteUrl);
   if (cached && Array.isArray(cached.data) && !isCacheExpired(cached.timestamp)) {
-    return cached.data;
+    return cached.data.slice(0, options?.maxPokemon ?? 6);
   }
 
   const detected = detectPasteService(pasteUrl);
@@ -90,10 +115,10 @@ export async function fetchAndParse(
   let pokemonData: PokemonData[];
 
   if (detected.type === "pokepaste") {
-    pokemonData = await fetchPokepaste(detected.pasteId, pasteUrl, options?.maxPokemon);
+    pokemonData = await withRequestSlot(() => fetchPokepaste(detected.pasteId, pasteUrl, options?.maxPokemon));
   } else {
     // pokebin and vrpastes both proxy through the backend (CORS blocks direct browser fetch)
-    pokemonData = await fetchViaBackend(detected.pasteId, pasteUrl, options?.maxPokemon);
+    pokemonData = await withRequestSlot(() => fetchViaBackend(detected.pasteId, pasteUrl, options?.maxPokemon));
   }
 
   // Cache the result
@@ -112,7 +137,7 @@ async function fetchPokepaste(
 ): Promise<PokemonData[]> {
   try {
     // Fetch raw text
-    const rawResponse = await fetch(`https://pokepast.es/${pasteId}/raw`);
+    const rawResponse = await fetch(`https://pokepast.es/${pasteId}/raw`, { signal: AbortSignal.timeout(15000) });
     if (!rawResponse.ok) {
       throw new Error(`Failed to fetch pokepaste: ${rawResponse.statusText}`);
     }
@@ -354,7 +379,12 @@ export function extractPasteId(url: string): string | null {
 /**
  * Cache a pokepaste
  */
-async function cachePokepaste(url: string, data: PokemonData[]): Promise<void> {
+let cacheWrite = Promise.resolve();
+function cachePokepaste(url: string, data: PokemonData[]): Promise<void> {
+  cacheWrite = cacheWrite.then(() => writeCachedPaste(url, data));
+  return cacheWrite;
+}
+async function writeCachedPaste(url: string, data: PokemonData[]): Promise<void> {
   const cache = (await storageService.get<Record<string, CachedPaste>>(CACHE_KEY)) || {};
   cache[url] = {
     data,

@@ -14,7 +14,41 @@ export interface ReplayPreview {
   identified: boolean;
 }
 
+export interface ReplayBrowseFilters {
+  page?: number;
+  size?: number;
+  tags?: string[];
+  result?: string;
+  reviewed?: boolean;
+  sort?: string;
+  direction?: "asc" | "desc";
+}
+export interface ReplayPage {
+  content: Replay[];
+  totalElements: number;
+  totalTeam: number;
+  wins: number;
+  losses: number;
+  page: number;
+  size: number;
+}
+function browseParams(teamId: number, filters: ReplayBrowseFilters) {
+  const params = new URLSearchParams({ teamId: String(teamId) });
+  for (const [name, value] of Object.entries(filters)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) value.forEach((tag) => params.append(name, tag));
+    else params.set(name, String(value));
+  }
+  return params;
+}
+
 export const replayApi = {
+  browse: (teamId: number, filters: ReplayBrowseFilters) =>
+    apiClient.get("/api/replays/browse", { params: browseParams(teamId, filters) }) as Promise<ReplayPage>,
+  urls: (teamId: number, filters: ReplayBrowseFilters) =>
+    apiClient.get("/api/replays/urls", { params: browseParams(teamId, filters) }) as Promise<string[]>,
+  setReviewed: (teamId: number, filters: ReplayBrowseFilters, reviewed: boolean) =>
+    apiClient.patch(`/api/replays/reviewed?teamId=${teamId}&reviewed=${reviewed}`, filters) as Promise<number>,
   getById: (id: number) =>
     apiClient.get(`/api/replays/${id}`) as Promise<Replay>,
 

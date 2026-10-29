@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { useState, useEffect, useMemo } from "react";
 import {
   Plus,
@@ -30,7 +31,7 @@ import SortableOpponentTeamCard, {
 } from "../../components/team/SortableOpponentTeamCard";
 import LeadGroupCard from "../../components/team/LeadGroupCard";
 import AddOpponentTeamModal from "../../components/modals/AddOpponentTeamModal";
-import RecentTourModal from "../../components/modals/RecentTourModal";
+const RecentTourModal = lazy(() => import("../../components/modals/RecentTourModal"));
 import TagInput from "../../components/form/TagInput";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useOpponentTeams } from "../../hooks/useOpponentTeams";
@@ -495,12 +496,12 @@ export default function MatchupPlannerPage() {
       />
 
       {/* Recent Tour Modal */}
-      <RecentTourModal
+      {showRecentTourModal && <RecentTourModal
         isOpen={showRecentTourModal}
         onClose={() => setShowRecentTourModal(false)}
         teamRegulation={team?.regulation}
         onImport={handleImportFromRecentTour}
-      />
+      />}
     </div>
     </>
   );

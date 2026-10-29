@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class ReplayService {
 
+    private final ReplayMetadataService replayMetadata;
     private final ReplayRepository replayRepository;
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
@@ -51,7 +52,7 @@ public class ReplayService {
         log.info("Creating new replay for team ID: {}", teamId);
 
         // Verify team exists
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdForUpdate(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
 
         // Check for duplicate URL within the same team
@@ -69,6 +70,7 @@ public class ReplayService {
             }
         }
 
+        replayMetadata.index(replay);
         Replay savedReplay = replayRepository.save(replay);
 
         // Handle Bo3 match association if applicable
@@ -82,77 +84,6 @@ public class ReplayService {
         log.info("Replay created successfully with ID: {}", savedReplay.getId());
 
         return savedReplay;
-    }
-
-    /**
-     * Create a replay from a URL (fetches and parses battle log, auto-detects Bo3)
-     *
-     * @param teamId the team ID
-     * @param url the Pokemon Showdown replay URL
-     * @return the created replay
-     * @throws IllegalArgumentException if URL already exists or team not found
-     */
-    public Replay createReplayFromUrl(Long teamId, String url) {
-        log.info("Creating replay from URL for team ID: {}", teamId);
-
-        // Strip query parameters to normalize the URL
-        url = url.split("\\?")[0];
-
-        // Check for duplicate URL within the same team
-        if (replayRepository.existsByUrlAndTeamId(url, teamId)) {
-            throw new IllegalArgumentException("Replay URL already exists in this team: " + url);
-        }
-
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
-
-        // Fetch battle log from Showdown
-        ShowdownDTO.ReplayData replayData = showdownService.fetchReplayData(url, team);
-
-        // Parse Bo3 information from battle log
-        ReplayMatcher.Bo3MatchInfo matchInfo = ReplayMatcher.parseBattleLog(replayData.getBattleLog());
-
-        // Create replay
-        Replay replay = new Replay();
-        replay.setTeam(team);
-        replay.setUrl(url);
-        replay.setBattleLog(replayData.getBattleLog());
-        replay.setOpponent(replayData.getOpponent());
-        replay.setResult(replayData.getResult());
-        replay.setDate(replayData.getDate() != null ? replayData.getDate() : LocalDateTime.now());
-
-        // Set game number if Bo3
-        if (matchInfo.isBo3()) {
-            replay.setGameNumber(matchInfo.getGameNumber());
-            log.info("Detected Bo3 replay - Game {} of match {}",
-                    matchInfo.getGameNumber(), matchInfo.getMatchId());
-        }
-
-        // Save replay first
-        Replay savedReplay = replayRepository.save(replay);
-
-        // Handle Bo3 match association
-        if (matchInfo.isBo3()) {
-            handleBo3Match(savedReplay, matchInfo, team);
-        }
-
-        touchTeam(team.getId());
-
-        log.info("Replay created from URL with ID: {}", savedReplay.getId());
-        return savedReplay;
-    }
-
-    /**
-     * Preview a replay from URL WITHOUT persisting it. Used by the bulk-import flow to
-     * detect the team-of-six the owner ran in each replay so the UI can group them.
-     */
-    public ShowdownDTO.ReplayPreview previewReplayFromUrl(Long teamId, String url) {
-        url = url.split("\\?")[0];
-
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with ID: " + teamId));
-
-        return showdownService.previewReplay(url, team);
     }
 
     /**
@@ -515,6 +446,8 @@ public class ReplayService {
                 String winner = showdownService.extractWinner(logText);
                 String result = showdownService.determineResult(userPlayer, winner);
 
+                replayMetadata.index(replay);
+
                 // Check if anything changed
                 boolean changed = !Objects.equals(replay.getOpponent(), opponent)
                         || !Objects.equals(replay.getResult(), result);
@@ -573,14 +506,9 @@ public class ReplayService {
         log.debug("Handling Bo3 match for replay ID: {}, matchId: {}", replay.getId(), matchId);
 
         // Find sibling replays with the same matchId
-        List<Replay> siblings = replayRepository.findByTeamId(team.getId()).stream()
-                .filter(r -> !r.getId().equals(replay.getId())) // Exclude self
-                .filter(r -> r.getBattleLog() != null)
-                .filter(r -> {
-                    String siblingMatchId = ReplayMatcher.getMatchId(r.getBattleLog());
-                    return matchId.equals(siblingMatchId);
-                })
-                .toList();
+        if (matchId == null) return;
+        List<Replay> siblings = replayRepository.findByTeamIdAndShowdownMatchIdAndIdNot(
+                team.getId(), matchId, replay.getId());
 
         if (siblings.isEmpty()) {
             // First game in this Bo3 set - create new match

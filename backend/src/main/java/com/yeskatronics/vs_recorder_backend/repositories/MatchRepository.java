@@ -92,4 +92,23 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
         Long getTeamId();
         Long getTotal();
     }
+
+    interface ResultCounts {
+        Long getMatchId();
+        String getOpponent();
+        int getReplayCount();
+        int getWins();
+        int getLosses();
+    }
+
+    String RESULT_COUNTS = "SELECT m.id AS matchId, m.opponent AS opponent, COUNT(r) AS replayCount, " +
+            "SUM(CASE WHEN LOWER(r.result) = 'win' THEN 1 ELSE 0 END) AS wins, " +
+            "SUM(CASE WHEN LOWER(r.result) = 'loss' THEN 1 ELSE 0 END) AS losses " +
+            "FROM Match m LEFT JOIN m.replays r ";
+
+    @Query(RESULT_COUNTS + "WHERE m.team.id = :teamId GROUP BY m.id, m.opponent")
+    List<ResultCounts> countResultsByTeamId(Long teamId);
+
+    @Query(RESULT_COUNTS + "WHERE m.id = :matchId GROUP BY m.id, m.opponent")
+    Optional<ResultCounts> countResultsByMatchId(Long matchId);
 }

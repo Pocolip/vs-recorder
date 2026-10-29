@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import * as pokepasteService from "../services/pokepasteService";
 
-type TeamLike = { id: number; pokepaste?: string | null };
+type TeamLike = { id: number; pokepaste?: string | null; pokemonNames?: string[] };
 
-const useTeamPokemon = (teams: TeamLike[]) => {
+const useTeamPokemon = (teams: TeamLike[], preferStored = false) => {
   const [teamPokemon, setTeamPokemon] = useState<Record<number, string[]>>({});
   const [loading, setLoading] = useState(false);
   const [teamSets, setTeamSets] = useState<Record<number, pokepasteService.PokemonData[]>>({});
@@ -14,8 +14,8 @@ const useTeamPokemon = (teams: TeamLike[]) => {
   // Create a stable key based on team IDs and pokepaste URLs
   const teamsKey = useMemo(() => {
     if (!teams || teams.length === 0) return "";
-    return teams.map((t) => `${t.id}:${t.pokepaste || ""}`).join("|");
-  }, [teams]);
+    return teams.map((t) => `${t.id}:${t.pokepaste || ""}:${preferStored ? t.pokemonNames?.join(",") : ""}`).join("|");
+  }, [teams, preferStored]);
 
   useEffect(() => {
     if (!teams || teams.length === 0) {
@@ -32,32 +32,23 @@ const useTeamPokemon = (teams: TeamLike[]) => {
     const resolveAll = async () => {
       setLoading(true);
 
-      const results = await Promise.allSettled(
-        teams.map(async (team) => {
-          if (!team.pokepaste) return { teamId: team.id, members: [] };
-          const members = await pokepasteService.fetchAndParse(team.pokepaste, { maxPokemon: 6 });
-          return { teamId: team.id, members };
-        }),
-      );
-
-      if (cancelled) return;
-
-      const pokemon: Record<number, string[]> = {};
-      const sets: Record<number, pokepasteService.PokemonData[]> = {};
-      const failed: Record<number, string> = {};
-      for (const [index, result] of results.entries()) {
-        if (result.status === "fulfilled") {
-          pokemon[result.value.teamId] = result.value.members.map((m) => m.name);
-          sets[result.value.teamId] = result.value.members;
-        } else {
-          failed[teams[index].id] = "Could not load matchup Pokémon.";
-        }
-      }
-
-      setTeamPokemon(pokemon);
-      setTeamSets(sets);
-      setErrors(failed);
       setLoadedKey(teamsKey);
+      setTeamPokemon({});
+      setTeamSets({});
+      setErrors({});
+      await Promise.allSettled(teams.map(async (team) => {
+        if (preferStored && team.pokemonNames?.length) return;
+        try {
+          const members = team.pokepaste
+            ? await pokepasteService.fetchAndParse(team.pokepaste, { maxPokemon: 6 }) : [];
+          if (cancelled) return;
+          setTeamPokemon((previous) => ({ ...previous, [team.id]: members.map((member) => member.name) }));
+          setTeamSets((previous) => ({ ...previous, [team.id]: members }));
+        } catch {
+          if (!cancelled) setErrors((previous) => ({ ...previous, [team.id]: "Could not load matchup Pokémon." }));
+        }
+      }));
+      if (cancelled) return;
       setLoading(false);
     };
 
@@ -69,8 +60,10 @@ const useTeamPokemon = (teams: TeamLike[]) => {
   }, [teamsKey, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = loadedKey === teamsKey;
+  const stored: Record<number, string[]> = preferStored ? Object.fromEntries(teams.filter((t) => t.pokemonNames?.length)
+    .map((t) => [t.id, t.pokemonNames!])) : {};
   return {
-    teamPokemon: current ? teamPokemon : {},
+    teamPokemon: { ...stored, ...(current ? teamPokemon : {}) },
     teamSets: current ? teamSets : {},
     errors: current ? errors : {},
     loading: loading || !current,

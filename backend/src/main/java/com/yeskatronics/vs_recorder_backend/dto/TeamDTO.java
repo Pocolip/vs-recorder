@@ -89,6 +89,7 @@ public class TeamDTO {
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private List<Long> folderIds;
+        private List<String> pokemonNames;
         private int replayCount;
         private int matchCount;
         private int wins;

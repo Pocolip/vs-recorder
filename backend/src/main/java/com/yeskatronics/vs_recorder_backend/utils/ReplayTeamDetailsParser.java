@@ -9,6 +9,7 @@ public final class ReplayTeamDetailsParser {
     private ReplayTeamDetailsParser() {}
 
     @Data
+    @lombok.NoArgsConstructor
     @AllArgsConstructor
     public static class Member {
         private String species;

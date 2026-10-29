@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BarChart3, Users, Star } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
@@ -41,16 +41,8 @@ function getWinRateColor(winRate: number): string {
 }
 
 export default function UsageStatsPage() {
-  const { team, statsVersion } = useActiveTeam();
-  const { replays, loading: replaysLoading, refreshStats } = useTeamStats(team?.id ?? null);
-
-  const prevVersion = useRef(statsVersion);
-  useEffect(() => {
-    if (statsVersion !== prevVersion.current) {
-      prevVersion.current = statsVersion;
-      refreshStats();
-    }
-  }, [statsVersion, refreshStats]);
+  const { team } = useActiveTeam();
+  const { replays, loading: replaysLoading } = useTeamStats(team?.id ?? null);
 
   const [teamPokemon, setTeamPokemon] = useState<string[]>([]);
   const [pokemonLoading, setPokemonLoading] = useState(true);

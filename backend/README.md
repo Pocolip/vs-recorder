@@ -253,3 +253,13 @@ Response:
 **Docker build fails:**
 - Ensure you're in the `backend/` directory
 - Check Maven can download dependencies: `mvn dependency:resolve`
+
+### External request limits
+
+The shared HTTP client uses a 5-second connection timeout and a 15-second read-inactivity timeout for Showdown and paste providers. These bound connection/read stalls, not a continuously streaming response's total duration. Replay imports fetch outside persistence transactions, recheck access and current team identification after fetching, and serialize same-team inserts while retaining the unique URL/team constraint. Temporary Showdown network/server failures return HTTP 503 with `Retry-After: 5`.
+
+### Replay browsing and performance backfill
+
+`GET /api/replays/browse?teamId=...` returns 25 summaries by default (maximum 100), matching totals, wins and losses. It accepts zero-based `page`, `size`, repeated `tags`, `result`, `reviewed`, `sort` (`date`, `result`, `opponent`) and `direction`. Filters apply to the complete team history. `GET /api/replays/urls` returns all matching URLs; `PATCH /api/replays/reviewed?teamId=...&reviewed=true` applies a filter body to all matching replays. The existing list endpoint remains the whole-history analytics path and now projects summaries without raw logs.
+
+Hibernate's existing schema-update deployment adds cached neutral battle metadata, its version, a team-identification fingerprint, an opponent-species search table, and an indexed Showdown match identifier. Startup runs a restartable backfill in batches of 100, committing each batch. First startup on a large database takes additional time and disk space; subsequent startups only process records missing metadata. Team username/roster or registry-version changes invalidate the search fingerprint on next browse; neutral cached battle metadata is reused. Raw logs remain available for full-detail/export and backend analytics.

@@ -13,6 +13,15 @@ import java.util.Optional;
 @Repository
 public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
 
+    interface TeamSpecies {
+        Long getTeamId();
+        String getPokemonName();
+    }
+
+    @org.springframework.data.jpa.repository.Query("SELECT m.team.id AS teamId, m.pokemonName AS pokemonName " +
+            "FROM TeamMember m WHERE m.team.id IN :teamIds ORDER BY m.slot")
+    List<TeamSpecies> findSpeciesByTeamIds(java.util.Collection<Long> teamIds);
+
     List<TeamMember> findByTeamIdOrderBySlotAsc(Long teamId);
 
     Optional<TeamMember> findByIdAndTeamId(Long id, Long teamId);

@@ -246,70 +246,43 @@ public class MatchService {
      */
     @Transactional(readOnly = true)
     public MatchStats getMatchStats(Long matchId) {
-        log.debug("Calculating statistics for match ID: {}", matchId);
-
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new IllegalArgumentException("Match not found with ID: " + matchId));
-
-        // Force load replays
-        List<Replay> replays = match.getReplays();
-
-        int replayCount = replays.size();
-        long wins = replays.stream().filter(Replay::isWin).count();
-        long losses = replays.stream().filter(Replay::isLoss).count();
-
-        boolean isComplete = match.isComplete();
-        String matchResult = match.getMatchResult();
-
-        return new MatchStats(
-                matchId,
-                match.getOpponent(),
-                replayCount,
-                (int) wins,
-                (int) losses,
-                isComplete,
-                matchResult
-        );
+        return fromCounts(matchRepository.countResultsByMatchId(matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match not found with ID: " + matchId)));
     }
 
-    /**
-     * Get overall match statistics for a team
-     *
-     * @param teamId the team ID
-     * @return TeamMatchStats with aggregated match statistics
-     */
+    private MatchStats fromCounts(MatchRepository.ResultCounts counts) {
+        return calculateStats(counts.getMatchId(), counts.getOpponent(), counts.getReplayCount(),
+                counts.getWins(), counts.getLosses());
+    }
+
+    public static MatchStats calculateStats(Long id, String opponent, int count, int wins, int losses) {
+        boolean complete = count >= 2 && count <= 3;
+        return new MatchStats(id, opponent, count, wins, losses, complete,
+                complete ? (wins >= 2 ? "win" : "loss") : "incomplete");
+    }
+
+    /** Reuse replays when the detailed response already needs them. */
+    public MatchStats getLoadedMatchStats(Match match) {
+        return calculateStats(match.getId(), match.getOpponent(), match.getReplays().size(),
+                (int) match.getReplays().stream().filter(Replay::isWin).count(),
+                (int) match.getReplays().stream().filter(Replay::isLoss).count());
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.Map<Long, MatchStats> getMatchStatsByTeamId(Long teamId) {
+        return matchRepository.countResultsByTeamId(teamId).stream()
+                .map(this::fromCounts)
+                .collect(java.util.stream.Collectors.toMap(MatchStats::matchId, stats -> stats));
+    }
+
     @Transactional(readOnly = true)
     public TeamMatchStats getTeamMatchStats(Long teamId) {
-        log.debug("Calculating match statistics for team ID: {}", teamId);
-
-        List<Match> matches = matchRepository.findByTeamIdWithReplays(teamId);
-
-        int totalMatches = matches.size();
-        long completeMatches = matches.stream().filter(Match::isComplete).count();
-        long incompleteMatches = totalMatches - completeMatches;
-
-        long matchWins = matches.stream()
-                .filter(Match::isComplete)
-                .filter(m -> "win".equals(m.getMatchResult()))
-                .count();
-
-        long matchLosses = matches.stream()
-                .filter(Match::isComplete)
-                .filter(m -> "loss".equals(m.getMatchResult()))
-                .count();
-
-        double matchWinRate = completeMatches > 0 ?
-                (double) matchWins / completeMatches * 100 : 0.0;
-
-        return new TeamMatchStats(
-                teamId,
-                totalMatches,
-                (int) completeMatches,
-                (int) incompleteMatches,
-                (int) matchWins,
-                (int) matchLosses,
-                matchWinRate
-        );
+        var stats = getMatchStatsByTeamId(teamId).values();
+        int complete = (int) stats.stream().filter(MatchStats::complete).count();
+        int wins = (int) stats.stream().filter(s -> "win".equals(s.matchResult())).count();
+        int losses = (int) stats.stream().filter(s -> "loss".equals(s.matchResult())).count();
+        return new TeamMatchStats(teamId, stats.size(), complete, stats.size() - complete,
+                wins, losses, complete > 0 ? (double) wins / complete * 100 : 0.0);
     }
 
     /**

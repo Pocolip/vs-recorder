@@ -61,9 +61,9 @@ public abstract class ReplayMapper {
      */
     @AfterMapping
     protected void populateBattleData(@MappingTarget ReplayDTO.Summary summary, Replay replay) {
-        if (replay.getBattleLog() != null && !replay.getBattleLog().isEmpty()) {
+        if (replay.getBattleMetadata() != null || (replay.getBattleLog() != null && !replay.getBattleLog().isEmpty())) {
             // Extract raw battle data from battle log
-            ReplayMatcher.BattleData rawData = ReplayMatcher.extractBattleData(
+            ReplayMatcher.BattleData rawData = replay.getBattleMetadata() != null ? replay.getBattleMetadata() : ReplayMatcher.extractBattleData(
                     replay.getBattleLog(),
                     replay.getTeam().getShowdownUsernames()
             );

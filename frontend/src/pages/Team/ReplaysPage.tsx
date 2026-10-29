@@ -1,26 +1,18 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Calendar, Copy, Check } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
-import { useTeamStats } from "../../hooks/useTeamStats";
+import { useReplayPage } from "../../hooks/useReplayPage";
+import { replayApi } from "../../services/api/replayApi";
+import ReplayPagination from "../../components/team/ReplayPagination";
 import CompactReplayCard from "../../components/team/CompactReplayCard";
 import TagInput from "../../components/form/TagInput";
 import * as replayService from "../../services/replayService";
-import { matchesPokemonTags, getOpponentPokemonFromReplay } from "../../utils/pokemonNameUtils";
 import type { Replay } from "../../types";
 
 export default function ReplaysPage() {
-  const { team, statsVersion, bumpStatsVersion } = useActiveTeam();
-  const { replays, loading, refreshStats } = useTeamStats(team?.id ?? null);
+  const { team, bumpStatsVersion } = useActiveTeam();
 
-  // Refresh when another component (e.g. TeamHeader) bumps the version
-  const prevVersion = useRef(statsVersion);
-  useEffect(() => {
-    if (statsVersion !== prevVersion.current) {
-      prevVersion.current = statsVersion;
-      refreshStats();
-    }
-  }, [statsVersion, refreshStats]);
 
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [deletingReplayId, setDeletingReplayId] = useState<number | null>(null);
@@ -29,18 +21,18 @@ export default function ReplaysPage() {
   const [savingNoteId, setSavingNoteId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const filteredReplays = useMemo(() => {
-    if (searchTags.length === 0) return replays;
-    return replays.filter((replay) =>
-      matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags)
-    );
-  }, [replays, searchTags]);
+  const [page, setPage] = useState(0);
+  const { data, loading, error, refresh: refreshStats } = useReplayPage(team?.id ?? null, { page, tags: searchTags });
+  const replays = data?.content ?? [];
+  const total = data?.totalElements ?? 0;
+  const totalTeam = data?.totalTeam ?? 0;
+  const filteredReplays = replays;
+  const changeTags = (tags: string[]) => { setSearchTags(tags); setPage(0); };
 
   const handleDeleteReplay = async (replayId: number) => {
     try {
       setDeletingReplayId(replayId);
-      await replayService.deleteReplay(replayId);
-      refreshStats();
+      if (!await replayService.deleteReplay(replayId)) throw new Error("Failed to delete replay");
       bumpStatsVersion();
     } catch (error) {
       console.error("Error deleting replay:", error);
@@ -75,7 +67,8 @@ export default function ReplaysPage() {
 
   const handleCopyAllUrls = async () => {
     try {
-      const urls = filteredReplays.map((r) => r.url).join("\n");
+      if (!team) return;
+      const urls = (await replayApi.urls(team.id, { tags: searchTags })).join("\n");
       await navigator.clipboard.writeText(urls);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -100,8 +93,10 @@ export default function ReplaysPage() {
     );
   }
 
+  if (error) return <div role="alert">{error} <button onClick={refreshStats}>Retry</button></div>;
+
   // Empty state
-  if (replays.length === 0) {
+  if (totalTeam === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -131,8 +126,8 @@ export default function ReplaysPage() {
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {searchTags.length > 0
-              ? `${filteredReplays.length} of ${replays.length} replays`
-              : `${replays.length} replays`}
+              ? `${total} of ${totalTeam} replays`
+              : `${totalTeam} replays`}
           </p>
         </div>
 
@@ -160,10 +155,12 @@ export default function ReplaysPage() {
       <div className="mb-4">
         <TagInput
           tags={searchTags}
-          onTagsChange={setSearchTags}
+          onTagsChange={changeTags}
           placeholder="Filter by opponent Pokemon..."
         />
       </div>
+
+      <ReplayPagination page={data?.page ?? 0} size={data?.size ?? 25} total={total} onPage={setPage} />
 
       {/* Filter no-results */}
       {filteredReplays.length === 0 && searchTags.length > 0 ? (
@@ -173,7 +170,7 @@ export default function ReplaysPage() {
           </p>
           <button
             type="button"
-            onClick={() => setSearchTags([])}
+            onClick={() => changeTags([])}
             className="mt-2 text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
           >
             Clear filters

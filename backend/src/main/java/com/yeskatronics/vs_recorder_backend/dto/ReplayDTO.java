@@ -202,4 +202,18 @@ public class ReplayDTO {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }
+
+    @Data
+    public static class BrowseRequest {
+        private int page = 0;
+        private int size = 25;
+        private String sort = "date";
+        private String direction = "desc";
+        private String result;
+        private Boolean reviewed;
+        private List<String> tags = List.of();
+    }
+
+    public record BrowsePage(List<Summary> content, long totalElements, long totalTeam,
+                             long wins, long losses, int page, int size) {}
 }

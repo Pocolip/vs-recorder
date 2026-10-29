@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
  * Each replay belongs to a team and optionally to a match (Bo3 set).
  */
 @Entity
-@Table(name = "replays", uniqueConstraints = {
+@org.hibernate.annotations.DynamicUpdate
+@Table(name = "replays", indexes = @Index(name = "idx_replay_team_showdown_match", columnList = "team_id,showdown_match_id"), uniqueConstraints = {
     @UniqueConstraint(name = "uk_replay_url_team", columnNames = {"url", "team_id"})
 })
 @Data
@@ -73,6 +74,41 @@ public class Replay {
      * 1 = Game 1, 2 = Game 2, 3 = Game 3
      * null = Bo1 (standalone game not part of a match)
      */
+    @Column(name = "showdown_match_id")
+    private String showdownMatchId;
+
+    @ColumnDefault("0")
+    private Integer matchIdentifierVersion;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "TEXT")
+    private com.yeskatronics.vs_recorder_backend.utils.ReplayMatcher.BattleData battleMetadata;
+
+    @ColumnDefault("0")
+    private Integer metadataVersion;
+
+    private String identificationKey;
+
+    @ElementCollection
+    @CollectionTable(name = "replay_opponent_species", joinColumns = @JoinColumn(name = "replay_id"),
+            indexes = @Index(name = "idx_replay_opponent_species", columnList = "replay_id"))
+    @Column(name = "species")
+    private java.util.List<String> opponentSpecies = new java.util.ArrayList<>();
+
+    @PrePersist
+    public void extractMatchIdentifier() {
+        if (!Integer.valueOf(1).equals(matchIdentifierVersion)) {
+            showdownMatchId = battleLog == null ? null :
+                    com.yeskatronics.vs_recorder_backend.utils.ReplayMatcher.getMatchId(battleLog);
+            matchIdentifierVersion = 1;
+        }
+        if (battleMetadata == null) {
+            battleMetadata = com.yeskatronics.vs_recorder_backend.utils.ReplayMatcher.extractBattleData(
+                    battleLog, java.util.List.of());
+        }
+        metadataVersion = 1;
+    }
+
     @Column(name = "game_number")
     private Integer gameNumber;
 

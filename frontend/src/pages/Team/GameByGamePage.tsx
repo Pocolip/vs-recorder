@@ -1,26 +1,18 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Calendar, Filter, SortAsc, SortDesc, CheckCircle2, RotateCcw } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
-import { useTeamStats } from "../../hooks/useTeamStats";
+import { useReplayPage } from "../../hooks/useReplayPage";
+import { replayApi } from "../../services/api/replayApi";
+import ReplayPagination from "../../components/team/ReplayPagination";
 import GameCard from "../../components/team/GameCard";
 import TagInput from "../../components/form/TagInput";
 import * as replayService from "../../services/replayService";
-import { matchesPokemonTags, getOpponentPokemonFromReplay } from "../../utils/pokemonNameUtils";
 import { isMegaRegulation } from "../../utils/regulationUtils";
 import type { Replay } from "../../types";
 
 export default function GameByGamePage() {
-  const { team, statsVersion } = useActiveTeam();
-  const { replays, loading, refreshStats, updateReplaysLocal } = useTeamStats(team?.id ?? null);
-
-  const prevVersion = useRef(statsVersion);
-  useEffect(() => {
-    if (statsVersion !== prevVersion.current) {
-      prevVersion.current = statsVersion;
-      refreshStats();
-    }
-  }, [statsVersion, refreshStats]);
+  const { team } = useActiveTeam();
 
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -32,6 +24,15 @@ export default function GameByGamePage() {
   const [savingNoteId, setSavingNoteId] = useState<number | null>(null);
   const [togglingReviewedId, setTogglingReviewedId] = useState<number | null>(null);
   const [bulkUpdating, setBulkUpdating] = useState(false);
+
+  const [page, setPage] = useState(0);
+  const filters = { page, tags: searchTags, result: filterResult, sort: sortBy, direction: sortOrder,
+    reviewed: filterReviewed === "all" ? undefined : filterReviewed === "reviewed" };
+  const { data, loading, error, refresh: refreshStats } = useReplayPage(team?.id ?? null, filters);
+  const replays = data?.content ?? [];
+  const sortedReplays = replays;
+  const total = data?.totalElements ?? 0;
+  const totalTeam = data?.totalTeam ?? 0;
 
   const startEditingNote = (replay: Replay) => {
     setEditingNoteId(replay.id);
@@ -62,7 +63,7 @@ export default function GameByGamePage() {
       setTogglingReviewedId(replay.id);
       const next = !replay.reviewed;
       await replayService.update(replay.id, { reviewed: next });
-      updateReplaysLocal([{ id: replay.id, changes: { reviewed: next } }]);
+      refreshStats();
     } catch (error) {
       console.error("Error toggling reviewed status:", error);
     } finally {
@@ -70,65 +71,16 @@ export default function GameByGamePage() {
     }
   };
 
-  const filteredReplays = useMemo(() => {
-    return replays.filter((replay) => {
-      if (searchTags.length > 0 && !matchesPokemonTags(getOpponentPokemonFromReplay(replay), searchTags)) {
-        return false;
-      }
-      if (filterResult !== "all" && replay.result !== filterResult) {
-        return false;
-      }
-      if (filterReviewed === "reviewed" && !replay.reviewed) {
-        return false;
-      }
-      if (filterReviewed === "unreviewed" && replay.reviewed) {
-        return false;
-      }
-      return true;
-    });
-  }, [replays, searchTags, filterResult, filterReviewed]);
-
   const bulkSetReviewed = async (reviewed: boolean) => {
-    if (filteredReplays.length === 0 || bulkUpdating) return;
+    if (!team || !total || bulkUpdating) return;
     try {
       setBulkUpdating(true);
-      const targets = filteredReplays.map((r) => r.id);
-      await Promise.all(
-        targets.map((id) => replayService.update(id, { reviewed }))
-      );
-      updateReplaysLocal(targets.map((id) => ({ id, changes: { reviewed } })));
+      await replayApi.setReviewed(team.id, filters, reviewed);
+      refreshStats();
     } catch (error) {
       console.error("Error bulk updating reviewed status:", error);
-    } finally {
-      setBulkUpdating(false);
-    }
+    } finally { setBulkUpdating(false); }
   };
-
-  const sortedReplays = useMemo(() => {
-    return [...filteredReplays].sort((a, b) => {
-      let comparison = 0;
-
-      switch (sortBy) {
-        case "date":
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          break;
-        case "result":
-          if (a.result === b.result) {
-            comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          } else if (a.result === "win") {
-            comparison = -1;
-          } else if (b.result === "win") {
-            comparison = 1;
-          }
-          break;
-        case "opponent":
-          comparison = (a.opponent || "").localeCompare(b.opponent || "");
-          break;
-      }
-
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
-  }, [filteredReplays, sortBy, sortOrder]);
 
   const clearFilters = () => {
     setFilterResult("all");
@@ -136,6 +88,7 @@ export default function GameByGamePage() {
     setSortBy("date");
     setSortOrder("desc");
     setSearchTags([]);
+    setPage(0);
   };
 
   // Loading state
@@ -151,8 +104,10 @@ export default function GameByGamePage() {
     );
   }
 
+  if (error) return <div role="alert">{error} <button onClick={refreshStats}>Retry</button></div>;
+
   // Empty state
-  if (replays.length === 0) {
+  if (totalTeam === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -168,9 +123,9 @@ export default function GameByGamePage() {
     );
   }
 
-  const wins = filteredReplays.filter((r) => r.result === "win").length;
-  const losses = filteredReplays.filter((r) => r.result === "loss").length;
-  const winRate = filteredReplays.length > 0 ? Math.round((wins / filteredReplays.length) * 100) : 0;
+  const wins = data?.wins ?? 0;
+  const losses = data?.losses ?? 0;
+  const winRate = total ? Math.round(wins / total * 100) : 0;
 
   return (
     <>
@@ -181,7 +136,7 @@ export default function GameByGamePage() {
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Game by Game Analysis</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Showing {filteredReplays.length} of {replays.length} games
+            Showing {total} of {totalTeam} games
           </p>
         </div>
 
@@ -192,7 +147,7 @@ export default function GameByGamePage() {
             <Filter className="h-4 w-4 text-gray-400" />
             <select
               value={filterResult}
-              onChange={(e) => setFilterResult(e.target.value)}
+              onChange={(e) => { setFilterResult(e.target.value); setPage(0); }}
               className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 focus:border-brand-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             >
               <option value="all">All Results</option>
@@ -205,7 +160,7 @@ export default function GameByGamePage() {
           <div className="flex items-center gap-2">
             <select
               value={filterReviewed}
-              onChange={(e) => setFilterReviewed(e.target.value)}
+              onChange={(e) => { setFilterReviewed(e.target.value); setPage(0); }}
               className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 focus:border-brand-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             >
               <option value="all">All Reviewed Status</option>
@@ -218,7 +173,7 @@ export default function GameByGamePage() {
           <div className="flex items-center gap-2">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
               className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 focus:border-brand-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
             >
               <option value="date">Sort by Date</option>
@@ -240,8 +195,10 @@ export default function GameByGamePage() {
 
       {/* Tag filter */}
       <div className="mb-4">
-        <TagInput tags={searchTags} onTagsChange={setSearchTags} placeholder="Filter by opponent Pokemon..." />
+        <TagInput tags={searchTags} onTagsChange={(tags) => { setSearchTags(tags); setPage(0); }} placeholder="Filter by opponent Pokemon..." />
       </div>
+
+      <ReplayPagination page={data?.page ?? 0} size={data?.size ?? 25} total={total} onPage={setPage} />
 
       {/* Games List */}
       {sortedReplays.length === 0 ? (
@@ -277,14 +234,14 @@ export default function GameByGamePage() {
       )}
 
       {/* Summary Stats */}
-      {filteredReplays.length > 0 && (
+      {total > 0 && (
         <div className="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
           <h4 className="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
             {filterResult === "all" ? "Overall" : filterResult === "win" ? "Wins" : "Losses"} Summary
           </h4>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800/50">
-              <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{filteredReplays.length}</p>
+              <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{total}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">Total Games</p>
             </div>
             <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800/50">
@@ -310,26 +267,26 @@ export default function GameByGamePage() {
             Bulk update reviewed status
           </h4>
           <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
-            Applies to the {filteredReplays.length} replay{filteredReplays.length === 1 ? "" : "s"} currently visible after filters above.
+            Applies to the {total} replay{total === 1 ? "" : "s"} matching the filters across all pages.
           </p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => bulkSetReviewed(true)}
-              disabled={bulkUpdating || filteredReplays.length === 0}
+              disabled={bulkUpdating || total === 0}
               className="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <CheckCircle2 className="h-4 w-4" />
-              {bulkUpdating ? "Updating..." : "Mark visible as Reviewed"}
+              {bulkUpdating ? "Updating..." : "Mark filtered as Reviewed"}
             </button>
             <button
               type="button"
               onClick={() => bulkSetReviewed(false)}
-              disabled={bulkUpdating || filteredReplays.length === 0}
+              disabled={bulkUpdating || total === 0}
               className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               <RotateCcw className="h-4 w-4" />
-              {bulkUpdating ? "Updating..." : "Reset visible to Unreviewed"}
+              {bulkUpdating ? "Updating..." : "Reset filtered to Unreviewed"}
             </button>
           </div>
         </div>

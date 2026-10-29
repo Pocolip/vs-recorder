@@ -1,7 +1,3 @@
-import maData from "./tournamentTeams-regM-A.json";
-import mbData from "./tournamentTeams-regM-B.json";
-import mcData from "./tournamentTeams-regM-C.json";
-
 export interface TournamentInnerTeam {
   name: string;
   placement: number | null;
@@ -40,15 +36,15 @@ export interface TournamentTeamsData {
 // Team.regulation is stored as the verbatim NewTeamModal string
 // (e.g. "VGC 2026 Regulation M-A"), so we match on a regex of the
 // trailing regulation code rather than an exact equality check.
-const REGISTRY: Array<{ match: RegExp; data: TournamentTeamsData }> = [
-  { match: /Regulation\s+M-A\b/i, data: maData as TournamentTeamsData },
-  { match: /Regulation\s+M-B\b/i, data: mbData as TournamentTeamsData },
-  { match: /Regulation\s+M-C\b/i, data: mcData as TournamentTeamsData },
+const REGISTRY = [
+  { match: /Regulation\s+M-A\b/i, load: () => import("./tournamentTeams-regM-A.json") },
+  { match: /Regulation\s+M-B\b/i, load: () => import("./tournamentTeams-regM-B.json") },
+  { match: /Regulation\s+M-C\b/i, load: () => import("./tournamentTeams-regM-C.json") },
 ];
 
-export function getTournamentTeamsForRegulation(
+export async function getTournamentTeamsForRegulation(
   regulation: string | null | undefined,
-): TournamentTeamsData | null {
-  if (!regulation) return null;
-  return REGISTRY.find((r) => r.match.test(regulation))?.data ?? null;
+): Promise<TournamentTeamsData | null> {
+  const entry = regulation ? REGISTRY.find((entry) => entry.match.test(regulation)) : null;
+  return entry ? (await entry.load()).default as TournamentTeamsData : null;
 }

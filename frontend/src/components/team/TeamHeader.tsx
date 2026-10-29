@@ -1,10 +1,10 @@
+import { lazy } from "react";
 import React, { useState, useEffect } from "react";
 import { Plus, ChevronUp, ChevronDown, Users } from "lucide-react";
 import { useActiveTeam } from "../../context/ActiveTeamContext";
-import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import PermissionGate from "../auth/PermissionGate";
-import AddReplayModal from "../modals/AddReplayModal";
+const AddReplayModal = lazy(() => import("../modals/AddReplayModal"));
 import { formatShortDate } from "../../utils/timeUtils";
 
 const STORAGE_KEY = "vs-recorder-team-header-collapsed";
@@ -16,14 +16,8 @@ function shortRegulation(reg: string): string {
 
 const TeamHeader: React.FC = () => {
   const { team, bumpStatsVersion } = useActiveTeam();
-  const {
-    gamesPlayed,
-    wins,
-    losses,
-    winRate,
-    loading: statsLoading,
-    refreshStats,
-  } = useTeamStats(team?.id ?? null);
+  const { totalGames: gamesPlayed = 0, wins = 0, losses = 0, winRate = 0 } = team?.stats ?? {};
+  const statsLoading = !team?.stats;
 
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -46,7 +40,6 @@ const TeamHeader: React.FC = () => {
   if (!team) return null;
 
   const handleReplayAdded = () => {
-    refreshStats();
     bumpStatsVersion();
   };
 
@@ -100,12 +93,12 @@ const TeamHeader: React.FC = () => {
           </div>
         </div>
 
-        <AddReplayModal
+        {showAddReplay && <AddReplayModal
           isOpen={showAddReplay}
           onClose={() => setShowAddReplay(false)}
           onAdded={handleReplayAdded}
           teamId={team.id}
-        />
+        />}
       </>
     );
   }
@@ -205,12 +198,12 @@ const TeamHeader: React.FC = () => {
         </div>
       </div>
 
-      <AddReplayModal
+      {showAddReplay && <AddReplayModal
         isOpen={showAddReplay}
         onClose={() => setShowAddReplay(false)}
         onAdded={handleReplayAdded}
         teamId={team.id}
-      />
+      />}
     </>
   );
 };

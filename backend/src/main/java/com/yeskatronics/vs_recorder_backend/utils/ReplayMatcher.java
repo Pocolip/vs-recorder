@@ -179,6 +179,7 @@ public class ReplayMatcher {
     }
 
     @Data
+    @lombok.NoArgsConstructor
     public static class TeraEvent {
         private String pokemon;
         private String type;
@@ -190,6 +191,7 @@ public class ReplayMatcher {
     }
 
     @Data
+    @lombok.NoArgsConstructor
     public static class MegaEvent {
         private String pokemon;     // Team-roster entry (e.g., "Charizard")
         private String megaForme;   // Resulting forme (e.g., "Charizard-Mega-Y")
@@ -201,6 +203,7 @@ public class ReplayMatcher {
     }
 
     @Data
+    @lombok.NoArgsConstructor
     public static class EloChange {
         private Integer before;
         private Integer after;
