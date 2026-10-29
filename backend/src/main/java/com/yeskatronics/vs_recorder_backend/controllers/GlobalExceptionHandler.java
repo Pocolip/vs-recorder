@@ -84,6 +84,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
+    @ExceptionHandler(com.yeskatronics.vs_recorder_backend.exceptions.UpstreamUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleUpstreamUnavailable(
+            com.yeskatronics.vs_recorder_backend.exceptions.UpstreamUnavailableException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "5").body(
+                new ErrorResponse(503, "Service Unavailable", ex.getMessage(),
+                        request.getDescription(false).replace("uri=", "")));
+    }
+
     /**
      * Handle generic exceptions
      */

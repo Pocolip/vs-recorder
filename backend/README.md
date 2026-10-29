@@ -253,3 +253,7 @@ Response:
 **Docker build fails:**
 - Ensure you're in the `backend/` directory
 - Check Maven can download dependencies: `mvn dependency:resolve`
+
+### External request limits
+
+The shared HTTP client uses a 5-second connection timeout and a 15-second read-inactivity timeout for Showdown and paste providers. These bound connection/read stalls, not a continuously streaming response's total duration. Replay imports fetch outside persistence transactions, recheck access and current team identification after fetching, and serialize same-team inserts while retaining the unique URL/team constraint. Temporary Showdown network/server failures return HTTP 503 with `Retry-After: 5`.

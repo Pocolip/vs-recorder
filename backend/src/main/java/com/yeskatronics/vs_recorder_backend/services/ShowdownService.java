@@ -44,10 +44,12 @@ public class ShowdownService {
      * when both players were registered usernames on the same team (issue #160).
      */
     public ShowdownDTO.ReplayData fetchReplayData(String replayUrl, Team team) {
-        log.info("Fetching replay data from: {}", replayUrl);
+        return parseReplayData(fetchRawReplay(replayUrl), team);
+    }
 
+    public ShowdownDTO.ReplayData parseReplayData(String battleLog, Team team) {
         try {
-            ParsedReplay parsed = fetchAndParse(replayUrl, team);
+            ParsedReplay parsed = parseReplay(battleLog, team);
 
             String userUsername = parsed.id.userUsername();
             String opponentUsername = parsed.id.opponentUsername();
@@ -114,6 +116,8 @@ public class ShowdownService {
             return new ShowdownDTO.ReplayPreview(
                     replayUrl, opponentUsername, result, userTeam, matchesTeam, identified);
 
+        } catch (com.yeskatronics.vs_recorder_backend.exceptions.UpstreamUnavailableException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error previewing replay data: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Failed to fetch or parse replay data: " + e.getMessage());
@@ -154,24 +158,22 @@ public class ShowdownService {
     }
 
     private ParsedReplay fetchAndParse(String replayUrl, Team team) throws Exception {
+        return parseReplay(fetchRawReplay(replayUrl), team);
+    }
+
+    public String fetchRawReplay(String replayUrl) {
         Matcher matcher = REPLAY_URL_PATTERN.matcher(replayUrl);
-        if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid Pokemon Showdown replay URL");
+        if (!matcher.find()) throw new IllegalArgumentException("Invalid Pokemon Showdown replay URL");
+        try {
+            String json = restTemplate.getForObject(SHOWDOWN_REPLAY_BASE + "/" + matcher.group(1) + ".json", String.class);
+            if (json == null || json.isBlank()) throw new IllegalArgumentException("Empty replay response");
+            return json;
+        } catch (org.springframework.web.client.ResourceAccessException | org.springframework.web.client.HttpServerErrorException ex) {
+            throw new com.yeskatronics.vs_recorder_backend.exceptions.UpstreamUnavailableException(ex);
         }
+    }
 
-        String battleId = matcher.group(1);
-        String jsonUrl = SHOWDOWN_REPLAY_BASE + "/" + battleId + ".json";
-
-        long startTime = System.currentTimeMillis();
-        log.debug("Fetching from: {}", jsonUrl);
-        String jsonResponse = restTemplate.getForObject(jsonUrl, String.class);
-        long fetchDuration = System.currentTimeMillis() - startTime;
-        log.info("Fetched replay JSON from Showdown in {}ms", fetchDuration);
-
-        if (jsonResponse == null || jsonResponse.isEmpty()) {
-            throw new IllegalArgumentException("Failed to fetch replay data");
-        }
-
+    private ParsedReplay parseReplay(String jsonResponse, Team team) throws Exception {
         JsonNode root = objectMapper.readTree(jsonResponse);
         String battleLog = jsonResponse;
 
