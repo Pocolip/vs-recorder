@@ -1,0 +1,144 @@
+/**
+ * LabMaus source for the Recent Tour data (`--source=labmaus`).
+ *
+ * Fetches pre-clustered top teams from labmaus.net's public top_teams
+ * endpoint. Moved verbatim from generate-tournament-teams.js when direct
+ * Limitless + Reportworm ingestion became the default; kept as a fallback.
+ */
+
+import { execFileSync } from "child_process";
+
+// LabMaus ships this bearer in their public SPA bundle — it is not a secret,
+// every visitor receives it. We treat it as a public anonymous API key.
+// If LabMaus rotates it, this script will start failing with 403; copy the
+// new value from their bundle (`Discord.Api_Key`) and re-run.
+const LABMAUS_TOKEN = "X:F3mz5e4SP6Rcl3co!ou:8y";
+
+// LabMaus returns every individual tournament submission per cluster (often
+// 50–100). The UI lists them inline; keeping that many is both wasteful in
+// bundle size and unhelpful in the browse experience. LabMaus already sorts
+// them by score, so the head of the list is the most representative.
+const MAX_INNER_TEAMS_PER_CLUSTER = 20;
+
+function isPokepasteUrl(url) {
+  return typeof url === "string" && /^https?:\/\/(www\.)?pokepast\.es\//.test(url);
+}
+
+// LabMaus encodes gender forms as Unicode "♂"/"♀" suffixes (e.g. "Basculegion ♂").
+// Our Pokemon registry uses Showdown-style "-M"/"-F" suffixes, which already
+// have alias coverage in scripts/pokemon-aliases.json. Normalize at the source
+// so the frontend doesn't need to know about the Unicode form.
+function normalizePokemonName(name) {
+  if (typeof name !== "string") return name;
+  return name.replace(/\s*♂$/u, "-M").replace(/\s*♀$/u, "-F");
+}
+
+function normalizeNames(names) {
+  return Array.isArray(names) ? names.map(normalizePokemonName) : [];
+}
+
+// Reject schema drift before it can replace a usable dataset with empty or
+// malformed entries. Extra upstream fields are fine; validate what we consume.
+export function validateTopTeams(raw) {
+  function expect(condition, path, shape) {
+    if (!condition) throw new Error(`Invalid LabMaus response at ${path}: expected ${shape}`);
+  }
+  const strings = (value, size) => Array.isArray(value) && value.length === size &&
+    value.every((entry) => typeof entry === "string" && entry.trim().length > 0);
+  const count = (value) => Number.isInteger(value) && value >= 0;
+  expect(Array.isArray(raw) && raw.length > 0, "$", "non-empty composition array");
+  const sizes = new Set();
+  let usableTeams = 0;
+  raw.forEach((bucket, i) => {
+    const path = `$[${i}]`;
+    expect(bucket && [4, 5, 6].includes(bucket.composition), path, "composition 4, 5, or 6");
+    expect(!sizes.has(bucket.composition), path, "unique composition");
+    sizes.add(bucket.composition);
+    expect(Array.isArray(bucket.teams), `${path}.teams`, "cluster array");
+    bucket.teams.forEach((cluster, j) => {
+      const cp = `${path}.teams[${j}]`;
+      expect(cluster && strings(cluster.pokemon, bucket.composition), `${cp}.pokemon`, "composition-sized Pokémon ID array");
+      expect(strings(cluster.pokemon_names, bucket.composition), `${cp}.pokemon_names`, "composition-sized Pokémon name array");
+      for (const field of ["wins", "losses"]) {
+        expect(count(cluster[field]), `${cp}.${field}`, "non-negative integer");
+      }
+      expect(Array.isArray(cluster.teams), `${cp}.teams`, "team array");
+      cluster.teams.forEach((team, k) => {
+        const tp = `${cp}.teams[${k}]`;
+        expect(team && strings(team.pokemon_names, 6), `${tp}.pokemon_names`, "six Pokémon names");
+        for (const field of ["name", "record", "tournament_name", "team_url"]) {
+          expect(team[field] == null || typeof team[field] === "string", `${tp}.${field}`, "string or null");
+        }
+        expect(team.placement == null || count(team.placement), `${tp}.placement`, "integer or null");
+        if (isPokepasteUrl(team.team_url)) usableTeams++;
+      });
+    });
+  });
+  expect(usableTeams > 0, "$", "at least one team with a Poképaste URL (refusing to overwrite with empty data)");
+}
+
+function trimInnerTeam(team) {
+  return {
+    name: team.name ?? "",
+    placement: team.placement ?? null,
+    record: team.record ?? "",
+    pokemonNames: normalizeNames(team.pokemon_names),
+    pokepasteUrl: team.team_url,
+    tournamentName: team.tournament_name ?? "",
+  };
+}
+
+export function trimCluster(cluster) {
+  const teams = Array.isArray(cluster.teams)
+    ? cluster.teams
+        .filter((t) => isPokepasteUrl(t.team_url))
+        .slice(0, MAX_INNER_TEAMS_PER_CLUSTER)
+        .map(trimInnerTeam)
+    : [];
+
+  return {
+    pokemon: Array.isArray(cluster.pokemon) ? cluster.pokemon : [],
+    pokemonNames: normalizeNames(cluster.pokemon_names),
+    wins: cluster.wins ?? 0,
+    losses: cluster.losses ?? 0,
+    teams,
+  };
+}
+
+// Use curl for the HTTP request. Node's `fetch` trips over corporate
+// MITM TLS proxies on some dev machines (UNABLE_TO_VERIFY_LEAF_SIGNATURE);
+// curl honors the system trust store and "just works" on every platform
+// we care about (macOS + Linux). The script is run manually by developers,
+// so the curl dependency is fine.
+export function fetchTopTeams(labmausRegulation, dateRange) {
+  const url = new URL("https://labmaus.net/api/top_teams");
+  url.searchParams.set("regulation", labmausRegulation);
+  url.searchParams.set("date_range", `${dateRange.from} to ${dateRange.to}`);
+  url.searchParams.set("language", "en");
+
+  const stdout = execFileSync(
+    "curl",
+    [
+      "-sSf",
+      "--max-time", "60",
+      "-H", `authorization: Bearer ${LABMAUS_TOKEN}`,
+      url.toString(),
+    ],
+    { encoding: "utf8", maxBuffer: 50 * 1024 * 1024 },
+  );
+
+  return JSON.parse(stdout);
+}
+
+export function buildCompositions(raw) {
+  validateTopTeams(raw);
+
+  return raw
+    .map((bucket) => ({
+      size: bucket.composition,
+      clusters: Array.isArray(bucket.teams) ? bucket.teams.map(trimCluster) : [],
+    }))
+    .filter((c) => typeof c.size === "number")
+    .sort((a, b) => a.size - b.size);
+}
+

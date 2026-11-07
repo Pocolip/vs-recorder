@@ -1,22 +1,40 @@
 name: Weekly Data Refresh
 
-# Pulls the latest NCP gen-10 setdex and LabMaus top-teams data once a week
+# Pulls the latest NCP gen-10 setdex and recent tournament teams once a week
 # and opens a single create-or-update PR against develop for review. Speed
 # tier JSONs are not refreshed here — regenerate them locally when a
 # regulation species list changes (see CLAUDE.md "Speed Tier Data").
+#
+# Tournament teams source (see CLAUDE.md "Automated weekly refresh"):
+#   direct  — Limitless API + Reportworm (default)
+#   labmaus — LabMaus top_teams
+# Manual runs pick it from the dispatch dropdown; scheduled runs use the repo
+# variable TOURNAMENT_TEAMS_SOURCE (Settings → Variables), defaulting to direct.
 
 on:
   schedule:
     - cron: '0 16 * * 1'   # Mondays 16:00 UTC (9am PT / 12pm ET)
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Tournament teams source
+        type: choice
+        options: [direct, labmaus]
+        default: direct
 
 permissions:
   contents: write
   pull-requests: write
 
+env:
+  TOURNAMENT_TEAMS_SOURCE: ${{ inputs.source || vars.TOURNAMENT_TEAMS_SOURCE || 'direct' }}
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # A cold keyless direct run spends ~30 min inside Limitless' 50 req / 5 min
+    # limit; with the LIMITLESS_API_KEY secret it takes a couple of minutes.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,6 +55,7 @@ jobs:
         run: node scripts/update-setdex-gen10.js
 
       - name: Prep CA bundle for labmaus.net
+        if: env.TOURNAMENT_TEAMS_SOURCE == 'labmaus'
         # labmaus.net's TLS server only sends its leaf cert. macOS curl does
         # AIA fetching of the missing intermediate; Linux curl does not. Pull
         # the Sectigo intermediate the leaf cert advertises and append it to
@@ -48,11 +67,34 @@ jobs:
           cat /etc/ssl/certs/ca-certificates.crt /tmp/sectigo-intermediate.pem > /tmp/ca-bundle.pem
           echo "CURL_CA_BUNDLE=/tmp/ca-bundle.pem" >> "$GITHUB_ENV"
 
-      - name: Validate LabMaus ingestion
-        run: node --test scripts/generate-tournament-teams.test.js
+      - name: Validate tournament ingestion
+        run: node --test scripts/generate-tournament-teams.test.js 'scripts/tournament-teams/*.test.js'
 
-      - name: Refresh tournament teams (LabMaus)
-        run: node scripts/generate-tournament-teams.js
+      - name: Restore tournament fetch cache
+        # Finished Limitless events never change; reusing last run's
+        # standings means only new events cost API calls.
+        if: env.TOURNAMENT_TEAMS_SOURCE == 'direct'
+        uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/tournament-teams
+          key: tournament-teams-${{ github.run_id }}
+          restore-keys: tournament-teams-
+
+      - name: Refresh tournament teams (${{ env.TOURNAMENT_TEAMS_SOURCE }})
+        env:
+          # Optional. Raises Limitless' 50 req / 5 min keyless limit; sent as
+          # the X-Access-Key header. Without it the run still works, just slower.
+          LIMITLESS_API_KEY: ${{ secrets.LIMITLESS_API_KEY }}
+        run: node scripts/generate-tournament-teams.js --source="$TOURNAMENT_TEAMS_SOURCE"
+
+      - name: Save tournament fetch cache
+        # Saved even when the refresh fails or times out, so a partial cold
+        # fetch isn't thrown away.
+        if: always() && env.TOURNAMENT_TEAMS_SOURCE == 'direct'
+        uses: actions/cache/save@v4
+        with:
+          path: scripts/.cache/tournament-teams
+          key: tournament-teams-${{ github.run_id }}
 
       - name: Open or update PR
         uses: peter-evans/create-pull-request@v6
@@ -68,7 +110,7 @@ jobs:
 
             **Possible changes:**
             - `frontend/src/data/setdex-gen10.ts` — pulled from [Nerd-of-Now/NCP-VGC-Damage-Calculator](https://github.com/Nerd-of-Now/NCP-VGC-Damage-Calculator/blob/master/script_res/setdex_ncp-g10.js) (used by the damage calculator's preset-sets dropdown)
-            - `frontend/src/data/tournamentTeams-regM-C.json` — pulled from [labmaus.net](https://labmaus.net) (last 60 days, Reg M-C)
+            - `frontend/src/data/tournamentTeams-regM-C.json` — last 60 days of Reg M-C teams, source: `${{ env.TOURNAMENT_TEAMS_SOURCE }}` (`direct` = [Limitless](https://play.limitlesstcg.com) + [Reportworm](https://standings.reportworm.com); `labmaus` = [labmaus.net](https://labmaus.net))
 
             If none of the upstream sources changed, this PR will not be opened.
 

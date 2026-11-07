@@ -95,6 +95,7 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
   const [isAddingPlan, setIsAddingPlan] = useState(false);
 
   const teamColor = COLOR_OPTIONS[opponentTeam.color] || COLOR_OPTIONS.blue;
+  const isInlineSheet = pokepasteService.isInlinePaste(opponentTeam.pokepaste);
 
   useEffect(() => {
     const fetchTitle = async () => {
@@ -198,7 +199,7 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
                 ? "Loading..."
                 : pasteTitle || "Matchup Team"}
             </h3>
-            {opponentTeam.pokepaste && (
+            {opponentTeam.pokepaste && !isInlineSheet && (
               <a
                 href={opponentTeam.pokepaste}
                 target="_blank"
@@ -269,15 +270,26 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
             <div className="space-y-2">
               <div>
                 <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
-                  Pokepaste URL
+                  {isInlineSheet ? "Team sheet" : "Pokepaste URL"}
                 </label>
-                <input
-                  type="text"
-                  value={editedPokepaste}
-                  onChange={(e) => setEditedPokepaste(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
-                  placeholder="https://pokepast.es/..."
-                />
+                {isInlineSheet ? (
+                  // Imported from an open teamsheet (Recent Tour): the paste
+                  // text itself is stored, not a link.
+                  <textarea
+                    rows={8}
+                    value={editedPokepaste}
+                    onChange={(e) => setEditedPokepaste(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 font-mono text-xs text-gray-800 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={editedPokepaste}
+                    onChange={(e) => setEditedPokepaste(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-300 focus:outline-none dark:border-gray-700 dark:text-white/90 dark:placeholder-gray-500"
+                    placeholder="https://pokepast.es/..."
+                  />
+                )}
               </div>
               <div>
                 <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">

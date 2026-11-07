@@ -1,0 +1,1224 @@
+{
+ "event": {
+  "name": "Gdańsk Regional",
+  "code": "gdansk",
+  "region": "Europe",
+  "country": "Poland",
+  "flag": "pl",
+  "start": "2026-10-31",
+  "end": "2026-11-01",
+  "tz": "Europe/Warsaw",
+  "game": "Champions",
+  "format": "Regulation M-C",
+  "rules": {
+   "mega": true,
+   "zmoves": false,
+   "dynamax": false,
+   "tera": false,
+   "restricted": 0,
+   "natures": true
+  },
+  "processed": true,
+  "dates": "Oct. 31 - Nov. 1, 2026",
+  "points": 256,
+  "playerCount": 758,
+  "phase2Count": 110,
+  "cutCount": 14,
+  "earn_points": true,
+  "status": "complete",
+  "winner": "Javier Varela",
+  "winner_flag": "es"
+ },
+ "standings": {
+  "javier-varela": {
+   "name": "Javier Varela",
+   "code": "javier-varela",
+   "country": "es",
+   "place": 1,
+   "record": {
+    "w": 14,
+    "l": 2,
+    "t": 0
+   },
+   "res": {
+    "self": 0.8333333333333334,
+    "opp": 0.673611111111111,
+    "oppopp": 0.6101096530784031
+   },
+   "cut": true,
+   "p2": true,
+   "drop": -1,
+   "points": 350,
+   "team": [
+    {
+     "name": "Gholdengo",
+     "code": "gholdengo",
+     "altname": "Gholdengo",
+     "altcode": "",
+     "dex": 1000,
+     "ptype": "steel",
+     "stype": "ghost",
+     "tera": null,
+     "ability": "Good as Gold",
+     "nature": "Modest",
+     "item": "Life Orb",
+     "itemcode": "lifeorb",
+     "moves": [
+      {
+       "name": "Shadow Ball",
+       "type": "ghost"
+      },
+      {
+       "name": "Make It Rain",
+       "type": "steel"
+      },
+      {
+       "name": "Nasty Plot",
+       "type": "dark"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Excadrill",
+     "code": "excadrill",
+     "altname": "Excadrill",
+     "altcode": "",
+     "dex": 530,
+     "ptype": "ground",
+     "stype": "steel",
+     "tera": null,
+     "ability": "Sand Rush",
+     "nature": "Adamant",
+     "item": "Focus Sash",
+     "itemcode": "focussash",
+     "moves": [
+      {
+       "name": "High Horsepower",
+       "type": "ground"
+      },
+      {
+       "name": "Iron Head",
+       "type": "steel"
+      },
+      {
+       "name": "Rock Slide",
+       "type": "rock"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Tyranitar",
+     "code": "tyranitar",
+     "altname": "Tyranitar-Mega",
+     "altcode": "tyranitarmega",
+     "dex": 10049,
+     "ptype": "rock",
+     "stype": "dark",
+     "tera": null,
+     "ability": "Sand Stream",
+     "nature": "Jolly",
+     "item": "Tyranitarite",
+     "itemcode": "tyranitarite",
+     "moves": [
+      {
+       "name": "Rock Slide",
+       "type": "rock"
+      },
+      {
+       "name": "Knock Off",
+       "type": "dark"
+      },
+      {
+       "name": "Dragon Dance",
+       "type": "dragon"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Staraptor",
+     "code": "staraptor",
+     "altname": "Staraptor-Mega",
+     "altcode": "staraptormega",
+     "dex": 10308,
+     "ptype": "normal",
+     "stype": "flying",
+     "tera": null,
+     "ability": "Intimidate",
+     "nature": "Jolly",
+     "item": "Staraptite",
+     "itemcode": "staraptite",
+     "moves": [
+      {
+       "name": "Brave Bird",
+       "type": "flying"
+      },
+      {
+       "name": "Close Combat",
+       "type": "fighting"
+      },
+      {
+       "name": "Tailwind",
+       "type": "flying"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Sinistcha",
+     "code": "sinistcha",
+     "altname": "Sinistcha",
+     "altcode": "",
+     "dex": 1013,
+     "ptype": "grass",
+     "stype": "ghost",
+     "tera": null,
+     "ability": "Hospitality",
+     "nature": "Bold",
+     "item": "Rocky Helmet",
+     "itemcode": "rockyhelmet",
+     "moves": [
+      {
+       "name": "Matcha Gotcha",
+       "type": "grass"
+      },
+      {
+       "name": "Strength Sap",
+       "type": "grass"
+      },
+      {
+       "name": "Rage Powder",
+       "type": "bug"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Milotic",
+     "code": "milotic",
+     "altname": "Milotic",
+     "altcode": "",
+     "dex": 350,
+     "ptype": "water",
+     "stype": "",
+     "tera": null,
+     "ability": "Competitive",
+     "nature": "Calm",
+     "item": "Sitrus Berry",
+     "itemcode": "sitrusberry",
+     "moves": [
+      {
+       "name": "Scald",
+       "type": "water"
+      },
+      {
+       "name": "Ice Beam",
+       "type": "ice"
+      },
+      {
+       "name": "Icy Wind",
+       "type": "ice"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    }
+   ],
+   "rounds": [
+    {
+     "round": 16,
+     "rname": "Finals",
+     "opp": "jude-gerard-lee-wei-cong",
+     "res": "W",
+     "tbl": 22,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    },
+    {
+     "round": 15,
+     "rname": "Top 4",
+     "opp": "michael-kelsch",
+     "res": "W",
+     "tbl": 22,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    }
+   ]
+  },
+  "jude-gerard-lee-wei-cong": {
+   "name": "Jude Gerard Lee Wei Cong",
+   "code": "jude-gerard-lee-wei-cong",
+   "country": "sg",
+   "place": 2,
+   "record": {
+    "w": 13,
+    "l": 3,
+    "t": 0
+   },
+   "res": {
+    "self": 0.8333333333333334,
+    "opp": 0.6491251803751804,
+    "oppopp": 0.615269598427066
+   },
+   "cut": true,
+   "p2": true,
+   "drop": -1,
+   "points": 325,
+   "team": [
+    {
+     "name": "Garchomp",
+     "code": "garchomp",
+     "altname": "Garchomp-Mega",
+     "altcode": "garchompmega",
+     "dex": 10058,
+     "ptype": "dragon",
+     "stype": "ground",
+     "tera": null,
+     "ability": "Rough Skin",
+     "nature": "Adamant",
+     "item": "Garchompite",
+     "itemcode": "garchompite",
+     "moves": [
+      {
+       "name": "Stomping Tantrum",
+       "type": "ground"
+      },
+      {
+       "name": "Scale Shot",
+       "type": "dragon"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      },
+      {
+       "name": "Rock Slide",
+       "type": "rock"
+      }
+     ]
+    },
+    {
+     "name": "Sneasler",
+     "code": "sneasler",
+     "altname": "Sneasler",
+     "altcode": "",
+     "dex": 903,
+     "ptype": "fighting",
+     "stype": "poison",
+     "tera": null,
+     "ability": "Poison Touch",
+     "nature": "Jolly",
+     "item": "Focus Sash",
+     "itemcode": "focussash",
+     "moves": [
+      {
+       "name": "Dire Claw",
+       "type": "poison"
+      },
+      {
+       "name": "Fake Out",
+       "type": "normal"
+      },
+      {
+       "name": "Coaching",
+       "type": "fighting"
+      },
+      {
+       "name": "Close Combat",
+       "type": "fighting"
+      }
+     ]
+    },
+    {
+     "name": "Floette-Eternal",
+     "code": "floetteeternal",
+     "altname": "Floette-Mega",
+     "altcode": "floettemega",
+     "dex": 10296,
+     "ptype": "fairy",
+     "stype": "",
+     "tera": null,
+     "ability": "Flower Veil",
+     "nature": "Modest",
+     "item": "Floettite",
+     "itemcode": "floettite",
+     "moves": [
+      {
+       "name": "Dazzling Gleam",
+       "type": "fairy"
+      },
+      {
+       "name": "Draining Kiss",
+       "type": "fairy"
+      },
+      {
+       "name": "Calm Mind",
+       "type": "psychic"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Incineroar",
+     "code": "incineroar",
+     "altname": "Incineroar",
+     "altcode": "",
+     "dex": 727,
+     "ptype": "fire",
+     "stype": "dark",
+     "tera": null,
+     "ability": "Intimidate",
+     "nature": "Sassy",
+     "item": "Sitrus Berry",
+     "itemcode": "sitrusberry",
+     "moves": [
+      {
+       "name": "Flare Blitz",
+       "type": "fire"
+      },
+      {
+       "name": "Fake Out",
+       "type": "normal"
+      },
+      {
+       "name": "Parting Shot",
+       "type": "dark"
+      },
+      {
+       "name": "Helping Hand",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Rillaboom",
+     "code": "rillaboom",
+     "altname": "Rillaboom",
+     "altcode": "",
+     "dex": 812,
+     "ptype": "grass",
+     "stype": "",
+     "tera": null,
+     "ability": "Grassy Surge",
+     "nature": "Adamant",
+     "item": "Miracle Seed",
+     "itemcode": "miracleseed",
+     "moves": [
+      {
+       "name": "Wood Hammer",
+       "type": "grass"
+      },
+      {
+       "name": "High Horsepower",
+       "type": "ground"
+      },
+      {
+       "name": "Fake Out",
+       "type": "normal"
+      },
+      {
+       "name": "Grassy Glide",
+       "type": "grass"
+      }
+     ]
+    },
+    {
+     "name": "Kingambit",
+     "code": "kingambit",
+     "altname": "Kingambit",
+     "altcode": "",
+     "dex": 983,
+     "ptype": "dark",
+     "stype": "steel",
+     "tera": null,
+     "ability": "Defiant",
+     "nature": "Adamant",
+     "item": "Life Orb",
+     "itemcode": "lifeorb",
+     "moves": [
+      {
+       "name": "Kowtow Cleave",
+       "type": "dark"
+      },
+      {
+       "name": "Swords Dance",
+       "type": "normal"
+      },
+      {
+       "name": "Sucker Punch",
+       "type": "dark"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    }
+   ],
+   "rounds": [
+    {
+     "round": 16,
+     "rname": "Finals",
+     "opp": "javier-varela",
+     "res": "L",
+     "tbl": 22,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    },
+    {
+     "round": 15,
+     "rname": "Top 4",
+     "opp": "ko-tsukide",
+     "res": "W",
+     "tbl": 23,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    }
+   ]
+  },
+  "michael-kelsch": {
+   "name": "Michael Kelsch",
+   "code": "michael-kelsch",
+   "country": "de",
+   "place": 3,
+   "record": {
+    "w": 13,
+    "l": 2,
+    "t": 0
+   },
+   "res": {
+    "self": 0.9166666666666666,
+    "opp": 0.7083333333333334,
+    "oppopp": 0.6329064454064454
+   },
+   "cut": true,
+   "p2": true,
+   "drop": -1,
+   "points": 300,
+   "team": [
+    {
+     "name": "Kingambit",
+     "code": "kingambit",
+     "altname": "Kingambit",
+     "altcode": "",
+     "dex": 983,
+     "ptype": "dark",
+     "stype": "steel",
+     "tera": null,
+     "ability": "Defiant",
+     "nature": "Adamant",
+     "item": "Chople Berry",
+     "itemcode": "chopleberry",
+     "moves": [
+      {
+       "name": "Kowtow Cleave",
+       "type": "dark"
+      },
+      {
+       "name": "Iron Head",
+       "type": "steel"
+      },
+      {
+       "name": "Sucker Punch",
+       "type": "dark"
+      },
+      {
+       "name": "Low Kick",
+       "type": "fighting"
+      }
+     ]
+    },
+    {
+     "name": "Sneasler",
+     "code": "sneasler",
+     "altname": "Sneasler",
+     "altcode": "",
+     "dex": 903,
+     "ptype": "fighting",
+     "stype": "poison",
+     "tera": null,
+     "ability": "Unburden",
+     "nature": "Adamant",
+     "item": "White Herb",
+     "itemcode": "whiteherb",
+     "moves": [
+      {
+       "name": "Close Combat",
+       "type": "fighting"
+      },
+      {
+       "name": "Gunk Shot",
+       "type": "poison"
+      },
+      {
+       "name": "Rock Slide",
+       "type": "rock"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Salamence",
+     "code": "salamence",
+     "altname": "Salamence-Mega",
+     "altcode": "salamencemega",
+     "dex": 10089,
+     "ptype": "dragon",
+     "stype": "flying",
+     "tera": null,
+     "ability": "Intimidate",
+     "nature": "Modest",
+     "item": "Salamencite",
+     "itemcode": "salamencite",
+     "moves": [
+      {
+       "name": "Hyper Voice",
+       "type": "normal"
+      },
+      {
+       "name": "Draco Meteor",
+       "type": "dragon"
+      },
+      {
+       "name": "Flamethrower",
+       "type": "fire"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Basculegion",
+     "code": "basculegion",
+     "altname": "Basculegion",
+     "altcode": "",
+     "dex": 902,
+     "ptype": "water",
+     "stype": "ghost",
+     "tera": null,
+     "ability": "Adaptability",
+     "nature": "Jolly",
+     "item": "Life Orb",
+     "itemcode": "lifeorb",
+     "moves": [
+      {
+       "name": "Wave Crash",
+       "type": "water"
+      },
+      {
+       "name": "Last Respects",
+       "type": "ghost"
+      },
+      {
+       "name": "Aqua Jet",
+       "type": "water"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Charizard",
+     "code": "charizard",
+     "altname": "Charizard-Mega-Y",
+     "altcode": "charizardmegay",
+     "dex": 10035,
+     "ptype": "fire",
+     "stype": "flying",
+     "tera": null,
+     "ability": "Blaze",
+     "nature": "Modest",
+     "item": "Charizardite Y",
+     "itemcode": "charizarditey",
+     "moves": [
+      {
+       "name": "Heat Wave",
+       "type": "fire"
+      },
+      {
+       "name": "Weather Ball",
+       "type": "normal"
+      },
+      {
+       "name": "Solar Beam",
+       "type": "grass"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Whimsicott",
+     "code": "whimsicott",
+     "altname": "Whimsicott",
+     "altcode": "",
+     "dex": 547,
+     "ptype": "grass",
+     "stype": "fairy",
+     "tera": null,
+     "ability": "Prankster",
+     "nature": "Timid",
+     "item": "Focus Sash",
+     "itemcode": "focussash",
+     "moves": [
+      {
+       "name": "Moonblast",
+       "type": "fairy"
+      },
+      {
+       "name": "Tailwind",
+       "type": "flying"
+      },
+      {
+       "name": "Encore",
+       "type": "normal"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    }
+   ],
+   "rounds": [
+    {
+     "round": 15,
+     "rname": "Top 4",
+     "opp": "javier-varela",
+     "res": "L",
+     "tbl": 22,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    },
+    {
+     "round": 14,
+     "rname": "Top 8",
+     "opp": "nikola-zirdum",
+     "res": "W",
+     "tbl": 22,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    }
+   ]
+  },
+  "ko-tsukide": {
+   "name": "Ko Tsukide",
+   "code": "ko-tsukide",
+   "country": "gb",
+   "place": 4,
+   "record": {
+    "w": 12,
+    "l": 3,
+    "t": 0
+   },
+   "res": {
+    "self": 0.8333333333333334,
+    "opp": 0.607638888888889,
+    "oppopp": 0.5979636393698894
+   },
+   "cut": true,
+   "p2": true,
+   "drop": -1,
+   "points": 300,
+   "team": [
+    {
+     "name": "Charizard",
+     "code": "charizard",
+     "altname": "Charizard-Mega-Y",
+     "altcode": "charizardmegay",
+     "dex": 10035,
+     "ptype": "fire",
+     "stype": "flying",
+     "tera": null,
+     "ability": "Blaze",
+     "nature": "Modest",
+     "item": "Charizardite Y",
+     "itemcode": "charizarditey",
+     "moves": [
+      {
+       "name": "Heat Wave",
+       "type": "fire"
+      },
+      {
+       "name": "Solar Beam",
+       "type": "grass"
+      },
+      {
+       "name": "Weather Ball",
+       "type": "normal"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Sneasler",
+     "code": "sneasler",
+     "altname": "Sneasler",
+     "altcode": "",
+     "dex": 903,
+     "ptype": "fighting",
+     "stype": "poison",
+     "tera": null,
+     "ability": "Unburden",
+     "nature": "Adamant",
+     "item": "White Herb",
+     "itemcode": "whiteherb",
+     "moves": [
+      {
+       "name": "Close Combat",
+       "type": "fighting"
+      },
+      {
+       "name": "Dire Claw",
+       "type": "poison"
+      },
+      {
+       "name": "Rock Tomb",
+       "type": "rock"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Kingambit",
+     "code": "kingambit",
+     "altname": "Kingambit",
+     "altcode": "",
+     "dex": 983,
+     "ptype": "dark",
+     "stype": "steel",
+     "tera": null,
+     "ability": "Defiant",
+     "nature": "Adamant",
+     "item": "Chople Berry",
+     "itemcode": "chopleberry",
+     "moves": [
+      {
+       "name": "Kowtow Cleave",
+       "type": "dark"
+      },
+      {
+       "name": "Iron Head",
+       "type": "steel"
+      },
+      {
+       "name": "Sucker Punch",
+       "type": "dark"
+      },
+      {
+       "name": "Low Kick",
+       "type": "fighting"
+      }
+     ]
+    },
+    {
+     "name": "Garchomp",
+     "code": "garchomp",
+     "altname": "Garchomp",
+     "altcode": "",
+     "dex": 445,
+     "ptype": "dragon",
+     "stype": "ground",
+     "tera": null,
+     "ability": "Rough Skin",
+     "nature": "Jolly",
+     "item": "Life Orb",
+     "itemcode": "lifeorb",
+     "moves": [
+      {
+       "name": "Earthquake",
+       "type": "ground"
+      },
+      {
+       "name": "Dragon Claw",
+       "type": "dragon"
+      },
+      {
+       "name": "Rock Slide",
+       "type": "rock"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Basculegion",
+     "code": "basculegion",
+     "altname": "Basculegion",
+     "altcode": "",
+     "dex": 902,
+     "ptype": "water",
+     "stype": "ghost",
+     "tera": null,
+     "ability": "Adaptability",
+     "nature": "Adamant",
+     "item": "Mystic Water",
+     "itemcode": "mysticwater",
+     "moves": [
+      {
+       "name": "Wave Crash",
+       "type": "water"
+      },
+      {
+       "name": "Last Respects",
+       "type": "ghost"
+      },
+      {
+       "name": "Aqua Jet",
+       "type": "water"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Whimsicott",
+     "code": "whimsicott",
+     "altname": "Whimsicott",
+     "altcode": "",
+     "dex": 547,
+     "ptype": "grass",
+     "stype": "fairy",
+     "tera": null,
+     "ability": "Prankster",
+     "nature": "Timid",
+     "item": "Focus Sash",
+     "itemcode": "focussash",
+     "moves": [
+      {
+       "name": "Moonblast",
+       "type": "fairy"
+      },
+      {
+       "name": "Encore",
+       "type": "normal"
+      },
+      {
+       "name": "Tailwind",
+       "type": "flying"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    }
+   ],
+   "rounds": [
+    {
+     "round": 15,
+     "rname": "Top 4",
+     "opp": "jude-gerard-lee-wei-cong",
+     "res": "L",
+     "tbl": 23,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    },
+    {
+     "round": 14,
+     "rname": "Top 8",
+     "opp": "alex-soto",
+     "res": "W",
+     "tbl": 24,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    }
+   ]
+  },
+  "liam-chatterjee": {
+   "name": "Liam Chatterjee",
+   "code": "liam-chatterjee",
+   "country": "de",
+   "place": 5,
+   "record": {
+    "w": 12,
+    "l": 2,
+    "t": 0
+   },
+   "res": {
+    "self": 0.9166666666666666,
+    "opp": 0.6458333333333334,
+    "oppopp": 0.6337714947089947
+   },
+   "cut": true,
+   "p2": true,
+   "drop": -1,
+   "points": 280,
+   "team": [
+    {
+     "name": "Floette-Eternal",
+     "code": "floetteeternal",
+     "altname": "Floette-Mega",
+     "altcode": "floettemega",
+     "dex": 10296,
+     "ptype": "fairy",
+     "stype": "",
+     "tera": null,
+     "ability": "Flower Veil",
+     "nature": "Modest",
+     "item": "Floettite",
+     "itemcode": "floettite",
+     "moves": [
+      {
+       "name": "Moonblast",
+       "type": "fairy"
+      },
+      {
+       "name": "Dazzling Gleam",
+       "type": "fairy"
+      },
+      {
+       "name": "Light of Ruin",
+       "type": "fairy"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Indeedee",
+     "code": "indeedee",
+     "altname": "Indeedee",
+     "altcode": "",
+     "dex": 876,
+     "ptype": "psychic",
+     "stype": "normal",
+     "tera": null,
+     "ability": "Psychic Surge",
+     "nature": "Timid",
+     "item": "Focus Sash",
+     "itemcode": "focussash",
+     "moves": [
+      {
+       "name": "Expanding Force",
+       "type": "psychic"
+      },
+      {
+       "name": "Hyper Voice",
+       "type": "normal"
+      },
+      {
+       "name": "Trick Room",
+       "type": "psychic"
+      },
+      {
+       "name": "Imprison",
+       "type": "psychic"
+      }
+     ]
+    },
+    {
+     "name": "Charizard",
+     "code": "charizard",
+     "altname": "Charizard-Mega-Y",
+     "altcode": "charizardmegay",
+     "dex": 10035,
+     "ptype": "fire",
+     "stype": "flying",
+     "tera": null,
+     "ability": "Blaze",
+     "nature": "Modest",
+     "item": "Charizardite Y",
+     "itemcode": "charizarditey",
+     "moves": [
+      {
+       "name": "Heat Wave",
+       "type": "fire"
+      },
+      {
+       "name": "Weather Ball",
+       "type": "normal"
+      },
+      {
+       "name": "Solar Beam",
+       "type": "grass"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    },
+    {
+     "name": "Glimmora",
+     "code": "glimmora",
+     "altname": "Glimmora",
+     "altcode": "",
+     "dex": 970,
+     "ptype": "rock",
+     "stype": "poison",
+     "tera": null,
+     "ability": "Toxic Debris",
+     "nature": "Modest",
+     "item": "Life Orb",
+     "itemcode": "lifeorb",
+     "moves": [
+      {
+       "name": "Sludge Bomb",
+       "type": "poison"
+      },
+      {
+       "name": "Power Gem",
+       "type": "rock"
+      },
+      {
+       "name": "Earth Power",
+       "type": "ground"
+      },
+      {
+       "name": "Spiky Shield",
+       "type": "grass"
+      }
+     ]
+    },
+    {
+     "name": "Garchomp",
+     "code": "garchomp",
+     "altname": "Garchomp",
+     "altcode": "",
+     "dex": 445,
+     "ptype": "dragon",
+     "stype": "ground",
+     "tera": null,
+     "ability": "Rough Skin",
+     "nature": "Adamant",
+     "item": "Choice Scarf",
+     "itemcode": "choicescarf",
+     "moves": [
+      {
+       "name": "Earthquake",
+       "type": "ground"
+      },
+      {
+       "name": "Dragon Claw",
+       "type": "dragon"
+      },
+      {
+       "name": "Rock Slide",
+       "type": "rock"
+      },
+      {
+       "name": "Stomping Tantrum",
+       "type": "ground"
+      }
+     ]
+    },
+    {
+     "name": "Whimsicott",
+     "code": "whimsicott",
+     "altname": "Whimsicott",
+     "altcode": "",
+     "dex": 547,
+     "ptype": "grass",
+     "stype": "fairy",
+     "tera": null,
+     "ability": "Prankster",
+     "nature": "Timid",
+     "item": "Occa Berry",
+     "itemcode": "occaberry",
+     "moves": [
+      {
+       "name": "Moonblast",
+       "type": "fairy"
+      },
+      {
+       "name": "Tailwind",
+       "type": "flying"
+      },
+      {
+       "name": "Encore",
+       "type": "normal"
+      },
+      {
+       "name": "Protect",
+       "type": "normal"
+      }
+     ]
+    }
+   ],
+   "rounds": [
+    {
+     "round": 14,
+     "rname": "Top 8",
+     "opp": "jude-gerard-lee-wei-cong",
+     "res": "L",
+     "tbl": 25,
+     "phase": 3,
+     "bye": 0,
+     "late": 0,
+     "drop": 0
+    },
+    {
+     "round": 13,
+     "rname": "Top Cut",
+     "opp": "",
+     "res": "W",
+     "tbl": 0,
+     "phase": 3,
+     "bye": 1,
+     "late": 0,
+     "drop": 0
+    }
+   ]
+  }
+ }
+}
