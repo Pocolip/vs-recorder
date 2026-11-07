@@ -48,6 +48,18 @@ interface CachedPaste {
 }
 
 /**
+ * True when a stored `pokepaste` value is Showdown paste text rather than a
+ * paste-site URL. Opponent teams imported from open teamsheets (Recent Tour,
+ * direct Limitless/Reportworm data) store the sheet text itself, since those
+ * sources have no pokepaste link.
+ */
+export function isInlinePaste(value: string | null | undefined): boolean {
+  if (!value) return false;
+  const trimmed = value.trim();
+  return !/^https?:\/\//i.test(trimmed) && trimmed.includes("\n");
+}
+
+/**
  * Detect paste service type from URL
  */
 export function detectPasteService(url: string): PasteServiceType | null {
@@ -76,6 +88,11 @@ export async function fetchAndParse(
   pasteUrl: string,
   options?: ParseOptions
 ): Promise<PokemonData[]> {
+  // Inline sheet text needs no network or cache
+  if (isInlinePaste(pasteUrl)) {
+    return parsePokepasteText(pasteUrl.trim(), options);
+  }
+
   // Check cache first
   const cached = await getCachedPokepaste(pasteUrl);
   if (cached && Array.isArray(cached.data) && !isCacheExpired(cached.timestamp)) {
@@ -413,6 +430,7 @@ export async function getCacheStats(): Promise<{
  * proxy since its API blocks browser-origin CORS.
  */
 export async function fetchPasteTitle(pasteUrl: string): Promise<string | null> {
+  if (isInlinePaste(pasteUrl)) return null;
   const detected = detectPasteService(pasteUrl);
   if (!detected) return null;
 

@@ -1,0 +1,607 @@
+{
+ "tournament": {
+  "game": "VGC",
+  "name": "🍋Sitrus-Series🍋|Champions-MC|#81",
+  "date": "2026-11-04T23:00:00.000Z",
+  "format": "M-C",
+  "id": "6ac02d2b85920e4d2536238f",
+  "players": 170,
+  "organizerId": 1468
+ },
+ "standings": [
+  {
+   "name": "Centiskorch18",
+   "country": "US",
+   "decklist": [
+    {
+     "id": "torkoal",
+     "name": "Torkoal",
+     "item": "Leftovers",
+     "ability": "Drought",
+     "attacks": [
+      "Eruption",
+      "Burning Jealousy",
+      "Helping Hand",
+      "Protect"
+     ],
+     "nature": "Quiet",
+     "tera": null
+    },
+    {
+     "id": "venusaur",
+     "name": "Venusaur",
+     "item": "Life Orb",
+     "ability": "Chlorophyll",
+     "attacks": [
+      "Leaf Storm",
+      "Sludge Bomb",
+      "Sleep Powder",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "raichu",
+     "name": "Raichu",
+     "item": "Raichunite Y",
+     "ability": "Lightning Rod",
+     "attacks": [
+      "Zap Cannon",
+      "Focus Blast",
+      "Fake Out",
+      "Protect"
+     ],
+     "nature": "Timid",
+     "tera": null
+    },
+    {
+     "id": "gardevoir",
+     "name": "Gardevoir",
+     "item": "Gardevoirite",
+     "ability": "Telepathy",
+     "attacks": [
+      "Hyper Voice",
+      "Thunderbolt",
+      "Trick Room",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "incineroar",
+     "name": "Incineroar",
+     "item": "Sitrus Berry",
+     "ability": "Intimidate",
+     "attacks": [
+      "Flare Blitz",
+      "Throat Chop",
+      "Fake Out",
+      "Parting Shot"
+     ],
+     "nature": "Impish",
+     "tera": null
+    },
+    {
+     "id": "garchomp",
+     "name": "Garchomp",
+     "item": "Choice Scarf",
+     "ability": "Rough Skin",
+     "attacks": [
+      "Earthquake",
+      "Dragon Claw",
+      "Stomping Tantrum",
+      "Rock Slide"
+     ],
+     "nature": "Adamant",
+     "tera": null
+    }
+   ],
+   "placing": 1,
+   "player": "centiskorch18",
+   "record": {
+    "wins": 10,
+    "losses": 2,
+    "ties": 0
+   },
+   "drop": null,
+   "deck": {}
+  },
+  {
+   "name": "porygon2",
+   "country": null,
+   "decklist": [
+    {
+     "id": "grimmsnarl",
+     "name": "Grimmsnarl",
+     "item": "Light Clay",
+     "ability": "Prankster",
+     "attacks": [
+      "Spirit Break",
+      "Reflect",
+      "Light Screen",
+      "Parting Shot"
+     ],
+     "nature": "Careful",
+     "tera": null
+    },
+    {
+     "id": "pelipper",
+     "name": "Pelipper",
+     "item": "Sitrus Berry",
+     "ability": "Drizzle",
+     "attacks": [
+      "Tailwind",
+      "Wide Guard",
+      "Weather Ball",
+      "Hurricane"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "archaludon",
+     "name": "Archaludon",
+     "item": "Leftovers",
+     "ability": "Levitate",
+     "attacks": [
+      "Electro Shot",
+      "Flash Cannon",
+      "Dragon Pulse",
+      "Snarl"
+     ],
+     "nature": "Calm",
+     "tera": null
+    },
+    {
+     "id": "scovillain",
+     "name": "Scovillain",
+     "item": "Scovillainite",
+     "ability": "Chlorophyll",
+     "attacks": [
+      "Flamethrower",
+      "Leech Seed",
+      "Rage Powder",
+      "Protect"
+     ],
+     "nature": "Calm",
+     "tera": null
+    },
+    {
+     "id": "raichu",
+     "name": "Raichu",
+     "item": "Raichunite Y",
+     "ability": "Lightning Rod",
+     "attacks": [
+      "Fake Out",
+      "Zap Cannon",
+      "Focus Blast",
+      "Protect"
+     ],
+     "nature": "Timid",
+     "tera": null
+    },
+    {
+     "id": "gholdengo",
+     "name": "Gholdengo",
+     "item": "Life Orb",
+     "ability": "Good as Gold",
+     "attacks": [
+      "Make It Rain",
+      "Nasty Plot",
+      "Shadow Ball",
+      "Protect"
+     ],
+     "nature": "Timid",
+     "tera": null
+    }
+   ],
+   "placing": 2,
+   "player": "porygon2",
+   "record": {
+    "wins": 9,
+    "losses": 3,
+    "ties": 0
+   },
+   "drop": null,
+   "deck": {}
+  },
+  {
+   "name": "138mysx",
+   "country": "IT",
+   "decklist": [
+    {
+     "id": "charizard",
+     "name": "Charizard",
+     "item": "Charizardite Y",
+     "ability": "Blaze",
+     "attacks": [
+      "Heat Wave",
+      "Weather Ball",
+      "Solar Beam",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "farigiraf",
+     "name": "Farigiraf",
+     "item": "Sitrus Berry",
+     "ability": "Armor Tail",
+     "attacks": [
+      "Thunderbolt",
+      "Psychic",
+      "Trick Room",
+      "Protect"
+     ],
+     "nature": "Bold",
+     "tera": null
+    },
+    {
+     "id": "aerodactyl",
+     "name": "Aerodactyl",
+     "item": "Aerodactylite",
+     "ability": "Unnerve",
+     "attacks": [
+      "Rock Slide",
+      "Dual Wingbeat",
+      "Tailwind",
+      "Protect"
+     ],
+     "nature": "Jolly",
+     "tera": null
+    },
+    {
+     "id": "kingambit",
+     "name": "Kingambit",
+     "item": "Focus Sash",
+     "ability": "Defiant",
+     "attacks": [
+      "Kowtow Cleave",
+      "Sucker Punch",
+      "Iron Head",
+      "Low Kick"
+     ],
+     "nature": "Adamant",
+     "tera": null
+    },
+    {
+     "id": "garchomp",
+     "name": "Garchomp",
+     "item": "Life Orb",
+     "ability": "Rough Skin",
+     "attacks": [
+      "Dragon Claw",
+      "Stomping Tantrum",
+      "Earthquake",
+      "Protect"
+     ],
+     "nature": "Jolly",
+     "tera": null
+    },
+    {
+     "id": "sylveon",
+     "name": "Sylveon",
+     "item": "Fairy Feather",
+     "ability": "Pixilate",
+     "attacks": [
+      "Hyper Voice",
+      "Hyper Beam",
+      "Quick Attack",
+      "Detect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    }
+   ],
+   "placing": 3,
+   "player": "138mysx",
+   "record": {
+    "wins": 9,
+    "losses": 2,
+    "ties": 0
+   },
+   "drop": null,
+   "deck": {}
+  },
+  {
+   "name": "Stallcelth",
+   "country": "BR",
+   "decklist": [
+    {
+     "id": "whimsicott",
+     "name": "Whimsicott",
+     "item": "Focus Sash",
+     "ability": "Prankster",
+     "attacks": [
+      "Moonblast",
+      "Tailwind",
+      "Encore",
+      "Protect"
+     ],
+     "nature": "Timid",
+     "tera": null
+    },
+    {
+     "id": "floette-eternal",
+     "name": "Eternal Flower Floette",
+     "item": "Floettite",
+     "ability": "Flower Veil",
+     "attacks": [
+      "Moonblast",
+      "Dazzling Gleam",
+      "Light of Ruin",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "farigiraf",
+     "name": "Farigiraf",
+     "item": "Sitrus Berry",
+     "ability": "Armor Tail",
+     "attacks": [
+      "Twin Beam",
+      "Thunderbolt",
+      "Trick Room",
+      "Helping Hand"
+     ],
+     "nature": "Bold",
+     "tera": null
+    },
+    {
+     "id": "basculegion",
+     "name": "Basculegion",
+     "item": "Life Orb",
+     "ability": "Adaptability",
+     "attacks": [
+      "Last Respects",
+      "Wave Crash",
+      "Aqua Jet",
+      "Protect"
+     ],
+     "nature": "Adamant",
+     "tera": null
+    },
+    {
+     "id": "garchomp",
+     "name": "Garchomp",
+     "item": "Garchompite Z",
+     "ability": "Rough Skin",
+     "attacks": [
+      "Dragon Pulse",
+      "Flamethrower",
+      "Power Gem",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "kingambit",
+     "name": "Kingambit",
+     "item": "Chople Berry",
+     "ability": "Defiant",
+     "attacks": [
+      "Kowtow Cleave",
+      "Iron Head",
+      "Low Kick",
+      "Sucker Punch"
+     ],
+     "nature": "Adamant",
+     "tera": null
+    }
+   ],
+   "placing": 7,
+   "player": "stallcelth",
+   "record": {
+    "wins": 7,
+    "losses": 3,
+    "ties": 0
+   },
+   "drop": null,
+   "deck": {}
+  },
+  {
+   "name": "Thegame",
+   "country": "US",
+   "decklist": [
+    {
+     "id": "raichu",
+     "name": "Raichu",
+     "item": "Raichunite Y",
+     "ability": "Lightning Rod",
+     "attacks": [
+      "Fake Out",
+      "Zap Cannon",
+      "Focus Blast",
+      "Protect"
+     ],
+     "nature": "Timid",
+     "tera": null
+    },
+    {
+     "id": "staraptor",
+     "name": "Staraptor",
+     "item": "Staraptite",
+     "ability": "Intimidate",
+     "attacks": [
+      "Close Combat",
+      "Brave Bird",
+      "Tailwind",
+      "Protect"
+     ],
+     "nature": "Jolly",
+     "tera": null
+    },
+    {
+     "id": "rillaboom",
+     "name": "Rillaboom",
+     "item": "Miracle Seed",
+     "ability": "Grassy Surge",
+     "attacks": [
+      "Fake Out",
+      "Wood Hammer",
+      "Grassy Glide",
+      "High Horsepower"
+     ],
+     "nature": "Adamant",
+     "tera": null
+    },
+    {
+     "id": "gholdengo",
+     "name": "Gholdengo",
+     "item": "Life Orb",
+     "ability": "Good as Gold",
+     "attacks": [
+      "Make It Rain",
+      "Shadow Ball",
+      "Nasty Plot",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "arcanine-hisui",
+     "name": "Hisuian Arcanine",
+     "item": "Focus Sash",
+     "ability": "Rock Head",
+     "attacks": [
+      "Head Smash",
+      "Flare Blitz",
+      "Extreme Speed",
+      "Protect"
+     ],
+     "nature": "Jolly",
+     "tera": null
+    },
+    {
+     "id": "primarina",
+     "name": "Primarina",
+     "item": "Leftovers",
+     "ability": "Liquid Voice",
+     "attacks": [
+      "Hyper Voice",
+      "Moonblast",
+      "Calm Mind",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    }
+   ],
+   "placing": 9,
+   "player": "thegame",
+   "record": {
+    "wins": 8,
+    "losses": 1,
+    "ties": 0
+   },
+   "drop": null,
+   "deck": {}
+  },
+  {
+   "name": "okaime",
+   "country": "BR",
+   "decklist": [
+    {
+     "id": "sneasler",
+     "name": "Sneasler",
+     "item": "Focus Sash",
+     "ability": "Poison Touch",
+     "attacks": [
+      "Close Combat",
+      "Poison Jab",
+      "Fake Out",
+      "Quick Guard"
+     ],
+     "nature": "Jolly",
+     "tera": null
+    },
+    {
+     "id": "sinistcha",
+     "name": "Sinistcha",
+     "item": "Colbur Berry",
+     "ability": "Hospitality",
+     "attacks": [
+      "Matcha Gotcha",
+      "Rage Powder",
+      "Trick Room",
+      "Protect"
+     ],
+     "nature": "Relaxed",
+     "tera": null
+    },
+    {
+     "id": "kingambit",
+     "name": "Kingambit",
+     "item": "Life Orb",
+     "ability": "Defiant",
+     "attacks": [
+      "Kowtow Cleave",
+      "Sucker Punch",
+      "Swords Dance",
+      "Protect"
+     ],
+     "nature": "Adamant",
+     "tera": null
+    },
+    {
+     "id": "incineroar",
+     "name": "Incineroar",
+     "item": "Sitrus Berry",
+     "ability": "Intimidate",
+     "attacks": [
+      "Flare Blitz",
+      "Throat Chop",
+      "Fake Out",
+      "Parting Shot"
+     ],
+     "nature": "Impish",
+     "tera": null
+    },
+    {
+     "id": "floette-eternal",
+     "name": "Eternal Flower Floette",
+     "item": "Floettite",
+     "ability": "Flower Veil",
+     "attacks": [
+      "Moonblast",
+      "Dazzling Gleam",
+      "Calm Mind",
+      "Protect"
+     ],
+     "nature": "Modest",
+     "tera": null
+    },
+    {
+     "id": "delphox",
+     "name": "Delphox",
+     "item": "Delphoxite",
+     "ability": "Blaze",
+     "attacks": [
+      "Heat Wave",
+      "Psychic",
+      "Nasty Plot",
+      "Protect"
+     ],
+     "nature": "Timid",
+     "tera": null
+    }
+   ],
+   "placing": 13,
+   "player": "okaime",
+   "record": {
+    "wins": 6,
+    "losses": 3,
+    "ties": 0
+   },
+   "drop": null,
+   "deck": {}
+  }
+ ]
+}

@@ -7,7 +7,12 @@ export interface TournamentInnerTeam {
   placement: number | null;
   record: string;
   pokemonNames: string[];
-  pokepasteUrl: string;
+  // LabMaus source: a pokepaste link. Direct sources (Limitless/Reportworm)
+  // have open teamsheets instead, shipped as paste text in
+  // `TournamentTeamsData.sheets[sheetId]`, plus a link to the source page.
+  pokepasteUrl?: string;
+  sheetId?: string;
+  sourceUrl?: string;
   tournamentName: string;
 }
 
@@ -24,9 +29,15 @@ export interface TournamentComposition {
   clusters: TournamentCluster[];
 }
 
+export type TournamentTeamsSource = "direct" | "labmaus";
+
 export interface TournamentTeamsData {
   regulation: string;
-  labmausRegulation: string;
+  // Absent on snapshots generated before direct ingestion existed (LabMaus).
+  source?: TournamentTeamsSource;
+  // Direct source only: which upstreams contributed and how many events each.
+  sources?: Array<{ name: string; events: number }>;
+  labmausRegulation?: string;
   // True when LabMaus had no data filed under this regulation and the
   // generator fell back to their "Custom format" bucket. That bucket is
   // dominated by this regulation's tournaments but is not exclusive to
@@ -35,6 +46,23 @@ export interface TournamentTeamsData {
   dateRange: { from: string; to: string };
   generatedAt: string;
   compositions: TournamentComposition[];
+  // Direct source only: Showdown paste text keyed by TournamentInnerTeam.sheetId.
+  sheets?: Record<string, string>;
+}
+
+/** What to store as an opponent team's `pokepaste`: a URL or inline paste text. */
+export function getImportablePaste(
+  data: TournamentTeamsData,
+  team: TournamentInnerTeam,
+): string | null {
+  if (team.pokepasteUrl) return team.pokepasteUrl;
+  if (team.sheetId) return data.sheets?.[team.sheetId] ?? null;
+  return null;
+}
+
+/** Stable identity for a listed team (used to track imported state). */
+export function getTeamKey(team: TournamentInnerTeam): string {
+  return team.pokepasteUrl ?? team.sourceUrl ?? team.sheetId ?? `${team.name}:${team.tournamentName}`;
 }
 
 // Team.regulation is stored as the verbatim NewTeamModal string

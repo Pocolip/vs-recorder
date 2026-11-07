@@ -178,11 +178,12 @@ export default function MatchupPlannerPage() {
     setShowAddTeamModal(false);
   };
 
+  // `pokepaste` is a paste URL or inline open-teamsheet text.
   const handleImportFromRecentTour = async (
-    pokepasteUrl: string,
+    pokepaste: string,
     notes: string,
   ) => {
-    await createOpponentTeam({ pokepaste: pokepasteUrl, notes, color: "blue" });
+    await createOpponentTeam({ pokepaste, notes, color: "blue" });
   };
 
   const handleUpdateNotes = async (
