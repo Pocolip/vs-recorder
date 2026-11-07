@@ -11,17 +11,67 @@ import {
 import { Modal } from "../ui/modal";
 import PokemonSprite from "../pokemon/PokemonSprite";
 import {
+  getImportablePaste,
+  getTeamKey,
   getTournamentTeamsForRegulation,
   type TournamentCluster,
   type TournamentInnerTeam,
+  type TournamentTeamsData,
 } from "../../data/tournamentTeamsByRegulation";
 
 interface RecentTourModalProps {
   isOpen: boolean;
   onClose: () => void;
   teamRegulation: string | null | undefined;
-  onImport: (pokepasteUrl: string, notes: string) => Promise<void>;
+  // `pokepaste` is a paste URL (LabMaus) or inline open-teamsheet text
+  // (direct Limitless/Reportworm data); both are valid opponent pokepastes.
+  onImport: (pokepaste: string, notes: string) => Promise<void>;
 }
+
+const SOURCE_LINKS: Record<string, string> = {
+  Limitless: "https://play.limitlesstcg.com",
+  Reportworm: "https://standings.reportworm.com",
+};
+
+const ExternalTextLink: React.FC<{ href: string; children: React.ReactNode }> = ({
+  href,
+  children,
+}) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline hover:text-brand-500"
+  >
+    {children}
+  </a>
+);
+
+const SourceAttribution: React.FC<{ data: TournamentTeamsData }> = ({ data }) => {
+  if (data.source === "direct" && data.sources?.length) {
+    return (
+      <span>
+        Sourced from{" "}
+        {data.sources.map((s, i) => (
+          <React.Fragment key={s.name}>
+            {i > 0 && " + "}
+            {SOURCE_LINKS[s.name] ? (
+              <ExternalTextLink href={SOURCE_LINKS[s.name]}>{s.name}</ExternalTextLink>
+            ) : (
+              s.name
+            )}{" "}
+            ({s.events} events)
+          </React.Fragment>
+        ))}
+      </span>
+    );
+  }
+  return (
+    <span>
+      Sourced from <ExternalTextLink href="https://labmaus.net">labmaus.net</ExternalTextLink>
+    </span>
+  );
+};
 
 const COMP_SIZES = [6, 5, 4] as const;
 type CompSize = (typeof COMP_SIZES)[number];
@@ -38,7 +88,12 @@ function buildImportNotes(team: TournamentInnerTeam): string {
   if (team.tournamentName) parts.push(team.tournamentName);
   if (team.placement) parts.push(`#${team.placement}`);
   if (team.record) parts.push(team.record);
-  return parts.join(" · ");
+  const summary = parts.join(" · ");
+  // Direct-source imports have no pokepaste link, so keep where the sheet
+  // came from in the notes.
+  return !team.pokepasteUrl && team.sourceUrl
+    ? `${summary}\n${team.sourceUrl}`
+    : summary;
 }
 
 const SpriteRow: React.FC<{ names: string[]; size?: "sm" | "md" }> = ({
@@ -54,10 +109,12 @@ const SpriteRow: React.FC<{ names: string[]; size?: "sm" | "md" }> = ({
 
 const InnerTeamRow: React.FC<{
   team: TournamentInnerTeam;
+  canImport: boolean;
   imported: boolean;
   importing: boolean;
   onImport: () => void;
-}> = ({ team, imported, importing, onImport }) => {
+}> = ({ team, canImport, imported, importing, onImport }) => {
+  const viewHref = team.pokepasteUrl ?? team.sourceUrl;
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -87,19 +144,21 @@ const InnerTeamRow: React.FC<{
       <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <SpriteRow names={team.pokemonNames} size="sm" />
         <div className="flex flex-col gap-2 sm:flex-row">
-          <a
-            href={team.pokepasteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-            View Paste
-          </a>
+          {viewHref && (
+            <a
+              href={viewHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              {team.pokepasteUrl ? "View Paste" : "View Teamsheet"}
+            </a>
+          )}
           <button
             type="button"
             onClick={onImport}
-            disabled={imported || importing}
+            disabled={!canImport || imported || importing}
             className="flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {imported ? (
@@ -120,13 +179,14 @@ const InnerTeamRow: React.FC<{
 };
 
 const ClusterCard: React.FC<{
+  data: TournamentTeamsData;
   cluster: TournamentCluster;
   expanded: boolean;
   onToggle: () => void;
-  importedUrls: Set<string>;
-  importingUrl: string | null;
+  importedKeys: Set<string>;
+  importingKey: string | null;
   onImport: (team: TournamentInnerTeam) => void;
-}> = ({ cluster, expanded, onToggle, importedUrls, importingUrl, onImport }) => {
+}> = ({ data, cluster, expanded, onToggle, importedKeys, importingKey, onImport }) => {
   const winRate = formatWinRate(cluster.wins, cluster.losses);
   return (
     <div className="rounded-lg border border-gray-200 bg-gray-50/50 dark:border-gray-700 dark:bg-white/[0.02]">
@@ -163,15 +223,19 @@ const ClusterCard: React.FC<{
               No individual teams available.
             </p>
           ) : (
-            cluster.teams.map((team, i) => (
-              <InnerTeamRow
-                key={`${team.pokepasteUrl}-${i}`}
-                team={team}
-                imported={importedUrls.has(team.pokepasteUrl)}
-                importing={importingUrl === team.pokepasteUrl}
-                onImport={() => onImport(team)}
-              />
-            ))
+            cluster.teams.map((team, i) => {
+              const teamKey = getTeamKey(team);
+              return (
+                <InnerTeamRow
+                  key={`${teamKey}-${i}`}
+                  team={team}
+                  canImport={getImportablePaste(data, team) != null}
+                  imported={importedKeys.has(teamKey)}
+                  importing={importingKey === teamKey}
+                  onImport={() => onImport(team)}
+                />
+              );
+            })
           )}
         </div>
       )}
@@ -191,8 +255,8 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
   );
   const [activeSize, setActiveSize] = useState<CompSize>(6);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
-  const [importedUrls, setImportedUrls] = useState<Set<string>>(new Set());
-  const [importingUrl, setImportingUrl] = useState<string | null>(null);
+  const [importedKeys, setImportedKeys] = useState<Set<string>>(new Set());
+  const [importingKey, setImportingKey] = useState<string | null>(null);
 
   const composition = useMemo(
     () => data?.compositions.find((c) => c.size === activeSize) ?? null,
@@ -200,13 +264,16 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
   );
 
   const handleImport = async (team: TournamentInnerTeam) => {
-    if (importedUrls.has(team.pokepasteUrl) || importingUrl) return;
-    setImportingUrl(team.pokepasteUrl);
+    if (!data) return;
+    const teamKey = getTeamKey(team);
+    const pokepaste = getImportablePaste(data, team);
+    if (!pokepaste || importedKeys.has(teamKey) || importingKey) return;
+    setImportingKey(teamKey);
     try {
-      await onImport(team.pokepasteUrl, buildImportNotes(team));
-      setImportedUrls((prev) => new Set(prev).add(team.pokepasteUrl));
+      await onImport(pokepaste, buildImportNotes(team));
+      setImportedKeys((prev) => new Set(prev).add(teamKey));
     } finally {
-      setImportingUrl(null);
+      setImportingKey(null);
     }
   };
 
@@ -232,17 +299,7 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
           {data ? (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
               Regulation {data.regulation} · {data.dateRange.from} – {data.dateRange.to} ·{" "}
-              <span>
-                Sourced from{" "}
-                <a
-                  href="https://labmaus.net"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-brand-500"
-                >
-                  labmaus.net
-                </a>
-              </span>
+              <SourceAttribution data={data} />
             </p>
           ) : (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
@@ -307,13 +364,14 @@ const RecentTourModal: React.FC<RecentTourModalProps> = ({
                   return (
                     <ClusterCard
                       key={key}
+                      data={data}
                       cluster={cluster}
                       expanded={expandedKey === key}
                       onToggle={() =>
                         setExpandedKey((prev) => (prev === key ? null : key))
                       }
-                      importedUrls={importedUrls}
-                      importingUrl={importingUrl}
+                      importedKeys={importedKeys}
+                      importingKey={importingKey}
                       onImport={handleImport}
                     />
                   );

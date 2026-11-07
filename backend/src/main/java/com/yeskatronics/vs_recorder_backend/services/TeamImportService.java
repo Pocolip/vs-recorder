@@ -219,11 +219,27 @@ public class TeamImportService {
         if (exportData.getOpponentPlans() != null) {
             for (int i = 0; i < exportData.getOpponentPlans().size(); i++) {
                 ExportDTO.OpponentPlanData plan = exportData.getOpponentPlans().get(i);
-                if (plan.getPokepaste() != null && !POKEPASTE_URL_PATTERN.matcher(plan.getPokepaste()).matches()) {
-                    errors.add("Invalid opponent pokepaste URL format at index " + i);
+                if (plan.getPokepaste() != null && !isValidOpponentPaste(plan.getPokepaste())) {
+                    errors.add("Invalid opponent pokepaste at index " + i);
                 }
             }
         }
+    }
+
+    /**
+     * Opponent teams store either a paste-site URL or inline Showdown paste
+     * text. Inline text comes from the Recent Tour modal importing open
+     * teamsheets (Limitless/Reportworm), which have no pokepaste link. The
+     * user's own team pokepaste stays URL-only.
+     */
+    static boolean isValidOpponentPaste(String pokepaste) {
+        if (POKEPASTE_URL_PATTERN.matcher(pokepaste).matches()) {
+            return true;
+        }
+        String trimmed = pokepaste.trim();
+        return !trimmed.regionMatches(true, 0, "http", 0, 4)
+                && trimmed.contains("\n")
+                && pokepaste.length() <= MAX_STRING_LENGTH;
     }
 
     private Team createTeamFromExport(ExportDTO.TeamData teamData, User user) {

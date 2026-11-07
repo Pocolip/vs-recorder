@@ -45,3 +45,6 @@ infra/.terraform/
 infra/*.tfstate
 infra/*.tfstate.backup
 infra/terraform.tfvars
+
+# Tournament-teams fetch cache (persisted in CI via actions/cache)
+scripts/.cache/
