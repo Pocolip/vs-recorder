@@ -239,9 +239,28 @@ Hand-edit the relevant `scripts/regulation-species/regM-*.json` (add/remove spec
 
 ### Automated weekly refresh
 
-`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`) and pulls the latest LabMaus tournament teams. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged. Speed tier JSONs are not auto-refreshed — regenerate them locally when a regulation species list changes.
+`.github/workflows/data-refresh.yml` runs every Monday at 16:00 UTC (and on manual `workflow_dispatch`). It mirrors the upstream NCP gen-10 setdex into `setdex-gen10.ts` (via `scripts/update-setdex-gen10.js`) and pulls recent tournament teams. If anything actually changed, a single create-or-update PR is opened against `develop` on the `chore/weekly-data-refresh` branch. No PR is opened when upstream is unchanged. Speed tier JSONs are not auto-refreshed — regenerate them locally when a regulation species list changes.
 
-Tournament teams are pulled per regulation — the list lives in `REGULATIONS` in `scripts/generate-tournament-teams.js`, and each entry writes `frontend/src/data/tournamentTeams-reg{X}.json`. To add a regulation: add the entry (the LabMaus string is `Regulation Set {X}`), run the script, import the new JSON in `frontend/src/data/tournamentTeamsByRegulation.ts`, and add the file to `add-paths` in `.github/workflows/data-refresh.yml`. Only M-C is refreshed; M-A and M-B remain available as archived snapshots. M-C now uses its dedicated LabMaus regulation rather than the mixed `Custom format` bucket. The generator validates consumed JSON fields and rejects empty or malformed responses before writing. Run `node --test scripts/generate-tournament-teams.test.js` to check ingestion behavior.
+Tournament teams (the Matchup Planner's Recent Tour modal) come from one of two sources, chosen with `--source` on `scripts/generate-tournament-teams.js` or the `TOURNAMENT_TEAMS_SOURCE` env var:
+
+- **`direct` (default)**: [Limitless API](https://docs.limitlesstcg.com/developer.html) for grassroots online events plus [Reportworm](https://standings.reportworm.com) (`/api/v1/{season}` index, `/api/v1/{season}/{code}` standings) for official events. The generator clusters the open teamsheets itself into 4/5/6-Pokémon cores (`scripts/tournament-teams/cluster.js`) and ships each listed team's sheet as Showdown paste text in the JSON's `sheets` map. Finished Limitless events are cached in `scripts/.cache/tournament-teams/` (gitignored; persisted in CI with `actions/cache`). Modules live in `scripts/tournament-teams/`. Species resolve through `pokemon-data.json`; an unknown species skips that event with a warning, so add an alias if one shows up.
+- **`labmaus`**: LabMaus' pre-clustered `top_teams` (pokepaste links). This is the old pipeline, kept as a fallback.
+
+**Limitless API key:** without a key Limitless allows 50 requests / 5 min, so a cold 60-day run takes ~30 min. Set `LIMITLESS_API_KEY` (env locally, repo secret of the same name in CI) to send it as the `X-Access-Key` header and lift that limit. The key goes through a curl header file, so it never shows in URLs, argv or logs. When the key is set, the client spaces requests lightly and backs off using the `ratelimit` response header.
+
+In CI, manual runs pick the source from the `workflow_dispatch` dropdown. Scheduled runs use the repo variable `TOURNAMENT_TEAMS_SOURCE` (Settings → Secrets and variables → Actions → Variables) and fall back to `direct`.
+
+**Inline sheets:** direct-source teams have no pokepaste. Importing one stores the paste text itself as the opponent team's `pokepaste`. `pokepasteService.isInlinePaste` tells text from URLs, `fetchAndParse` parses text locally, and `TeamImportService.isValidOpponentPaste` accepts it in export/import. The user's own team pokepaste stays URL-only.
+
+**Sources we don't use:** RK9 isn't scraped because its robots.txt disallows `/roster/`, `/pairings/` and `/teamlist/public/`. Reportworm's `/grassroots` is skipped because it's sourced from Limitless and would double-count. Reportworm's code license forbids ML-training use, so keep its data out of the matchup engine's training pool unless the author agrees.
+
+Tournament teams are pulled per regulation. The list lives in `REGULATIONS` in `scripts/generate-tournament-teams.js`, and each entry writes `frontend/src/data/tournamentTeams-reg{X}.json`. To add a regulation:
+1. Add the entry with all three source keys: `labmaus: "Regulation Set {X}"`, `limitless: "{X}"` (format id from `GET https://play.limitlesstcg.com/api/games`) and `reportworm: "Regulation {X}"`.
+2. Run the script.
+3. Import the new JSON in `frontend/src/data/tournamentTeamsByRegulation.ts`.
+4. Add the file to `add-paths` in `.github/workflows/data-refresh.yml`.
+
+Only M-C is refreshed; M-A and M-B remain available as archived LabMaus snapshots. The generator validates consumed JSON fields per source. It refuses to write when both direct sources fail, fewer than 100 complete teams were collected, or any composition size is empty. Run `node --test scripts/generate-tournament-teams.test.js 'scripts/tournament-teams/*.test.js'` to check ingestion behavior.
 
 ## Important Notes
 
@@ -301,3 +320,4 @@ Implementation plans created during Claude Code sessions:
 - **[CI/CD & AWS Hosting](~/.claude/plans/gleaming-percolating-canyon.md)** - Single EC2 + Docker Compose architecture, GitHub Actions CI/CD, Terraform infrastructure, ~$32/month estimated cost. Includes Dockerfiles, nginx reverse proxy, RDS PostgreSQL setup.
 - **[CI/CD Decoupling & Beta Environment](~/.claude/plans/generic-cooking-cascade.md)** - Separate beta API (api.beta.vsrecorder.app) and database, automatic version bumping on develop branch, decoupled build/deploy workflows (feature→beta, develop→versioned beta, main→prod).
 - **[TeamMember Calcs](~/.claude/plans/iterative-snacking-bonbon.md)** - Per-Pokemon saved damage calc results. Backend `@ElementCollection` storage, full CRUD through existing PATCH endpoint, collapsible UI in PokemonNoteCard. Includes controller calcs bypass fix for mapper/`@ElementCollection` interaction.
+- **[Direct tournament sources](~/.claude/plans/merry-hatching-oasis.md)** - Recent Tour data from Limitless API + Reportworm instead of LabMaus (kept behind `--source=labmaus` / `TOURNAMENT_TEAMS_SOURCE`). Generator-side core clustering, inline open-teamsheet imports stored as paste text, Limitless fetch cache in CI.
