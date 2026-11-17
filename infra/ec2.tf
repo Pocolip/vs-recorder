@@ -163,6 +163,14 @@ resource "aws_instance" "main" {
   tags = {
     Name = "${var.project_name}-server"
   }
+
+  # The AMI lookup always finds the newest Amazon Linux 2023 image, and a new AMI
+  # forces a new instance, which would lose /opt/vsrecorder (.env, compose file,
+  # nginx). user_data only runs at first boot. Replace the server deliberately,
+  # never as a side effect of an apply.
+  lifecycle {
+    ignore_changes = [ami, user_data]
+  }
 }
 
 # Elastic IP
