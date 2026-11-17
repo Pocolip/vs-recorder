@@ -17,6 +17,7 @@ import MatchByMatchPage from "./pages/Team/MatchByMatchPage";
 import UsageStatsPage from "./pages/Team/UsageStatsPage";
 import MatchupStatsPage from "./pages/Team/MatchupStatsPage";
 import MoveUsagePage from "./pages/Team/MoveUsagePage";
+import DiagnosticsPage from "./pages/Team/DiagnosticsPage";
 import MatchupPlannerPage from "./pages/Team/MatchupPlannerPage";
 import PokemonNotesPage from "./pages/Team/PokemonNotesPage";
 import CalculatorPage from "./pages/Team/CalculatorPage";
@@ -87,6 +88,7 @@ export default function App() {
             <Route path="usage-stats" element={<UsageStatsPage />} />
             <Route path="matchup-stats" element={<MatchupStatsPage />} />
             <Route path="move-usage" element={<MoveUsagePage />} />
+            <Route path="diagnostics" element={<DiagnosticsPage />} />
             <Route path="matchup-planner" element={<MatchupPlannerPage />} />
             <Route path="pokemon-notes" element={<PokemonNotesPage />} />
             <Route path="calculator" element={<CalculatorPage />} />

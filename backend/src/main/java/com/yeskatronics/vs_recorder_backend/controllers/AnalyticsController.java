@@ -4,6 +4,7 @@ import com.yeskatronics.vs_recorder_backend.dto.AnalyticsDTO;
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.services.AnalyticsService;
+import com.yeskatronics.vs_recorder_backend.services.SimulationService;
 import com.yeskatronics.vs_recorder_backend.services.TeamAccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
+    private final SimulationService simulationService;
     private final TeamAccessService teamAccessService;
     private final CustomUserDetailsService userDetailsService;
 
@@ -81,6 +83,8 @@ public class AnalyticsController {
     public ResponseEntity<AnalyticsDTO.UsageStatsResponse> getUsageStats(
             @Parameter(description = "Team ID", required = true)
             @PathVariable Long teamId,
+            @Parameter(description = "Serve the team's matchup engine simulation instead of its replays")
+            @RequestParam(defaultValue = "false") boolean simulated,
             Authentication authentication) {
 
         Long userId = getCurrentUserId(authentication);
@@ -88,7 +92,9 @@ public class AnalyticsController {
 
         verifyTeamAccess(teamId, userId);
 
-        AnalyticsDTO.UsageStatsResponse stats = analyticsService.getUsageStats(teamId);
+        AnalyticsDTO.UsageStatsResponse stats = simulated
+                ? simulationService.getSimulatedUsageStats(teamId)
+                : analyticsService.getUsageStats(teamId);
         return ResponseEntity.ok(stats);
     }
 
@@ -121,6 +127,8 @@ public class AnalyticsController {
     public ResponseEntity<AnalyticsDTO.MatchupStatsResponse> getMatchupStats(
             @Parameter(description = "Team ID", required = true)
             @PathVariable Long teamId,
+            @Parameter(description = "Serve the team's matchup engine simulation instead of its replays")
+            @RequestParam(defaultValue = "false") boolean simulated,
             Authentication authentication) {
 
         Long userId = getCurrentUserId(authentication);
@@ -128,7 +136,9 @@ public class AnalyticsController {
 
         verifyTeamAccess(teamId, userId);
 
-        AnalyticsDTO.MatchupStatsResponse stats = analyticsService.getMatchupStats(teamId);
+        AnalyticsDTO.MatchupStatsResponse stats = simulated
+                ? simulationService.getSimulatedMatchupStats(teamId)
+                : analyticsService.getMatchupStats(teamId);
         return ResponseEntity.ok(stats);
     }
 
@@ -167,6 +177,8 @@ public class AnalyticsController {
     public ResponseEntity<AnalyticsDTO.CustomMatchupResponse> getCustomMatchupAnalysis(
             @Parameter(description = "Team ID", required = true)
             @PathVariable Long teamId,
+            @Parameter(description = "Serve the team's matchup engine simulation instead of its replays")
+            @RequestParam(defaultValue = "false") boolean simulated,
             Authentication authentication,
             @Valid @RequestBody AnalyticsDTO.CustomMatchupRequest request) {
 
@@ -182,7 +194,9 @@ public class AnalyticsController {
             throw new IllegalArgumentException("Must provide 4-6 Pokemon for custom matchup analysis");
         }
 
-        AnalyticsDTO.CustomMatchupResponse stats = analyticsService.getCustomMatchupAnalysis(teamId, request);
+        AnalyticsDTO.CustomMatchupResponse stats = simulated
+                ? simulationService.getSimulatedCustomMatchup(teamId, request)
+                : analyticsService.getCustomMatchupAnalysis(teamId, request);
         return ResponseEntity.ok(stats);
     }
 
@@ -215,6 +229,8 @@ public class AnalyticsController {
     public ResponseEntity<AnalyticsDTO.MoveUsageResponse> getMoveUsageStats(
             @Parameter(description = "Team ID", required = true)
             @PathVariable Long teamId,
+            @Parameter(description = "Serve the team's matchup engine simulation instead of its replays")
+            @RequestParam(defaultValue = "false") boolean simulated,
             Authentication authentication) {
 
         Long userId = getCurrentUserId(authentication);
@@ -222,7 +238,9 @@ public class AnalyticsController {
 
         verifyTeamAccess(teamId, userId);
 
-        AnalyticsDTO.MoveUsageResponse stats = analyticsService.getMoveUsageStats(teamId);
+        AnalyticsDTO.MoveUsageResponse stats = simulated
+                ? simulationService.getSimulatedMoveUsage(teamId)
+                : analyticsService.getMoveUsageStats(teamId);
         return ResponseEntity.ok(stats);
     }
 

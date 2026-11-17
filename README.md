@@ -53,8 +53,9 @@ cd frontend && npm install && npm start
 ### Run with Docker
 
 ```bash
-# Full stack (backend + frontend + PostgreSQL)
-docker-compose up
+# Full stack built from your working tree, configured like prod (Postgres, Redis, memory limits)
+scripts/local.sh up      # app on http://localhost:3000, API on http://localhost:8080
+scripts/local.sh help    # logs, status, psql, a fake matchup engine worker, reset
 ```
 
 ## Project Structure
@@ -75,7 +76,7 @@ vs-recorder/
 │   │   └── data/           # NCP setdex
 │   ├── public/sprites/     # Local Pokemon sprite icons
 │   └── Dockerfile
-├── docker-compose.yml      # Local dev (backend + frontend + PostgreSQL)
+├── docker-compose.yml      # Local full stack (backend + frontend + PostgreSQL + Redis)
 ├── docker-compose.prod.yml # Production (prod + beta side-by-side with nginx)
 └── .github/workflows/      # CI, deploy-prod, deploy-beta
 ```

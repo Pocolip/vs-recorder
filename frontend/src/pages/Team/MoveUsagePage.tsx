@@ -7,6 +7,8 @@ import PokemonSprite from "../../components/pokemon/PokemonSprite";
 import { getDisplayName, resolveAnalyticsKey } from "../../utils/pokemonNameUtils";
 import * as pokepasteService from "../../services/pokepasteService";
 import { analyticsApi } from "../../services/api/analyticsApi";
+import { useSimulation } from "../../context/SimulationContext";
+import SimulatedBar from "../../components/team/SimulatedBar";
 
 const MOVE_COLORS = [
   "#3b82f6", "#8b5cf6", "#06b6d4", "#f59e0b", "#ec4899",
@@ -28,6 +30,7 @@ interface PokemonChartData {
 
 export default function MoveUsagePage() {
   const { team } = useActiveTeam();
+  const { showSimulated, resultKey } = useSimulation();
 
   const [teamMovesets, setTeamMovesets] = useState<Record<string, string[]>>({});
   const [moveUsageStats, setMoveUsageStats] = useState<Record<string, Record<string, number>>>({});
@@ -35,6 +38,10 @@ export default function MoveUsagePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Ignore a load overtaken by a newer one (e.g. the toggle flipped mid-request),
+    // so real and simulated data never mix.
+    let cancelled = false;
+
     const loadMoveData = async () => {
       if (!team) return;
 
@@ -68,32 +75,35 @@ export default function MoveUsagePage() {
         }
 
         // Fetch move usage from backend
-        const backendMoveData = await analyticsApi.getMoveUsage(team.id);
+        const backendMoveData = await analyticsApi.getMoveUsage(team.id, { simulated: showSimulated });
         const usageStats: Record<string, Record<string, number>> = {};
         if (backendMoveData?.pokemonMoves) {
           backendMoveData.pokemonMoves.forEach(({ pokemon, moves }) => {
             const key = resolveAnalyticsKey(pokemon);
             if (!usageStats[key]) usageStats[key] = {};
             moves.forEach((moveEntry) => {
-              // Handle both possible field names from backend
-              const timesUsed = (moveEntry as Record<string, unknown>).timesUsed as number | undefined;
-              usageStats[key][moveEntry.move] = timesUsed ?? moveEntry.count ?? 0;
+              usageStats[key][moveEntry.move] = moveEntry.timesUsed ?? 0;
             });
           });
         }
 
+        if (cancelled) return;
         setTeamMovesets(pokepasteMovesets);
         setMoveUsageStats(usageStats);
       } catch (err) {
+        if (cancelled) return;
         console.error("Error loading move data:", err);
         setError(err instanceof Error ? err.message : "Failed to load move data");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     loadMoveData();
-  }, [team?.id, team?.pokepaste]); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => {
+      cancelled = true;
+    };
+  }, [team?.id, team?.pokepaste, showSimulated, resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const chartData = useMemo(() => {
     const results: Record<string, PokemonChartData> = {};
@@ -152,6 +162,7 @@ export default function MoveUsagePage() {
   if (error) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <SimulatedBar />
         <div className="py-12 text-center">
           <p className="mb-4 text-sm text-red-600 dark:text-red-400">Error loading move data: {error}</p>
         </div>
@@ -163,7 +174,8 @@ export default function MoveUsagePage() {
 
   if (pokemonWithData.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <SimulatedBar />
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 rounded-full bg-gray-100 p-4 dark:bg-gray-800">
             <Zap className="h-8 w-8 text-gray-400" />
@@ -184,11 +196,14 @@ export default function MoveUsagePage() {
     <>
       <PageMeta title="Move Usage | VS Recorder" description="Move usage analysis" />
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+      <SimulatedBar />
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Move Usage Analysis</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Move statistics from all recorded games</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {showSimulated ? "Move statistics from simulated games" : "Move statistics from all recorded games"}
+          </p>
         </div>
 
         {/* Legend */}

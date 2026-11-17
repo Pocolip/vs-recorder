@@ -1,8 +1,15 @@
-# Docker Compose for local development
-# Usage: docker-compose up --build
+# Local full stack: the app as production runs it, built from this working tree.
+#
+#   scripts/local.sh up        # build images, start everything, wait until healthy
+#   scripts/local.sh help      # the other commands (logs, psql, redis, fake engine worker, reset)
+#
+# Frontend http://localhost:3000, API http://localhost:8080, Postgres :5432, Redis :6379.
+# Optional settings go in a gitignored .env next to this file (see scripts/local.sh help).
+#
+# For quick iteration, run the backend (mvn spring-boot:run) and frontend (npm run start)
+# on the host instead; `docker compose up -d redis` gives them a Redis.
 
 services:
-  # PostgreSQL database (for testing prod config locally)
   postgres:
     image: postgres:15-alpine
     container_name: vsrecorder-postgres
@@ -16,12 +23,28 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U vsrecorder_user -d vsrecorder_dev"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
-  # Backend API
+  # The matchup engine's job queue. With no engine running, scripts/local.sh worker
+  # plays the worker using the sample result.
+  redis:
+    image: redis:7-alpine
+    container_name: vsrecorder-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
+    image: vsrecorder-backend:local
+    # Prod runs on x86 (t3), and the runtime base image (eclipse-temurin:17-jre-alpine)
+    # has no ARM build, so Apple Silicon runs this one under Rosetta.
+    platform: linux/amd64
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -32,25 +55,49 @@ services:
       - DB_USERNAME=vsrecorder_user
       - DB_PASSWORD=localdevpassword
       - JWT_SECRET=local-dev-secret-change-in-production-minimum-256-bits
+      # Emails can't be sent locally; password-reset links would point here.
+      - RESEND_API_KEY=re_local_placeholder
+      - APP_FRONTEND_URL=http://localhost:3000
+      # Matchup engine jobs, on locally. Put your username in .env as ENGINE_ALLOWED_USERS
+      # to run simulations. No worker instance IDs, so nothing is started on AWS.
+      - ENGINE_JOBS_ENABLED=${ENGINE_JOBS_ENABLED:-true}
+      - REDIS_URL=redis://redis:6379/0
+      - ENGINE_ALLOWED_USERS=${ENGINE_ALLOWED_USERS:-}
+      - ENGINE_DAILY_CAP=${ENGINE_DAILY_CAP:-50}
+      - ENGINE_WORKER_INSTANCE_IDS=${ENGINE_WORKER_INSTANCE_IDS:-}
+      - AWS_REGION=us-east-1
+      # Prod polls once a minute; faster here so the fake worker's stages show up quickly.
+      - ENGINE_POLL_INTERVAL=${ENGINE_POLL_INTERVAL:-PT10S}
+      - ENGINE_POLL_INITIAL_DELAY=PT10S
+      # Same JVM settings and memory limit as prod (docker-compose.prod.yml); keep them in sync,
+      # so an out-of-memory problem shows up here first.
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=64m -XX:MaxDirectMemorySize=32m -Xss512k
     ports:
       - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 576M
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 60s
+      start_period: 120s
 
-  # Frontend (production build)
+  # Production build served by nginx, talking to the local API.
   frontend:
+    image: vsrecorder-frontend:local
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_BASE_URL: http://localhost:8080
+        VITE_API_BASE_URL: http://localhost:8080
     container_name: vsrecorder-frontend
     ports:
       - "3000:80"

@@ -11,7 +11,27 @@ export { ALL_PERMISSIONS_FALSE, ALL_PERMISSIONS_TRUE } from "./collaborator";
 export type { Folder } from "./folder";
 export type { Replay, BattleData } from "./replay";
 export type { Match, MatchStats } from "./match";
-export type { UsageStats, MatchupStats, MatchupEntry, MoveUsage } from "./analytics";
+export type {
+  UsageStats,
+  PokemonUsageStats,
+  LeadPairStats,
+  MatchupStats,
+  MatchupEntry,
+  MoveUsage,
+  CustomMatchup,
+  AnalyticsOptions,
+} from "./analytics";
+export type {
+  SimulationStatus,
+  SimulationJob,
+  SimulationJobStatus,
+  SimulationDepth,
+  SimulationResultInfo,
+  SimulationOpponentPokemon,
+  SimulationDiagnostics,
+  SimulationMember,
+  SimulationThreat,
+} from "./simulation";
 export type { GamePlan, GamePlanTeam, Composition } from "./gamePlan";
 export type { ExportOptions, ExportResult, ImportResult, RateLimitStatus, ExportSummary } from "./export";
 export type { TeamMember, TeamMemberSyncResponse } from "./teamMember";

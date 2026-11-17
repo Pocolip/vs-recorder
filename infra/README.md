@@ -198,6 +198,31 @@ JWT_SECRET=<generate-a-long-random-string>
 EOF
 ```
 
+### Matchup engine jobs (optional)
+
+The "Simulated" analytics send jobs to the matchup engine, whose own Terraform stack
+creates the queue and the GPU worker. It also grants this instance's role
+`ec2:StartInstances` on the worker, so nothing here changes for that. Jobs are off
+unless the prod `.env` turns them on. Beta never gets these settings: it would share
+the queue, and each job starts a GPU.
+
+```bash
+ENGINE_JOBS_ENABLED=true
+REDIS_URL=<the value of the engine stack's queue_url_secret_arn secret>
+ENGINE_WORKER_INSTANCE_IDS=<the engine stack's worker_instance_ids output, comma-separated>
+ENGINE_ALLOWED_USERS=<comma-separated usernames allowed to run jobs>
+ENGINE_DAILY_CAP=3
+```
+
+The backend reaches AWS with the instance role through IMDSv2. A container on Docker's
+bridge network needs a hop limit of 2 for that, which `metadata_options` in `ec2.tf`
+sets. Check what the instance has before applying:
+
+```bash
+aws ec2 describe-instances --instance-ids <id> \
+  --query 'Reservations[].Instances[].MetadataOptions'
+```
+
 ## Common Commands
 
 ```bash

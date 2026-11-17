@@ -1,0 +1,1998 @@
+{
+ "schema_version": 1,
+ "kind": "simulate",
+ "job_id": "00000000-0000-0000-0000-000000000000",
+ "regulation": "gen9championsvgc2026regmc",
+ "team": [
+  "Raichu",
+  "Golisopod",
+  "Archaludon",
+  "Pelipper",
+  "Basculegion-F",
+  "Sneasler"
+ ],
+ "metrics": {
+  "usageStats": {
+   "pokemonStats": [
+    {
+     "pokemon": "Pelipper",
+     "usage": 467,
+     "usageRate": 97,
+     "overallWinRate": 49,
+     "leadUsage": 111,
+     "leadWinRate": 56,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Basculegion-F",
+     "usage": 369,
+     "usageRate": 77,
+     "overallWinRate": 45,
+     "leadUsage": 271,
+     "leadWinRate": 44,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Archaludon",
+     "usage": 366,
+     "usageRate": 76,
+     "overallWinRate": 49,
+     "leadUsage": 53,
+     "leadWinRate": 52,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Golisopod",
+     "usage": 244,
+     "usageRate": 51,
+     "overallWinRate": 48,
+     "leadUsage": 149,
+     "leadWinRate": 45,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 230,
+     "megaWinRate": 49
+    },
+    {
+     "pokemon": "Raichu",
+     "usage": 243,
+     "usageRate": 51,
+     "overallWinRate": 50,
+     "leadUsage": 220,
+     "leadWinRate": 49,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 227,
+     "megaWinRate": 52
+    },
+    {
+     "pokemon": "Sneasler",
+     "usage": 204,
+     "usageRate": 42,
+     "overallWinRate": 59,
+     "leadUsage": 157,
+     "leadWinRate": 61,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    }
+   ],
+   "leadPairStats": [
+    {
+     "pair": "Basculegion-F + Raichu",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Raichu",
+     "usage": 116,
+     "usageRate": 24,
+     "wins": 47,
+     "winRate": 40
+    },
+    {
+     "pair": "Raichu + Sneasler",
+     "pokemon1": "Raichu",
+     "pokemon2": "Sneasler",
+     "usage": 72,
+     "usageRate": 15,
+     "wins": 47,
+     "winRate": 64
+    },
+    {
+     "pair": "Basculegion-F + Golisopod",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Golisopod",
+     "usage": 58,
+     "usageRate": 12,
+     "wins": 17,
+     "winRate": 29
+    },
+    {
+     "pair": "Golisopod + Pelipper",
+     "pokemon1": "Golisopod",
+     "pokemon2": "Pelipper",
+     "usage": 54,
+     "usageRate": 11,
+     "wins": 29,
+     "winRate": 53
+    },
+    {
+     "pair": "Basculegion-F + Sneasler",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Sneasler",
+     "usage": 49,
+     "usageRate": 10,
+     "wins": 28,
+     "winRate": 58
+    },
+    {
+     "pair": "Basculegion-F + Pelipper",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Pelipper",
+     "usage": 42,
+     "usageRate": 9,
+     "wins": 25,
+     "winRate": 60
+    }
+   ],
+   "averageWinRate": 50,
+   "totalGames": 480
+  },
+  "matchupStats": {
+   "bestMatchups": [
+    {
+     "pokemon": "Raichu",
+     "gamesAgainst": 74,
+     "winsAgainst": 48,
+     "winRate": 65,
+     "timesOnTeam": 74,
+     "timesBrought": 59,
+     "attendanceRate": 80
+    },
+    {
+     "pokemon": "Rillaboom",
+     "gamesAgainst": 111,
+     "winsAgainst": 64,
+     "winRate": 58,
+     "timesOnTeam": 111,
+     "timesBrought": 79,
+     "attendanceRate": 71
+    },
+    {
+     "pokemon": "Floette-Eternal",
+     "gamesAgainst": 34,
+     "winsAgainst": 20,
+     "winRate": 58,
+     "timesOnTeam": 34,
+     "timesBrought": 34,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Volcarona",
+     "gamesAgainst": 60,
+     "winsAgainst": 34,
+     "winRate": 56,
+     "timesOnTeam": 60,
+     "timesBrought": 57,
+     "attendanceRate": 95
+    },
+    {
+     "pokemon": "Incineroar",
+     "gamesAgainst": 175,
+     "winsAgainst": 88,
+     "winRate": 50,
+     "timesOnTeam": 175,
+     "timesBrought": 125,
+     "attendanceRate": 72
+    }
+   ],
+   "worstMatchups": [
+    {
+     "pokemon": "Sneasler",
+     "gamesAgainst": 173,
+     "winsAgainst": 70,
+     "winRate": 41,
+     "timesOnTeam": 173,
+     "timesBrought": 122,
+     "attendanceRate": 70
+    },
+    {
+     "pokemon": "Kingambit",
+     "gamesAgainst": 138,
+     "winsAgainst": 58,
+     "winRate": 42,
+     "timesOnTeam": 138,
+     "timesBrought": 135,
+     "attendanceRate": 98
+    },
+    {
+     "pokemon": "Garchomp",
+     "gamesAgainst": 290,
+     "winsAgainst": 133,
+     "winRate": 46,
+     "timesOnTeam": 290,
+     "timesBrought": 134,
+     "attendanceRate": 46
+    },
+    {
+     "pokemon": "Charizard",
+     "gamesAgainst": 310,
+     "winsAgainst": 150,
+     "winRate": 48,
+     "timesOnTeam": 310,
+     "timesBrought": 310,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Basculegion",
+     "gamesAgainst": 256,
+     "winsAgainst": 125,
+     "winRate": 49,
+     "timesOnTeam": 256,
+     "timesBrought": 209,
+     "attendanceRate": 82
+    }
+   ],
+   "highestAttendance": [
+    {
+     "pokemon": "Charizard",
+     "gamesAgainst": 310,
+     "winsAgainst": 150,
+     "winRate": 48,
+     "timesOnTeam": 310,
+     "timesBrought": 310,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Floette-Eternal",
+     "gamesAgainst": 34,
+     "winsAgainst": 20,
+     "winRate": 58,
+     "timesOnTeam": 34,
+     "timesBrought": 34,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Kingambit",
+     "gamesAgainst": 138,
+     "winsAgainst": 58,
+     "winRate": 42,
+     "timesOnTeam": 138,
+     "timesBrought": 135,
+     "attendanceRate": 98
+    },
+    {
+     "pokemon": "Volcarona",
+     "gamesAgainst": 60,
+     "winsAgainst": 34,
+     "winRate": 56,
+     "timesOnTeam": 60,
+     "timesBrought": 57,
+     "attendanceRate": 95
+    },
+    {
+     "pokemon": "Basculegion",
+     "gamesAgainst": 256,
+     "winsAgainst": 125,
+     "winRate": 49,
+     "timesOnTeam": 256,
+     "timesBrought": 209,
+     "attendanceRate": 82
+    }
+   ],
+   "lowestAttendance": [
+    {
+     "pokemon": "Garchomp",
+     "gamesAgainst": 290,
+     "winsAgainst": 133,
+     "winRate": 46,
+     "timesOnTeam": 290,
+     "timesBrought": 134,
+     "attendanceRate": 46
+    },
+    {
+     "pokemon": "Sneasler",
+     "gamesAgainst": 173,
+     "winsAgainst": 70,
+     "winRate": 41,
+     "timesOnTeam": 173,
+     "timesBrought": 122,
+     "attendanceRate": 70
+    },
+    {
+     "pokemon": "Rillaboom",
+     "gamesAgainst": 111,
+     "winsAgainst": 64,
+     "winRate": 58,
+     "timesOnTeam": 111,
+     "timesBrought": 79,
+     "attendanceRate": 71
+    },
+    {
+     "pokemon": "Incineroar",
+     "gamesAgainst": 175,
+     "winsAgainst": 88,
+     "winRate": 50,
+     "timesOnTeam": 175,
+     "timesBrought": 125,
+     "attendanceRate": 72
+    },
+    {
+     "pokemon": "Raichu",
+     "gamesAgainst": 74,
+     "winsAgainst": 48,
+     "winRate": 65,
+     "timesOnTeam": 74,
+     "timesBrought": 59,
+     "attendanceRate": 80
+    }
+   ]
+  },
+  "moveUsage": {
+   "pokemonMoves": [
+    {
+     "pokemon": "Archaludon",
+     "moves": [
+      {
+       "move": "Electro Shot",
+       "timesUsed": 566,
+       "usageRate": 39
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 348,
+       "usageRate": 24
+      },
+      {
+       "move": "Dragon Pulse",
+       "timesUsed": 276,
+       "usageRate": 19
+      },
+      {
+       "move": "Snarl",
+       "timesUsed": 259,
+       "usageRate": 18
+      }
+     ]
+    },
+    {
+     "pokemon": "Basculegion-F",
+     "moves": [
+      {
+       "move": "Muddy Water",
+       "timesUsed": 622,
+       "usageRate": 51
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 388,
+       "usageRate": 32
+      },
+      {
+       "move": "Ice Beam",
+       "timesUsed": 120,
+       "usageRate": 10
+      },
+      {
+       "move": "Shadow Ball",
+       "timesUsed": 93,
+       "usageRate": 8
+      }
+     ]
+    },
+    {
+     "pokemon": "Golisopod",
+     "moves": [
+      {
+       "move": "Sucker Punch",
+       "timesUsed": 300,
+       "usageRate": 31
+      },
+      {
+       "move": "Leech Life",
+       "timesUsed": 262,
+       "usageRate": 27
+      },
+      {
+       "move": "Iron Head",
+       "timesUsed": 221,
+       "usageRate": 23
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 174,
+       "usageRate": 18
+      }
+     ]
+    },
+    {
+     "pokemon": "Pelipper",
+     "moves": [
+      {
+       "move": "Weather Ball",
+       "timesUsed": 373,
+       "usageRate": 47
+      },
+      {
+       "move": "Hurricane",
+       "timesUsed": 218,
+       "usageRate": 27
+      },
+      {
+       "move": "Wide Guard",
+       "timesUsed": 113,
+       "usageRate": 14
+      },
+      {
+       "move": "Helping Hand",
+       "timesUsed": 95,
+       "usageRate": 12
+      }
+     ]
+    },
+    {
+     "pokemon": "Raichu",
+     "moves": [
+      {
+       "move": "Volt Tackle",
+       "timesUsed": 281,
+       "usageRate": 45
+      },
+      {
+       "move": "Fake Out",
+       "timesUsed": 246,
+       "usageRate": 39
+      },
+      {
+       "move": "Volt Switch",
+       "timesUsed": 90,
+       "usageRate": 14
+      },
+      {
+       "move": "Feint",
+       "timesUsed": 11,
+       "usageRate": 2
+      }
+     ]
+    },
+    {
+     "pokemon": "Sneasler",
+     "moves": [
+      {
+       "move": "Poison Jab",
+       "timesUsed": 240,
+       "usageRate": 34
+      },
+      {
+       "move": "Close Combat",
+       "timesUsed": 191,
+       "usageRate": 27
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 168,
+       "usageRate": 24
+      },
+      {
+       "move": "Swords Dance",
+       "timesUsed": 115,
+       "usageRate": 16
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "metricsEqual": {
+  "usageStats": {
+   "pokemonStats": [
+    {
+     "pokemon": "Pelipper",
+     "usage": 475,
+     "usageRate": 99,
+     "overallWinRate": 54,
+     "leadUsage": 269,
+     "leadWinRate": 59,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Basculegion-F",
+     "usage": 415,
+     "usageRate": 86,
+     "overallWinRate": 52,
+     "leadUsage": 236,
+     "leadWinRate": 50,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Golisopod",
+     "usage": 351,
+     "usageRate": 73,
+     "overallWinRate": 55,
+     "leadUsage": 231,
+     "leadWinRate": 52,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 339,
+     "megaWinRate": 55
+    },
+    {
+     "pokemon": "Archaludon",
+     "usage": 325,
+     "usageRate": 68,
+     "overallWinRate": 52,
+     "leadUsage": 37,
+     "leadWinRate": 51,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Sneasler",
+     "usage": 183,
+     "usageRate": 38,
+     "overallWinRate": 57,
+     "leadUsage": 102,
+     "leadWinRate": 62,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 0,
+     "megaWinRate": null
+    },
+    {
+     "pokemon": "Raichu",
+     "usage": 141,
+     "usageRate": 29,
+     "overallWinRate": 54,
+     "leadUsage": 85,
+     "leadWinRate": 49,
+     "teraUsage": 0,
+     "teraWinRate": null,
+     "megaUsage": 110,
+     "megaWinRate": 52
+    }
+   ],
+   "leadPairStats": [
+    {
+     "pair": "Golisopod + Pelipper",
+     "pokemon1": "Golisopod",
+     "pokemon2": "Pelipper",
+     "usage": 132,
+     "usageRate": 28,
+     "wins": 75,
+     "winRate": 57
+    },
+    {
+     "pair": "Basculegion-F + Pelipper",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Pelipper",
+     "usage": 111,
+     "usageRate": 23,
+     "wins": 68,
+     "winRate": 61
+    },
+    {
+     "pair": "Basculegion-F + Golisopod",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Golisopod",
+     "usage": 53,
+     "usageRate": 11,
+     "wins": 18,
+     "winRate": 34
+    },
+    {
+     "pair": "Basculegion-F + Raichu",
+     "pokemon1": "Basculegion-F",
+     "pokemon2": "Raichu",
+     "usage": 45,
+     "usageRate": 9,
+     "wins": 18,
+     "winRate": 40
+    },
+    {
+     "pair": "Golisopod + Sneasler",
+     "pokemon1": "Golisopod",
+     "pokemon2": "Sneasler",
+     "usage": 29,
+     "usageRate": 6,
+     "wins": 18,
+     "winRate": 62
+    },
+    {
+     "pair": "Raichu + Sneasler",
+     "pokemon1": "Raichu",
+     "pokemon2": "Sneasler",
+     "usage": 28,
+     "usageRate": 6,
+     "wins": 18,
+     "winRate": 64
+    }
+   ],
+   "averageWinRate": 54,
+   "totalGames": 480
+  },
+  "matchupStats": {
+   "bestMatchups": [
+    {
+     "pokemon": "Raichu",
+     "gamesAgainst": 160,
+     "winsAgainst": 106,
+     "winRate": 66,
+     "timesOnTeam": 160,
+     "timesBrought": 109,
+     "attendanceRate": 68
+    },
+    {
+     "pokemon": "Volcarona",
+     "gamesAgainst": 160,
+     "winsAgainst": 97,
+     "winRate": 61,
+     "timesOnTeam": 160,
+     "timesBrought": 150,
+     "attendanceRate": 94
+    },
+    {
+     "pokemon": "Rillaboom",
+     "gamesAgainst": 240,
+     "winsAgainst": 143,
+     "winRate": 60,
+     "timesOnTeam": 240,
+     "timesBrought": 183,
+     "attendanceRate": 76
+    },
+    {
+     "pokemon": "Floette-Eternal",
+     "gamesAgainst": 120,
+     "winsAgainst": 70,
+     "winRate": 58,
+     "timesOnTeam": 120,
+     "timesBrought": 120,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Incineroar",
+     "gamesAgainst": 240,
+     "winsAgainst": 134,
+     "winRate": 56,
+     "timesOnTeam": 240,
+     "timesBrought": 185,
+     "attendanceRate": 77
+    }
+   ],
+   "worstMatchups": [
+    {
+     "pokemon": "Sneasler",
+     "gamesAgainst": 200,
+     "winsAgainst": 96,
+     "winRate": 48,
+     "timesOnTeam": 200,
+     "timesBrought": 133,
+     "attendanceRate": 66
+    },
+    {
+     "pokemon": "Charizard",
+     "gamesAgainst": 120,
+     "winsAgainst": 58,
+     "winRate": 48,
+     "timesOnTeam": 120,
+     "timesBrought": 120,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Kingambit",
+     "gamesAgainst": 160,
+     "winsAgainst": 82,
+     "winRate": 51,
+     "timesOnTeam": 160,
+     "timesBrought": 149,
+     "attendanceRate": 93
+    },
+    {
+     "pokemon": "Basculegion",
+     "gamesAgainst": 200,
+     "winsAgainst": 104,
+     "winRate": 52,
+     "timesOnTeam": 200,
+     "timesBrought": 129,
+     "attendanceRate": 64
+    },
+    {
+     "pokemon": "Garchomp",
+     "gamesAgainst": 320,
+     "winsAgainst": 172,
+     "winRate": 54,
+     "timesOnTeam": 320,
+     "timesBrought": 71,
+     "attendanceRate": 22
+    }
+   ],
+   "highestAttendance": [
+    {
+     "pokemon": "Floette-Eternal",
+     "gamesAgainst": 120,
+     "winsAgainst": 70,
+     "winRate": 58,
+     "timesOnTeam": 120,
+     "timesBrought": 120,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Charizard",
+     "gamesAgainst": 120,
+     "winsAgainst": 58,
+     "winRate": 48,
+     "timesOnTeam": 120,
+     "timesBrought": 120,
+     "attendanceRate": 100
+    },
+    {
+     "pokemon": "Volcarona",
+     "gamesAgainst": 160,
+     "winsAgainst": 97,
+     "winRate": 61,
+     "timesOnTeam": 160,
+     "timesBrought": 150,
+     "attendanceRate": 94
+    },
+    {
+     "pokemon": "Kingambit",
+     "gamesAgainst": 160,
+     "winsAgainst": 82,
+     "winRate": 51,
+     "timesOnTeam": 160,
+     "timesBrought": 149,
+     "attendanceRate": 93
+    },
+    {
+     "pokemon": "Incineroar",
+     "gamesAgainst": 240,
+     "winsAgainst": 134,
+     "winRate": 56,
+     "timesOnTeam": 240,
+     "timesBrought": 185,
+     "attendanceRate": 77
+    }
+   ],
+   "lowestAttendance": [
+    {
+     "pokemon": "Garchomp",
+     "gamesAgainst": 320,
+     "winsAgainst": 172,
+     "winRate": 54,
+     "timesOnTeam": 320,
+     "timesBrought": 71,
+     "attendanceRate": 22
+    },
+    {
+     "pokemon": "Basculegion",
+     "gamesAgainst": 200,
+     "winsAgainst": 104,
+     "winRate": 52,
+     "timesOnTeam": 200,
+     "timesBrought": 129,
+     "attendanceRate": 64
+    },
+    {
+     "pokemon": "Sneasler",
+     "gamesAgainst": 200,
+     "winsAgainst": 96,
+     "winRate": 48,
+     "timesOnTeam": 200,
+     "timesBrought": 133,
+     "attendanceRate": 66
+    },
+    {
+     "pokemon": "Raichu",
+     "gamesAgainst": 160,
+     "winsAgainst": 106,
+     "winRate": 66,
+     "timesOnTeam": 160,
+     "timesBrought": 109,
+     "attendanceRate": 68
+    },
+    {
+     "pokemon": "Rillaboom",
+     "gamesAgainst": 240,
+     "winsAgainst": 143,
+     "winRate": 60,
+     "timesOnTeam": 240,
+     "timesBrought": 183,
+     "attendanceRate": 76
+    }
+   ]
+  },
+  "moveUsage": {
+   "pokemonMoves": [
+    {
+     "pokemon": "Archaludon",
+     "moves": [
+      {
+       "move": "Electro Shot",
+       "timesUsed": 557,
+       "usageRate": 43
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 282,
+       "usageRate": 22
+      },
+      {
+       "move": "Snarl",
+       "timesUsed": 268,
+       "usageRate": 21
+      },
+      {
+       "move": "Dragon Pulse",
+       "timesUsed": 194,
+       "usageRate": 15
+      }
+     ]
+    },
+    {
+     "pokemon": "Basculegion-F",
+     "moves": [
+      {
+       "move": "Muddy Water",
+       "timesUsed": 714,
+       "usageRate": 55
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 347,
+       "usageRate": 27
+      },
+      {
+       "move": "Ice Beam",
+       "timesUsed": 115,
+       "usageRate": 9
+      },
+      {
+       "move": "Shadow Ball",
+       "timesUsed": 114,
+       "usageRate": 9
+      }
+     ]
+    },
+    {
+     "pokemon": "Golisopod",
+     "moves": [
+      {
+       "move": "Leech Life",
+       "timesUsed": 443,
+       "usageRate": 31
+      },
+      {
+       "move": "Sucker Punch",
+       "timesUsed": 403,
+       "usageRate": 28
+      },
+      {
+       "move": "Iron Head",
+       "timesUsed": 344,
+       "usageRate": 24
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 260,
+       "usageRate": 18
+      }
+     ]
+    },
+    {
+     "pokemon": "Pelipper",
+     "moves": [
+      {
+       "move": "Weather Ball",
+       "timesUsed": 401,
+       "usageRate": 45
+      },
+      {
+       "move": "Hurricane",
+       "timesUsed": 264,
+       "usageRate": 30
+      },
+      {
+       "move": "Wide Guard",
+       "timesUsed": 149,
+       "usageRate": 17
+      },
+      {
+       "move": "Helping Hand",
+       "timesUsed": 80,
+       "usageRate": 9
+      }
+     ]
+    },
+    {
+     "pokemon": "Raichu",
+     "moves": [
+      {
+       "move": "Volt Tackle",
+       "timesUsed": 155,
+       "usageRate": 43
+      },
+      {
+       "move": "Fake Out",
+       "timesUsed": 131,
+       "usageRate": 37
+      },
+      {
+       "move": "Volt Switch",
+       "timesUsed": 56,
+       "usageRate": 16
+      },
+      {
+       "move": "Feint",
+       "timesUsed": 15,
+       "usageRate": 4
+      }
+     ]
+    },
+    {
+     "pokemon": "Sneasler",
+     "moves": [
+      {
+       "move": "Poison Jab",
+       "timesUsed": 227,
+       "usageRate": 37
+      },
+      {
+       "move": "Close Combat",
+       "timesUsed": 178,
+       "usageRate": 29
+      },
+      {
+       "move": "Protect",
+       "timesUsed": 144,
+       "usageRate": 23
+      },
+      {
+       "move": "Swords Dance",
+       "timesUsed": 72,
+       "usageRate": 12
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "diagnostics": {
+  "games": 480,
+  "win_rate": 0.4998,
+  "members": [
+   {
+    "species": "Raichu",
+    "brought_rate": 0.3063,
+    "lead_rate": 0.1771,
+    "games_brought": 147,
+    "games_benched": 333,
+    "win_rate_brought": 0.5077,
+    "win_rate_benched": 0.4916,
+    "delta": 0.0161,
+    "ci95": [
+     -0.1067,
+     0.1389
+    ]
+   },
+   {
+    "species": "Golisopod",
+    "brought_rate": 0.7354,
+    "lead_rate": 0.4813,
+    "games_brought": 353,
+    "games_benched": 127,
+    "win_rate_brought": 0.4838,
+    "win_rate_benched": 0.5167,
+    "delta": -0.0329,
+    "ci95": [
+     -0.1572,
+     0.0914
+    ]
+   },
+   {
+    "species": "Archaludon",
+    "brought_rate": 0.6937,
+    "lead_rate": 0.0771,
+    "games_brought": 333,
+    "games_benched": 147,
+    "win_rate_brought": 0.499,
+    "win_rate_benched": 0.5029,
+    "delta": -0.0039,
+    "ci95": [
+     -0.1439,
+     0.136
+    ]
+   },
+   {
+    "species": "Pelipper",
+    "brought_rate": 1.0,
+    "lead_rate": 0.5604,
+    "games_brought": 480,
+    "games_benched": 0,
+    "win_rate_brought": 0.4998,
+    "win_rate_benched": null,
+    "delta": null,
+    "ci95": null
+   },
+   {
+    "species": "Basculegion-F",
+    "brought_rate": 0.8729,
+    "lead_rate": 0.4917,
+    "games_brought": 419,
+    "games_benched": 61,
+    "win_rate_brought": 0.4531,
+    "win_rate_benched": 0.6591,
+    "delta": -0.2059,
+    "ci95": [
+     -0.3585,
+     -0.0534
+    ]
+   },
+   {
+    "species": "Sneasler",
+    "brought_rate": 0.3917,
+    "lead_rate": 0.2125,
+    "games_brought": 188,
+    "games_benched": 292,
+    "win_rate_brought": 0.5954,
+    "win_rate_benched": 0.428,
+    "delta": 0.1673,
+    "ci95": [
+     0.0452,
+     0.2894
+    ]
+   }
+  ],
+  "threats": {
+   "species": [
+    {
+     "species": [
+      "Garchomp"
+     ],
+     "games": 71,
+     "win_rate": 0.4173,
+     "delta": -0.0826
+    },
+    {
+     "species": [
+      "Kingambit"
+     ],
+     "games": 152,
+     "win_rate": 0.4195,
+     "delta": -0.0804
+    },
+    {
+     "species": [
+      "Incineroar"
+     ],
+     "games": 188,
+     "win_rate": 0.4617,
+     "delta": -0.0381
+    },
+    {
+     "species": [
+      "Sneasler"
+     ],
+     "games": 138,
+     "win_rate": 0.4695,
+     "delta": -0.0304
+    },
+    {
+     "species": [
+      "Charizard"
+     ],
+     "games": 120,
+     "win_rate": 0.4833,
+     "delta": -0.0165
+    },
+    {
+     "species": [
+      "Sylveon"
+     ],
+     "games": 78,
+     "win_rate": 0.4899,
+     "delta": -0.0099
+    },
+    {
+     "species": [
+      "Basculegion"
+     ],
+     "games": 139,
+     "win_rate": 0.4904,
+     "delta": -0.0095
+    },
+    {
+     "species": [
+      "Volcarona"
+     ],
+     "games": 150,
+     "win_rate": 0.5702,
+     "delta": 0.0704
+    },
+    {
+     "species": [
+      "Rillaboom"
+     ],
+     "games": 185,
+     "win_rate": 0.5734,
+     "delta": 0.0735
+    },
+    {
+     "species": [
+      "Floette-Eternal"
+     ],
+     "games": 120,
+     "win_rate": 0.5833,
+     "delta": 0.0835
+    }
+   ],
+   "pairs": [
+    {
+     "species": [
+      "Basculegion",
+      "Kingambit"
+     ],
+     "games": 80,
+     "win_rate": 0.395,
+     "delta": -0.1048
+    },
+    {
+     "species": [
+      "Basculegion",
+      "Sneasler"
+     ],
+     "games": 71,
+     "win_rate": 0.4671,
+     "delta": -0.0328
+    },
+    {
+     "species": [
+      "Kingambit",
+      "Sneasler"
+     ],
+     "games": 109,
+     "win_rate": 0.4762,
+     "delta": -0.0237
+    },
+    {
+     "species": [
+      "Incineroar",
+      "Rillaboom"
+     ],
+     "games": 88,
+     "win_rate": 0.478,
+     "delta": -0.0218
+    },
+    {
+     "species": [
+      "Basculegion",
+      "Charizard"
+     ],
+     "games": 80,
+     "win_rate": 0.4875,
+     "delta": -0.0123
+    },
+    {
+     "species": [
+      "Incineroar",
+      "Volcarona"
+     ],
+     "games": 72,
+     "win_rate": 0.4918,
+     "delta": -0.008
+    },
+    {
+     "species": [
+      "Floette-Eternal",
+      "Kingambit"
+     ],
+     "games": 72,
+     "win_rate": 0.5556,
+     "delta": 0.0557
+    },
+    {
+     "species": [
+      "Incineroar",
+      "Kingambit"
+     ],
+     "games": 72,
+     "win_rate": 0.5556,
+     "delta": 0.0557
+    },
+    {
+     "species": [
+      "Rillaboom",
+      "Volcarona"
+     ],
+     "games": 137,
+     "win_rate": 0.5724,
+     "delta": 0.0726
+    },
+    {
+     "species": [
+      "Floette-Eternal",
+      "Incineroar"
+     ],
+     "games": 120,
+     "win_rate": 0.5833,
+     "delta": 0.0835
+    }
+   ]
+  }
+ },
+ "replays": [],
+ "status": "complete",
+ "opponents": [
+  {
+   "source": "https://pokepast.es/012ae1c09fb683df",
+   "placement": 1,
+   "record": "8-1-0",
+   "species": [
+    "Raichu",
+    "Volcarona",
+    "Rillaboom",
+    "Incineroar",
+    "Basculegion",
+    "Floette-Eternal"
+   ],
+   "usageWeight": 0.2873,
+   "games": 16,
+   "wins": 6,
+   "winRate": 0.375,
+   "ci95": [
+    0.0679,
+    0.6821
+   ],
+   "category": "even",
+   "mode": "search",
+   "preview": {
+    "value": 0.6282,
+    "verified": true,
+    "ours": [
+     {
+      "lead": [
+       "Golisopod",
+       "Sneasler"
+      ],
+      "back": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "weight": 0.4951
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Basculegion-F",
+       "Sneasler"
+      ],
+      "weight": 0.3084
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.1964
+     }
+    ]
+   },
+   "raw": {
+    "games": 40,
+    "winRate": 0.65
+   }
+  },
+  {
+   "source": "https://pokepast.es/1346520f3f60ce3c",
+   "placement": 1,
+   "record": "8-1-1",
+   "species": [
+    "Garchomp",
+    "Delphox",
+    "Sneasler",
+    "Kingambit",
+    "Basculegion",
+    "Dragonite"
+   ],
+   "usageWeight": 0.2873,
+   "games": 16,
+   "wins": 10,
+   "winRate": 0.625,
+   "ci95": [
+    0.3179,
+    0.9321
+   ],
+   "category": "even",
+   "mode": "search",
+   "preview": {
+    "value": 0.5526,
+    "verified": true,
+    "ours": [
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.3736
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Archaludon",
+       "Basculegion-F"
+      ],
+      "weight": 0.3629
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Raichu",
+       "Archaludon"
+      ],
+      "weight": 0.2634
+     }
+    ]
+   },
+   "raw": {
+    "games": 40,
+    "winRate": 0.575
+   }
+  },
+  {
+   "source": "https://pokepast.es/193e47701913ecd3",
+   "placement": 1,
+   "record": "5-0-0",
+   "species": [
+    "Arcanine-Hisui",
+    "Rillaboom",
+    "Gholdengo",
+    "Staraptor",
+    "Raichu",
+    "Primarina"
+   ],
+   "usageWeight": 0.9886,
+   "games": 40,
+   "wins": 25,
+   "winRate": 0.625,
+   "ci95": [
+    0.468,
+    0.782
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.5338,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Raichu",
+       "Archaludon"
+      ],
+      "weight": 0.3223
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "back": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "weight": 0.2738
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Sneasler"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.2305
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/1aaee1d810025883",
+   "placement": 1,
+   "record": "6-2-0",
+   "species": [
+    "Garchomp",
+    "Kingambit",
+    "Sneasler",
+    "Sinistcha",
+    "Incineroar",
+    "Floette-Eternal"
+   ],
+   "usageWeight": 0.2873,
+   "games": 40,
+   "wins": 23,
+   "winRate": 0.575,
+   "ci95": [
+    0.4117,
+    0.7383
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.6606,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Archaludon",
+       "Basculegion-F"
+      ],
+      "weight": 0.4526
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Sneasler"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.2959
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Raichu",
+       "Archaludon"
+      ],
+      "weight": 0.2515
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/1ae149a3076ae320",
+   "placement": 1,
+   "record": "9-0-0",
+   "species": [
+    "Basculegion",
+    "Sneasler",
+    "Kingambit",
+    "Whimsicott",
+    "Charizard",
+    "Garchomp"
+   ],
+   "usageWeight": 2.5858,
+   "games": 40,
+   "wins": 15,
+   "winRate": 0.375,
+   "ci95": [
+    0.218,
+    0.532
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.3957,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Raichu",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Archaludon",
+       "Pelipper"
+      ],
+      "weight": 0.616
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Archaludon",
+       "Pelipper"
+      ],
+      "weight": 0.2184
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Sneasler"
+      ],
+      "back": [
+       "Archaludon",
+       "Pelipper"
+      ],
+      "weight": 0.1655
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/1ce55d0416a731cf",
+   "placement": 1,
+   "record": "7-2-0",
+   "species": [
+    "Froslass",
+    "Incineroar",
+    "Rillaboom",
+    "Volcarona",
+    "Garchomp",
+    "Basculegion"
+   ],
+   "usageWeight": 0.6445,
+   "games": 40,
+   "wins": 16,
+   "winRate": 0.4,
+   "ci95": [
+    0.2318,
+    0.5682
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.3732,
+    "verified": true,
+    "ours": [
+     {
+      "lead": [
+       "Golisopod",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Archaludon",
+       "Pelipper"
+      ],
+      "weight": 0.5723
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.2071
+     },
+     {
+      "lead": [
+       "Archaludon",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "weight": 0.1645
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/25bb865a5a59614f",
+   "placement": 1,
+   "record": "5-1-0",
+   "species": [
+    "Salamence",
+    "Sneasler",
+    "Indeedee",
+    "Tyranitar",
+    "Corviknight",
+    "Excadrill"
+   ],
+   "usageWeight": 0.8855,
+   "games": 40,
+   "wins": 14,
+   "winRate": 0.35,
+   "ci95": [
+    0.2248,
+    0.4752
+   ],
+   "category": "unfavorable",
+   "mode": "raw",
+   "preview": {
+    "value": 0.4345,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Golisopod",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Pelipper",
+       "Sneasler"
+      ],
+      "weight": 0.3906
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Archaludon",
+       "Basculegion-F"
+      ],
+      "weight": 0.2718
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Basculegion-F",
+       "Sneasler"
+      ],
+      "weight": 0.2476
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/28122e28d7c55a01",
+   "placement": 1,
+   "record": "8-0-0",
+   "species": [
+    "Rillaboom",
+    "Sneasler",
+    "Incineroar",
+    "Floette-Eternal",
+    "Kingambit",
+    "Garchomp"
+   ],
+   "usageWeight": 0.2873,
+   "games": 40,
+   "wins": 21,
+   "winRate": 0.525,
+   "ci95": [
+    0.3925,
+    0.6575
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.5875,
+    "verified": true,
+    "ours": [
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Archaludon",
+       "Basculegion-F"
+      ],
+      "weight": 0.5443
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Sneasler"
+      ],
+      "weight": 0.2871
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Basculegion-F",
+       "Sneasler"
+      ],
+      "weight": 0.1685
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/2d4d8fbd361d2da3",
+   "placement": 1,
+   "record": "6-0-0",
+   "species": [
+    "Volcarona",
+    "Rillaboom",
+    "Raichu",
+    "Garchomp",
+    "Sylveon",
+    "Farigiraf"
+   ],
+   "usageWeight": 0.2873,
+   "games": 40,
+   "wins": 26,
+   "winRate": 0.65,
+   "ci95": [
+    0.4894,
+    0.8106
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.6144,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Sneasler"
+      ],
+      "weight": 0.3583
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Raichu",
+       "Sneasler"
+      ],
+      "weight": 0.2966
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.2181
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/305d80e7e8587bd1",
+   "placement": 1,
+   "record": "8-2-0",
+   "species": [
+    "Grimmsnarl",
+    "Golisopod",
+    "Pelipper",
+    "Charizard",
+    "Basculegion",
+    "Archaludon"
+   ],
+   "usageWeight": 2.5858,
+   "games": 40,
+   "wins": 24,
+   "winRate": 0.6,
+   "ci95": [
+    0.4318,
+    0.7682
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.4468,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Raichu",
+       "Sneasler"
+      ],
+      "back": [
+       "Archaludon",
+       "Pelipper"
+      ],
+      "weight": 0.7401
+     },
+     {
+      "lead": [
+       "Raichu",
+       "Archaludon"
+      ],
+      "back": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "weight": 0.1557
+     },
+     {
+      "lead": [
+       "Raichu",
+       "Archaludon"
+      ],
+      "back": [
+       "Pelipper",
+       "Sneasler"
+      ],
+      "weight": 0.1041
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/3284b5f682ee5ebd",
+   "placement": 1,
+   "record": "7-1-0",
+   "species": [
+    "Garchomp",
+    "Raichu",
+    "Incineroar",
+    "Volcarona",
+    "Rillaboom",
+    "Gholdengo"
+   ],
+   "usageWeight": 0.2873,
+   "games": 40,
+   "wins": 29,
+   "winRate": 0.725,
+   "ci95": [
+    0.5925,
+    0.8575
+   ],
+   "category": "favorable",
+   "mode": "raw",
+   "preview": {
+    "value": 0.7361,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Archaludon",
+       "Basculegion-F"
+      ],
+      "weight": 0.4183
+     },
+     {
+      "lead": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "back": [
+       "Raichu",
+       "Basculegion-F"
+      ],
+      "weight": 0.3845
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Golisopod",
+       "Archaludon"
+      ],
+      "weight": 0.1201
+     }
+    ]
+   }
+  },
+  {
+   "source": "https://pokepast.es/33d16de038a1d8d2",
+   "placement": 1,
+   "record": "8-1-0",
+   "species": [
+    "Charizard",
+    "Farigiraf",
+    "Incineroar",
+    "Sylveon",
+    "Aerodactyl",
+    "Garchomp"
+   ],
+   "usageWeight": 2.5858,
+   "games": 40,
+   "wins": 19,
+   "winRate": 0.475,
+   "ci95": [
+    0.3086,
+    0.6414
+   ],
+   "category": "even",
+   "mode": "raw",
+   "preview": {
+    "value": 0.3716,
+    "verified": false,
+    "ours": [
+     {
+      "lead": [
+       "Basculegion-F",
+       "Sneasler"
+      ],
+      "back": [
+       "Golisopod",
+       "Pelipper"
+      ],
+      "weight": 0.4143
+     },
+     {
+      "lead": [
+       "Raichu",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Archaludon",
+       "Pelipper"
+      ],
+      "weight": 0.4143
+     },
+     {
+      "lead": [
+       "Pelipper",
+       "Basculegion-F"
+      ],
+      "back": [
+       "Raichu",
+       "Golisopod"
+      ],
+      "weight": 0.0916
+     }
+    ]
+   }
+  }
+ ],
+ "provenance": {
+  "model": "run24-latest-70830fb1",
+  "pool_snapshot": "2026-10-23",
+  "created": "2026-11-06T01:37:55+00:00"
+ }
+}

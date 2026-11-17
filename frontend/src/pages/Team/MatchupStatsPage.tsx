@@ -5,6 +5,11 @@ import { useActiveTeam } from "../../context/ActiveTeamContext";
 import { useTeamStats } from "../../hooks/useTeamStats";
 import PokemonSprite from "../../components/pokemon/PokemonSprite";
 import { cleanPokemonName, getDisplayName } from "../../utils/pokemonNameUtils";
+import { useSimulation } from "../../context/SimulationContext";
+import { useSimulatedData } from "../../hooks/useSimulatedData";
+import { analyticsApi } from "../../services/api/analyticsApi";
+import SimulatedBar from "../../components/team/SimulatedBar";
+import type { MatchupEntry, SimulationOpponentPokemon } from "../../types";
 
 function normalizePokemonName(pokemonName: string): string {
   const cleaned = cleanPokemonName(pokemonName);
@@ -22,9 +27,43 @@ interface OpponentPokemonStats {
   attendanceRate: number;
 }
 
+const winRateOf = (wins: number, games: number) => (games > 0 ? Math.round((wins / games) * 100) : 0);
+
+function fromSimulatedEntry(m: MatchupEntry): OpponentPokemonStats {
+  return { ...m, pokemon: normalizePokemonName(m.pokemon), attendanceRate: m.attendanceRate ?? 0 };
+}
+
+/**
+ * Games and wins against every opposing Pokemon in the simulation, keyed like
+ * the replay-based map, for the custom team analysis. Attendance isn't known here.
+ */
+function simulatedMatchupsMap(opponents: SimulationOpponentPokemon[]): Map<string, OpponentPokemonStats> {
+  const map = new Map<string, OpponentPokemonStats>();
+  opponents.forEach((o) => {
+    const pokemon = normalizePokemonName(o.pokemon);
+    if (!pokemon) return;
+    const existing = map.get(pokemon);
+    const gamesAgainst = (existing?.gamesAgainst ?? 0) + o.gamesAgainst;
+    const winsAgainst = (existing?.winsAgainst ?? 0) + o.winsAgainst;
+    map.set(pokemon, {
+      pokemon,
+      gamesAgainst,
+      winsAgainst,
+      winRate: winRateOf(winsAgainst, gamesAgainst),
+      timesOnTeam: 0,
+      timesBrought: 0,
+      attendanceRate: 0,
+    });
+  });
+  return map;
+}
+
 export default function MatchupStatsPage() {
   const { team, statsVersion } = useActiveTeam();
-  const { replays, loading, refreshStats } = useTeamStats(team?.id ?? null);
+  const { replays, loading: replaysLoading, refreshStats } = useTeamStats(team?.id ?? null);
+  const { showSimulated, status: simulation } = useSimulation();
+  const simulatedMatchups = useSimulatedData((teamId) => analyticsApi.getMatchupStats(teamId, { simulated: true }));
+  const simulatedOpponents = simulation?.result?.opponentPokemon;
 
   const prevVersion = useRef(statsVersion);
   useEffect(() => {
@@ -55,7 +94,7 @@ export default function MatchupStatsPage() {
     return Array.from(pokemonSet).sort();
   }, [replays]);
 
-  const { matchupStats, allMatchupsMap } = useMemo(() => {
+  const replayMatchups = useMemo(() => {
     const emptyResult = {
       matchupStats: { bestMatchups: [] as OpponentPokemonStats[], worstMatchups: [] as OpponentPokemonStats[], highestAttendance: [] as OpponentPokemonStats[], lowestAttendance: [] as OpponentPokemonStats[] },
       allMatchupsMap: new Map<string, OpponentPokemonStats>(),
@@ -126,6 +165,22 @@ export default function MatchupStatsPage() {
     };
   }, [replays]);
 
+  const simulatedView = useMemo(() => {
+    if (!showSimulated || !simulatedMatchups.data) return null;
+    const d = simulatedMatchups.data;
+    return {
+      matchupStats: {
+        bestMatchups: d.bestMatchups.map(fromSimulatedEntry),
+        worstMatchups: d.worstMatchups.map(fromSimulatedEntry),
+        highestAttendance: d.highestAttendance.map(fromSimulatedEntry),
+        lowestAttendance: d.lowestAttendance.map(fromSimulatedEntry),
+      },
+      allMatchupsMap: simulatedMatchupsMap(simulatedOpponents ?? []),
+    };
+  }, [showSimulated, simulatedMatchups.data, simulatedOpponents]);
+
+  const { matchupStats, allMatchupsMap } = simulatedView ?? replayMatchups;
+
   const customTeamAnalysis = useMemo(() => {
     const pokemonData = selectedPokemon
       .filter((p) => p && allMatchupsMap.has(p))
@@ -147,10 +202,11 @@ export default function MatchupStatsPage() {
   const searchSuggestions = useMemo(() => {
     if (!searchQuery.trim() || searchQuery.length < 1) return [];
     const query = searchQuery.toLowerCase();
-    return uniqueOpponentPokemon
+    const candidates = showSimulated ? Array.from(allMatchupsMap.keys()).sort() : uniqueOpponentPokemon;
+    return candidates
       .filter((pokemon) => pokemon.toLowerCase().includes(query) || pokemon.replace(/-/g, " ").toLowerCase().includes(query))
       .slice(0, 8);
-  }, [searchQuery, uniqueOpponentPokemon]);
+  }, [searchQuery, uniqueOpponentPokemon, showSimulated, allMatchupsMap]);
 
   const handleSlotClick = (slotIndex: number) => {
     setActiveSlot(slotIndex);
@@ -176,6 +232,8 @@ export default function MatchupStatsPage() {
     setSelectedPokemon(newSelection);
   };
 
+  const loading = showSimulated ? simulatedMatchups.loading : replaysLoading;
+
   if (loading) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
@@ -186,9 +244,21 @@ export default function MatchupStatsPage() {
     );
   }
 
-  if (replays.length === 0) {
+  if (showSimulated && simulatedMatchups.error) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <SimulatedBar />
+        <div className="py-12 text-center">
+          <p className="mb-4 text-sm text-red-600 dark:text-red-400">Error loading simulated matchups: {simulatedMatchups.error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!showSimulated && replays.length === 0) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <SimulatedBar />
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 rounded-full bg-gray-100 p-4 dark:bg-gray-800">
             <Target className="h-8 w-8 text-gray-400" />
@@ -203,18 +273,27 @@ export default function MatchupStatsPage() {
   }
 
   const { bestMatchups, worstMatchups, highestAttendance, lowestAttendance } = matchupStats;
-  const validGameCount = replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
+  const validGameCount = showSimulated
+    ? simulation?.result?.totalGames ?? 0
+    : replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
 
   return (
     <>
       <PageMeta title="Matchup Stats | VS Recorder" description="Matchup statistics" />
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+      <SimulatedBar />
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Matchup Analysis</h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Best/Worst matchups require at least 3 encounters</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {showSimulated
+              ? "Best/Worst matchups require Pokemon on at least 3 opposing teams"
+              : "Best/Worst matchups require at least 3 encounters"}
+          </p>
         </div>
-        <span className="text-sm text-gray-500 dark:text-gray-400">Based on {validGameCount} games</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          Based on {validGameCount} {showSimulated ? "simulated " : ""}games
+        </span>
       </div>
 
       {/* Stats Cards Grid */}
