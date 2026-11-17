@@ -7,7 +7,11 @@ import PokemonSprite from "../../components/pokemon/PokemonSprite";
 import * as pokepasteService from "../../services/pokepasteService";
 import { getDisplayName, resolveAnalyticsKey } from "../../utils/pokemonNameUtils";
 import { isMegaRegulation } from "../../utils/regulationUtils";
-import type { Replay } from "../../types";
+import { useSimulation } from "../../context/SimulationContext";
+import { useSimulatedData } from "../../hooks/useSimulatedData";
+import { analyticsApi } from "../../services/api/analyticsApi";
+import SimulatedBar from "../../components/team/SimulatedBar";
+import type { Replay, UsageStats } from "../../types";
 
 function normalizePokemonName(pokemonName: string): string {
   return resolveAnalyticsKey(pokemonName);
@@ -34,6 +38,48 @@ function getMegaFromReplay(replay: Replay): string | null {
   return normalizePokemonName(userMegaEvents[0].pokemon);
 }
 
+type LeadPairStat = { pair: string; pokemon1: string; pokemon2: string; usage: number; wins: number; winRate: number; usageRate: number };
+
+const byUsage = (a: LeadPairStat, b: LeadPairStat) => b.usage - a.usage;
+const byWinRate = (a: LeadPairStat, b: LeadPairStat) => (b.winRate === a.winRate ? b.usage - a.usage : b.winRate - a.winRate);
+
+/**
+ * The engine's usage stats in the shape this page renders: rows for the paste's
+ * Pokemon first (in paste order), then any others the result has.
+ */
+function fromSimulated(data: UsageStats, teamPokemon: string[]) {
+  const byName = new Map(data.pokemonStats.map((s) => [normalizePokemonName(s.pokemon), s]));
+  const names = [...teamPokemon, ...[...byName.keys()].filter((name) => !teamPokemon.includes(name))];
+
+  const individualStats = names.map((pokemon) => {
+    const s = byName.get(pokemon);
+    return {
+      pokemon,
+      usage: s?.usage ?? 0,
+      usageRate: s?.usageRate ?? 0,
+      overallWinRate: s?.overallWinRate ?? 0,
+      leadUsage: s?.leadUsage ?? 0,
+      leadWinRate: s?.leadWinRate ?? 0,
+      teraUsage: s?.teraUsage ?? 0,
+      teraWinRate: s?.teraWinRate ?? null,
+      megaUsage: s?.megaUsage ?? 0,
+      megaWinRate: s?.megaWinRate ?? null,
+    };
+  });
+
+  const pairs: LeadPairStat[] = data.leadPairStats.map((p) => {
+    const pokemon1 = normalizePokemonName(p.pokemon1);
+    const pokemon2 = normalizePokemonName(p.pokemon2);
+    return { ...p, pokemon1, pokemon2, pair: [pokemon1, pokemon2].sort().join(" + ") };
+  });
+
+  return {
+    individualStats,
+    leadPairStats: [...pairs].sort(byUsage).slice(0, 6),
+    bestLeadStats: [...pairs].sort(byWinRate).slice(0, 6),
+  };
+}
+
 function getWinRateColor(winRate: number): string {
   if (winRate >= 60) return "text-green-600 dark:text-green-400";
   if (winRate >= 40) return "text-yellow-600 dark:text-yellow-400";
@@ -43,6 +89,8 @@ function getWinRateColor(winRate: number): string {
 export default function UsageStatsPage() {
   const { team, statsVersion } = useActiveTeam();
   const { replays, loading: replaysLoading, refreshStats } = useTeamStats(team?.id ?? null);
+  const { showSimulated } = useSimulation();
+  const simulatedUsage = useSimulatedData((teamId) => analyticsApi.getUsageStats(teamId, { simulated: true }));
 
   const prevVersion = useRef(statsVersion);
   useEffect(() => {
@@ -158,15 +206,19 @@ export default function UsageStatsPage() {
         .sort(sortFn)
         .slice(0, 6);
 
-    type LeadPairStat = { pair: string; pokemon1: string; pokemon2: string; usage: number; wins: number; winRate: number; usageRate: number };
-
-    const leadPairStats = buildLeadStats((a, b) => b.usage - a.usage);
-    const bestLeadStats = buildLeadStats((a, b) => b.winRate === a.winRate ? b.usage - a.usage : b.winRate - a.winRate);
+    const leadPairStats = buildLeadStats(byUsage);
+    const bestLeadStats = buildLeadStats(byWinRate);
 
     return { individualStats, leadPairStats, bestLeadStats };
   }, [replays, teamPokemon]);
 
-  const loading = replaysLoading || pokemonLoading;
+  const simulatedStats = useMemo(
+    () => (simulatedUsage.data ? fromSimulated(simulatedUsage.data, teamPokemon) : null),
+    [simulatedUsage.data, teamPokemon],
+  );
+
+  const loading = showSimulated ? pokemonLoading || simulatedUsage.loading : replaysLoading || pokemonLoading;
+  const loadError = showSimulated ? simulatedUsage.error : error;
 
   if (loading) {
     return (
@@ -178,19 +230,21 @@ export default function UsageStatsPage() {
     );
   }
 
-  if (error) {
+  if (loadError) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <SimulatedBar />
         <div className="py-12 text-center">
-          <p className="mb-4 text-sm text-red-600 dark:text-red-400">Error loading team data: {error}</p>
+          <p className="mb-4 text-sm text-red-600 dark:text-red-400">Error loading team data: {loadError}</p>
         </div>
       </div>
     );
   }
 
-  if (replays.length === 0) {
+  if (!showSimulated && replays.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <SimulatedBar />
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 rounded-full bg-gray-100 p-4 dark:bg-gray-800">
             <BarChart3 className="h-8 w-8 text-gray-400" />
@@ -204,8 +258,11 @@ export default function UsageStatsPage() {
     );
   }
 
-  const validGameCount = replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
-  const { individualStats, leadPairStats, bestLeadStats } = usageStats;
+  const validGameCount = showSimulated
+    ? simulatedUsage.data?.totalGames ?? 0
+    : replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
+  const { individualStats, leadPairStats, bestLeadStats } =
+    showSimulated && simulatedStats ? simulatedStats : usageStats;
   const showMega = isMegaRegulation(team?.regulation);
   const mechanicLabel = showMega ? "Mega" : "Tera";
 
@@ -213,9 +270,12 @@ export default function UsageStatsPage() {
     <>
       <PageMeta title="Usage Stats | VS Recorder" description="Pokemon usage statistics" />
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+      <SimulatedBar />
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Usage Statistics</h3>
-        <span className="text-sm text-gray-500 dark:text-gray-400">Based on {validGameCount} games</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          Based on {validGameCount} {showSimulated ? "simulated " : ""}games
+        </span>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

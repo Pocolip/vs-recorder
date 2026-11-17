@@ -3,6 +3,8 @@ import { useState } from "react";
 interface SwitchProps {
   label: string;
   defaultChecked?: boolean;
+  /** Controlled state. When set, the parent owns the value and `defaultChecked` is ignored. */
+  checked?: boolean;
   disabled?: boolean;
   onChange?: (checked: boolean) => void;
   color?: "blue" | "gray"; // Added prop to toggle color theme
@@ -11,16 +13,18 @@ interface SwitchProps {
 const Switch: React.FC<SwitchProps> = ({
   label,
   defaultChecked = false,
+  checked,
   disabled = false,
   onChange,
   color = "blue", // Default to blue color
 }) => {
-  const [isChecked, setIsChecked] = useState(defaultChecked);
+  const [internalChecked, setIsChecked] = useState(defaultChecked);
+  const isChecked = checked ?? internalChecked;
 
   const handleToggle = () => {
     if (disabled) return;
     const newCheckedState = !isChecked;
-    setIsChecked(newCheckedState);
+    if (checked === undefined) setIsChecked(newCheckedState);
     if (onChange) {
       onChange(newCheckedState);
     }
@@ -46,11 +50,15 @@ const Switch: React.FC<SwitchProps> = ({
         };
 
   return (
-    <label
-      className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
-        disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isChecked}
+      disabled={disabled}
+      className={`flex select-none items-center gap-3 text-sm font-medium ${
+        disabled ? "cursor-not-allowed text-gray-400" : "cursor-pointer text-gray-700 dark:text-gray-400"
       }`}
-      onClick={handleToggle} // Toggle when the label itself is clicked
+      onClick={handleToggle}
     >
       <div className="relative">
         <div
@@ -65,7 +73,7 @@ const Switch: React.FC<SwitchProps> = ({
         ></div>
       </div>
       {label}
-    </label>
+    </button>
   );
 };
 

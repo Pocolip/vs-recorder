@@ -1,5 +1,8 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
 
+/** An API call's rejection: the backend's message, plus its status and `error` field. */
+export type ApiError = Error & { status?: number; errorCode?: string };
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const apiClient = axios.create({
@@ -169,7 +172,14 @@ apiClient.interceptors.response.use(
       error.message ||
       "An unexpected error occurred";
 
-    return Promise.reject(new Error(errorMessage));
+    // Keep the HTTP status and the backend's `error` field, so callers can
+    // tell cases apart (e.g. a 409 "simulation_unchanged").
+    return Promise.reject(
+      Object.assign(new Error(errorMessage), {
+        status: error.response?.status as number | undefined,
+        errorCode: error.response?.data?.error as string | undefined,
+      }) as ApiError,
+    );
   },
 );
 
