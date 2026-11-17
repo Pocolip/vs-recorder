@@ -1,7 +1,11 @@
 package com.yeskatronics.vs_recorder_backend.repositories;
 
 import com.yeskatronics.vs_recorder_backend.entities.User;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,6 +24,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return Optional containing the user if found
      */
     Optional<User> findByUsername(String username);
+
+    /**
+     * Load a user with a row lock held until the transaction ends. Serializes
+     * operations that check and then consume a per-user allowance (e.g. the daily
+     * simulation cap).
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.id = :id")
+    Optional<User> findByIdForUpdate(@Param("id") Long id);
 
     /**
      * Find a user by email

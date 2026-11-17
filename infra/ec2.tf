@@ -117,6 +117,15 @@ resource "aws_instance" "main" {
   vpc_security_group_ids = [aws_security_group.ec2.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
 
+  # IMDSv2, with a hop limit of 2 so the backend container (on Docker's bridge
+  # network) can get the instance role's credentials to start the engine's worker.
+  # Changing this updates the instance in place.
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
   root_block_device {
     volume_size = 30
     volume_type = "gp3"
