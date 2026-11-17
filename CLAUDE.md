@@ -56,11 +56,18 @@ npm run build
 npm run clean
 ```
 
-### Full Stack (Docker Compose)
+### Full Stack (Docker, prod-like)
+Builds images from the working tree and runs them as prod does: the `prod` profile on Postgres, prod's JVM options and 576M memory limit, and Redis with the matchup engine feature on. Needs Docker (OrbStack on the dev Mac).
+
 ```bash
-# From project root - starts backend, frontend, and PostgreSQL
-docker-compose up
+scripts/local.sh up        # build + start, waits until healthy (app :3000, API :8080)
+scripts/local.sh status    # health and memory use
+scripts/local.sh logs backend
+scripts/local.sh worker    # play the matchup engine's worker for the next simulation job
+scripts/local.sh psql | redis | down | reset   # `help` lists everything
 ```
+
+Settings go in a gitignored `.env` at the repo root (e.g. `ENGINE_ALLOWED_USERS=<username>`). The backend image is `linux/amd64` (prod is x86, and its Alpine JRE base has no ARM build), so it runs under Rosetta on Apple Silicon.
 
 ## Architecture
 
@@ -140,7 +147,7 @@ User ─(1:N)─> GamePlan ─(1:N)─> GamePlanTeam
 1. Run `npm run start` for dev server with hot reload on port 3000
 2. Dev server proxies API requests to backend on port 8080
 3. Use React DevTools to inspect component state
-4. Environment config in `.env.development` / `.env.production` (`REACT_APP_API_BASE_URL`)
+4. Environment config in `.env.development` / `.env.production` (`VITE_API_BASE_URL`)
 
 ## Pokemon Data Registry
 
@@ -262,6 +269,20 @@ Tournament teams are pulled per regulation. The list lives in `REGULATIONS` in `
 
 Only M-C is refreshed; M-A and M-B remain available as archived LabMaus snapshots. The generator validates consumed JSON fields per source. It refuses to write when both direct sources fail, fewer than 100 complete teams were collected, or any composition size is empty. Run `node --test scripts/generate-tournament-teams.test.js 'scripts/tournament-teams/*.test.js'` to check ingestion behavior.
 
+## Matchup Engine ("Simulated" analytics)
+
+A separate matchup engine can play a team against the meta's top teams. Its result fills the Usage Stats, Matchup Stats and Move Usage pages when their **Simulated** toggle is on, and the **Diagnostics** page. Results are numbers in our own `AnalyticsDTO` shapes; no replays are stored.
+
+- **Backend:** `engine/` (settings, the Redis queue over Jedis, the EC2 worker starter, and `SimulationPoller`), `services/SimulationService`, `controllers/SimulationController`, and the entity `SimulationJob`. The analytics endpoints take `?simulated=true`.
+- **Frontend:** `context/SimulationContext.tsx` (status, polling, the toggle), `components/team/SimulatedBar.tsx`, `pages/Team/DiagnosticsPage.tsx`, and `hooks/useSimulatedData.ts`. Runs start from the **Simulations** modal (`components/modals/SimulationsModal.tsx`, a team action in the sidebar): the current job, then one section per engine feature. Simulated analytics runs at two depths, `quick` (the job's `options.search_opponents: 0`) and `full` (the engine's defaults); a full result counts as covering a quick one for the "unchanged paste" check. Matchup Planner and Replay grading are listed as coming later (the engine's ADR 0019 `plan` and `grade` jobs).
+- **Off by default:** `ENGINE_JOBS_ENABLED`. With it off, no Redis, EC2 or poller beans exist, and the UI hides everything. Only allowlisted team owners (`ENGINE_ALLOWED_USERS`, exact usernames) can run jobs, within a daily cap. Prod only; beta never gets these settings.
+- **Contract:** `SimulationResultContractTest` deserializes the engine's sample result (`backend/src/test/resources/engine/simulate-result.sample.json`) into `AnalyticsDTO`. **If you change `UsageStatsResponse`, `MatchupStatsResponse`, `MoveUsageResponse` or their nested classes, tell the engine's side**: it checks the same shapes.
+- **Keep out of this public repo:** the engine's code and methods, `REDIS_URL`, ARNs, instance IDs, and anything from a result's `provenance.method` (results are stored without it).
+
+Local development, with no engine needed: `scripts/local.sh up` (with `ENGINE_ALLOWED_USERS=<you>` in `.env`), press **Run simulation** on a Matchup Stats page, and run `scripts/local.sh worker` in a terminal. It claims the job and plays it through running, partial and complete using the sample result (`worker fail` publishes an `invalid_team` failure, `worker partial` holds at the partial until you press Cancel; it honours Cancel at every stage). The local stack polls the queue every 10 s; prod polls once a minute, and the page every 30 s while a job is unfinished.
+
+To run the backend on the host instead, start only Redis: `docker compose up -d redis`, then `(cd backend && ENGINE_JOBS_ENABLED=true ENGINE_ALLOWED_USERS='your-username' mvn spring-boot:run)`. `scripts/local.sh worker` works against that too.
+
 ## Important Notes
 
 ### Backend
@@ -321,3 +342,4 @@ Implementation plans created during Claude Code sessions:
 - **[CI/CD Decoupling & Beta Environment](~/.claude/plans/generic-cooking-cascade.md)** - Separate beta API (api.beta.vsrecorder.app) and database, automatic version bumping on develop branch, decoupled build/deploy workflows (feature→beta, develop→versioned beta, main→prod).
 - **[TeamMember Calcs](~/.claude/plans/iterative-snacking-bonbon.md)** - Per-Pokemon saved damage calc results. Backend `@ElementCollection` storage, full CRUD through existing PATCH endpoint, collapsible UI in PokemonNoteCard. Includes controller calcs bypass fix for mapper/`@ElementCollection` interaction.
 - **[Direct tournament sources](~/.claude/plans/merry-hatching-oasis.md)** - Recent Tour data from Limitless API + Reportworm instead of LabMaus (kept behind `--source=labmaus` / `TOURNAMENT_TEAMS_SOURCE`). Generator-side core clustering, inline open-teamsheet imports stored as paste text, Limitless fetch cache in CI.
+- **[Simulated analytics](~/.claude/plans/vs-recorder-matchup-engine-docs-vs-reco-sunny-swan.md)** - VS Recorder side of the matchup engine: `SimulationJob`, Redis queue + poller, EC2 worker start, `?simulated=true` analytics, Diagnostics page. Includes the Codex review fixes (per-user submit lock, commit-then-enqueue, reconcile timed-out jobs).
