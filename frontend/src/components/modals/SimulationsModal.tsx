@@ -18,11 +18,6 @@ const formatTime = (iso: string | null | undefined) =>
 /** Features that will run on the engine later, shown so users see what's coming. */
 const PLANNED_FEATURES = [
   {
-    name: "Matchup Planner",
-    description:
-      "For one opponent you add to the planner: your win rate and the leads and backs that work best for both sides, with optional turn-1 guidance.",
-  },
-  {
     name: "Replay grading",
     description:
       "For a replay or a Bo3 set: how each of your decisions compares with the engine's choices, and the ones that cost the most.",
@@ -59,6 +54,7 @@ export default function SimulationsModal({ team }: { team: Team }) {
             </h3>
             <div className="space-y-3">
               <SimulatedAnalytics status={status} teamId={team.id} />
+              <SimulatedPlans teamId={team.id} />
               {PLANNED_FEATURES.map((feature) => (
                 <div key={feature.name} className={`${card} opacity-75`}>
                   <div className="flex items-center gap-2">
@@ -260,6 +256,27 @@ function SimulatedAnalytics({ status, teamId }: { status: SimulationStatus; team
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Simulated plans run from the Matchup Planner, which shows each entry's progress. */
+function SimulatedPlans({ teamId }: { teamId: number }) {
+  const { closePanel } = useSimulation();
+  return (
+    <div className={card}>
+      <h4 className="font-semibold text-gray-800 dark:text-gray-100">Matchup Planner</h4>
+      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        For each team in your planner: the leads and backs to bring, what they bring, and your win rate, with the
+        Simulated toggle showing them in place of your own plans. Pick the teams to simulate from the planner.
+      </p>
+      <Link
+        to={`/team/${teamId}/matchup-planner`}
+        onClick={closePanel}
+        className={`${secondaryButton} mt-3 inline-block`}
+      >
+        Open Matchup Planner
+      </Link>
     </div>
   );
 }

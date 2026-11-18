@@ -1,6 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.repositories;
 
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob;
+import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Kind;
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Status;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Team-level queries take a {@link Kind}: a team has SIMULATE jobs (the analytics) and
+ * PLAN jobs (one series per Matchup Planner entry), followed separately. The poller's
+ * queries cover both.
+ */
 @Repository
 public interface SimulationJobRepository extends JpaRepository<SimulationJob, UUID> {
 
@@ -28,21 +34,39 @@ public interface SimulationJobRepository extends JpaRepository<SimulationJob, UU
     @Query("select j from SimulationJob j where j.id = :id")
     Optional<SimulationJob> findByIdForUpdate(@Param("id") UUID id);
 
-    /** The team's job ids, newest first (page with {@code PageRequest.of(0, 1)} for the latest). */
-    @Query("select j.id from SimulationJob j where j.team.id = :teamId order by j.createdAt desc")
-    List<UUID> findIdsByTeamNewestFirst(@Param("teamId") Long teamId, Pageable pageable);
+    /** The team's job ids of a kind, newest first (page with {@code PageRequest.of(0, 1)} for the latest). */
+    @Query("select j.id from SimulationJob j where j.team.id = :teamId and j.kind = :kind order by j.createdAt desc")
+    List<UUID> findIdsByTeamNewestFirst(@Param("teamId") Long teamId, @Param("kind") Kind kind, Pageable pageable);
 
     boolean existsByReconcilePendingTrueAndLastChangedAtAfter(Instant since);
 
-    /** The team's latest job, whatever its state. */
-    Optional<SimulationJob> findFirstByTeamIdOrderByCreatedAtDesc(Long teamId);
+    /** The team's latest job of a kind, whatever its state. */
+    Optional<SimulationJob> findFirstByTeamIdAndKindOrderByCreatedAtDesc(Long teamId, Kind kind);
 
-    /** The team's latest job with a result (partial or complete): what the pages show. */
-    Optional<SimulationJob> findFirstByTeamIdAndResultIsNotNullOrderByCreatedAtDesc(Long teamId);
+    /** The team's latest job of a kind with a result (partial or complete): what the pages show. */
+    Optional<SimulationJob> findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(Long teamId, Kind kind);
 
-    Optional<SimulationJob> findFirstByTeamIdAndStatusOrderByCreatedAtDesc(Long teamId, Status status);
+    Optional<SimulationJob> findFirstByTeamIdAndKindAndStatusOrderByCreatedAtDesc(Long teamId, Kind kind, Status status);
 
-    boolean existsByTeamIdAndStatusIn(Long teamId, Collection<Status> statuses);
+    boolean existsByTeamIdAndKindAndStatusIn(Long teamId, Kind kind, Collection<Status> statuses);
+
+    // ==================== Plans (one series of jobs per Matchup Planner entry) ====================
+
+    /** Every plan job of these entries, newest first. Plan results are small. */
+    List<SimulationJob> findByGamePlanTeamIdInOrderByCreatedAtDesc(Collection<Long> gamePlanTeamIds);
+
+    /** The entry's job ids, newest first (page with {@code PageRequest.of(0, 1)} for the latest). */
+    @Query("select j.id from SimulationJob j where j.gamePlanTeam.id = :entryId order by j.createdAt desc")
+    List<UUID> findIdsByGamePlanTeamNewestFirst(@Param("entryId") Long gamePlanTeamId, Pageable pageable);
+
+    boolean existsByGamePlanTeamIdAndStatusIn(Long gamePlanTeamId, Collection<Status> statuses);
+
+    Optional<SimulationJob> findFirstByGamePlanTeamIdAndStatusOrderByCreatedAtDesc(Long gamePlanTeamId, Status status);
+
+    /** The latest complete job that names its model: the model the engine runs now, as far as we know. */
+    Optional<SimulationJob> findFirstByStatusAndModelIsNotNullOrderByLastChangedAtDesc(Status status);
+
+    // ==================== The poller ====================
 
     boolean existsByStatusIn(Collection<Status> statuses);
 
@@ -55,14 +79,17 @@ public interface SimulationJobRepository extends JpaRepository<SimulationJob, UU
     @Query("select j.id from SimulationJob j where j.reconcilePending = true")
     List<UUID> findIdsByReconcilePendingTrue();
 
-    long countByRequestedByAndCreatedAtAfter(Long requestedBy, Instant since);
+    /** For the daily caps, which are per kind. */
+    long countByRequestedByAndKindAndCreatedAtAfter(Long requestedBy, Kind kind, Instant since);
 
     /**
-     * Finished jobs of deleted teams created before {@code before}, once Redis is
-     * clean. Recent ones stay: the daily cap counts them.
+     * Finished jobs of deleted teams (or, for plans, deleted entries) created before
+     * {@code before}, once Redis is clean. Recent ones stay: the daily caps count them.
      */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from SimulationJob j where j.team is null and j.cleanupPending = false"
-            + " and j.reconcilePending = false and j.status not in :unfinished and j.createdAt < :before")
-    int deleteOrphaned(@Param("unfinished") Collection<Status> unfinished, @Param("before") Instant before);
+    @Query("delete from SimulationJob j where (j.team is null or (j.kind = :plan and j.gamePlanTeam is null))"
+            + " and j.cleanupPending = false and j.reconcilePending = false"
+            + " and j.status not in :unfinished and j.createdAt < :before")
+    int deleteOrphaned(@Param("unfinished") Collection<Status> unfinished, @Param("plan") Kind plan,
+                       @Param("before") Instant before);
 }

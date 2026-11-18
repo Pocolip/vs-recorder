@@ -40,6 +40,11 @@ import * as pokepasteService from "../../services/pokepasteService";
 import { matchesPokemonTags } from "../../utils/pokemonNameUtils";
 import { useMatchupReplays } from "../../hooks/useMatchupReplays";
 import MatchupReplays from "../../components/team/MatchupReplays";
+import { useSimulation } from "../../context/SimulationContext";
+import { usePlanSimulations } from "../../hooks/usePlanSimulations";
+import { useTeamPermissions } from "../../hooks/useTeamPermissions";
+import PlannerSimulatedBar from "../../components/team/PlannerSimulatedBar";
+import SimulatePlansModal from "../../components/modals/SimulatePlansModal";
 
 export default function MatchupPlannerPage() {
   const { team, statsVersion } = useActiveTeam();
@@ -81,6 +86,26 @@ export default function MatchupPlannerPage() {
   );
 
   const isReorderable = searchTags.length === 0;
+
+  // Simulated plans: one engine job per entry. The toggle is the team's Simulated
+  // toggle, shared with the analytics pages; it swaps each entry's compositions for
+  // the engine's, and never changes the user's own.
+  const { simulated, setSimulated } = useSimulation();
+  const { isOwner } = useTeamPermissions();
+  const plansKey = useMemo(
+    () => `${team?.pokepaste ?? ""}|${opponentTeams.map((t) => `${t.id}:${t.pokepaste}`).join("|")}`,
+    [team?.pokepaste, opponentTeams],
+  );
+  const plans = usePlanSimulations(team?.id ?? null, plansKey);
+  const showPlans = simulated && plans.anyResult;
+  const canSimulate = plans.status?.enabled === true && plans.status.canRun;
+  // null: the modal picks every entry without an up-to-date plan.
+  const [simulateSelection, setSimulateSelection] = useState<number[] | null>(null);
+  const [showSimulateModal, setShowSimulateModal] = useState(false);
+  const openSimulate = (selection: number[] | null) => {
+    setSimulateSelection(selection);
+    setShowSimulateModal(true);
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveDragId(event.active.id as number);
@@ -296,6 +321,16 @@ export default function MatchupPlannerPage() {
         </div>
       </div>
 
+      {!groupByLeads && (
+        <PlannerSimulatedBar
+          plans={plans}
+          entryCount={opponentTeams.length}
+          simulated={simulated}
+          setSimulated={setSimulated}
+          onSimulate={() => openSimulate(null)}
+        />
+      )}
+
       {/* Warning if team has no pokepaste */}
       {!team?.pokepaste && (
         <div className="flex items-start gap-3 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-500/50 dark:bg-yellow-900/20">
@@ -459,6 +494,19 @@ export default function MatchupPlannerPage() {
                           onUpdateComposition={updateComposition}
                           onDeleteComposition={deleteComposition}
                           onDeleteTeam={handleDeleteOpponentTeam}
+                          plan={plans.byEntry.get(opponentTeam.id) ?? null}
+                          simulated={showPlans}
+                          onSimulate={
+                            canSimulate
+                              ? () => openSimulate([opponentTeam.id])
+                              : undefined
+                          }
+                          onCancelPlan={
+                            isOwner
+                              ? () => plans.cancel(opponentTeam.id)
+                              : undefined
+                          }
+                          planBusy={plans.busy}
                           replaySection={
                             <MatchupReplays
                               key={`${team?.id}:${opponentTeam.id}:${opponentTeam.pokepaste}`}
@@ -493,6 +541,14 @@ export default function MatchupPlannerPage() {
         isOpen={showAddTeamModal}
         onClose={() => setShowAddTeamModal(false)}
         onSubmit={handleAddOpponentTeam}
+      />
+
+      <SimulatePlansModal
+        isOpen={showSimulateModal}
+        onClose={() => setShowSimulateModal(false)}
+        entries={opponentTeams}
+        plans={plans}
+        initialSelection={simulateSelection}
       />
 
       {/* Recent Tour Modal */}

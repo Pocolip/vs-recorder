@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { describeProgress, jobProgress, simulatedScopeLabel } from "./simulationUtils";
+import {
+  describePlanProgress,
+  describeProgress,
+  jobProgress,
+  percent,
+  percentRange,
+  planErrorMessage,
+  simulatedScopeLabel,
+  staleLabel,
+} from "./simulationUtils";
 
 describe("describeProgress", () => {
   it("names each engine stage", () => {
@@ -48,5 +57,32 @@ describe("jobProgress", () => {
   it("counts a partial result as the volume games done", () => {
     expect(jobProgress(job("full", null, "PARTIAL"))).toBeCloseTo(0.35);
     expect(jobProgress(job("full", "search 3/10", "PARTIAL"))).toBeCloseTo(0.545);
+  });
+});
+
+describe("plan helpers", () => {
+  it("describes a plan job's stages", () => {
+    expect(describePlanProgress("preview 1/1")).toBe("Working out team preview");
+    expect(describePlanProgress("search 1/1")).toBe("Playing the matchup");
+    expect(describePlanProgress(null)).toBeNull();
+    expect(describePlanProgress("warming up")).toBe("warming up");
+  });
+
+  it("formats rates and intervals", () => {
+    expect(percent(0.6797)).toBe("68%");
+    expect(percent(null)).toBe("–");
+    expect(percentRange([0.5914, 0.768])).toBe("59–77%");
+    expect(percentRange(null)).toBeNull();
+  });
+
+  it("names the team an error is about", () => {
+    expect(planErrorMessage("invalid_opponent", "not 6 Pokémon")).toBe("This team can't be simulated: not 6 Pokémon");
+    expect(planErrorMessage("invalid_team", "a typo")).toBe("Your team can't be simulated: a typo");
+    expect(planErrorMessage("internal", "The simulation failed on our side.")).toBe("The simulation failed on our side.");
+  });
+
+  it("says what made a plan stale", () => {
+    expect(staleLabel({ stale: false, staleReason: null })).toBeNull();
+    expect(staleLabel({ stale: true, staleReason: "MODEL" })).toBe("The engine has improved since this plan.");
   });
 });
