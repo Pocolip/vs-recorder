@@ -362,9 +362,7 @@ public class PlanSimulationService {
         List<PlanDTO.EntryStatus> statuses = entries.stream().map(entry -> {
             List<SimulationJob> jobs = jobsByEntry.getOrDefault(entry.getId(), List.of());
             SimulationJob latest = jobs.isEmpty() ? null : jobs.get(0);
-            PlanDTO.PlanInfo result = jobs.stream()
-                    .filter(job -> job.getResult() != null)
-                    .findFirst()
+            PlanDTO.PlanInfo result = shownPlanJob(team, entry, jobs, currentModel)
                     .map(job -> toPlanInfo(team, entry, job, currentModel))
                     .orElse(null);
             return PlanDTO.EntryStatus.builder()
@@ -381,6 +379,22 @@ public class PlanSimulationService {
                 .runsLeftToday(runsLeftToday)
                 .entries(statuses)
                 .build();
+    }
+
+    /**
+     * The plan an entry shows: its latest complete one while it's current (same pastes
+     * and model), otherwise its latest with any result. A re-run that hasn't finished,
+     * or stopped after its picks arrived, never hides a complete plan that still holds.
+     *
+     * @param jobs the entry's jobs, newest first
+     */
+    static Optional<SimulationJob> shownPlanJob(Team team, GamePlanTeam entry, List<SimulationJob> jobs,
+                                                String currentModel) {
+        return jobs.stream()
+                .filter(job -> job.getStatus() == Status.COMPLETE && job.getResult() != null)
+                .findFirst()
+                .filter(job -> staleReason(team, entry, job, currentModel) == null)
+                .or(() -> jobs.stream().filter(job -> job.getResult() != null).findFirst());
     }
 
     private static SimulationDTO.JobInfo toJobInfo(SimulationJob job) {

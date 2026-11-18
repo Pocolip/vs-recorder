@@ -87,10 +87,14 @@ cmd_status() {
 }
 
 # Sets a job's final result and status, and stops serving it.
+# The result and the final status in one step, as the real worker's transaction does.
+# Written apart, the backend could see the result, finish the job and delete its keys
+# in between, and the status write would then leave the job's hash behind for good.
+PUBLISH_LUA="redis.call('SET', KEYS[1], ARGV[2]); redis.call('HSET', KEYS[2], 'status', ARGV[1]); return 1"
+
 publish() {
   local id="$1" json="$2" status="$3"
-  printf '%s' "$json" | redis -x SET "vsr:result:$id" >/dev/null
-  redis HSET "vsr:job:$id" status "$status" >/dev/null
+  printf '%s' "$json" | redis -x EVAL "$PUBLISH_LUA" 2 "vsr:result:$id" "vsr:job:$id" "$status" >/dev/null
   redis LREM vsr:processing:local 0 "$JOB" >/dev/null
   echo "Published a $status result."
 }

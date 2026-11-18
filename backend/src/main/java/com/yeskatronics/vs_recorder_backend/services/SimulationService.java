@@ -594,8 +594,7 @@ public class SimulationService {
         }
         Team team = access.getTeam();
         Optional<SimulationJob> latest = jobRepository.findFirstByTeamIdAndKindOrderByCreatedAtDesc(team.getId(), Kind.SIMULATE);
-        Optional<SimulationJob> withResult = jobRepository
-                .findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(team.getId(), Kind.SIMULATE);
+        Optional<SimulationJob> withResult = shownResultJob(team.getId());
 
         boolean canRun = false;
         String blockedReason = null;
@@ -688,9 +687,22 @@ public class SimulationService {
         if (!properties.enabled()) {
             throw new SimulationNotFoundException("Simulations are not enabled");
         }
-        SimulationJob job = jobRepository.findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(teamId, Kind.SIMULATE)
+        SimulationJob job = shownResultJob(teamId)
                 .orElseThrow(() -> new SimulationNotFoundException("This team has no simulation result yet"));
         return new StoredResult(job, parse(job));
+    }
+
+    /**
+     * The job whose result the pages show: the latest complete one while the team's
+     * paste is still the one it ran, otherwise the latest with any result (a partial,
+     * or one kept from a run that failed or was cancelled after it). So a re-run that
+     * hasn't finished, or stopped early, never hides a complete result for the same
+     * paste, and the status and every simulated page agree on which result it is.
+     */
+    private Optional<SimulationJob> shownResultJob(Long teamId) {
+        return jobRepository.findFirstByTeamIdAndKindAndStatusOrderByCreatedAtDesc(teamId, Kind.SIMULATE, Status.COMPLETE)
+                .filter(job -> job.getResult() != null && job.getTeam() != null && !isStale(job.getTeam(), job))
+                .or(() -> jobRepository.findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(teamId, Kind.SIMULATE));
     }
 
     private SimulationResult parse(SimulationJob job) {

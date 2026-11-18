@@ -501,6 +501,45 @@ class SimulationFlowTest {
     }
 
     @Test
+    void aReRunThatStopsAfterItsPartialKeepsShowingTheCompleteResult() {
+        UUID first = submit(false).getJob().getId();
+        finishWith(first, completeJson);
+
+        UUID rerun = submit(true).getJob().getId();
+        String key = rerun.toString();
+        when(queue.jobState(key)).thenReturn(Map.of("status", "running", "progress", "search 3/10", "partial", "1"));
+        when(queue.partial(key)).thenReturn(Optional.of(partialJson));
+        poller.poll();
+        // While it runs, the complete result stays
+        assertEquals(first, simulationService.getStatus(team.getId(), owner.getId(), "sim-owner").getResult().getJobId());
+
+        finishWith(rerun, failedJson(rerun, "cancelled", "cancelled"));
+        SimulationDTO.StatusResponse status = simulationService.getStatus(team.getId(), owner.getId(), "sim-owner");
+        assertEquals("CANCELLED", status.getJob().getStatus());
+        assertEquals(first, status.getResult().getJobId());
+        assertEquals("complete", status.getResult().getStatus());
+        // And the pages serve the same one
+        assertEquals("complete", simulationService.getDiagnostics(team.getId(), owner.getId()).getResultStatus());
+    }
+
+    @Test
+    void aStoppedReRunOfAChangedPasteShowsItsPartial() {
+        UUID first = submit(false).getJob().getId();
+        finishWith(first, completeJson);
+        team.setPokepaste("https://pokepast.es/edited");
+        teamRepository.save(team);
+
+        UUID rerun = submit(true).getJob().getId();
+        when(queue.partial(rerun.toString())).thenReturn(Optional.of(partialJson));
+        finishWith(rerun, failedJson(rerun, "cancelled", "cancelled"));
+
+        SimulationDTO.ResultInfo result = simulationService.getStatus(team.getId(), owner.getId(), "sim-owner").getResult();
+        assertEquals(rerun, result.getJobId());
+        assertEquals("partial", result.getStatus());
+        assertFalse(result.isStale());
+    }
+
+    @Test
     void aPartialPublishedBeforeAFailureIsKept() {
         UUID id = submit(false).getJob().getId();
         when(queue.partial(id.toString())).thenReturn(Optional.of(partialJson));

@@ -452,6 +452,52 @@ class PlanSimulationFlowTest {
         assertEquals(1, status().getEntries().size());
     }
 
+    @Test
+    void aReRunThatStopsAfterItsPicksKeepsShowingTheCompletePlan() {
+        UUID first = latestJobId(byUrl);
+        finishWith(first, completeJson);
+
+        PlanDTO.SubmitResponse resubmitted = submit(true, byUrl);
+        assertTrue(outcome(resubmitted, byUrl).isQueued());
+        UUID rerun = entryStatus(resubmitted.getStatus(), byUrl).getJob().getId();
+        String key = rerun.toString();
+        when(queue.jobState(key)).thenReturn(Map.of("status", "running", "progress", "preview 1/1", "partial", "1"));
+        when(queue.partial(key)).thenReturn(Optional.of(partialJson));
+        poller.poll();
+
+        // While it runs, the complete plan stays, win rate and all
+        PlanDTO.EntryStatus during = entryStatus(status(), byUrl);
+        assertEquals("PARTIAL", during.getJob().getStatus());
+        assertEquals(first, during.getResult().getJobId());
+        assertNotNull(during.getResult().getWinRate());
+
+        // Cancelled after its picks: still the complete plan
+        finishWith(rerun, failedJson(rerun, "cancelled", "cancelled"));
+        PlanDTO.EntryStatus after = entryStatus(status(), byUrl);
+        assertEquals("CANCELLED", after.getJob().getStatus());
+        assertEquals(first, after.getResult().getJobId());
+        assertEquals("complete", after.getResult().getStatus());
+    }
+
+    @Test
+    void aStoppedReRunForAChangedOpponentShowsItsPicks() {
+        UUID first = latestJobId(byUrl);
+        finishWith(first, completeJson);
+        String edited = "https://pokepast.es/frankfurt-edited";
+        pasteAt(edited, "Kingambit @ Black Glasses\nAbility: Defiant\n- Kowtow Cleave\n");
+        byUrl.setPokepaste(edited);
+        gamePlanTeamRepository.save(byUrl);
+
+        UUID rerun = latestJobId(byUrl);
+        when(queue.partial(rerun.toString())).thenReturn(Optional.of(partialJson));
+        finishWith(rerun, failedJson(rerun, "cancelled", "cancelled"));
+
+        PlanDTO.PlanInfo result = entryStatus(status(), byUrl).getResult();
+        assertEquals(rerun, result.getJobId());
+        assertEquals("partial", result.getStatus());
+        assertFalse(result.isStale());
+    }
+
     // ==================== Helpers ====================
 
     private PlanDTO.SubmitResponse submit(boolean force, GamePlanTeam... entries) {
