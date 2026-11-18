@@ -7,6 +7,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 FIXTURE="backend/src/test/resources/engine/simulate-result.sample.json"
+PLAN_FIXTURE="backend/src/test/resources/engine/plan-result.sample.json"
 STEP_SECONDS="${STEP_SECONDS:-15}"
 
 compose() { docker compose "$@"; }
@@ -23,9 +24,13 @@ Usage: scripts/local.sh <command>
   logs [service]    Follow logs (backend, frontend, postgres, redis)
   psql              A psql shell on the local database
   redis [args]      redis-cli in the Redis container (e.g. `redis keys 'vsr:*'`)
-  worker [outcome]  Play the matchup engine's worker for the next job, with the sample result.
-                    Outcome: complete (default), fail, or partial (holds there until Cancel).
-                    Waits for a job if none is queued; honours Cancel. STEP_SECONDS=15 per stage.
+  worker [outcome] [jobs]
+                    Play the matchup engine's worker for the next job, with the sample result
+                    (simulate or plan, by the job's kind). Outcome: complete (default), fail, or
+                    partial (holds there until Cancel). jobs: how many to play, one after another
+                    as the real worker does (default 1; 0 = until Ctrl-C), e.g. `worker complete 0`
+                    for a batch of Matchup Planner plans. Waits for a job if none is queued;
+                    honours Cancel. STEP_SECONDS=15 per stage.
 
 URLs: app http://localhost:3000, API http://localhost:8080 (Swagger at /swagger-ui.html).
 
@@ -91,35 +96,56 @@ publish() {
 }
 
 failed_json() {
-  jq -cn --arg id "$1" --arg code "$2" --arg message "$3" \
-    '{schema_version: 1, kind: "simulate", job_id: $id, regulation: "gen9championsvgc2026regmc",
+  jq -cn --arg id "$1" --arg code "$2" --arg message "$3" --arg kind "${KIND:-simulate}" \
+    '{schema_version: 1, kind: $kind, job_id: $id, regulation: "gen9championsvgc2026regmc",
       status: "failed", error: {code: $code, message: $message}}'
 }
 
-# Between stages, publishes a cancelled result if the user pressed Cancel.
+# Between stages, publishes a cancelled result if the user pressed Cancel (and returns 1).
 step() {
   local id="$1" label="$2"
   echo "$label"
   sleep "$STEP_SECONDS"
   if [[ "$(redis EXISTS "vsr:cancel:$id")" == "1" ]]; then
     publish "$id" "$(failed_json "$id" cancelled cancelled)" failed
-    exit 0
+    return 1
   fi
 }
 
 cmd_worker() {
-  local outcome="${1:-complete}"
+  local outcome="${1:-complete}" jobs="${2:-1}"
   case "$outcome" in complete | fail | partial) ;; *) usage; exit 1 ;; esac
+  [[ "$jobs" =~ ^[0-9]+$ ]] || { usage; exit 1; }
   command -v jq >/dev/null || { echo "This needs jq (brew install jq)." >&2; exit 1; }
 
-  echo "Waiting for a job (press Run simulation in the app)..."
+  local played=0
+  while [[ "$jobs" == 0 || "$played" -lt "$jobs" ]]; do
+    play_one "$outcome"
+    played=$((played + 1))
+  done
+}
+
+# Claims the next job and plays it through, as its kind's worker stages do.
+play_one() {
+  local outcome="$1"
+  echo "Waiting for a job (press Run simulation, or Simulate on the Matchup Planner)..."
   JOB="$(redis BLMOVE vsr:jobs vsr:processing:local RIGHT LEFT 0)"
   local id
   id="$(jq -r .job_id <<<"$JOB")"
-  echo "Claimed job $id"
+  KIND="$(jq -r '.kind // "simulate"' <<<"$JOB")"
+  echo "Claimed $KIND job $id"
 
+  if [[ "$KIND" == "plan" ]]; then
+    play_plan "$id" "$outcome"
+  else
+    play_simulate "$id" "$outcome"
+  fi
+}
+
+play_simulate() {
+  local id="$1" outcome="$2"
   redis HSET "vsr:job:$id" status running progress "preview 12/40" >/dev/null
-  step "$id" "Running..."
+  step "$id" "Running..." || return 0
 
   if [[ "$outcome" == "fail" ]]; then
     publish "$id" "$(failed_json "$id" invalid_team "the team isn't valid: a team has 6 Pokémon, this one 5")" failed
@@ -129,14 +155,42 @@ cmd_worker() {
   jq -c --arg id "$id" '.job_id = $id | .status = "partial"' "$FIXTURE" | redis -x SET "vsr:partial:$id" >/dev/null
   redis HSET "vsr:job:$id" partial 1 progress "search 3/10" >/dev/null
   if [[ "$outcome" == "partial" ]]; then
-    echo "Published a partial result. Holding the job running until you press Cancel in the app..."
-    until [[ "$(redis EXISTS "vsr:cancel:$id")" == "1" ]]; do sleep 2; done
-    publish "$id" "$(failed_json "$id" cancelled cancelled)" failed
+    hold_until_cancel "$id"
     return
   fi
-  step "$id" "Published a partial result; refining..."
+  step "$id" "Published a partial result; refining..." || return 0
 
   publish "$id" "$(jq -c --arg id "$id" '.job_id = $id' "$FIXTURE")" complete
+}
+
+# A plan: the preview solve (then the compositions as a partial), then the search games.
+play_plan() {
+  local id="$1" outcome="$2"
+  redis HSET "vsr:job:$id" status running progress "preview 1/1" >/dev/null
+  step "$id" "Working out team preview..." || return 0
+
+  if [[ "$outcome" == "fail" ]]; then
+    publish "$id" "$(failed_json "$id" invalid_opponent "the team isn't valid: a team has 6 Pokémon, this one 4")" failed
+    return
+  fi
+
+  jq -c --arg id "$id" '.job_id = $id | .status = "partial" | del(.games, .wins, .losses, .ties, .winRate, .ci95, .category)' \
+    "$PLAN_FIXTURE" | redis -x SET "vsr:partial:$id" >/dev/null
+  redis HSET "vsr:job:$id" partial 1 progress "search 1/1" >/dev/null
+  if [[ "$outcome" == "partial" ]]; then
+    hold_until_cancel "$id"
+    return
+  fi
+  step "$id" "Published the compositions; playing the matchup..." || return 0
+
+  publish "$id" "$(jq -c --arg id "$id" '.job_id = $id' "$PLAN_FIXTURE")" complete
+}
+
+hold_until_cancel() {
+  local id="$1"
+  echo "Published a partial result. Holding the job running until you press Cancel in the app..."
+  until [[ "$(redis EXISTS "vsr:cancel:$id")" == "1" ]]; do sleep 2; done
+  publish "$id" "$(failed_json "$id" cancelled cancelled)" failed
 }
 
 case "${1:-help}" in

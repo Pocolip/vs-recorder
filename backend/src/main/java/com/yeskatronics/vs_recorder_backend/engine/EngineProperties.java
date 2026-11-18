@@ -18,7 +18,9 @@ import java.util.List;
  * @param workerInstanceIds EC2 instance IDs of the engine's workers; the first is started
  * @param awsRegion         region of the workers
  * @param allowedUsers      usernames allowed to run jobs (exact match, as usernames are); empty means nobody
- * @param dailyCap          jobs a user may submit per UTC day
+ * @param dailyCap          simulations (Simulated analytics) a user may submit per UTC day
+ * @param planDailyCap      Matchup Planner plans a user may submit per UTC day, one per entry.
+ *                          Separate because plans are cheap and come in batches.
  * @param staleTimeout      a job with no change in status or progress for this long is failed
  */
 @ConfigurationProperties(prefix = "engine")
@@ -30,6 +32,7 @@ public record EngineProperties(
         @DefaultValue("us-east-1") String awsRegion,
         @DefaultValue List<String> allowedUsers,
         @DefaultValue("3") int dailyCap,
+        @DefaultValue("20") int planDailyCap,
         @DefaultValue("PT3H") Duration staleTimeout
 ) {
 

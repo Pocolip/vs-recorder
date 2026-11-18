@@ -517,7 +517,7 @@ class SimulationFlowTest {
         doThrow(new RuntimeException("connection refused")).when(queue).submit(anyString());
 
         assertThrows(SimulationUnavailableException.class, () -> submit(false));
-        SimulationJob job = jobRepository.findFirstByTeamIdOrderByCreatedAtDesc(team.getId()).orElseThrow();
+        SimulationJob job = jobRepository.findFirstByTeamIdAndKindOrderByCreatedAtDesc(team.getId(), SimulationJob.Kind.SIMULATE).orElseThrow();
         assertEquals(Status.FAILED, job.getStatus());
         assertEquals("queue_unavailable", job.getErrorCode());
         verify(workerStarter, never()).start();

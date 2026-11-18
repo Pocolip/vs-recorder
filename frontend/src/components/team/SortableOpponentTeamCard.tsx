@@ -4,7 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import OpponentTeamCard from "./OpponentTeamCard";
 import PokemonTeam from "../pokemon/PokemonTeam";
-import type { Composition } from "../../types";
+import type { Composition, PlanEntryStatus } from "../../types";
 
 interface OpponentTeam {
   id: number;
@@ -37,6 +37,11 @@ interface SortableOpponentTeamCardProps {
   ) => Promise<unknown>;
   onDeleteComposition: (id: number, index: number) => Promise<unknown>;
   onDeleteTeam: (id: number) => Promise<unknown>;
+  plan?: PlanEntryStatus | null;
+  simulated?: boolean;
+  onSimulate?: () => void;
+  onCancelPlan?: () => void;
+  planBusy?: boolean;
 }
 
 const SortableOpponentTeamCard: React.FC<SortableOpponentTeamCardProps> = ({

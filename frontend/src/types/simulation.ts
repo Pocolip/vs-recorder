@@ -83,3 +83,74 @@ export interface SimulationDiagnostics {
   threatSpecies: SimulationThreat[];
   threatPairs: SimulationThreat[];
 }
+
+// ==================== Simulated Matchup Planner plans (backend PlanDTO) ====================
+
+/** A plan job: a SimulationJob with no depth. */
+export type PlanJob = Omit<SimulationJob, "depth"> & { depth?: null };
+
+/** A composition (lead1, lead2, back1, back2, notes) plus its share of the engine's mix, 0-1. */
+export interface PlanComposition {
+  lead1: string;
+  lead2: string;
+  back1: string;
+  back2: string;
+  notes: string;
+  weight: number | null;
+}
+
+export type PlanCategory = "favorable" | "even" | "unfavorable";
+
+/** What changed since a plan: the user's team, the entry's team, or the engine's model. */
+export type PlanStaleReason = "TEAM" | "OPPONENT" | "MODEL";
+
+export interface PlanResultInfo {
+  jobId: string;
+  /** "partial": the compositions are ready, the win rate is pending. */
+  status: "partial" | "complete";
+  stale: boolean;
+  staleReason: PlanStaleReason | null;
+  compositions: PlanComposition[];
+  opponentCompositions: PlanComposition[];
+  opponentSummary: string | null;
+  /** Null until complete. Rates are 0-1. */
+  games: number | null;
+  wins: number | null;
+  losses: number | null;
+  ties: number | null;
+  winRate: number | null;
+  ci95: [number, number] | null;
+  category: PlanCategory | null;
+  previewValue: number | null;
+  /** What always bringing the top composition costs against an opponent who expects it. */
+  simplifyCost: number | null;
+  opponentSpreads: "sheet" | "paste" | null;
+  createdAt: string | null;
+}
+
+export interface PlanEntryStatus {
+  gamePlanTeamId: number;
+  job: PlanJob | null;
+  result: PlanResultInfo | null;
+}
+
+export interface PlanStatus {
+  enabled: boolean;
+  canRun: boolean;
+  runBlockedReason: string | null;
+  /** Plans the viewer may still submit today; null unless they may run them on this team. */
+  runsLeftToday: number | null;
+  entries: PlanEntryStatus[];
+}
+
+export interface PlanSubmitOutcome {
+  gamePlanTeamId: number;
+  queued: boolean;
+  errorCode: string | null;
+  message: string | null;
+}
+
+export interface PlanSubmitResponse {
+  outcomes: PlanSubmitOutcome[];
+  status: PlanStatus;
+}

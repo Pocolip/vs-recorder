@@ -1,4 +1,4 @@
-import type { SimulationDepth, SimulationJob } from "../types";
+import type { PlanCategory, PlanResultInfo, PlanStaleReason, SimulationDepth, SimulationJob } from "../types";
 
 const STAGES: Record<string, string> = {
   preview: "Previewing opponents",
@@ -78,4 +78,62 @@ export function jobProgress(job: Pick<SimulationJob, "depth" | "status" | "progr
   // A partial result means the volume games are done, whatever the text says.
   if (job.status === "PARTIAL") fraction = Math.max(fraction ?? 0, spans.games?.[1] ?? 0);
   return fraction;
+}
+
+// ==================== Simulated Matchup Planner plans ====================
+
+const PLAN_STAGES: Record<string, string> = {
+  preview: "Working out team preview",
+  search: "Playing the matchup",
+};
+
+/** A plan job's progress text, readable: "search 1/1" → "Playing the matchup". */
+export function describePlanProgress(progress: string | null | undefined): string | null {
+  if (!progress) return null;
+  const match = /^(\w+)\s+\d+\/\d+$/.exec(progress.trim());
+  if (!match) return progress;
+  return PLAN_STAGES[match[1]] ?? progress;
+}
+
+/** The caveat shown with every simulated plan. */
+export const PLAN_CAVEAT =
+  "Simulated against the engine playing this team well, not against a person: a real opponent can do much better or worse.";
+
+/** One entry at a time costs about as much as three together, because the engine has to start. */
+export const SINGLE_PLAN_WARNING =
+  "Simulating one team at a time costs about as much as three in a batch: the engine has to start up. Select several teams to simulate them together.";
+
+/** "68%" from 0.6797. */
+export function percent(rate: number | null | undefined): string {
+  return rate == null ? "–" : `${Math.round(rate * 100)}%`;
+}
+
+/** "59–77%" from [0.5914, 0.768]. */
+export function percentRange(ci95: [number, number] | null | undefined): string | null {
+  if (!ci95) return null;
+  return `${Math.round(ci95[0] * 100)}–${Math.round(ci95[1] * 100)}%`;
+}
+
+export const CATEGORY_LABEL: Record<PlanCategory, string> = {
+  favorable: "Favorable",
+  even: "Even",
+  unfavorable: "Unfavorable",
+};
+
+const STALE_LABEL: Record<PlanStaleReason, string> = {
+  TEAM: "Your team's paste changed since this plan.",
+  OPPONENT: "This team's paste changed since this plan.",
+  MODEL: "The engine has improved since this plan.",
+};
+
+export function staleLabel(result: Pick<PlanResultInfo, "stale" | "staleReason">): string | null {
+  if (!result.stale) return null;
+  return result.staleReason ? STALE_LABEL[result.staleReason] : "Something changed since this plan.";
+}
+
+/** A failed plan's message, saying which team it's about. */
+export function planErrorMessage(errorCode: string | null, message: string | null): string {
+  if (errorCode === "invalid_opponent") return `This team can't be simulated: ${message ?? "it isn't valid"}`;
+  if (errorCode === "invalid_team") return `Your team can't be simulated: ${message ?? "it isn't valid"}`;
+  return message || "The simulation failed.";
 }

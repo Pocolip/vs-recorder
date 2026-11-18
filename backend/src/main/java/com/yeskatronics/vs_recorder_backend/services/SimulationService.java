@@ -13,6 +13,7 @@ import com.yeskatronics.vs_recorder_backend.engine.EngineQueue;
 import com.yeskatronics.vs_recorder_backend.engine.WorkerStarter;
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob;
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Depth;
+import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Kind;
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Status;
 import com.yeskatronics.vs_recorder_backend.entities.Team;
 import com.yeskatronics.vs_recorder_backend.exceptions.RateLimitExceededException;
@@ -49,6 +50,9 @@ import java.util.stream.Collectors;
  *
  * Results are only numbers in VS Recorder's own analytics shapes, so the "Simulated"
  * pages are the real pages fed from a stored result instead of replays.
+ *
+ * Polling covers every kind of job; Matchup Planner plans are submitted and served by
+ * {@link PlanSimulationService}.
  */
 @Service
 @RequiredArgsConstructor
@@ -64,11 +68,12 @@ public class SimulationService {
     static final String GENERIC_FAILURE = "The simulation failed on our side. Please try again later.";
     static final String UNSUPPORTED_REGULATION = "Simulations only support VGC 2026 Regulation M-C for now.";
 
-    private static final String ERROR_INVALID_TEAM = "invalid_team";
+    static final String ERROR_INVALID_TEAM = "invalid_team";
+    static final String ERROR_INVALID_OPPONENT = "invalid_opponent";
     private static final String ERROR_CANCELLED = "cancelled";
     private static final String ERROR_INTERNAL = "internal";
     private static final String ERROR_TIMEOUT = "timeout";
-    private static final String ERROR_QUEUE_UNAVAILABLE = "queue_unavailable";
+    static final String ERROR_QUEUE_UNAVAILABLE = "queue_unavailable";
     static final String QUEUE_UNAVAILABLE = "Simulations are unavailable right now. Please try again later.";
 
     /** How long the worker is still woken for a job being reconciled. */
@@ -140,12 +145,12 @@ public class SimulationService {
                     .orElseThrow(() -> new TeamAccessDeniedException("User not found"));
             Team team = teamAccessService.requireOwner(teamId, userId).getTeam();
 
-            if (jobRepository.existsByTeamIdAndStatusIn(teamId, SimulationJob.UNFINISHED)) {
+            if (jobRepository.existsByTeamIdAndKindAndStatusIn(teamId, Kind.SIMULATE, SimulationJob.UNFINISHED)) {
                 throw new SimulationConflictException(SimulationConflictException.UNFINISHED,
                         "A simulation for this team is already running.");
             }
             if (!force) {
-                jobRepository.findFirstByTeamIdAndStatusOrderByCreatedAtDesc(teamId, Status.COMPLETE)
+                jobRepository.findFirstByTeamIdAndKindAndStatusOrderByCreatedAtDesc(teamId, Kind.SIMULATE, Status.COMPLETE)
                         .filter(latest -> pasteSha256.equals(latest.getPasteSha256()))
                         .filter(latest -> latest.getDepth().covers(depth))
                         .ifPresent(latest -> {
@@ -161,6 +166,7 @@ public class SimulationService {
 
             SimulationJob job = new SimulationJob();
             job.setId(UUID.randomUUID());
+            job.setKind(Kind.SIMULATE);
             job.setTeam(team);
             job.setRequestedBy(userId);
             job.setPasteUrl(submission.pasteUrl());
@@ -175,16 +181,7 @@ public class SimulationService {
         try {
             queue().submit(jobJson(jobId, submission.regulation(), pasteText, depth));
         } catch (RuntimeException e) {
-            log.error("Couldn't queue simulation job {}: {}", jobId, e.getClass().getSimpleName());
-            // The push may have landed even though it reported failure, so the job isn't
-            // abandoned: reconciliation keeps it cancelled until a worker is done with it.
-            transactions.executeWithoutResult(tx -> jobRepository.findByIdForUpdate(jobId).ifPresent(job -> {
-                job.setStatus(Status.FAILED);
-                job.setErrorCode(ERROR_QUEUE_UNAVAILABLE);
-                job.setErrorMessage(QUEUE_UNAVAILABLE);
-                job.setLastChangedAt(Instant.now());
-                job.setReconcilePending(true);
-            }));
+            recordQueueFailure(jobId, e);
             throw new SimulationUnavailableException(QUEUE_UNAVAILABLE, e);
         }
         log.info("Submitted {} simulation job {} for team {}", depth, jobId, teamId);
@@ -195,6 +192,22 @@ public class SimulationService {
     }
 
     private record Submission(String pasteUrl, String regulation) {}
+
+    /**
+     * A committed job couldn't be pushed. The push may have landed even though it
+     * reported failure, so the job isn't abandoned: reconciliation keeps it cancelled
+     * until a worker is done with it. Runs in a transaction of its own.
+     */
+    void recordQueueFailure(UUID jobId, RuntimeException cause) {
+        log.error("Couldn't queue simulation job {}: {}", jobId, cause.getClass().getSimpleName());
+        transactions.executeWithoutResult(tx -> jobRepository.findByIdForUpdate(jobId).ifPresent(job -> {
+            job.setStatus(Status.FAILED);
+            job.setErrorCode(ERROR_QUEUE_UNAVAILABLE);
+            job.setErrorMessage(QUEUE_UNAVAILABLE);
+            job.setLastChangedAt(Instant.now());
+            job.setReconcilePending(true);
+        }));
+    }
 
     public SimulationDTO.StatusResponse getStatus(Long teamId, Long userId, String username) {
         TeamAccess access = teamAccessService.resolve(teamId, userId);
@@ -214,7 +227,7 @@ public class SimulationService {
         TeamAccess access = teamAccessService.requireOwner(teamId, userId);
         // Only the id first: the job itself must first be read under the lock, or this
         // persistence context would hand back a stale copy.
-        jobRepository.findIdsByTeamNewestFirst(teamId, PageRequest.of(0, 1)).stream().findFirst()
+        jobRepository.findIdsByTeamNewestFirst(teamId, Kind.SIMULATE, PageRequest.of(0, 1)).stream().findFirst()
                 .flatMap(jobRepository::findByIdForUpdate)
                 .filter(SimulationJob::isUnfinished)
                 .filter(job -> !job.isCancelRequested())
@@ -340,7 +353,7 @@ public class SimulationService {
      */
     @Transactional
     public int purgeOrphanedJobs(Instant now) {
-        return jobRepository.deleteOrphaned(SimulationJob.UNFINISHED, now.minus(ORPHAN_RETENTION));
+        return jobRepository.deleteOrphaned(SimulationJob.UNFINISHED, Kind.PLAN, now.minus(ORPHAN_RETENTION));
     }
 
     /**
@@ -395,8 +408,11 @@ public class SimulationService {
         EngineQueue queue = queue();
         String id = job.getId().toString();
 
-        // The team was deleted: nobody will look at this job, so stop the engine early.
-        if (job.getTeam() == null && !job.isCancelRequested()) {
+        // The team (or the plan's entry) was deleted: nobody will look at this job, so
+        // stop the engine early.
+        boolean orphaned = job.getTeam() == null
+                || (job.getKind() == Kind.PLAN && job.getGamePlanTeam() == null);
+        if (orphaned && !job.isCancelRequested()) {
             queue.cancel(id);
             job.setCancelRequested(true);
         }
@@ -513,6 +529,7 @@ public class SimulationService {
             try {
                 job.setResult(sanitize(resultJson));
                 job.setStatus(Status.COMPLETE);
+                job.setModel(modelOf(result));
                 log.info("Simulation job {} complete", id);
             } catch (JsonProcessingException e) {
                 log.error("Unreadable result for simulation job {}: {}", id, e.getOriginalMessage());
@@ -540,21 +557,33 @@ public class SimulationService {
             log.info("Simulation job {} cancelled", id);
             return;
         }
-        if (ERROR_INVALID_TEAM.equals(code)) {
-            log.info("Simulation job {} rejected the team: {}", id, message);
+        if (ERROR_INVALID_TEAM.equals(code) || ERROR_INVALID_OPPONENT.equals(code)) {
+            log.info("Simulation job {} rejected a team ({}): {}", id, code, message);
         } else {
             log.error("Simulation job {} failed: {} {}", id, code, message);
         }
         fail(job, code, message);
     }
 
-    /** Keeps any partial result: it's still usable. */
+    /**
+     * Keeps any partial result: it's still usable. The engine's message is shown only
+     * when it's about a team the user can fix.
+     */
     private static void fail(SimulationJob job, String code, String engineMessage) {
         job.setStatus(Status.FAILED);
         job.setErrorCode(code);
-        job.setErrorMessage(ERROR_INVALID_TEAM.equals(code)
+        boolean aboutATeam = ERROR_INVALID_TEAM.equals(code) || ERROR_INVALID_OPPONENT.equals(code);
+        job.setErrorMessage(aboutATeam
                 ? (engineMessage != null && !engineMessage.isBlank() ? engineMessage : "The team isn't valid.")
                 : GENERIC_FAILURE);
+    }
+
+    private static String modelOf(SimulationResult result) {
+        String model = result.getProvenance() != null ? result.getProvenance().getModel() : null;
+        if (model == null || model.isBlank()) {
+            return null;
+        }
+        return model.length() > 100 ? model.substring(0, 100) : model;
     }
 
     // ==================== Helpers ====================
@@ -564,8 +593,9 @@ public class SimulationService {
             return SimulationDTO.StatusResponse.builder().enabled(false).build();
         }
         Team team = access.getTeam();
-        Optional<SimulationJob> latest = jobRepository.findFirstByTeamIdOrderByCreatedAtDesc(team.getId());
-        Optional<SimulationJob> withResult = jobRepository.findFirstByTeamIdAndResultIsNotNullOrderByCreatedAtDesc(team.getId());
+        Optional<SimulationJob> latest = jobRepository.findFirstByTeamIdAndKindOrderByCreatedAtDesc(team.getId(), Kind.SIMULATE);
+        Optional<SimulationJob> withResult = jobRepository
+                .findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(team.getId(), Kind.SIMULATE);
 
         boolean canRun = false;
         String blockedReason = null;
@@ -658,7 +688,7 @@ public class SimulationService {
         if (!properties.enabled()) {
             throw new SimulationNotFoundException("Simulations are not enabled");
         }
-        SimulationJob job = jobRepository.findFirstByTeamIdAndResultIsNotNullOrderByCreatedAtDesc(teamId)
+        SimulationJob job = jobRepository.findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(teamId, Kind.SIMULATE)
                 .orElseThrow(() -> new SimulationNotFoundException("This team has no simulation result yet"));
         return new StoredResult(job, parse(job));
     }
@@ -675,7 +705,7 @@ public class SimulationService {
      * The stored copy of a result keeps only {@code provenance.model} and
      * {@code provenance.created}; the rest of the provenance is the engine's business.
      */
-    private String sanitize(String resultJson) throws JsonProcessingException {
+    String sanitize(String resultJson) throws JsonProcessingException {
         JsonNode root = objectMapper.readTree(resultJson);
         if (root instanceof ObjectNode object && object.get("provenance") instanceof ObjectNode provenance) {
             provenance.retain("model", "created");
@@ -683,9 +713,10 @@ public class SimulationService {
         return objectMapper.writeValueAsString(root);
     }
 
-    /** "quick" or "full". */
+    /** "quick" or "full"; null for a plan, which has no depth. */
     private static String depthName(SimulationJob job) {
-        return job.getDepth().name().toLowerCase(java.util.Locale.ROOT);
+        Depth depth = job.getDepth();
+        return depth == null ? null : depth.name().toLowerCase(java.util.Locale.ROOT);
     }
 
     private String jobJson(UUID jobId, String regulation, String pasteText, Depth depth) {
@@ -711,21 +742,26 @@ public class SimulationService {
     }
 
     private long jobsToday(Long userId) {
+        return jobsToday(userId, Kind.SIMULATE);
+    }
+
+    /** Jobs of a kind the user submitted today (UTC): each kind has its own daily cap. */
+    long jobsToday(Long userId, Kind kind) {
         Instant startOfDay = LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant();
-        return jobRepository.countByRequestedByAndCreatedAtAfter(userId, startOfDay);
+        return jobRepository.countByRequestedByAndKindAndCreatedAtAfter(userId, kind, startOfDay);
     }
 
     private String dailyCapMessage() {
         return "You've reached today's limit of " + properties.dailyCap() + " simulations.";
     }
 
-    private void requireEnabled() {
+    void requireEnabled() {
         if (!properties.enabled()) {
             throw new TeamAccessDeniedException("Simulations are not enabled");
         }
     }
 
-    private EngineQueue queue() {
+    EngineQueue queue() {
         EngineQueue queue = queueProvider.getIfAvailable();
         if (queue == null) {
             throw new IllegalStateException("Engine queue is not configured");

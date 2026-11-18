@@ -8,6 +8,8 @@ import {
   ExternalLink,
   GripVertical,
   ChevronDown,
+  Cpu,
+  Loader2,
 } from "lucide-react";
 import type {
   DraggableAttributes,
@@ -17,8 +19,9 @@ import PokemonTeam from "../pokemon/PokemonTeam";
 import PokemonSprite from "../pokemon/PokemonSprite";
 import PokemonDropdown from "../form/PokemonDropdown";
 import ConfirmationModal from "../modals/ConfirmationModal";
+import SimulatedPlan, { PlanBadge } from "./SimulatedPlan";
 import * as pokepasteService from "../../services/pokepasteService";
-import type { Composition } from "../../types";
+import type { Composition, PlanEntryStatus } from "../../types";
 
 const COLOR_OPTIONS: Record<string, { border: string; bg: string }> = {
   blue: { border: "#3b82f6", bg: "bg-blue-500" },
@@ -65,6 +68,15 @@ interface OpponentTeamCardProps {
   };
   isExpanded?: boolean;
   onToggleExpand?: (id: number) => void;
+  /** The entry's simulated plan, if simulations are on. */
+  plan?: PlanEntryStatus | null;
+  /** The planner's Simulated toggle: show the engine's plan instead of the user's own. */
+  simulated?: boolean;
+  /** Present when the viewer may simulate this entry. */
+  onSimulate?: () => void;
+  /** Present for the owner, to cancel the entry's running plan. */
+  onCancelPlan?: () => void;
+  planBusy?: boolean;
 }
 
 const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
@@ -79,6 +91,11 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
   isExpanded = true,
   onToggleExpand,
   replaySection,
+  plan,
+  simulated = false,
+  onSimulate,
+  onCancelPlan,
+  planBusy,
 }) => {
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [editedNotes, setEditedNotes] = useState(opponentTeam.notes || "");
@@ -164,6 +181,10 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
   };
 
   const compositions = opponentTeam.compositions || [];
+  const planResult = plan?.result ?? null;
+  const planRunning = plan?.job?.unfinished ?? false;
+  // While Simulated is on, the notes show the engine's summary of what they bring.
+  const simulatedNotes = simulated && planResult ? planResult.opponentSummary : null;
 
   return (
     <div
@@ -210,9 +231,31 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
                 <ExternalLink className="h-3 w-3" />
               </a>
             )}
+            {simulated && (
+              <PlanBadge
+                result={planResult}
+                pending={planRunning && plan?.job?.id === planResult?.jobId}
+              />
+            )}
           </div>
 
           <div className="flex flex-shrink-0 items-center gap-1">
+            {planRunning ? (
+              <span className="rounded p-1.5 text-brand-500" title="Simulating this matchup…">
+                <Loader2 className="h-3 w-3 animate-spin" />
+              </span>
+            ) : (
+              onSimulate && (
+                <button
+                  onClick={onSimulate}
+                  className="rounded p-1.5 text-gray-400 transition-colors hover:bg-brand-50 hover:text-brand-500 dark:hover:bg-brand-500/10 dark:hover:text-brand-400"
+                  title="Simulate this matchup"
+                  aria-label="Simulate this matchup"
+                >
+                  <Cpu className="h-3 w-3" />
+                </button>
+              )
+            )}
             {onToggleExpand && (
               <button
                 onClick={() => onToggleExpand(opponentTeam.id)}
@@ -254,9 +297,9 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
         <div className="mt-3">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-800 dark:text-white/90">
-              Notes
+              {simulatedNotes != null ? "Notes (simulated)" : "Notes"}
             </h4>
-            {!isEditingNotes && (
+            {!isEditingNotes && simulatedNotes == null && (
               <button
                 onClick={() => setIsEditingNotes(true)}
                 className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
@@ -266,7 +309,11 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
               </button>
             )}
           </div>
-          {isEditingNotes ? (
+          {simulatedNotes != null ? (
+            <p className="whitespace-pre-wrap text-sm text-gray-500 dark:text-gray-400">
+              {simulatedNotes || "The engine has no summary of what they bring."}
+            </p>
+          ) : isEditingNotes ? (
             <div className="space-y-2">
               <div>
                 <label className="mb-1 block text-xs text-gray-500 dark:text-gray-400">
@@ -351,8 +398,26 @@ const OpponentTeamCard: React.FC<OpponentTeamCardProps> = ({
         )}
       </div>
 
+      {/* Simulated plan, in place of the user's own while the toggle is on */}
+      {isExpanded && simulated && (
+        <div className="p-4">
+          <h4 className="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">
+            Simulated plan
+          </h4>
+          <SimulatedPlan
+            plan={plan}
+            onSimulate={onSimulate}
+            onCancel={onCancelPlan}
+            busy={planBusy}
+            onCopyComposition={(composition) =>
+              onAddComposition(opponentTeam.id, composition)
+            }
+          />
+        </div>
+      )}
+
       {/* Strategy Plans Section */}
-      {isExpanded && (
+      {isExpanded && !simulated && (
       <div className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <h4 className="text-sm font-semibold text-gray-800 dark:text-white/90">
