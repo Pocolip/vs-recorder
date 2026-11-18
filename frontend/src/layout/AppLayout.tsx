@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { ActiveTeamProvider } from "../context/ActiveTeamContext";
 import { SimulationProvider } from "../context/SimulationContext";
+import SimulationProgressBar from "../components/team/SimulationProgressBar";
 import { CalcStateProvider } from "../context/CalcStateContext";
 import { FolderProvider, useFolderContext } from "../context/FolderContext";
 import { DndContext, PointerSensor, useSensor, useSensors, DragOverlay, pointerWithin } from "@dnd-kit/core";
@@ -133,6 +134,7 @@ const LayoutContent: React.FC = () => {
           <Footer />
         </div>
       </div>
+      <SimulationProgressBar />
     </DndWrapper>
   );
 };
