@@ -11,6 +11,8 @@ import { useSimulation } from "../../context/SimulationContext";
 import { useSimulatedData } from "../../hooks/useSimulatedData";
 import { analyticsApi } from "../../services/api/analyticsApi";
 import SimulatedBar from "../../components/team/SimulatedBar";
+import RateWithDelta from "../../components/stats/RateWithDelta";
+import { vsBaseline, type Signal } from "../../utils/winRateSignal";
 import type { Replay, UsageStats } from "../../types";
 
 function normalizePokemonName(pokemonName: string): string {
@@ -77,13 +79,8 @@ function fromSimulated(data: UsageStats, teamPokemon: string[]) {
     individualStats,
     leadPairStats: [...pairs].sort(byUsage).slice(0, 6),
     bestLeadStats: [...pairs].sort(byWinRate).slice(0, 6),
+    teamWinRate: data.totalGames > 0 ? data.averageWinRate / 100 : null,
   };
-}
-
-function getWinRateColor(winRate: number): string {
-  if (winRate >= 60) return "text-green-600 dark:text-green-400";
-  if (winRate >= 40) return "text-yellow-600 dark:text-yellow-400";
-  return "text-red-600 dark:text-red-400";
 }
 
 export default function UsageStatsPage() {
@@ -131,7 +128,7 @@ export default function UsageStatsPage() {
 
   const usageStats = useMemo(() => {
     if (!replays || replays.length === 0 || teamPokemon.length === 0) {
-      return { individualStats: [], leadPairStats: [], bestLeadStats: [] };
+      return { individualStats: [], leadPairStats: [], bestLeadStats: [], teamWinRate: null };
     }
 
     const validReplays = replays.filter(
@@ -139,8 +136,9 @@ export default function UsageStatsPage() {
     );
 
     if (validReplays.length === 0) {
-      return { individualStats: [], leadPairStats: [], bestLeadStats: [] };
+      return { individualStats: [], leadPairStats: [], bestLeadStats: [], teamWinRate: null };
     }
+    const teamWinRate = validReplays.filter((r) => r.result === "win").length / validReplays.length;
 
     // Individual Pokemon stats
     const individualStats = teamPokemon.map((pokemon) => {
@@ -209,7 +207,7 @@ export default function UsageStatsPage() {
     const leadPairStats = buildLeadStats(byUsage);
     const bestLeadStats = buildLeadStats(byWinRate);
 
-    return { individualStats, leadPairStats, bestLeadStats };
+    return { individualStats, leadPairStats, bestLeadStats, teamWinRate };
   }, [replays, teamPokemon]);
 
   const simulatedStats = useMemo(
@@ -261,8 +259,13 @@ export default function UsageStatsPage() {
   const validGameCount = showSimulated
     ? simulatedUsage.data?.totalGames ?? 0
     : replays.filter((r) => r.result && ["win", "loss"].includes(r.result)).length;
-  const { individualStats, leadPairStats, bestLeadStats } =
+  const { individualStats, leadPairStats, bestLeadStats, teamWinRate } =
     showSimulated && simulatedStats ? simulatedStats : usageStats;
+  // Each rate against the team's own, judged for its number of games. The rates
+  // here are whole percentages, so a gap of a point or less may be rounding.
+  const teamRate = teamWinRate == null ? null : Math.round(teamWinRate * 100) / 100;
+  const signal = (ratePercent: number | null | undefined, games: number) =>
+    vsBaseline(ratePercent == null ? null : ratePercent / 100, teamRate, games, validGameCount, 0.01);
   const showMega = isMegaRegulation(team?.regulation);
   const mechanicLabel = showMega ? "Mega" : "Tera";
 
@@ -271,10 +274,18 @@ export default function UsageStatsPage() {
       <PageMeta title="Usage Stats | VS Recorder" description="Pokemon usage statistics" />
       <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       <SimulatedBar />
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Usage Statistics</h3>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Usage Statistics</h3>
+          {teamWinRate != null && (
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Win rates are compared with the team's {Math.round(teamWinRate * 100)}%: green or red when the gap is
+              real for that many games, grey when it's within normal variation.
+            </p>
+          )}
+        </div>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          Based on {validGameCount} {showSimulated ? "simulated " : ""}games
+          Based on {validGameCount.toLocaleString()} {showSimulated ? "simulated " : ""}games
         </span>
       </div>
 
@@ -319,22 +330,38 @@ export default function UsageStatsPage() {
                           <div className="text-xs text-gray-500 dark:text-gray-400">({stat.usageRate}%)</div>
                         </td>
                         <td className="px-2 py-3 text-center">
-                          <span className={`font-semibold ${stat.usage > 0 ? getWinRateColor(stat.overallWinRate) : "text-gray-400"}`}>
-                            {stat.usage > 0 ? `${stat.overallWinRate}%` : "\u2014"}
-                          </span>
+                          {stat.usage > 0 ? (
+                            <RateWithDelta
+                              rate={stat.overallWinRate}
+                              signal={signal(stat.overallWinRate, stat.usage)}
+                              games={stat.usage}
+                            />
+                          ) : (
+                            <span className="text-gray-400">&mdash;</span>
+                          )}
                         </td>
                         <td className="px-2 py-3 text-center text-gray-800 dark:text-gray-100">{stat.leadUsage}</td>
                         <td className="px-2 py-3 text-center">
-                          <span className={`font-semibold ${stat.leadUsage > 0 ? getWinRateColor(stat.leadWinRate) : "text-gray-400"}`}>
-                            {stat.leadUsage > 0 ? `${stat.leadWinRate}%` : "\u2014"}
-                          </span>
+                          {stat.leadUsage > 0 ? (
+                            <RateWithDelta
+                              rate={stat.leadWinRate}
+                              signal={signal(stat.leadWinRate, stat.leadUsage)}
+                              games={stat.leadUsage}
+                            />
+                          ) : (
+                            <span className="text-gray-400">&mdash;</span>
+                          )}
                         </td>
                         <td className="px-2 py-3 text-center text-gray-800 dark:text-gray-100">
                           {mechanicUsage > 0 ? mechanicUsage : <span className="text-gray-400">&mdash;</span>}
                         </td>
                         <td className="px-2 py-3 text-center">
-                          {mechanicWinRate !== null && mechanicWinRate !== undefined ? (
-                            <span className={`font-semibold ${getWinRateColor(mechanicWinRate)}`}>{mechanicWinRate}%</span>
+                          {mechanicWinRate !== null && mechanicWinRate !== undefined && mechanicUsage > 0 ? (
+                            <RateWithDelta
+                              rate={mechanicWinRate}
+                              signal={signal(mechanicWinRate, mechanicUsage)}
+                              games={mechanicUsage}
+                            />
                           ) : (
                             <span className="text-gray-400">&mdash;</span>
                           )}
@@ -354,6 +381,7 @@ export default function UsageStatsPage() {
           icon={<Users className="h-5 w-5" />}
           stats={leadPairStats}
           rankColor="text-gray-500 dark:text-gray-400"
+          signal={signal}
         />
 
         {/* Best Leads */}
@@ -362,6 +390,7 @@ export default function UsageStatsPage() {
           icon={<Star className="h-5 w-5" />}
           stats={bestLeadStats}
           rankColor="text-yellow-600 dark:text-yellow-400"
+          signal={signal}
         />
       </div>
     </div>
@@ -374,11 +403,13 @@ function LeadPairSection({
   icon,
   stats,
   rankColor,
+  signal,
 }: {
   title: string;
   icon: React.ReactNode;
   stats: { pair: string; pokemon1: string; pokemon2: string; usage: number; wins: number; winRate: number; usageRate: number }[];
   rankColor: string;
+  signal: (ratePercent: number, games: number) => Signal;
 }) {
   return (
     <div className="rounded-lg bg-gray-50 p-6 dark:bg-gray-800/50">
@@ -407,11 +438,11 @@ function LeadPairSection({
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className={`font-semibold ${getWinRateColor(stat.winRate)}`}>{stat.winRate}%</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-3">
+                <div className="text-right text-xs text-gray-500 dark:text-gray-400">
                   {stat.wins}W-{stat.usage - stat.wins}L
                 </div>
+                <RateWithDelta rate={stat.winRate} signal={signal(stat.winRate, stat.usage)} games={stat.usage} align="right" />
               </div>
             </div>
           ))}

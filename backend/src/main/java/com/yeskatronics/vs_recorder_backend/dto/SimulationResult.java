@@ -103,6 +103,8 @@ public class SimulationResult {
         @JsonAlias("win_rate_benched")
         private Double winRateBenched;
         private Double delta;
+        /** The 95% interval of {@code delta}, [low, high]. */
+        private List<Double> ci95;
     }
 
     @Data

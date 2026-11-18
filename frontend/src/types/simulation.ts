@@ -60,6 +60,8 @@ export interface SimulationMember {
   winRateBrought: number | null;
   winRateBenched: number | null;
   delta: number | null;
+  /** The 95% interval of `delta`, when the engine sends one. */
+  ci95?: [number, number] | null;
 }
 
 export interface SimulationThreat {
