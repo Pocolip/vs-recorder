@@ -3,11 +3,15 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import SimulationsModal from "./SimulationsModal";
 import { useSimulation } from "../../context/SimulationContext";
+import { usePlanSimulationContext } from "../../context/PlanSimulationContext";
 import { simulationContext, simulationJob, simulationResult } from "../../test/simulationFixtures";
-import type { SimulationStatus, Team } from "../../types";
+import { planJob, planResult, planSimulations } from "../../test/planFixtures";
+import type { PlanEntryStatus, SimulationStatus, Team } from "../../types";
 
 let isOwner = true;
+let planEntries: PlanEntryStatus[] = [];
 vi.mock("../../context/SimulationContext", () => ({ useSimulation: vi.fn() }));
+vi.mock("../../context/PlanSimulationContext", () => ({ usePlanSimulationContext: vi.fn() }));
 vi.mock("../../hooks/useTeamPermissions", () => ({ useTeamPermissions: () => ({ isOwner }) }));
 
 const team = { id: 7, name: "Rain" } as Team;
@@ -15,6 +19,7 @@ const team = { id: 7, name: "Rain" } as Team;
 function renderModal(status: Partial<SimulationStatus>, over: Partial<ReturnType<typeof useSimulation>> = {}) {
   const context = { ...simulationContext(status), ...over };
   vi.mocked(useSimulation).mockReturnValue(context);
+  vi.mocked(usePlanSimulationContext).mockReturnValue({ ...planSimulations(planEntries), setEntriesKey: vi.fn() });
   render(
     <MemoryRouter>
       <SimulationsModal team={team} />
@@ -78,6 +83,30 @@ describe("SimulationsModal", () => {
     });
     expect(screen.getByText(/The paste was adjusted for the engine/)).toBeTruthy();
     expect(screen.getByText("Garchomp-Mega was sent as Garchomp holding Garchompite.")).toBeTruthy();
+  });
+
+  it("says how a planner run is going", () => {
+    isOwner = true;
+    planEntries = [
+      { gamePlanTeamId: 1, job: planJob("COMPLETE", "p1", { createdAt: "2026-11-18T10:00:00Z" }), result: planResult() },
+      { gamePlanTeamId: 2, job: planJob("RUNNING", "p2", { createdAt: "2026-11-18T10:00:00Z" }), result: null },
+      { gamePlanTeamId: 3, job: planJob("QUEUED", "p3", { createdAt: "2026-11-18T10:00:00Z" }), result: null },
+    ];
+    renderModal({});
+    expect(screen.getByText("Simulating 3 teams: 1 done, 1 running, 1 queued.")).toBeTruthy();
+    planEntries = [];
+  });
+
+  it("sums up the planner when nothing is running", () => {
+    isOwner = true;
+    planEntries = [
+      { gamePlanTeamId: 1, job: planJob("COMPLETE", "p1"), result: planResult() },
+      { gamePlanTeamId: 2, job: planJob("FAILED", "p2"), result: null },
+      { gamePlanTeamId: 3, job: null, result: null },
+    ];
+    renderModal({});
+    expect(screen.getByText(/1 of 3 teams has a plan \(1 failed\)\./)).toBeTruthy();
+    planEntries = [];
   });
 
   it("shows a collaborator the status without run buttons", () => {

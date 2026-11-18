@@ -1,4 +1,13 @@
-import type { PlanCategory, PlanResultInfo, PlanStaleReason, SimulationDepth, SimulationJob } from "../types";
+import type {
+  PlanCategory,
+  PlanEntryStatus,
+  PlanJob,
+  PlanResultInfo,
+  PlanStaleReason,
+  SimulationDepth,
+  SimulationJob,
+  SimulationJobStatus,
+} from "../types";
 
 const STAGES: Record<string, string> = {
   preview: "Previewing opponents",
@@ -136,4 +145,159 @@ export function planErrorMessage(errorCode: string | null, message: string | nul
   if (errorCode === "invalid_opponent") return `This team can't be simulated: ${message ?? "it isn't valid"}`;
   if (errorCode === "invalid_team") return `Your team can't be simulated: ${message ?? "it isn't valid"}`;
   return message || "The simulation failed.";
+}
+
+// ==================== Engine progress (the bar along the bottom) ====================
+
+/**
+ * Rough engine minutes per job, to weigh jobs against each other in one bar (GPU
+ * timings from the engine's pricing notes; only their ratios matter).
+ */
+const JOB_MINUTES = { quick: 8, full: 30, plan: 4 } as const;
+
+/**
+ * A run starts this long before its oldest unfinished job, so jobs submitted together
+ * (a batch of plans, created milliseconds apart) stay in it after the first finishes.
+ */
+const RUN_SLACK_MS = 60_000;
+
+/** When the run of these unfinished jobs began, in ms; null when there are none. */
+function runStart(unfinishedCreatedAt: string[]): number | null {
+  const times = unfinishedCreatedAt.map((t) => Date.parse(t)).filter((t) => !Number.isNaN(t));
+  return times.length === 0 ? null : Math.min(...times) - RUN_SLACK_MS;
+}
+
+const inRun = (createdAt: string, start: number) => Date.parse(createdAt) >= start;
+
+/** A plan job's share of its run: the preview solve, then the matchup's search games. */
+const PLAN_PREVIEW_SHARE = 0.25;
+
+/**
+ * How far a plan job is, 0-1. The engine reports "preview 1/1" once its preview solve
+ * is done (the picks then arrive as a partial) and "search 1/1" once the matchup is
+ * played. Null while it's queued.
+ */
+export function planJobProgress(job: Pick<PlanJob, "status" | "progress"> | null | undefined): number | null {
+  if (!job) return null;
+  const match = job.progress ? /^(\w+)\s+(\d+)\/(\d+)$/.exec(job.progress.trim()) : null;
+  let fraction: number | null = null;
+  if (match && Number(match[3]) > 0) {
+    const done = Math.min(Number(match[2]) / Number(match[3]), 1);
+    if (match[1] === "preview") fraction = PLAN_PREVIEW_SHARE * done;
+    else if (match[1] === "search") fraction = PLAN_PREVIEW_SHARE + (1 - PLAN_PREVIEW_SHARE) * done;
+  }
+  if (job.status === "PARTIAL") fraction = Math.max(fraction ?? 0, PLAN_PREVIEW_SHARE);
+  if (fraction == null && job.status === "RUNNING") fraction = 0;
+  return fraction;
+}
+
+interface RunJob {
+  id: string;
+  status: SimulationJobStatus;
+  unfinished: boolean;
+  createdAt: string;
+  weight: number;
+  /** 0-1; null while queued. */
+  fraction: number | null;
+}
+
+export interface EngineProgress {
+  /** Anything of the team's is queued or running. */
+  active: boolean;
+  /** The whole run, 0-1; null while nothing has started (the worker starting). */
+  fraction: number | null;
+  /** What's running, in words, for screen readers. */
+  label: string;
+  /** The run's jobs: the unfinished ones and those that finished since it started. */
+  jobs: { id: string; status: SimulationJobStatus }[];
+}
+
+/**
+ * Everything the engine is doing for a team, as one bar: its Simulated analytics job and
+ * its Matchup Planner plans. A run is the unfinished jobs plus the ones that finished
+ * since the oldest of them was submitted, give or take a minute (a batch of plans counts
+ * its finished plans as done), each weighted by how long it takes.
+ */
+export function engineProgress(simulateJob: SimulationJob | null, planEntries: PlanEntryStatus[]): EngineProgress {
+  const candidates: RunJob[] = [];
+  if (simulateJob) {
+    candidates.push({
+      id: simulateJob.id,
+      status: simulateJob.status,
+      unfinished: simulateJob.unfinished,
+      createdAt: simulateJob.createdAt,
+      weight: JOB_MINUTES[simulateJob.depth === "quick" ? "quick" : "full"],
+      fraction: simulateJob.unfinished ? jobProgress(simulateJob) : 1,
+    });
+  }
+  const planJobs: RunJob[] = planEntries.flatMap(({ job }) =>
+    job
+      ? [{
+          id: job.id,
+          status: job.status,
+          unfinished: job.unfinished,
+          createdAt: job.createdAt,
+          weight: JOB_MINUTES.plan,
+          fraction: job.unfinished ? planJobProgress(job) : 1,
+        }]
+      : [],
+  );
+  candidates.push(...planJobs);
+
+  const unfinished = candidates.filter((j) => j.unfinished);
+  if (unfinished.length === 0) return { active: false, fraction: null, label: "", jobs: [] };
+
+  const start = runStart(unfinished.map((j) => j.createdAt)) ?? -Infinity;
+  const run = candidates.filter((j) => j.unfinished || inRun(j.createdAt, start));
+  const started = run.some((j) => !j.unfinished || j.fraction != null);
+  const total = run.reduce((sum, j) => sum + j.weight, 0);
+  const fraction = started ? run.reduce((sum, j) => sum + j.weight * (j.fraction ?? 0), 0) / total : null;
+
+  const parts: string[] = [];
+  if (simulateJob?.unfinished) {
+    const progress = describeProgress(simulateJob.progress);
+    parts.push(`${depthName(simulateJob.depth)} simulation${progress ? `: ${progress}` : " starting"}`);
+  }
+  const runPlans = run.filter((j) => planJobs.includes(j));
+  if (runPlans.some((j) => j.unfinished)) {
+    const done = runPlans.filter((j) => !j.unfinished).length;
+    parts.push(`Matchup plans: ${done} of ${runPlans.length} done`);
+  }
+
+  return {
+    active: true,
+    fraction,
+    label: parts.join(" · "),
+    jobs: run.map(({ id, status }) => ({ id, status })),
+  };
+}
+
+export interface PlanSummary {
+  /** Teams in the planner. */
+  total: number;
+  /** Teams with a plan to show, and how many of those are out of date. */
+  withPlan: number;
+  stale: number;
+  /** Teams whose latest plan failed. */
+  failed: number;
+  /** The current run: plans queued, running, and finished since it started. */
+  queued: number;
+  running: number;
+  doneInRun: number;
+}
+
+/** The planner at a glance, for the Simulations modal. */
+export function planSummary(entries: PlanEntryStatus[]): PlanSummary {
+  const latest = entries.map((e) => e.job).filter((j): j is PlanJob => j != null);
+  const unfinished = latest.filter((j) => j.unfinished);
+  const start = runStart(unfinished.map((j) => j.createdAt));
+  return {
+    total: entries.length,
+    withPlan: entries.filter((e) => e.result != null).length,
+    stale: entries.filter((e) => e.result?.stale).length,
+    failed: latest.filter((j) => j.status === "FAILED").length,
+    queued: unfinished.filter((j) => j.status === "QUEUED").length,
+    running: unfinished.filter((j) => j.status !== "QUEUED").length,
+    doneInRun: start == null ? 0 : latest.filter((j) => !j.unfinished && inRun(j.createdAt, start)).length,
+  };
 }
