@@ -279,6 +279,24 @@ public class AnalyticsService {
             }
         }
 
+        return buildCustomMatchupResponse(pokemonTrackers, anyMatchCount, anyMatchWins, exactMatchCount);
+    }
+
+    /**
+     * Build a custom matchup response from per-Pokemon tallies. Shared with the
+     * simulated version ({@link SimulationService}) so both rank and average alike.
+     *
+     * @param pokemonTrackers games and wins against each requested Pokemon that was seen
+     * @param anyMatchCount   games where the opponent had any of the requested Pokemon
+     * @param anyMatchWins    wins among those
+     * @param exactMatchCount games where the opponent had all of them
+     */
+    static AnalyticsDTO.CustomMatchupResponse buildCustomMatchupResponse(
+            Map<String, CustomMatchupTracker> pokemonTrackers,
+            int anyMatchCount,
+            int anyMatchWins,
+            int exactMatchCount) {
+
         // Convert to response DTOs
         List<AnalyticsDTO.CustomPokemonAnalysis> pokemonAnalysis = pokemonTrackers.entrySet().stream()
                 .map(entry -> {
@@ -308,7 +326,6 @@ public class AnalyticsService {
                         .mapToInt(AnalyticsDTO.CustomPokemonAnalysis::getWinRate)
                         .average()
                         .orElse(0));
-
 
         return new AnalyticsDTO.CustomMatchupResponse(
                 pokemonAnalysis,
@@ -436,7 +453,7 @@ public class AnalyticsService {
      * Uses PokemonService to resolve base species, which handles cosmetic vs competitive forms.
      * Returns the Showdown name format (e.g., "Ogerpon-Hearthflame", "Raging Bolt").
      */
-    private String normalizeForAnalytics(String pokemonName) {
+    public String normalizeForAnalytics(String pokemonName) {
         String baseSpecies = pokemonService.resolveBaseSpecies(pokemonName);
         PokemonEntry entry = pokemonService.getEntry(baseSpecies);
         if (entry != null) {
@@ -701,7 +718,7 @@ public class AnalyticsService {
         int timesBrought = 0;
     }
 
-    private static class CustomMatchupTracker {
+    static class CustomMatchupTracker {
         int gamesAgainst = 0;
         int winsAgainst = 0;
     }

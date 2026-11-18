@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { ActiveTeamProvider } from "../context/ActiveTeamContext";
+import { SimulationProvider } from "../context/SimulationContext";
 import { CalcStateProvider } from "../context/CalcStateContext";
 import { FolderProvider, useFolderContext } from "../context/FolderContext";
 import { DndContext, PointerSensor, useSensor, useSensors, DragOverlay, pointerWithin } from "@dnd-kit/core";
@@ -139,13 +140,15 @@ const LayoutContent: React.FC = () => {
 const AppLayout: React.FC = () => {
   return (
     <ActiveTeamProvider>
-      <CalcStateProvider>
-        <FolderProvider>
-          <SidebarProvider>
-            <LayoutContent />
-          </SidebarProvider>
-        </FolderProvider>
-      </CalcStateProvider>
+      <SimulationProvider>
+        <CalcStateProvider>
+          <FolderProvider>
+            <SidebarProvider>
+              <LayoutContent />
+            </SidebarProvider>
+          </FolderProvider>
+        </CalcStateProvider>
+      </SimulationProvider>
     </ActiveTeamProvider>
   );
 };

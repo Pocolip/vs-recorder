@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.yeskatronics</groupId>
     <artifactId>vs-recorder-backend</artifactId>
-    <version>1.0.78</version>
+    <version>1.0.80</version>
     <name>vs-recorder-backend</name>
     <description>Backend API for VS Recorder</description>
     <properties>
@@ -24,6 +24,14 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <!-- AWS SDK v2: only the EC2 client is used (to start the matchup engine's worker) -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>2.46.7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- CVE-2023-3635: resend-java 3.1.0 pulls okio 3.2.0 transitively -->
             <dependency>
                 <groupId>com.squareup.okio</groupId>
@@ -128,6 +136,39 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.7.0</version>
+        </dependency>
+
+        <!--
+            Matchup engine jobs. Kept deliberately small: the backend runs with a
+            tight heap/metaspace/direct-memory budget (see docker-compose.prod.yml).
+            Jedis directly (no Spring Data Redis / Lettuce / Netty), and the EC2
+            client on the JDK's URL connection client (no Netty / Apache clients).
+        -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ec2</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>netty-nio-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>apache-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>apache5-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>url-connection-client</artifactId>
         </dependency>
 
         <!-- Resend for email sending -->

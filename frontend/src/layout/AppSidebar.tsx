@@ -13,6 +13,7 @@ import {
   X,
   Users,
   UserPlus,
+  Cpu,
 } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -21,11 +22,13 @@ import { CSS } from "@dnd-kit/utilities";
 import { HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { useActiveTeam } from "../context/ActiveTeamContext";
+import { useSimulation } from "../context/SimulationContext";
 import { useFolderContext } from "../context/FolderContext";
 import EditTeamModal from "../components/modals/EditTeamModal";
 import ExportTeamModal from "../components/modals/ExportTeamModal";
 import ManageCollaboratorsModal from "../components/modals/ManageCollaboratorsModal";
 import ConfirmationModal from "../components/modals/ConfirmationModal";
+import SimulationsModal from "../components/modals/SimulationsModal";
 import * as teamService from "../services/teamService";
 import type { Team, Folder } from "../types";
 
@@ -197,6 +200,11 @@ function DroppableHomeItem({ isActive, isVisible }: { isActive: boolean; isVisib
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
   const { team, setTeam, bumpStatsVersion } = useActiveTeam();
+  const { status: simulation, openPanel: openSimulations } = useSimulation();
+  // Like the analytics pages' bar: shown once there's something to run or see.
+  const showSimulations =
+    simulation?.enabled === true &&
+    (simulation.canRun || simulation.job != null || simulation.result != null || simulation.runBlockedReason != null);
   const { folders, createFolder, renameFolder, deleteFolder } = useFolderContext();
   const location = useLocation();
   const navigate = useNavigate();
@@ -306,11 +314,18 @@ const AppSidebar: React.FC = () => {
         { name: "Usage Stats", path: `/team/${team.id}/usage-stats` },
         { name: "Matchup Stats", path: `/team/${team.id}/matchup-stats` },
         { name: "Move Usage", path: `/team/${team.id}/move-usage` },
+        // Matchup engine results; only when engine jobs are on for this deployment.
+        ...(simulation?.enabled
+          ? [{ name: "Diagnostics", path: `/team/${team.id}/diagnostics` } as SubItem]
+          : []),
         { name: "Matchup Planner", path: `/team/${team.id}/matchup-planner` },
         { name: "Pokemon Notes", path: `/team/${team.id}/pokemon-notes` },
         { name: "Calculator", path: `/team/${team.id}/calculator` },
         { name: "Speed Tiers", path: `/team/${team.id}/speed-tiers` },
         { name: "Type Chart", path: `/team/${team.id}/type-chart`, dividerAfter: true },
+        ...(showSimulations
+          ? [{ name: "Simulations", onClick: openSimulations, icon: <Cpu className="h-3 w-3" /> } as SubItem]
+          : []),
         { name: "Edit Team", onClick: () => setShowEditModal(true), icon: <Pencil className="h-3 w-3" /> },
         { name: "Export Team", onClick: () => setShowExportModal(true), icon: <Share2 className="h-3 w-3" /> },
         ...(team.role !== "COLLABORATOR"
@@ -550,6 +565,7 @@ const AppSidebar: React.FC = () => {
             team={team}
             onClose={() => setShowCollaboratorsModal(false)}
           />
+          <SimulationsModal team={team} />
           <ConfirmationModal
             isOpen={showDeleteModal}
             title="Delete Team"

@@ -1,6 +1,10 @@
 package com.yeskatronics.vs_recorder_backend.controllers;
 
 import com.yeskatronics.vs_recorder_backend.dto.ErrorResponse;
+import com.yeskatronics.vs_recorder_backend.exceptions.RateLimitExceededException;
+import com.yeskatronics.vs_recorder_backend.exceptions.SimulationConflictException;
+import com.yeskatronics.vs_recorder_backend.exceptions.SimulationNotFoundException;
+import com.yeskatronics.vs_recorder_backend.exceptions.SimulationUnavailableException;
 import com.yeskatronics.vs_recorder_backend.exceptions.TeamAccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -82,6 +86,83 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    /**
+     * Handle a simulation that can't be submitted now. {@code error} carries the
+     * conflict's code so the client can tell the cases apart.
+     */
+    @ExceptionHandler(SimulationConflictException.class)
+    public ResponseEntity<ErrorResponse> handleSimulationConflict(
+            SimulationConflictException ex,
+            WebRequest request) {
+
+        log.info("Simulation conflict: {}", ex.getMessage());
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                ex.getCode(),
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Handle a missing simulation result.
+     */
+    @ExceptionHandler(SimulationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSimulationNotFound(
+            SimulationNotFoundException ex,
+            WebRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Handle the engine's queue being unreachable.
+     */
+    @ExceptionHandler(SimulationUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleSimulationUnavailable(
+            SimulationUnavailableException ex,
+            WebRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Service Unavailable",
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    /**
+     * Handle rate limits (e.g. the daily simulation cap).
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitExceeded(
+            RateLimitExceededException ex,
+            WebRequest request) {
+
+        log.info("Rate limit exceeded: {}", ex.getMessage());
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.TOO_MANY_REQUESTS.value(),
+                "Too Many Requests",
+                ex.getMessage(),
+                request.getDescription(false).replace("uri=", "")
+        );
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error);
     }
 
     /**

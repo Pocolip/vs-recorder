@@ -39,6 +39,14 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      # Matchup engine jobs ("Simulated" analytics). Off unless the host's .env turns them on.
+      # Prod only: beta shares the engine's queue and each job starts a GPU, so it never gets these.
+      - ENGINE_JOBS_ENABLED=${ENGINE_JOBS_ENABLED:-false}
+      - REDIS_URL=${REDIS_URL:-}
+      - ENGINE_WORKER_INSTANCE_IDS=${ENGINE_WORKER_INSTANCE_IDS:-}
+      - ENGINE_ALLOWED_USERS=${ENGINE_ALLOWED_USERS:-}
+      - ENGINE_DAILY_CAP=${ENGINE_DAILY_CAP:-3}
+      - AWS_REGION=${AWS_REGION}
       # Non-heap (metaspace + code cache) runs ~145MB, plus ~50MB native/GC overhead,
       # so the container limit must stay well above Xmx + 200MB or the cgroup OOM-kills the JVM.
       - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=64m -XX:MaxDirectMemorySize=32m -Xss512k
