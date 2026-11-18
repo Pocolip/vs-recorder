@@ -175,6 +175,8 @@ This reads from:
 
 And outputs: `backend/src/main/resources/pokemon-data.json` (checked into source control)
 
+Mega formes also carry `megaOf` (the species a team lists, e.g. `Floette-Eternal` for `Floette-Mega`) and `megaStone`, from `@pkmn/dex`'s `battleOnly`/`requiredItem`; simulations use them to normalize pastes. The generator stamps today's month as `version`, which the frontend uses to invalidate its cached registry: keep the old value when a regeneration doesn't change anything the frontend reads.
+
 ### When to Regenerate
 - New Pokemon generation or DLC released
 - New VGC regulation adds previously unsupported forms
@@ -276,6 +278,7 @@ A separate matchup engine can play a team against the meta's top teams. Its resu
 - **Backend:** `engine/` (settings, the Redis queue over Jedis, the EC2 worker starter, and `SimulationPoller`), `services/SimulationService`, `controllers/SimulationController`, and the entity `SimulationJob`. The analytics endpoints take `?simulated=true`.
 - **Frontend:** `context/SimulationContext.tsx` (status, polling, the toggle), `components/team/SimulatedBar.tsx`, `pages/Team/DiagnosticsPage.tsx`, and `hooks/useSimulatedData.ts`. Runs start from the **Simulations** modal (`components/modals/SimulationsModal.tsx`, a team action in the sidebar): the current job, then one section per engine feature. Simulated analytics runs at two depths, `quick` (the job's `options.search_opponents: 0`) and `full` (the engine's defaults); a full result counts as covering a quick one for the "unchanged paste" check. Matchup Planner and Replay grading are listed as coming later (the engine's ADR 0019 `plan` and `grade` jobs).
 - **Off by default:** `ENGINE_JOBS_ENABLED`. With it off, no Redis, EC2 or poller beans exist, and the UI hides everything. Only allowlisted team owners (`ENGINE_ALLOWED_USERS`, exact usernames) can run jobs, within a daily cap. Prod only; beta never gets these settings.
+- **Paste normalization:** on submit, `PasteNormalizer` rewrites a set that names a Mega forme (`Garchomp-Mega @ Garchompite`) as the species it evolves from, as Showdown's validator does, so users needn't edit their paste; a Mega forme without its stone is refused with a 400. The cleaned text is what's hashed and queued, and the job's `pasteNotes` say what changed (shown in the Simulations modal). The forme → species/stone data is the registry's `megaOf`/`megaStone`.
 - **Contract:** `SimulationResultContractTest` deserializes the engine's sample result (`backend/src/test/resources/engine/simulate-result.sample.json`) into `AnalyticsDTO`. **If you change `UsageStatsResponse`, `MatchupStatsResponse`, `MoveUsageResponse` or their nested classes, tell the engine's side**: it checks the same shapes.
 - **Keep out of this public repo:** the engine's code and methods, `REDIS_URL`, ARNs, instance IDs, and anything from a result's `provenance.method` (results are stored without it).
 

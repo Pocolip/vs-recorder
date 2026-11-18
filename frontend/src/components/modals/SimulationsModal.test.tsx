@@ -67,6 +67,16 @@ describe("SimulationsModal", () => {
     expect(run).toHaveBeenCalledWith("quick", true);
   });
 
+  it("says what was adjusted in the paste", () => {
+    isOwner = true;
+    renderModal({
+      canRun: false,
+      job: { ...simulationJob("QUEUED"), pasteNotes: ["Garchomp-Mega was sent as Garchomp holding Garchompite."] },
+    });
+    expect(screen.getByText(/The paste was adjusted for the engine/)).toBeTruthy();
+    expect(screen.getByText("Garchomp-Mega was sent as Garchomp holding Garchompite.")).toBeTruthy();
+  });
+
   it("shows a collaborator the status without run buttons", () => {
     isOwner = false;
     renderModal({ canRun: false, runsLeftToday: null, job: simulationJob("COMPLETE", "job-1"), result: simulationResult() });

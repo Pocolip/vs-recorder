@@ -47,7 +47,9 @@
         "Grass",
         "Poison"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Venusaur",
+      "megaStone": "Venusaurite"
     },
     "venusaur-gmax": {
       "num": 3,
@@ -105,7 +107,9 @@
         "Fire",
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Charizard",
+      "megaStone": "Charizardite X"
     },
     "charizard-mega-y": {
       "num": 6,
@@ -117,7 +121,9 @@
         "Fire",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Charizard",
+      "megaStone": "Charizardite Y"
     },
     "charizard-gmax": {
       "num": 6,
@@ -173,7 +179,9 @@
       "types": [
         "Water"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Blastoise",
+      "megaStone": "Blastoisinite"
     },
     "blastoise-gmax": {
       "num": 9,
@@ -278,7 +286,9 @@
         "Bug",
         "Poison"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Beedrill",
+      "megaStone": "Beedrillite"
     },
     "pidgey": {
       "num": 16,
@@ -326,7 +336,9 @@
         "Normal",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Pidgeot",
+      "megaStone": "Pidgeotite"
     },
     "rattata": {
       "num": 19,
@@ -651,7 +663,9 @@
       "types": [
         "Electric"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Raichu",
+      "megaStone": "Raichunite X"
     },
     "raichu-mega-y": {
       "num": 26,
@@ -662,7 +676,9 @@
       "types": [
         "Electric"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Raichu",
+      "megaStone": "Raichunite Y"
     },
     "sandshrew": {
       "num": 27,
@@ -810,7 +826,9 @@
         "Fairy",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Clefable",
+      "megaStone": "Clefablite"
     },
     "vulpix": {
       "num": 37,
@@ -1267,7 +1285,9 @@
       "types": [
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Alakazam",
+      "megaStone": "Alakazite"
     },
     "machop": {
       "num": 66,
@@ -1359,7 +1379,9 @@
         "Grass",
         "Poison"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Victreebel",
+      "megaStone": "Victreebelite"
     },
     "tentacool": {
       "num": 72,
@@ -1547,7 +1569,9 @@
         "Water",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Slowbro",
+      "megaStone": "Slowbronite"
     },
     "slowbro-galar": {
       "num": 80,
@@ -1770,7 +1794,9 @@
         "Ghost",
         "Poison"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Gengar",
+      "megaStone": "Gengarite"
     },
     "gengar-gmax": {
       "num": 94,
@@ -2112,7 +2138,9 @@
       "types": [
         "Normal"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Kangaskhan",
+      "megaStone": "Kangaskhanite"
     },
     "horsea": {
       "num": 116,
@@ -2191,7 +2219,9 @@
         "Water",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Starmie",
+      "megaStone": "Starminite"
     },
     "mr-mime": {
       "num": 122,
@@ -2284,7 +2314,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Pinsir",
+      "megaStone": "Pinsirite"
     },
     "tauros": {
       "num": 128,
@@ -2375,7 +2407,9 @@
         "Water",
         "Dark"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Gyarados",
+      "megaStone": "Gyaradosite"
     },
     "lapras": {
       "num": 131,
@@ -2559,7 +2593,9 @@
         "Rock",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Aerodactyl",
+      "megaStone": "Aerodactylite"
     },
     "snorlax": {
       "num": 143,
@@ -2699,7 +2735,9 @@
         "Dragon",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Dragonite",
+      "megaStone": "Dragoninite"
     },
     "mewtwo": {
       "num": 150,
@@ -2722,7 +2760,9 @@
         "Psychic",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Mewtwo",
+      "megaStone": "Mewtwonite X"
     },
     "mewtwo-mega-y": {
       "num": 150,
@@ -2733,7 +2773,9 @@
       "types": [
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Mewtwo",
+      "megaStone": "Mewtwonite Y"
     },
     "mew": {
       "num": 151,
@@ -2789,7 +2831,9 @@
         "Grass",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Meganium",
+      "megaStone": "Meganiumite"
     },
     "cyndaquil": {
       "num": 155,
@@ -2879,7 +2923,9 @@
         "Water",
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Feraligatr",
+      "megaStone": "Feraligite"
     },
     "sentret": {
       "num": 161,
@@ -3146,7 +3192,9 @@
         "Electric",
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Ampharos",
+      "megaStone": "Ampharosite"
     },
     "bellossom": {
       "num": 182,
@@ -3493,7 +3541,9 @@
         "Steel",
         "Ground"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Steelix",
+      "megaStone": "Steelixite"
     },
     "snubbull": {
       "num": 209,
@@ -3563,7 +3613,9 @@
         "Bug",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Scizor",
+      "megaStone": "Scizorite"
     },
     "shuckle": {
       "num": 213,
@@ -3599,7 +3651,9 @@
         "Bug",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Heracross",
+      "megaStone": "Heracronite"
     },
     "sneasel": {
       "num": 215,
@@ -3785,7 +3839,9 @@
         "Steel",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Skarmory",
+      "megaStone": "Skarmorite"
     },
     "houndour": {
       "num": 228,
@@ -3821,7 +3877,9 @@
         "Dark",
         "Fire"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Houndoom",
+      "megaStone": "Houndoominite"
     },
     "kingdra": {
       "num": 230,
@@ -4047,7 +4105,9 @@
         "Rock",
         "Dark"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Tyranitar",
+      "megaStone": "Tyranitarite"
     },
     "lugia": {
       "num": 249,
@@ -4128,7 +4188,9 @@
         "Grass",
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Sceptile",
+      "megaStone": "Sceptilite"
     },
     "torchic": {
       "num": 255,
@@ -4175,7 +4237,9 @@
         "Fire",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Blaziken",
+      "megaStone": "Blazikenite"
     },
     "mudkip": {
       "num": 258,
@@ -4222,7 +4286,9 @@
         "Water",
         "Ground"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Swampert",
+      "megaStone": "Swampertite"
     },
     "poochyena": {
       "num": 261,
@@ -4514,7 +4580,9 @@
         "Psychic",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Gardevoir",
+      "megaStone": "Gardevoirite"
     },
     "surskit": {
       "num": 283,
@@ -4754,7 +4822,9 @@
         "Dark",
         "Ghost"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Sableye",
+      "megaStone": "Sablenite"
     },
     "mawile": {
       "num": 303,
@@ -4778,7 +4848,9 @@
         "Steel",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Mawile",
+      "megaStone": "Mawilite"
     },
     "aron": {
       "num": 304,
@@ -4825,7 +4897,9 @@
       "types": [
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Aggron",
+      "megaStone": "Aggronite"
     },
     "meditite": {
       "num": 307,
@@ -4861,7 +4935,9 @@
         "Fighting",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Medicham",
+      "megaStone": "Medichamite"
     },
     "electrike": {
       "num": 309,
@@ -4894,7 +4970,9 @@
       "types": [
         "Electric"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Manectric",
+      "megaStone": "Manectite"
     },
     "plusle": {
       "num": 311,
@@ -5008,7 +5086,9 @@
         "Water",
         "Dark"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Sharpedo",
+      "megaStone": "Sharpedonite"
     },
     "wailmer": {
       "num": 320,
@@ -5066,7 +5146,9 @@
         "Fire",
         "Ground"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Camerupt",
+      "megaStone": "Cameruptite"
     },
     "torkoal": {
       "num": 324,
@@ -5204,7 +5286,9 @@
         "Dragon",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Altaria",
+      "megaStone": "Altarianite"
     },
     "zangoose": {
       "num": 335,
@@ -5479,7 +5563,9 @@
       "types": [
         "Ghost"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Banette",
+      "megaStone": "Banettite"
     },
     "duskull": {
       "num": 355,
@@ -5536,7 +5622,9 @@
         "Psychic",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Chimecho",
+      "megaStone": "Chimechite"
     },
     "absol": {
       "num": 359,
@@ -5558,7 +5646,9 @@
       "types": [
         "Dark"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Absol",
+      "megaStone": "Absolite"
     },
     "absol-mega-z": {
       "num": 359,
@@ -5570,7 +5660,9 @@
         "Dark",
         "Ghost"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Absol",
+      "megaStone": "Absolite Z"
     },
     "wynaut": {
       "num": 360,
@@ -5614,7 +5706,9 @@
       "types": [
         "Ice"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Glalie",
+      "megaStone": "Glalitite"
     },
     "spheal": {
       "num": 363,
@@ -5752,7 +5846,9 @@
         "Dragon",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Salamence",
+      "megaStone": "Salamencite"
     },
     "beldum": {
       "num": 374,
@@ -5800,7 +5896,9 @@
         "Steel",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Metagross",
+      "megaStone": "Metagrossite"
     },
     "regirock": {
       "num": 377,
@@ -5857,7 +5955,9 @@
         "Dragon",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Latias",
+      "megaStone": "Latiasite"
     },
     "latios": {
       "num": 381,
@@ -5881,7 +5981,9 @@
         "Dragon",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Latios",
+      "megaStone": "Latiosite"
     },
     "kyogre": {
       "num": 382,
@@ -6157,7 +6259,9 @@
         "Fighting",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Staraptor",
+      "megaStone": "Staraptite"
     },
     "bidoof": {
       "num": 399,
@@ -6591,7 +6695,9 @@
         "Normal",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Lopunny",
+      "megaStone": "Lopunnite"
     },
     "mismagius": {
       "num": 429,
@@ -6801,7 +6907,9 @@
         "Dragon",
         "Ground"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Garchomp",
+      "megaStone": "Garchompite"
     },
     "garchomp-mega-z": {
       "num": 445,
@@ -6812,7 +6920,9 @@
       "types": [
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Garchomp",
+      "megaStone": "Garchompite Z"
     },
     "munchlax": {
       "num": 446,
@@ -6858,7 +6968,9 @@
         "Fighting",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Lucario",
+      "megaStone": "Lucarionite"
     },
     "lucario-mega-z": {
       "num": 448,
@@ -6870,7 +6982,9 @@
         "Fighting",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Lucario",
+      "megaStone": "Lucarionite Z"
     },
     "hippopotas": {
       "num": 449,
@@ -7021,7 +7135,9 @@
         "Grass",
         "Ice"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Abomasnow",
+      "megaStone": "Abomasite"
     },
     "weavile": {
       "num": 461,
@@ -7206,7 +7322,9 @@
         "Psychic",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Gallade",
+      "megaStone": "Galladite"
     },
     "probopass": {
       "num": 476,
@@ -7253,7 +7371,9 @@
         "Ice",
         "Ghost"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Froslass",
+      "megaStone": "Froslassite"
     },
     "rotom": {
       "num": 479,
@@ -7430,7 +7550,9 @@
         "Fire",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Heatran",
+      "megaStone": "Heatranite"
     },
     "regigigas": {
       "num": 486,
@@ -7523,7 +7645,9 @@
       "types": [
         "Dark"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Darkrai",
+      "megaStone": "Darkranite"
     },
     "shaymin": {
       "num": 492,
@@ -7836,7 +7960,9 @@
         "Fire",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Emboar",
+      "megaStone": "Emboarite"
     },
     "oshawott": {
       "num": 501,
@@ -8196,7 +8322,9 @@
         "Ground",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Excadrill",
+      "megaStone": "Excadrite"
     },
     "audino": {
       "num": 531,
@@ -8219,7 +8347,9 @@
         "Normal",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Audino",
+      "megaStone": "Audinite"
     },
     "timburr": {
       "num": 532,
@@ -8393,7 +8523,9 @@
         "Bug",
         "Poison"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Scolipede",
+      "megaStone": "Scolipite"
     },
     "cottonee": {
       "num": 546,
@@ -8659,7 +8791,9 @@
         "Dark",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Scrafty",
+      "megaStone": "Scraftinite"
     },
     "sigilyph": {
       "num": 561,
@@ -9256,7 +9390,9 @@
       "types": [
         "Electric"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Eelektross",
+      "megaStone": "Eelektrossite"
     },
     "elgyem": {
       "num": 605,
@@ -9326,7 +9462,9 @@
         "Ghost",
         "Fire"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Chandelure",
+      "megaStone": "Chandelurite"
     },
     "axew": {
       "num": 610,
@@ -9507,7 +9645,9 @@
         "Ground",
         "Ghost"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Golurk",
+      "megaStone": "Golurkite"
     },
     "pawniard": {
       "num": 624,
@@ -10011,7 +10151,9 @@
         "Grass",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Chesnaught",
+      "megaStone": "Chesnaughtite"
     },
     "fennekin": {
       "num": 653,
@@ -10057,7 +10199,9 @@
         "Fire",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Delphox",
+      "megaStone": "Delphoxite"
     },
     "froakie": {
       "num": 656,
@@ -10127,7 +10271,9 @@
         "Water",
         "Dark"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Greninja",
+      "megaStone": "Greninjite"
     },
     "bunnelby": {
       "num": 659,
@@ -10487,7 +10633,9 @@
         "Fire",
         "Normal"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Pyroar",
+      "megaStone": "Pyroarite"
     },
     "flabebe": {
       "num": 669,
@@ -10535,7 +10683,9 @@
       "types": [
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Floette-Eternal",
+      "megaStone": "Floettite"
     },
     "florges": {
       "num": 671,
@@ -10652,7 +10802,9 @@
       "types": [
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Meowstic",
+      "megaStone": "Meowsticite"
     },
     "meowstic-f-mega": {
       "num": 678,
@@ -10663,7 +10815,9 @@
       "types": [
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Meowstic-F",
+      "megaStone": "Meowsticite"
     },
     "honedge": {
       "num": 679,
@@ -10791,7 +10945,9 @@
         "Dark",
         "Psychic"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Malamar",
+      "megaStone": "Malamarite"
     },
     "binacle": {
       "num": 688,
@@ -10827,7 +10983,9 @@
         "Rock",
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Barbaracle",
+      "megaStone": "Barbaracite"
     },
     "skrelp": {
       "num": 690,
@@ -10863,7 +11021,9 @@
         "Poison",
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Dragalge",
+      "megaStone": "Dragalgite"
     },
     "clauncher": {
       "num": 692,
@@ -10992,7 +11152,9 @@
         "Fighting",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Hawlucha",
+      "megaStone": "Hawluchanite"
     },
     "dedenne": {
       "num": 702,
@@ -11345,7 +11507,9 @@
         "Dragon",
         "Ground"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Zygarde",
+      "megaStone": "Zygardite"
     },
     "diancie": {
       "num": 719,
@@ -11369,7 +11533,9 @@
         "Rock",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Diancie",
+      "megaStone": "Diancite"
     },
     "hoopa": {
       "num": 720,
@@ -11672,7 +11838,9 @@
         "Fighting",
         "Ice"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Crabominable",
+      "megaStone": "Crabominite"
     },
     "oricorio": {
       "num": 741,
@@ -12135,7 +12303,9 @@
         "Bug",
         "Steel"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Golisopod",
+      "megaStone": "Golisopite"
     },
     "sandygast": {
       "num": 769,
@@ -12606,7 +12776,9 @@
         "Normal",
         "Dragon"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Drampa",
+      "megaStone": "Drampanite"
     },
     "dhelmise": {
       "num": 781,
@@ -12929,7 +13101,9 @@
         "Steel",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Magearna",
+      "megaStone": "Magearnite"
     },
     "magearna-original-mega": {
       "num": 801,
@@ -12941,7 +13115,9 @@
         "Steel",
         "Fairy"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Magearna-Original",
+      "megaStone": "Magearnite"
     },
     "marshadow": {
       "num": 802,
@@ -13022,7 +13198,9 @@
       "types": [
         "Electric"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Zeraora",
+      "megaStone": "Zeraorite"
     },
     "meltan": {
       "num": 808,
@@ -14084,7 +14262,9 @@
       "types": [
         "Fighting"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Falinks",
+      "megaStone": "Falinksite"
     },
     "pincurchin": {
       "num": 871,
@@ -15354,7 +15534,9 @@
         "Grass",
         "Fire"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Scovillain",
+      "megaStone": "Scovillainite"
     },
     "rellor": {
       "num": 953,
@@ -15590,7 +15772,9 @@
         "Rock",
         "Poison"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Glimmora",
+      "megaStone": "Glimmoranite"
     },
     "greavard": {
       "num": 971,
@@ -15720,7 +15904,9 @@
         "Dragon",
         "Water"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Tatsugiri",
+      "megaStone": "Tatsugirinite"
     },
     "tatsugiri-droopy-mega": {
       "num": 978,
@@ -15732,7 +15918,9 @@
         "Dragon",
         "Water"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Tatsugiri-Droopy",
+      "megaStone": "Tatsugirinite"
     },
     "tatsugiri-stretchy-mega": {
       "num": 978,
@@ -15744,7 +15932,9 @@
         "Dragon",
         "Water"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Tatsugiri-Stretchy",
+      "megaStone": "Tatsugirinite"
     },
     "annihilape": {
       "num": 979,
@@ -16008,7 +16198,9 @@
         "Dragon",
         "Ice"
       ],
-      "aliases": []
+      "aliases": [],
+      "megaOf": "Baxcalibur",
+      "megaStone": "Baxcalibrite"
     },
     "gimmighoul": {
       "num": 999,

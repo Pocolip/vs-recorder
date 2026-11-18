@@ -80,6 +80,7 @@ public class SimulationService {
     private final UserRepository userRepository;
     private final TeamAccessService teamAccessService;
     private final PokepasteService pokepasteService;
+    private final PasteNormalizer pasteNormalizer;
     private final AnalyticsService analyticsService;
     private final EngineProperties properties;
     private final ObjectProvider<EngineQueue> queueProvider;
@@ -121,10 +122,16 @@ public class SimulationService {
         });
 
         PokepasteDTO.PasteData paste = pokepasteService.fetchPasteData(submission.pasteUrl());
-        String pasteText = paste.getRawText();
-        if (pasteText == null || pasteText.isBlank()) {
+        String rawPaste = paste.getRawText();
+        if (rawPaste == null || rawPaste.isBlank()) {
             throw new IllegalArgumentException("Couldn't read the team's paste.");
         }
+        // Mega formes become the species they evolve from (400 if a stone is missing),
+        // so the user's paste needn't change. Hashed as sent, so "unchanged" compares
+        // what the engine saw.
+        PasteNormalizer.Result cleaned = pasteNormalizer.normalize(rawPaste);
+        String pasteText = cleaned.text();
+        String pasteNotes = cleaned.notes().isEmpty() ? null : String.join("\n", cleaned.notes());
         String pasteSha256 = sha256(pasteText);
 
         UUID jobId = transactions.execute(tx -> {
@@ -160,6 +167,7 @@ public class SimulationService {
             job.setPasteSha256(pasteSha256);
             job.setStatus(Status.QUEUED);
             job.setDepth(depth);
+            job.setPasteNotes(pasteNotes);
             job.setLastChangedAt(Instant.now());
             return jobRepository.saveAndFlush(job).getId();
         });
@@ -590,6 +598,7 @@ public class SimulationService {
                 .id(job.getId())
                 .status(job.getStatus().name())
                 .depth(depthName(job))
+                .pasteNotes(job.getPasteNotes() == null ? List.of() : List.of(job.getPasteNotes().split("\n")))
                 .progress(job.getProgress())
                 .unfinished(job.isUnfinished())
                 .cancelRequested(job.isCancelRequested())

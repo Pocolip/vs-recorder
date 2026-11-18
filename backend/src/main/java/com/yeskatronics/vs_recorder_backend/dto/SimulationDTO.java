@@ -47,6 +47,8 @@ public class SimulationDTO {
         private String status;
         /** "quick" or "full". */
         private String depth;
+        /** What was changed in the paste before sending it, e.g. a Mega forme listed as its base species. */
+        private List<String> pasteNotes;
         /** e.g. "preview 12/40", "games 8/40", "search 3/10". */
         private String progress;
         private boolean unfinished;

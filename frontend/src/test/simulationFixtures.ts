@@ -6,6 +6,7 @@ export const simulationJob = (status: SimulationJob["status"], id = "job-2"): Si
   id,
   status,
   depth: "full",
+  pasteNotes: [],
   progress: null,
   unfinished: ["QUEUED", "RUNNING", "PARTIAL"].includes(status),
   cancelRequested: false,
