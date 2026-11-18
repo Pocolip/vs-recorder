@@ -120,6 +120,7 @@ class SimulationResultContractTest {
         assertEquals(0.5077, raichu.getWinRateBrought(), 1e-9);
         assertEquals(0.4916, raichu.getWinRateBenched(), 1e-9);
         assertEquals(0.0161, raichu.getDelta(), 1e-9);
+        assertEquals(List.of(-0.1067, 0.1389), raichu.getCi95());
         // delta is nullable
         assertNull(diagnostics.getMembers().get(3).getDelta());
 
