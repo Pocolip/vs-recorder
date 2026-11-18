@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeProgress, simulatedScopeLabel } from "./simulationUtils";
+import { describeProgress, jobProgress, simulatedScopeLabel } from "./simulationUtils";
 
 describe("describeProgress", () => {
   it("names each engine stage", () => {
@@ -21,5 +21,32 @@ describe("simulatedScopeLabel", () => {
     const label = simulatedScopeLabel(40);
     expect(label).toContain("40 teams in the meta");
     expect(label).toContain("Not a prediction");
+  });
+});
+
+describe("jobProgress", () => {
+  const job = (depth: "quick" | "full", progress: string | null, status: "QUEUED" | "RUNNING" | "PARTIAL" = "RUNNING") => ({
+    depth,
+    progress,
+    status,
+  });
+
+  it("maps each stage onto the whole run", () => {
+    expect(jobProgress(job("full", "preview 20/40"))).toBeCloseTo(0.125);
+    expect(jobProgress(job("full", "games 40/40"))).toBeCloseTo(0.35);
+    expect(jobProgress(job("full", "search 5/10"))).toBeCloseTo(0.675);
+    expect(jobProgress(job("quick", "preview 40/40"))).toBeCloseTo(0.8);
+    expect(jobProgress(job("quick", "games 20/40"))).toBeCloseTo(0.9);
+  });
+
+  it("has nothing to measure before the worker reports", () => {
+    expect(jobProgress(job("full", null, "QUEUED"))).toBeNull();
+    expect(jobProgress(job("full", "warming up"))).toBeNull();
+    expect(jobProgress(null)).toBeNull();
+  });
+
+  it("counts a partial result as the volume games done", () => {
+    expect(jobProgress(job("full", null, "PARTIAL"))).toBeCloseTo(0.35);
+    expect(jobProgress(job("full", "search 3/10", "PARTIAL"))).toBeCloseTo(0.545);
   });
 });
