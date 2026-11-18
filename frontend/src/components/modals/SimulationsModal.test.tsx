@@ -31,7 +31,10 @@ describe("SimulationsModal", () => {
     expect(screen.getByText("Simulated analytics")).toBeTruthy();
     expect(screen.getByText("Matchup Planner")).toBeTruthy();
     expect(screen.getByText("Replay grading")).toBeTruthy();
-    expect(screen.getAllByText("Coming later")).toHaveLength(2);
+    expect(screen.getAllByText("Coming later")).toHaveLength(1);
+    expect(screen.getByRole("link", { name: "Open Matchup Planner" }).getAttribute("href")).toBe(
+      "/team/7/matchup-planner",
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "Run quick" }));
     expect(run).toHaveBeenCalledWith("quick");

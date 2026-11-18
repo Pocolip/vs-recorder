@@ -7,6 +7,7 @@ import com.yeskatronics.vs_recorder_backend.exceptions.SimulationNotFoundExcepti
 import com.yeskatronics.vs_recorder_backend.exceptions.TeamAccessDeniedException;
 import com.yeskatronics.vs_recorder_backend.repositories.TeamRepository;
 import com.yeskatronics.vs_recorder_backend.repositories.UserRepository;
+import com.yeskatronics.vs_recorder_backend.services.PlanSimulationService;
 import com.yeskatronics.vs_recorder_backend.services.SimulationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ class SimulationDisabledTest {
 
     @Autowired private ApplicationContext context;
     @Autowired private SimulationService simulationService;
+    @Autowired private PlanSimulationService planSimulationService;
     @Autowired private TeamRepository teamRepository;
     @Autowired private UserRepository userRepository;
 
@@ -71,6 +73,16 @@ class SimulationDisabledTest {
                 () -> simulationService.submit(team.getId(), owner.getId(), "sim-off-owner", SimulationJob.Depth.FULL, false));
         assertThrows(TeamAccessDeniedException.class,
                 () -> simulationService.cancel(team.getId(), owner.getId(), "sim-off-owner"));
+    }
+
+    @Test
+    void plansReportDisabledAndCantBeSubmitted() {
+        var status = planSimulationService.getStatus(team.getId(), owner.getId(), "sim-off-owner");
+        assertFalse(status.isEnabled());
+        assertFalse(status.isCanRun());
+        assertTrue(status.getEntries().isEmpty());
+        assertThrows(TeamAccessDeniedException.class, () -> planSimulationService.submit(
+                team.getId(), owner.getId(), "sim-off-owner", java.util.List.of(1L), false));
     }
 
     @Test

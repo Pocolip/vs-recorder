@@ -1,0 +1,188 @@
+{
+ "schema_version": 1,
+ "kind": "plan",
+ "job_id": "00000000-0000-0000-0000-000000000000",
+ "regulation": "gen9championsvgc2026regmc",
+ "team": [
+  "Raichu",
+  "Golisopod",
+  "Archaludon",
+  "Pelipper",
+  "Basculegion-F",
+  "Sneasler"
+ ],
+ "opponent": {
+  "species": [
+   "Gholdengo",
+   "Volcarona",
+   "Garchomp",
+   "Incineroar",
+   "Rillaboom",
+   "Raichu"
+  ],
+  "spreads": "sheet"
+ },
+ "compositions": [
+  {
+   "lead1": "Golisopod",
+   "lead2": "Pelipper",
+   "back1": "Basculegion-F",
+   "back2": "Sneasler",
+   "notes": "Simulated: 40% of the engine's preview mix.",
+   "weight": 0.4025
+  },
+  {
+   "lead1": "Pelipper",
+   "lead2": "Basculegion-F",
+   "back1": "Golisopod",
+   "back2": "Archaludon",
+   "notes": "Simulated: 29% of the engine's preview mix.",
+   "weight": 0.294
+  },
+  {
+   "lead1": "Archaludon",
+   "lead2": "Pelipper",
+   "back1": "Golisopod",
+   "back2": "Basculegion-F",
+   "notes": "Simulated: 17% of the engine's preview mix.",
+   "weight": 0.1749
+  }
+ ],
+ "opponentCompositions": [
+  {
+   "lead1": "Garchomp",
+   "lead2": "Rillaboom",
+   "back1": "Gholdengo",
+   "back2": "Incineroar",
+   "notes": "Simulated: they bring this 54% of the time.",
+   "weight": 0.5427
+  },
+  {
+   "lead1": "Gholdengo",
+   "lead2": "Raichu",
+   "back1": "Incineroar",
+   "back2": "Rillaboom",
+   "notes": "Simulated: they bring this 35% of the time.",
+   "weight": 0.3531
+  }
+ ],
+ "opponentSummary": "Simulated: they lead Garchomp + Rillaboom 57% of the time, with Gholdengo / Incineroar in the back.",
+ "preview": {
+  "value": 0.7264,
+  "valueSe": 0.0111,
+  "simplifyCost": {
+   "option": 41,
+   "vs_equilibrium": -0.0001,
+   "vs_best_response": 0.1364
+  },
+  "verified": true,
+  "ours": [
+   {
+    "lead": [
+     "Golisopod",
+     "Pelipper"
+    ],
+    "back": [
+     "Basculegion-F",
+     "Sneasler"
+    ],
+    "weight": 0.4025
+   },
+   {
+    "lead": [
+     "Pelipper",
+     "Basculegion-F"
+    ],
+    "back": [
+     "Golisopod",
+     "Archaludon"
+    ],
+    "weight": 0.294
+   },
+   {
+    "lead": [
+     "Archaludon",
+     "Pelipper"
+    ],
+    "back": [
+     "Golisopod",
+     "Basculegion-F"
+    ],
+    "weight": 0.1749
+   },
+   {
+    "lead": [
+     "Golisopod",
+     "Pelipper"
+    ],
+    "back": [
+     "Archaludon",
+     "Basculegion-F"
+    ],
+    "weight": 0.1285
+   }
+  ],
+  "theirs": [
+   {
+    "lead": [
+     "Garchomp",
+     "Rillaboom"
+    ],
+    "back": [
+     "Gholdengo",
+     "Incineroar"
+    ],
+    "weight": 0.5427
+   },
+   {
+    "lead": [
+     "Gholdengo",
+     "Raichu"
+    ],
+    "back": [
+     "Incineroar",
+     "Rillaboom"
+    ],
+    "weight": 0.3531
+   },
+   {
+    "lead": [
+     "Garchomp",
+     "Incineroar"
+    ],
+    "back": [
+     "Gholdengo",
+     "Rillaboom"
+    ],
+    "weight": 0.0816
+   },
+   {
+    "lead": [
+     "Garchomp",
+     "Rillaboom"
+    ],
+    "back": [
+     "Gholdengo",
+     "Volcarona"
+    ],
+    "weight": 0.0226
+   }
+  ]
+ },
+ "status": "complete",
+ "games": 128,
+ "wins": 87,
+ "losses": 41,
+ "ties": 0,
+ "winRate": 0.6797,
+ "ci95": [
+  0.5914,
+  0.768
+ ],
+ "category": "favorable",
+ "provenance": {
+  "model": "run26-latest-7b58dee0",
+  "pool_snapshot": "2026-11-16",
+  "created": "2026-11-18T16:45:53+00:00"
+ }
+}

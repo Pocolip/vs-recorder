@@ -31,6 +31,15 @@ export type {
   SimulationDiagnostics,
   SimulationMember,
   SimulationThreat,
+  PlanJob,
+  PlanComposition,
+  PlanCategory,
+  PlanStaleReason,
+  PlanResultInfo,
+  PlanEntryStatus,
+  PlanStatus,
+  PlanSubmitOutcome,
+  PlanSubmitResponse,
 } from "./simulation";
 export type { GamePlan, GamePlanTeam, Composition } from "./gamePlan";
 export type { ExportOptions, ExportResult, ImportResult, RateLimitStatus, ExportSummary } from "./export";
