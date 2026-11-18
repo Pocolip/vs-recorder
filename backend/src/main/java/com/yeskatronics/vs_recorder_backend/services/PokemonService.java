@@ -29,6 +29,15 @@ public class PokemonService {
 
     private String registryVersion;
 
+    /**
+     * A Mega forme: the species a team lists for it ({@code from}, e.g. Floette-Eternal
+     * for Floette-Mega) and the stone that makes it Mega Evolve. Showdown names.
+     */
+    public record MegaForme(String name, String from, String stone) {}
+
+    /** Mega formes by canonical key. */
+    private final Map<String, MegaForme> megaFormes = new HashMap<>();
+
     @PostConstruct
     public void init() {
         try {
@@ -63,6 +72,10 @@ public class PokemonService {
                     );
 
                     registry.put(key, entry);
+                    if (node.hasNonNull("megaOf") && node.hasNonNull("megaStone")) {
+                        megaFormes.put(key, new MegaForme(
+                                node.path("name").asText(), node.path("megaOf").asText(), node.path("megaStone").asText()));
+                    }
 
                     // Index the canonical name
                     aliasIndex.put(key, key);
@@ -89,6 +102,16 @@ public class PokemonService {
         } catch (Exception e) {
             log.error("Failed to load pokemon-data.json: {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * The Mega forme a name refers to, if it is one ("Garchomp-Mega", "Charizard Mega Y").
+     */
+    public Optional<MegaForme> megaForme(String anyName) {
+        if (anyName == null || anyName.isBlank()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(megaFormes.get(resolveCanonical(anyName)));
     }
 
     /**

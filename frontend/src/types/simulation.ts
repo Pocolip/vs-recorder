@@ -9,6 +9,8 @@ export interface SimulationJob {
   id: string;
   status: SimulationJobStatus;
   depth: SimulationDepth;
+  /** What was changed in the team's paste before sending it (e.g. a Mega forme listed as its base species). */
+  pasteNotes?: string[];
   /** e.g. "preview 12/40", "games 8/40", "search 3/10" */
   progress: string | null;
   unfinished: boolean;

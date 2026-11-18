@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { AlertTriangle, CheckCircle2, Cpu, Loader2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Cpu, Info, Loader2, XCircle } from "lucide-react";
 import { Modal } from "../ui/modal";
 import { useSimulation } from "../../context/SimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
@@ -141,6 +141,20 @@ function CurrentStatus({ status }: { status: SimulationStatus }) {
         </div>
         {action}
       </div>
+
+      {job?.pasteNotes && job.pasteNotes.length > 0 && (
+        <div className="mt-3 flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+          <div>
+            <p>The paste was adjusted for the engine; your team's paste is unchanged:</p>
+            <ul className="mt-0.5 list-disc pl-5 text-gray-500 dark:text-gray-400">
+              {job.pasteNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       {result && (
         <div className="mt-3 border-t border-gray-200 pt-3 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">

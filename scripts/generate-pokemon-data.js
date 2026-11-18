@@ -124,6 +124,16 @@ async function main() {
       aliases: [],
     };
 
+    // Mega formes only exist in battle: a team lists the species it evolves from
+    // holding its stone. Simulations rewrite pastes that name the forme instead.
+    // battleOnly is that species (Floette-Mega comes from Floette-Eternal); the
+    // newer -Mega-Z formes lack it, and their base species is the right one.
+    if (/-Mega(-[XYZ])?$/.test(species.name) && species.requiredItem) {
+      const from = Array.isArray(species.battleOnly) ? species.battleOnly[0] : species.battleOnly;
+      pokemon[key].megaOf = from || species.baseSpecies;
+      pokemon[key].megaStone = species.requiredItem;
+    }
+
     if (!aliasCollector[key]) aliasCollector[key] = new Set();
   }
 

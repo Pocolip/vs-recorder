@@ -144,6 +144,55 @@ class SimulationFlowTest {
         assertEquals("full", status.getJob().getDepth());
     }
 
+    // ==================== Paste normalization ====================
+
+    private void pasteIs(String text) {
+        PokepasteDTO.PasteData paste = new PokepasteDTO.PasteData();
+        paste.setRawText(text);
+        when(pokepasteService.fetchPasteData(anyString())).thenReturn(paste);
+    }
+
+    @Test
+    void aMegaFormeIsSentAsItsBaseSpeciesWithANote() throws Exception {
+        pasteIs("Chompy (Garchomp-Mega) @ Garchompite\nAbility: Rough Skin\n- Protect\n");
+        SimulationDTO.StatusResponse status = submit(false);
+
+        ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
+        verify(queue).submit(json.capture());
+        assertEquals("Chompy (Garchomp) @ Garchompite\nAbility: Rough Skin\n- Protect\n",
+                objectMapper.readTree(json.getValue()).get("team_paste").asText());
+        assertEquals(List.of("Garchomp-Mega was sent as Garchomp holding Garchompite."),
+                status.getJob().getPasteNotes());
+    }
+
+    @Test
+    void aMegaFormeWithoutItsStoneIsRefusedBeforeAnythingIsQueued() {
+        pasteIs("Garchomp-Mega @ Life Orb\nAbility: Rough Skin\n");
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> submit(false));
+        assertTrue(e.getMessage().contains("needs to hold Garchompite"), e.getMessage());
+        verify(queue, never()).submit(anyString());
+        verify(workerStarter, never()).start();
+        assertTrue(jobRepository.findAll().isEmpty());
+    }
+
+    @Test
+    void unchangedComparesThePasteAsSent() {
+        pasteIs("Garchomp-Mega @ Garchompite\nAbility: Rough Skin\n");
+        finishWith(submit(false).getJob().getId(), completeJson);
+
+        // The same team written the standard way is the same simulation
+        pasteIs("Garchomp @ Garchompite\nAbility: Rough Skin\n");
+        SimulationConflictException e = assertThrows(SimulationConflictException.class, () -> submit(false));
+        assertEquals(SimulationConflictException.UNCHANGED, e.getCode());
+        assertEquals(1, simulationService.getStatus(team.getId(), owner.getId(), "sim-owner")
+                .getJob().getPasteNotes().size());
+    }
+
+    @Test
+    void aStandardPasteHasNoNotes() {
+        assertEquals(List.of(), submit(false).getJob().getPasteNotes());
+    }
+
     @Test
     void aQuickSimulationSkipsTheCarefulGames() throws Exception {
         SimulationDTO.StatusResponse status = submit(Depth.QUICK, false);

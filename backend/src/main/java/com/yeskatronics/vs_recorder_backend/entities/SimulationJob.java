@@ -74,9 +74,13 @@ public class SimulationJob {
     @Column(name = "paste_url", nullable = false, columnDefinition = "TEXT")
     private String pasteUrl;
 
-    /** SHA-256 of the paste text submitted. */
+    /** SHA-256 of the paste text submitted (after normalization: what the engine got). */
     @Column(name = "paste_sha256", nullable = false, length = 64)
     private String pasteSha256;
+
+    /** What normalization changed in the paste, one note per line; null when nothing. */
+    @Column(name = "paste_notes", columnDefinition = "TEXT")
+    private String pasteNotes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
