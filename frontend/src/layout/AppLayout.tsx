@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { ActiveTeamProvider } from "../context/ActiveTeamContext";
 import { SimulationProvider } from "../context/SimulationContext";
+import { PlanSimulationProvider } from "../context/PlanSimulationContext";
 import SimulationProgressBar from "../components/team/SimulationProgressBar";
 import { CalcStateProvider } from "../context/CalcStateContext";
 import { FolderProvider, useFolderContext } from "../context/FolderContext";
@@ -143,6 +144,7 @@ const AppLayout: React.FC = () => {
   return (
     <ActiveTeamProvider>
       <SimulationProvider>
+        <PlanSimulationProvider>
         <CalcStateProvider>
           <FolderProvider>
             <SidebarProvider>
@@ -150,6 +152,7 @@ const AppLayout: React.FC = () => {
             </SidebarProvider>
           </FolderProvider>
         </CalcStateProvider>
+        </PlanSimulationProvider>
       </SimulationProvider>
     </ActiveTeamProvider>
   );

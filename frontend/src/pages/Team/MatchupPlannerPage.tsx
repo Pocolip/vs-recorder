@@ -41,7 +41,7 @@ import { matchesPokemonTags } from "../../utils/pokemonNameUtils";
 import { useMatchupReplays } from "../../hooks/useMatchupReplays";
 import MatchupReplays from "../../components/team/MatchupReplays";
 import { useSimulation } from "../../context/SimulationContext";
-import { usePlanSimulations } from "../../hooks/usePlanSimulations";
+import { usePlanSimulationContext } from "../../context/PlanSimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
 import PlannerSimulatedBar from "../../components/team/PlannerSimulatedBar";
 import SimulatePlansModal from "../../components/modals/SimulatePlansModal";
@@ -96,7 +96,10 @@ export default function MatchupPlannerPage() {
     () => `${team?.pokepaste ?? ""}|${opponentTeams.map((t) => `${t.id}:${t.pokepaste}`).join("|")}`,
     [team?.pokepaste, opponentTeams],
   );
-  const plans = usePlanSimulations(team?.id ?? null, plansKey);
+  // Shared with the Simulations modal and the progress bar; this page keeps it current.
+  const plans = usePlanSimulationContext();
+  const { setEntriesKey } = plans;
+  useEffect(() => setEntriesKey(plansKey), [setEntriesKey, plansKey]);
   const showPlans = simulated && plans.anyResult;
   const canSimulate = plans.status?.enabled === true && plans.status.canRun;
   // null: the modal picks every entry without an up-to-date plan.
