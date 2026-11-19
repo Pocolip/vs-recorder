@@ -2,8 +2,9 @@ import { Link } from "react-router";
 import { AlertTriangle, CheckCircle2, Cpu, Info, Loader2, XCircle } from "lucide-react";
 import { Modal } from "../ui/modal";
 import { useSimulation } from "../../context/SimulationContext";
+import { usePlanSimulationContext } from "../../context/PlanSimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
-import { DEPTH_OPTIONS, depthName, describeProgress } from "../../utils/simulationUtils";
+import { DEPTH_OPTIONS, depthName, describeProgress, planSummary } from "../../utils/simulationUtils";
 import type { SimulationStatus, Team } from "../../types";
 
 const buttonBase =
@@ -260,12 +261,57 @@ function SimulatedAnalytics({ status, teamId }: { status: SimulationStatus; team
   );
 }
 
+/** The planner's plans at a glance: what's running now, or how many teams have one. */
+function PlanStatusLine() {
+  const { status } = usePlanSimulationContext();
+  if (!status?.enabled) return null;
+  const s = planSummary(status.entries);
+  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+  if (s.queued + s.running > 0) {
+    const inRun = s.queued + s.running + s.doneInRun;
+    const parts = [
+      s.doneInRun > 0 ? `${s.doneInRun} done` : null,
+      s.running > 0 ? `${s.running} running` : null,
+      s.queued > 0 ? `${s.queued} queued` : null,
+    ].filter(Boolean);
+    return (
+      <p className="mt-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand-500" />
+        Simulating {plural(inRun, "team")}: {parts.join(", ")}.
+      </p>
+    );
+  }
+  if (s.total === 0) {
+    return <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No teams in your planner yet.</p>;
+  }
+  const notes = [
+    s.stale > 0 ? `${s.stale} out of date` : null,
+    s.failed > 0 ? `${s.failed} failed` : null,
+  ].filter(Boolean);
+  const Icon = s.failed > 0 ? XCircle : s.withPlan === s.total && s.stale === 0 ? CheckCircle2 : Cpu;
+  const tone =
+    s.failed > 0
+      ? "text-red-500"
+      : s.withPlan === s.total && s.stale === 0
+        ? "text-green-500"
+        : "text-gray-400";
+  return (
+    <p className="mt-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+      <Icon className={`h-4 w-4 shrink-0 ${tone}`} />
+      {s.withPlan} of {plural(s.total, "team")} {s.withPlan === 1 ? "has" : "have"} a plan
+      {notes.length > 0 ? ` (${notes.join(", ")})` : ""}.
+    </p>
+  );
+}
+
 /** Simulated plans run from the Matchup Planner, which shows each entry's progress. */
 function SimulatedPlans({ teamId }: { teamId: number }) {
   const { closePanel } = useSimulation();
   return (
     <div className={card}>
       <h4 className="font-semibold text-gray-800 dark:text-gray-100">Matchup Planner</h4>
+      <PlanStatusLine />
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
         For each team in your planner: the leads and backs to bring, what they bring, and your win rate, with the
         Simulated toggle showing them in place of your own plans. Pick the teams to simulate from the planner.

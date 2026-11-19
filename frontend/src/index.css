@@ -307,6 +307,14 @@ layer(base);
   from { transform: translateX(-100%); }
   to   { transform: translateX(300%); }
 }
+/* While the engine works, the fill breathes. */
+@utility progress-pulse {
+  animation: progressPulse 1.8s ease-in-out infinite;
+}
+@keyframes progressPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
 @utility progress-done {
   animation: progressDone 2.5s ease-out both;
 }
@@ -315,6 +323,9 @@ layer(base);
   100%    { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .progress-pulse {
+    animation: none;
+  }
   .progress-sweep {
     animation: none;
     width: 100%;

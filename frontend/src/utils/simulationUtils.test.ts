@@ -1,14 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  describePlanProgress,
-  describeProgress,
-  jobProgress,
-  percent,
-  percentRange,
-  planErrorMessage,
-  simulatedScopeLabel,
-  staleLabel,
-} from "./simulationUtils";
+import { planJob, planResult } from "../test/planFixtures";
+import { simulationJob } from "../test/simulationFixtures";
+import { describePlanProgress, describeProgress, engineProgress, jobProgress, percent, percentRange, planErrorMessage, planJobProgress, planSummary, simulatedScopeLabel, staleLabel } from "./simulationUtils";
 
 describe("describeProgress", () => {
   it("names each engine stage", () => {
@@ -84,5 +77,82 @@ describe("plan helpers", () => {
   it("says what made a plan stale", () => {
     expect(staleLabel({ stale: false, staleReason: null })).toBeNull();
     expect(staleLabel({ stale: true, staleReason: "MODEL" })).toBe("The engine has improved since this plan.");
+  });
+});
+
+describe("planJobProgress", () => {
+  it("follows a plan's preview solve, then its matchup", () => {
+    expect(planJobProgress({ status: "QUEUED", progress: null })).toBeNull();
+    expect(planJobProgress({ status: "RUNNING", progress: null })).toBe(0);
+    expect(planJobProgress({ status: "RUNNING", progress: "preview 1/1" })).toBeCloseTo(0.25);
+    expect(planJobProgress({ status: "PARTIAL", progress: null })).toBeCloseTo(0.25);
+    expect(planJobProgress({ status: "PARTIAL", progress: "search 1/1" })).toBeCloseTo(1);
+  });
+});
+
+describe("engineProgress", () => {
+  const at = "2026-11-18T10:00:00Z";
+  const later = "2026-11-18T10:05:00Z";
+  const earlier = "2026-11-17T10:00:00Z";
+
+  it("is inactive with nothing unfinished", () => {
+    expect(engineProgress(simulationJob("COMPLETE"), [{ gamePlanTeamId: 1, job: planJob("COMPLETE"), result: null }]).active).toBe(false);
+  });
+
+  it("counts a batch's finished plans as done, and leaves out older runs", () => {
+    const p = engineProgress(null, [
+      { gamePlanTeamId: 1, job: planJob("COMPLETE", "old", { createdAt: earlier }), result: null },
+      { gamePlanTeamId: 2, job: planJob("COMPLETE", "a", { createdAt: at }), result: null },
+      { gamePlanTeamId: 3, job: planJob("RUNNING", "b", { createdAt: at, progress: "preview 1/1" }), result: null },
+    ]);
+    expect(p.fraction).toBeCloseTo((1 + 0.25) / 2);
+    expect(p.jobs.map((j) => j.id)).toEqual(["a", "b"]);
+    expect(p.label).toBe("Matchup plans: 1 of 2 done");
+  });
+
+  it("weighs a full simulation against plans by how long each takes", () => {
+    const p = engineProgress(
+      { ...simulationJob("RUNNING"), createdAt: at, progress: "search 5/10" },
+      [{ gamePlanTeamId: 1, job: planJob("COMPLETE", "a", { createdAt: later }), result: null }],
+    );
+    // full: 30 min at 0.675; the plan: 4 min, done
+    expect(p.fraction).toBeCloseTo((30 * 0.675 + 4) / 34);
+    expect(p.label).toBe("Full simulation: Refining the top opponents (5/10)");
+  });
+
+  it("keeps a batch together once its first plan finishes", () => {
+    // Created in one request, milliseconds apart; the first one is done
+    const p = engineProgress(null, [
+      { gamePlanTeamId: 1, job: planJob("COMPLETE", "a", { createdAt: "2026-11-18T10:00:00.101Z" }), result: null },
+      { gamePlanTeamId: 2, job: planJob("RUNNING", "b", { createdAt: "2026-11-18T10:00:00.152Z" }), result: null },
+      { gamePlanTeamId: 3, job: planJob("QUEUED", "c", { createdAt: "2026-11-18T10:00:00.198Z" }), result: null },
+    ]);
+    expect(p.label).toBe("Matchup plans: 1 of 3 done");
+    expect(p.fraction).toBeCloseTo(1 / 3);
+    expect(
+      planSummary([
+        { gamePlanTeamId: 1, job: planJob("COMPLETE", "a", { createdAt: "2026-11-18T10:00:00.101Z" }), result: null },
+        { gamePlanTeamId: 2, job: planJob("RUNNING", "b", { createdAt: "2026-11-18T10:00:00.152Z" }), result: null },
+      ]).doneInRun,
+    ).toBe(1);
+  });
+
+  it("has no fraction before anything starts", () => {
+    const p = engineProgress(null, [{ gamePlanTeamId: 1, job: planJob("QUEUED", "a", { createdAt: at }), result: null }]);
+    expect(p.active).toBe(true);
+    expect(p.fraction).toBeNull();
+  });
+});
+
+describe("planSummary", () => {
+  it("counts the planner's plans and the current run", () => {
+    const at = "2026-11-18T10:00:00Z";
+    const s = planSummary([
+      { gamePlanTeamId: 1, job: planJob("COMPLETE", "a", { createdAt: at }), result: planResult({ stale: true }) },
+      { gamePlanTeamId: 2, job: planJob("RUNNING", "b", { createdAt: at }), result: null },
+      { gamePlanTeamId: 3, job: planJob("FAILED", "c", { createdAt: "2026-11-17T10:00:00Z" }), result: null },
+      { gamePlanTeamId: 4, job: null, result: null },
+    ]);
+    expect(s).toEqual({ total: 4, withPlan: 1, stale: 1, failed: 1, queued: 0, running: 1, doneInRun: 1 });
   });
 });
