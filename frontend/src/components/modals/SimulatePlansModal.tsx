@@ -117,7 +117,7 @@ export default function SimulatePlansModal({ isOpen, onClose, entries, plans, in
       <h2 className="pr-12 text-xl font-semibold text-gray-800 dark:text-white/90">Simulate matchups</h2>
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
         For each team, the engine works out what you should bring, what they bring, and how the matchup goes. Your
-        own plans aren't changed. About 4 minutes per team, plus a few minutes for the engine to start.
+        own plans aren't changed. About 5 minutes per team, plus a few minutes for the engine to start.
       </p>
 
       {entries.length === 0 ? (

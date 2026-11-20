@@ -42,13 +42,13 @@ export const DEPTH_OPTIONS: DepthOption[] = [
   {
     depth: "quick",
     name: "Quick",
-    time: "about 10 minutes",
+    time: "about 15 minutes",
     description: "Fast games against each of the meta's top 40 teams.",
   },
   {
     depth: "full",
     name: "Full",
-    time: "about 30 minutes",
+    time: "about 50 minutes",
     description:
       "The same, plus slower, more careful games against the 10 best-placed teams, for sharper win rates where they matter most.",
   },
@@ -150,10 +150,10 @@ export function planErrorMessage(errorCode: string | null, message: string | nul
 // ==================== Engine progress (the bar along the bottom) ====================
 
 /**
- * Rough engine minutes per job, to weigh jobs against each other in one bar (GPU
- * timings from the engine's pricing notes; only their ratios matter).
+ * Rough engine minutes per job, to weigh jobs against each other in one bar (observed
+ * run times; only their ratios matter).
  */
-const JOB_MINUTES = { quick: 8, full: 30, plan: 4 } as const;
+const JOB_MINUTES = { quick: 15, full: 50, plan: 5 } as const;
 
 /**
  * A run starts this long before its oldest unfinished job, so jobs submitted together

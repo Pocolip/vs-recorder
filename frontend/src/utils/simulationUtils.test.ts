@@ -115,8 +115,8 @@ describe("engineProgress", () => {
       { ...simulationJob("RUNNING"), createdAt: at, progress: "search 5/10" },
       [{ gamePlanTeamId: 1, job: planJob("COMPLETE", "a", { createdAt: later }), result: null }],
     );
-    // full: 30 min at 0.675; the plan: 4 min, done
-    expect(p.fraction).toBeCloseTo((30 * 0.675 + 4) / 34);
+    // full: 50 min at 0.675; the plan: 5 min, done
+    expect(p.fraction).toBeCloseTo((50 * 0.675 + 5) / 55);
     expect(p.label).toBe("Full simulation: Refining the top opponents (5/10)");
   });
 
