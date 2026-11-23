@@ -90,7 +90,7 @@ export default function MatchupPlannerPage() {
   // Simulated plans: one engine job per entry. The toggle is the team's Simulated
   // toggle, shared with the analytics pages; it swaps each entry's compositions for
   // the engine's, and never changes the user's own.
-  const { simulated, setSimulated } = useSimulation();
+  const { simulated, setSimulated, status: simulationStatus } = useSimulation();
   const { isOwner } = useTeamPermissions();
   const plansKey = useMemo(
     () => `${team?.pokepaste ?? ""}|${opponentTeams.map((t) => `${t.id}:${t.pokepaste}`).join("|")}`,
@@ -552,6 +552,8 @@ export default function MatchupPlannerPage() {
         entries={opponentTeams}
         plans={plans}
         initialSelection={simulateSelection}
+        openToAll={simulationStatus?.openToAll}
+        feedbackUrl={simulationStatus?.feedbackUrl}
       />
 
       {/* Recent Tour Modal */}

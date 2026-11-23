@@ -48,6 +48,10 @@ export interface SimulationStatus {
   runBlockedReason: string | null;
   /** Runs the viewer has left today; null unless they may run simulations on this team. */
   runsLeftToday: number | null;
+  /** Simulations are open to every signed-in user (for a limited time). */
+  openToAll?: boolean;
+  /** Where to send feedback about simulations, when configured. */
+  feedbackUrl?: string | null;
   job: SimulationJob | null;
   result: SimulationResultInfo | null;
 }

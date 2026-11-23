@@ -301,3 +301,8 @@ export function planSummary(entries: PlanEntryStatus[]): PlanSummary {
     doneInRun: start == null ? 0 : latest.filter((j) => !j.unfinished && inRun(j.createdAt, start)).length,
   };
 }
+
+/** The footers' note on who gets simulations: a limited-time trial for everyone, or testing. */
+export function accessNote(openToAll: boolean | undefined): string {
+  return openToAll ? "Open to everyone for a limited time." : "Free while simulations are being tested.";
+}

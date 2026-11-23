@@ -109,6 +109,15 @@ describe("SimulationsModal", () => {
     planEntries = [];
   });
 
+  it("says when simulations are open to everyone, with the feedback link", () => {
+    isOwner = true;
+    renderModal({ openToAll: true, feedbackUrl: "https://example.com/feedback", runsLeftToday: 2 });
+    expect(screen.getByText(/Open to everyone for a limited time\. 2 runs left today\./)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Tell us what you think" }).getAttribute("href")).toBe(
+      "https://example.com/feedback",
+    );
+  });
+
   it("shows a collaborator the status without run buttons", () => {
     isOwner = false;
     renderModal({ canRun: false, runsLeftToday: null, job: simulationJob("COMPLETE", "job-1"), result: simulationResult() });
