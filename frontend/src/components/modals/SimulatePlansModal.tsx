@@ -4,7 +4,7 @@ import { Modal } from "../ui/modal";
 import Checkbox from "../form/input/Checkbox";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import { PlanBadge } from "../team/SimulatedPlan";
-import { SINGLE_PLAN_WARNING, planErrorMessage } from "../../utils/simulationUtils";
+import { SINGLE_PLAN_WARNING, accessNote, planErrorMessage } from "../../utils/simulationUtils";
 import type { PlanSimulations } from "../../hooks/usePlanSimulations";
 import type { PlanEntryStatus, PlanSubmitOutcome } from "../../types";
 
@@ -27,6 +27,8 @@ interface SimulatePlansModalProps {
   plans: PlanSimulations;
   /** Entries checked when it opens; null checks every entry without an up-to-date plan. */
   initialSelection: number[] | null;
+  /** Simulations are open to everyone for a limited time (the team's simulation status). */
+  openToAll?: boolean;
 }
 
 type EntryState = "running" | "upToDate" | "stale" | "failed" | "none";
@@ -52,7 +54,14 @@ const STATE_LABEL: Record<EntryState, string> = {
  * Pick which Matchup Planner entries to simulate. Each is its own job, but jobs
  * queued together share one engine start, so batches are cheaper per team.
  */
-export default function SimulatePlansModal({ isOpen, onClose, entries, plans, initialSelection }: SimulatePlansModalProps) {
+export default function SimulatePlansModal({
+  isOpen,
+  onClose,
+  entries,
+  plans,
+  initialSelection,
+  openToAll,
+}: SimulatePlansModalProps) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [outcomes, setOutcomes] = useState<Map<number, PlanSubmitOutcome>>(new Map());
   const [error, setError] = useState<string | null>(null);
@@ -192,7 +201,7 @@ export default function SimulatePlansModal({ isOpen, onClose, entries, plans, in
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
         {runsLeft != null && (
           <span className="mr-auto text-xs text-gray-500 dark:text-gray-400">
-            Free while simulations are being tested. {runsLeft} left today.
+            {accessNote(openToAll)} {runsLeft} left today.
           </span>
         )}
         <button type="button" className={secondaryButton} onClick={onClose}>

@@ -31,6 +31,8 @@ public class SimulationDTO {
         private String runBlockedReason;
         /** Runs the caller has left today; null unless they may run simulations on this team. */
         private Integer runsLeftToday;
+        /** Simulations are open to every signed-in user (the allowlist is {@code *}). */
+        private boolean openToAll;
         /** The team's latest job, or null if it has none. */
         private JobInfo job;
         /** The result the pages show (the latest job with one), or null. */

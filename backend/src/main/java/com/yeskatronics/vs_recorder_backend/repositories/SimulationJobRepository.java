@@ -82,6 +82,9 @@ public interface SimulationJobRepository extends JpaRepository<SimulationJob, UU
     /** For the daily caps, which are per kind. */
     long countByRequestedByAndKindAndCreatedAtAfter(Long requestedBy, Kind kind, Instant since);
 
+    /** Jobs of a kind submitted by anyone since then: the global daily caps. */
+    long countByKindAndCreatedAtAfter(Kind kind, Instant since);
+
     /**
      * Finished jobs of deleted teams (or, for plans, deleted entries) created before
      * {@code before}, once Redis is clean. Recent ones stay: the daily caps count them.
