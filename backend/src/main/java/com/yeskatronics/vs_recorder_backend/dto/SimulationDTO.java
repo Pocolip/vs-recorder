@@ -33,8 +33,6 @@ public class SimulationDTO {
         private Integer runsLeftToday;
         /** Simulations are open to every signed-in user (the allowlist is {@code *}). */
         private boolean openToAll;
-        /** Where to send feedback about simulations, when configured. */
-        private String feedbackUrl;
         /** The team's latest job, or null if it has none. */
         private JobInfo job;
         /** The result the pages show (the latest job with one), or null. */

@@ -5,7 +5,6 @@ import Checkbox from "../form/input/Checkbox";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import { PlanBadge } from "../team/SimulatedPlan";
 import { SINGLE_PLAN_WARNING, accessNote, planErrorMessage } from "../../utils/simulationUtils";
-import FeedbackLink from "../team/FeedbackLink";
 import type { PlanSimulations } from "../../hooks/usePlanSimulations";
 import type { PlanEntryStatus, PlanSubmitOutcome } from "../../types";
 
@@ -30,7 +29,6 @@ interface SimulatePlansModalProps {
   initialSelection: number[] | null;
   /** Simulations are open to everyone for a limited time (the team's simulation status). */
   openToAll?: boolean;
-  feedbackUrl?: string | null;
 }
 
 type EntryState = "running" | "upToDate" | "stale" | "failed" | "none";
@@ -63,7 +61,6 @@ export default function SimulatePlansModal({
   plans,
   initialSelection,
   openToAll,
-  feedbackUrl,
 }: SimulatePlansModalProps) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [outcomes, setOutcomes] = useState<Map<number, PlanSubmitOutcome>>(new Map());
@@ -204,7 +201,7 @@ export default function SimulatePlansModal({
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
         {runsLeft != null && (
           <span className="mr-auto text-xs text-gray-500 dark:text-gray-400">
-            {accessNote(openToAll)} {runsLeft} left today. <FeedbackLink url={feedbackUrl} />
+            {accessNote(openToAll)} {runsLeft} left today.
           </span>
         )}
         <button type="button" className={secondaryButton} onClick={onClose}>

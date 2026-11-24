@@ -620,7 +620,6 @@ public class SimulationService {
                 .runBlockedReason(blockedReason)
                 .runsLeftToday(runsLeftToday)
                 .openToAll(properties.openToAll())
-                .feedbackUrl(properties.safeFeedbackUrl())
                 .job(latest.map(SimulationService::toJobInfo).orElse(null))
                 .result(withResult.map(job -> toResultInfo(team, job)).orElse(null))
                 .build();

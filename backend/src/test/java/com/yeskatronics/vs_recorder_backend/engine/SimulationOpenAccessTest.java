@@ -42,7 +42,6 @@ import static org.mockito.Mockito.when;
         "engine.global-daily-cap=2",
         "engine.plan-daily-cap=20",
         "engine.global-plan-daily-cap=3",
-        "engine.feedback-url=https://example.com/simulation-feedback",
         "engine.poll-initial-delay=PT24H"
 })
 @Transactional
@@ -81,7 +80,6 @@ class SimulationOpenAccessTest {
         SimulationDTO.StatusResponse status = simulationService.getStatus(alicesTeam.getId(), alice.getId(), alice.getUsername());
         assertTrue(status.isCanRun(), status.getRunBlockedReason());
         assertTrue(status.isOpenToAll());
-        assertEquals("https://example.com/simulation-feedback", status.getFeedbackUrl());
 
         assertNotNull(simulationService.submit(alicesTeam.getId(), alice.getId(), alice.getUsername(), Depth.QUICK, false).getJob());
         // Open to everyone still means owners: bob can't run alice's team
@@ -137,28 +135,16 @@ class SimulationOpenAccessTest {
     }
 
     @Test
-    void onlyAnHttpFeedbackLinkIsShown() {
-        assertNull(properties("javascript:alert(1)").safeFeedbackUrl());
-        assertNull(properties("").safeFeedbackUrl());
-        assertEquals("https://example.com/f", properties(" https://example.com/f ").safeFeedbackUrl());
-    }
-
-    @Test
     void theWildcardIsTheOnlyWayToOpenItUp() {
         EngineProperties listed = new EngineProperties(true, "redis://x", "vsr", List.of(), "us-east-1",
-                List.of("someone"), 3, 20, 0, 0, "", Duration.ofHours(3));
+                List.of("someone"), 3, 20, 0, 0, Duration.ofHours(3));
         assertFalse(listed.openToAll());
         assertFalse(listed.isAllowed("someone-else"));
         EngineProperties open = new EngineProperties(true, "redis://x", "vsr", List.of(), "us-east-1",
-                List.of(" * "), 3, 20, 0, 0, "", Duration.ofHours(3));
+                List.of(" * "), 3, 20, 0, 0, Duration.ofHours(3));
         assertTrue(open.openToAll());
         assertTrue(open.isAllowed("someone-else"));
         assertFalse(open.isAllowed(" "));
-    }
-
-    private static EngineProperties properties(String feedbackUrl) {
-        return new EngineProperties(true, "redis://x", "vsr", List.of(), "us-east-1",
-                List.of(), 3, 20, 0, 0, feedbackUrl, Duration.ofHours(3));
     }
 
     private User saveUser(String username) {

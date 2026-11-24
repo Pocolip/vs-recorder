@@ -25,7 +25,6 @@ import java.util.List;
  * @param globalDailyCap    simulations everyone together may submit per UTC day; 0 for no limit.
  *                          Bounds what a day can cost once the feature is open to everyone.
  * @param globalPlanDailyCap the same for Matchup Planner plans; 0 for no limit
- * @param feedbackUrl       optional http(s) link the Simulations modal offers for feedback
  * @param staleTimeout      a job with no change in status or progress for this long is failed
  */
 @ConfigurationProperties(prefix = "engine")
@@ -40,7 +39,6 @@ public record EngineProperties(
         @DefaultValue("20") int planDailyCap,
         @DefaultValue("0") int globalDailyCap,
         @DefaultValue("0") int globalPlanDailyCap,
-        @DefaultValue("") String feedbackUrl,
         @DefaultValue("PT3H") Duration staleTimeout
 ) {
 
@@ -61,14 +59,5 @@ public record EngineProperties(
         return allowedUsers.stream()
                 .map(String::trim)
                 .anyMatch(u -> !u.isEmpty() && u.equals(username));
-    }
-
-    /** The feedback link if it's an http(s) URL, else null (nothing else is shown to users). */
-    public String safeFeedbackUrl() {
-        if (feedbackUrl == null) {
-            return null;
-        }
-        String url = feedbackUrl.trim();
-        return url.startsWith("https://") || url.startsWith("http://") ? url : null;
     }
 }

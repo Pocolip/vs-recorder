@@ -553,7 +553,6 @@ export default function MatchupPlannerPage() {
         plans={plans}
         initialSelection={simulateSelection}
         openToAll={simulationStatus?.openToAll}
-        feedbackUrl={simulationStatus?.feedbackUrl}
       />
 
       {/* Recent Tour Modal */}
