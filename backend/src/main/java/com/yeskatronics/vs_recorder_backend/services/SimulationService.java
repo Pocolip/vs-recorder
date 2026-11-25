@@ -151,9 +151,12 @@ public class SimulationService {
                         "A simulation for this team is already running.");
             }
             if (!force) {
+                EngineVersion current = currentVersion();
                 jobRepository.findFirstByTeamIdAndKindAndStatusOrderByCreatedAtDesc(teamId, Kind.SIMULATE, Status.COMPLETE)
                         .filter(latest -> pasteSha256.equals(latest.getPasteSha256()))
                         .filter(latest -> latest.getDepth().covers(depth))
+                        // A newer pool or model is worth running the same paste against.
+                        .filter(latest -> engineChange(latest, current) == null)
                         .ifPresent(latest -> {
                             throw new SimulationConflictException(SimulationConflictException.UNCHANGED,
                                     latest.getDepth() == depth
@@ -304,6 +307,7 @@ public class SimulationService {
     public SimulationDTO.DiagnosticsResponse getDiagnostics(Long teamId, Long userId) {
         TeamAccess access = teamAccessService.resolve(teamId, userId);
         StoredResult stored = latestResult(teamId);
+        EngineVersion current = currentVersion();
         SimulationResult.Diagnostics diagnostics = stored.result().getDiagnostics();
         if (diagnostics == null) {
             throw new SimulationNotFoundException("This simulation has no diagnostics");
@@ -314,7 +318,7 @@ public class SimulationService {
 
         return SimulationDTO.DiagnosticsResponse.builder()
                 .resultStatus(stored.result().getStatus())
-                .stale(isStale(access.getTeam(), stored.job()))
+                .stale(staleReason(access.getTeam(), stored.job(), current) != null)
                 .opponentsCount(stored.result().getOpponents().size())
                 .games(diagnostics.getGames())
                 .winRate(diagnostics.getWinRate())
@@ -538,6 +542,7 @@ public class SimulationService {
                 job.setResult(sanitize(resultJson));
                 job.setStatus(Status.COMPLETE);
                 job.setModel(modelOf(result));
+                job.setPoolSnapshot(poolOf(result));
                 log.info("Simulation job {} complete", id);
             } catch (JsonProcessingException e) {
                 log.error("Unreadable result for simulation job {}: {}", id, e.getOriginalMessage());
@@ -587,11 +592,18 @@ public class SimulationService {
     }
 
     private static String modelOf(SimulationResult result) {
-        String model = result.getProvenance() != null ? result.getProvenance().getModel() : null;
-        if (model == null || model.isBlank()) {
+        return provenanceValue(result.getProvenance() != null ? result.getProvenance().getModel() : null);
+    }
+
+    private static String poolOf(SimulationResult result) {
+        return provenanceValue(result.getProvenance() != null ? result.getProvenance().getPoolSnapshot() : null);
+    }
+
+    private static String provenanceValue(String value) {
+        if (value == null || value.isBlank()) {
             return null;
         }
-        return model.length() > 100 ? model.substring(0, 100) : model;
+        return value.length() > 100 ? value.substring(0, 100) : value;
     }
 
     // ==================== Helpers ====================
@@ -603,6 +615,7 @@ public class SimulationService {
         Team team = access.getTeam();
         Optional<SimulationJob> latest = jobRepository.findFirstByTeamIdAndKindOrderByCreatedAtDesc(team.getId(), Kind.SIMULATE);
         Optional<SimulationJob> withResult = shownResultJob(team.getId());
+        EngineVersion current = currentVersion();
         EngineQueueEstimator.Snapshot queue = queueEstimator.snapshot(Instant.now());
 
         boolean canRun = false;
@@ -629,7 +642,7 @@ public class SimulationService {
                 .runsLeftToday(runsLeftToday)
                 .openToAll(properties.openToAll())
                 .job(latest.map(job -> toJobInfo(job, queue)).orElse(null))
-                .result(withResult.map(job -> toResultInfo(team, job)).orElse(null))
+                .result(withResult.map(job -> toResultInfo(team, job, current)).orElse(null))
                 .queue(queue.forNewJob())
                 .build();
     }
@@ -653,8 +666,9 @@ public class SimulationService {
                 .build();
     }
 
-    private SimulationDTO.ResultInfo toResultInfo(Team team, SimulationJob job) {
+    private SimulationDTO.ResultInfo toResultInfo(Team team, SimulationJob job, EngineVersion current) {
         SimulationResult result = parse(job);
+        SimulationDTO.StaleReason staleReason = staleReason(team, job, current);
         int totalGames = result.getMetrics() != null && result.getMetrics().getUsageStats() != null
                 ? result.getMetrics().getUsageStats().getTotalGames()
                 : 0;
@@ -675,7 +689,8 @@ public class SimulationService {
                 .jobId(job.getId())
                 .status(result.getStatus())
                 .depth(depthName(job))
-                .stale(isStale(team, job))
+                .stale(staleReason != null)
+                .staleReason(staleReason)
                 .opponentsCount(result.getOpponents().size())
                 .totalGames(totalGames)
                 .opponentPokemon(List.copyOf(byPokemon.values()))
@@ -684,8 +699,49 @@ public class SimulationService {
     }
 
     /** The paste is a URL; a different one means the team changed since the job. */
-    private static boolean isStale(Team team, SimulationJob job) {
+    private static boolean pasteChanged(Team team, SimulationJob job) {
         return !Objects.equals(team.getPokepaste(), job.getPasteUrl());
+    }
+
+    /**
+     * What the engine runs now, as far as we know: the model and pool of the latest
+     * complete job of any kind that names them. A new one shows only once a job has run
+     * on it; from then on every result from before it is out of date.
+     */
+    record EngineVersion(String model, String pool) {}
+
+    EngineVersion currentVersion() {
+        return new EngineVersion(
+                jobRepository.findFirstByStatusAndModelIsNotNullOrderByLastChangedAtDesc(Status.COMPLETE)
+                        .map(SimulationJob::getModel).orElse(null),
+                jobRepository.findFirstByStatusAndPoolSnapshotIsNotNullOrderByLastChangedAtDesc(Status.COMPLETE)
+                        .map(SimulationJob::getPoolSnapshot).orElse(null));
+    }
+
+    /** Why the team's simulation is out of date, or null if it isn't. */
+    static SimulationDTO.StaleReason staleReason(Team team, SimulationJob job, EngineVersion current) {
+        if (pasteChanged(team, job)) {
+            return SimulationDTO.StaleReason.TEAM;
+        }
+        return engineChange(job, current);
+    }
+
+    /**
+     * A complete job run on another pool or model than the current one. One that doesn't
+     * name its pool or model predates recording them, so it's from before the current
+     * one. A partial's are unknown until it finishes, so it isn't judged on them.
+     */
+    static SimulationDTO.StaleReason engineChange(SimulationJob job, EngineVersion current) {
+        if (job.getStatus() != Status.COMPLETE) {
+            return null;
+        }
+        if (current.pool() != null && !current.pool().equals(job.getPoolSnapshot())) {
+            return SimulationDTO.StaleReason.POOL;
+        }
+        if (current.model() != null && !current.model().equals(job.getModel())) {
+            return SimulationDTO.StaleReason.MODEL;
+        }
+        return null;
     }
 
     private SimulationResult.Metrics latestMetrics(Long teamId) {
@@ -716,7 +772,7 @@ public class SimulationService {
      */
     private Optional<SimulationJob> shownResultJob(Long teamId) {
         return jobRepository.findFirstByTeamIdAndKindAndStatusOrderByCreatedAtDesc(teamId, Kind.SIMULATE, Status.COMPLETE)
-                .filter(job -> job.getResult() != null && job.getTeam() != null && !isStale(job.getTeam(), job))
+                .filter(job -> job.getResult() != null && job.getTeam() != null && !pasteChanged(job.getTeam(), job))
                 .or(() -> jobRepository.findFirstByTeamIdAndKindAndResultIsNotNullOrderByCreatedAtDesc(teamId, Kind.SIMULATE));
     }
 

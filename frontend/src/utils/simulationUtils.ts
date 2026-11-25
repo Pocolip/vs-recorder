@@ -8,6 +8,8 @@ import type {
   SimulationDepth,
   SimulationJob,
   SimulationJobStatus,
+  SimulationResultInfo,
+  SimulationStaleReason,
 } from "../types";
 
 const STAGES: Record<string, string> = {
@@ -184,6 +186,18 @@ const STALE_LABEL: Record<PlanStaleReason, string> = {
 export function staleLabel(result: Pick<PlanResultInfo, "stale" | "staleReason">): string | null {
   if (!result.stale) return null;
   return result.staleReason ? STALE_LABEL[result.staleReason] : "Something changed since this plan.";
+}
+
+const SIMULATION_STALE_LABEL: Record<SimulationStaleReason, string> = {
+  TEAM: "The team's paste changed since this simulation.",
+  POOL: "The meta's teams were updated since this simulation.",
+  MODEL: "The engine has improved since this simulation.",
+};
+
+/** What changed since the team's simulation, or null when it's current. */
+export function simulationStaleLabel(result: Pick<SimulationResultInfo, "stale" | "staleReason">): string | null {
+  if (!result.stale) return null;
+  return result.staleReason ? SIMULATION_STALE_LABEL[result.staleReason] : SIMULATION_STALE_LABEL.TEAM;
 }
 
 /** A failed plan's message, saying which team it's about. */

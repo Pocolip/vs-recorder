@@ -67,6 +67,9 @@ public interface SimulationJobRepository extends JpaRepository<SimulationJob, UU
     /** The latest complete job that names its model: the model the engine runs now, as far as we know. */
     Optional<SimulationJob> findFirstByStatusAndModelIsNotNullOrderByLastChangedAtDesc(Status status);
 
+    /** The latest complete job that names its pool: the meta teams the engine plays now, as far as we know. */
+    Optional<SimulationJob> findFirstByStatusAndPoolSnapshotIsNotNullOrderByLastChangedAtDesc(Status status);
+
     // ==================== The queue (wait estimates) ====================
 
     /** An unfinished job's place in the queue, without its result. */

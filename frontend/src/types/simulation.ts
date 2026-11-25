@@ -47,13 +47,17 @@ export interface SimulationOpponentPokemon {
   winsAgainst: number;
 }
 
+/** Why a simulation is out of date: the team's paste, the engine's meta teams (POOL) or its model. */
+export type SimulationStaleReason = "TEAM" | "POOL" | "MODEL";
+
 export interface SimulationResultInfo {
   jobId: string;
   /** "partial": the top opponents are still being refined. */
   status: "partial" | "complete";
   depth: SimulationDepth;
-  /** The team's paste changed since this result. */
+  /** Something changed since this result: see staleReason. */
   stale: boolean;
+  staleReason?: SimulationStaleReason | null;
   opponentsCount: number;
   totalGames: number;
   opponentPokemon: SimulationOpponentPokemon[];

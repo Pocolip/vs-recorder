@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { planJob, planResult } from "../test/planFixtures";
 import { simulationJob } from "../test/simulationFixtures";
-import { describePlanProgress, describeProgress, describeQueue, describeQueuedJob, engineProgress, formatWait, jobProgress, percent, percentRange, planErrorMessage, planJobProgress, planSummary, simulatedScopeLabel, staleLabel } from "./simulationUtils";
+import { describePlanProgress, describeProgress, describeQueue, describeQueuedJob, engineProgress, formatWait, jobProgress, percent, percentRange, planErrorMessage, planJobProgress, planSummary, simulatedScopeLabel, simulationStaleLabel, staleLabel } from "./simulationUtils";
 
 describe("describeProgress", () => {
   it("names each engine stage", () => {
@@ -51,6 +51,20 @@ describe("the engine's queue", () => {
       "2 jobs ahead in the engine's queue: starts in about 40 minutes.",
     );
     expect(describeQueuedJob({ jobsAhead: null, startsInMinutes: null })).toBeNull();
+  });
+});
+
+describe("simulationStaleLabel", () => {
+  it("says what changed since the simulation", () => {
+    expect(simulationStaleLabel({ stale: false, staleReason: null })).toBeNull();
+    expect(simulationStaleLabel({ stale: true, staleReason: "POOL" })).toBe(
+      "The meta's teams were updated since this simulation.",
+    );
+    expect(simulationStaleLabel({ stale: true, staleReason: "MODEL" })).toBe(
+      "The engine has improved since this simulation.",
+    );
+    // From a backend without reasons: only the paste made it stale.
+    expect(simulationStaleLabel({ stale: true })).toBe("The team's paste changed since this simulation.");
   });
 });
 
