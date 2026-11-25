@@ -91,12 +91,14 @@ jobs:
             cd /opt/vsrecorder
 
             # Pull latest beta images
-            docker-compose -f docker-compose.prod.yml pull frontend-beta backend-beta
+            docker-compose -f docker-compose.prod.yml pull nginx frontend-beta backend-beta
 
             # Restart beta services only (don't touch prod)
             docker-compose -f docker-compose.prod.yml up -d --force-recreate frontend-beta backend-beta
 
-            # Reload nginx to pick up any config changes
+            # Recreate the proxy only if its image changed (a version bump), then reload
+            # it to pick up any config changes
+            docker-compose -f docker-compose.prod.yml up -d --no-deps nginx
             docker-compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || true
 
             # Clean up old images
