@@ -65,6 +65,7 @@ public class PlanSimulationService {
     private final PokepasteService pokepasteService;
     private final PasteNormalizer pasteNormalizer;
     private final SimulationService simulationService;
+    private final EngineQueueEstimator queueEstimator;
     private final EngineProperties properties;
     private final ObjectProvider<WorkerStarter> workerStarterProvider;
     private final ObjectMapper objectMapper;
@@ -343,6 +344,7 @@ public class PlanSimulationService {
                         .collect(Collectors.groupingBy(job -> job.getGamePlanTeam().getId(),
                                 LinkedHashMap::new, Collectors.toList()));
         String currentModel = currentModel();
+        EngineQueueEstimator.Snapshot queue = queueEstimator.snapshot(Instant.now());
 
         boolean canRun = false;
         String blockedReason = null;
@@ -369,7 +371,7 @@ public class PlanSimulationService {
                     .orElse(null);
             return PlanDTO.EntryStatus.builder()
                     .gamePlanTeamId(entry.getId())
-                    .job(latest == null ? null : toJobInfo(latest))
+                    .job(latest == null ? null : toJobInfo(latest, queue))
                     .result(result)
                     .build();
         }).toList();
@@ -380,6 +382,7 @@ public class PlanSimulationService {
                 .runBlockedReason(blockedReason)
                 .runsLeftToday(runsLeftToday)
                 .entries(statuses)
+                .queue(queue.forNewJob())
                 .build();
     }
 
@@ -399,7 +402,8 @@ public class PlanSimulationService {
                 .or(() -> jobs.stream().filter(job -> job.getResult() != null).findFirst());
     }
 
-    private static SimulationDTO.JobInfo toJobInfo(SimulationJob job) {
+    private static SimulationDTO.JobInfo toJobInfo(SimulationJob job, EngineQueueEstimator.Snapshot queue) {
+        Optional<EngineQueueEstimator.Wait> wait = queue.forJob(job);
         return SimulationDTO.JobInfo.builder()
                 .id(job.getId())
                 .status(job.getStatus().name())
@@ -411,6 +415,8 @@ public class PlanSimulationService {
                 .errorMessage(job.getErrorMessage())
                 .createdAt(job.getCreatedAt())
                 .updatedAt(job.getUpdatedAt())
+                .jobsAhead(wait.map(EngineQueueEstimator.Wait::jobsAhead).orElse(null))
+                .startsInMinutes(wait.map(EngineQueueEstimator.Wait::startsInMinutes).orElse(null))
                 .build();
     }
 

@@ -153,6 +153,25 @@ class SimulationFlowTest {
     }
 
     @Test
+    void aQueuedJobShowsItsPlaceInTheQueue() {
+        SimulationDTO.StatusResponse status = submit(false);
+
+        // Nothing else is queued and the worker is off: only its start-up is ahead.
+        assertEquals(0, status.getJob().getJobsAhead());
+        assertTrue(status.getJob().getStartsInMinutes() >= 1);
+        assertEquals("starting", status.getQueue().getState());
+        assertEquals(1, status.getQueue().getJobsAhead());
+        assertTrue(status.getQueue().getWaitMinutes() > status.getJob().getStartsInMinutes());
+
+        when(queue.jobState(status.getJob().getId().toString())).thenReturn(Map.of("status", "running"));
+        poller.poll();
+        status = simulationService.getStatus(team.getId(), owner.getId(), "sim-owner");
+        assertNull(status.getJob().getJobsAhead(), "only while it waits its turn");
+        assertNull(status.getJob().getStartsInMinutes());
+        assertEquals("busy", status.getQueue().getState());
+    }
+
+    @Test
     void aMegaFormeIsSentAsItsBaseSpeciesWithANote() throws Exception {
         pasteIs("Chompy (Garchomp-Mega) @ Garchompite\nAbility: Rough Skin\n- Protect\n");
         SimulationDTO.StatusResponse status = submit(false);
@@ -300,6 +319,7 @@ class SimulationFlowTest {
         // Not claimed yet: no hash
         poller.poll();
         assertEquals(Status.QUEUED, job(id).getStatus());
+        assertNull(job(id).getStartedAt());
         verify(workerStarter).start();
 
         // Claimed and running
@@ -307,12 +327,15 @@ class SimulationFlowTest {
         poller.poll();
         assertEquals(Status.RUNNING, job(id).getStatus());
         assertEquals("preview 12/40", job(id).getProgress());
+        Instant startedAt = job(id).getStartedAt();
+        assertNotNull(startedAt, "first seen running");
 
         // Requeued after a retry: not a failure
         when(queue.jobState(key)).thenReturn(Map.of("status", "queued", "progress", "games 8/40"));
         poller.poll();
         assertEquals(Status.QUEUED, job(id).getStatus());
         assertNull(job(id).getErrorCode());
+        assertEquals(startedAt, job(id).getStartedAt(), "a retry keeps when it first started");
 
         // Partial result
         when(queue.jobState(key)).thenReturn(Map.of("status", "running", "progress", "search 3/10", "partial", "1"));
@@ -336,6 +359,7 @@ class SimulationFlowTest {
         SimulationJob done = job(id);
         assertEquals(Status.COMPLETE, done.getStatus());
         assertFalse(done.isUnfinished());
+        assertNotNull(done.getFinishedAt());
         verify(queue).cleanup(key);
         assertFalse(done.isCleanupPending());
         verify(workerStarter, never()).start();

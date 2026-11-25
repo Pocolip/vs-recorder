@@ -1,4 +1,5 @@
 import type {
+  EngineQueue,
   PlanCategory,
   PlanEntryStatus,
   PlanJob,
@@ -22,6 +23,51 @@ export function describeProgress(progress: string | null | undefined): string | 
   if (!match) return progress;
   const stage = STAGES[match[1]];
   return stage ? `${stage} (${match[2]})` : progress;
+}
+
+// ==================== The engine's queue ====================
+
+/**
+ * A wait, roughly: "about a minute", "about 12 minutes", "about 35 minutes" (to 5 past
+ * 20), "about 1 hour 10 minutes", "about 2 hours".
+ */
+export function formatWait(minutes: number): string {
+  if (minutes <= 1) return "about a minute";
+  if (minutes < 20) return `about ${Math.round(minutes)} minutes`;
+  const rounded = Math.round(minutes / 5) * 5;
+  if (rounded < 60) return `about ${rounded} minutes`;
+  const hours = Math.floor(rounded / 60);
+  const rest = rounded % 60;
+  const hourText = `${hours} ${hours === 1 ? "hour" : "hours"}`;
+  return `about ${hourText}${rest > 0 ? ` ${rest} minutes` : ""}`;
+}
+
+const jobs = (n: number) => `${n} ${n === 1 ? "job" : "jobs"}`;
+
+/** The queue as a run started now would find it, for the place a run is started. */
+export function describeQueue(queue: EngineQueue | null | undefined): string | null {
+  if (!queue) return null;
+  switch (queue.state) {
+    case "awake":
+      return "The engine is free: a run would start right away.";
+    case "asleep":
+      return `The engine is free. It's powered off when idle, so a run would start in ${formatWait(queue.waitMinutes)}.`;
+    case "starting":
+      return `The engine is starting up for ${jobs(queue.jobsAhead)}. A run now would start in ${formatWait(queue.waitMinutes)}.`;
+    case "busy":
+      return `The engine is busy, with ${jobs(queue.jobsAhead)} in line. A run now would start in ${formatWait(queue.waitMinutes)}.`;
+    default:
+      return null;
+  }
+}
+
+/** A queued job's place in line, or null when the backend didn't send one. */
+export function describeQueuedJob(job: Pick<SimulationJob, "jobsAhead" | "startsInMinutes">): string | null {
+  if (job.jobsAhead == null || job.startsInMinutes == null) return null;
+  const starts = `starts in ${formatWait(job.startsInMinutes)}`;
+  return job.jobsAhead === 0
+    ? `Next in line: ${starts}.`
+    : `${jobs(job.jobsAhead)} ahead in the engine's queue: ${starts}.`;
 }
 
 /** The caveat shown whenever simulated numbers are on screen. */

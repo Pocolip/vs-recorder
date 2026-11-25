@@ -57,6 +57,16 @@ describe("SimulatePlansModal", () => {
     await waitFor(() => expect(p.submit).toHaveBeenCalledWith([1, 2, 4], true));
   });
 
+  it("says how long the engine's queue would make a run wait", () => {
+    const p = planSimulations([{ gamePlanTeamId: 1, job: null, result: null }], {
+      queue: { state: "busy", jobsAhead: 2, waitMinutes: 33 },
+    });
+    render(<SimulatePlansModal isOpen onClose={vi.fn()} entries={entries.slice(0, 1)} plans={p} initialSelection={null} />);
+    expect(
+      screen.getByText("The engine is busy, with 2 jobs in line. A run now would start in about 35 minutes."),
+    ).toBeTruthy();
+  });
+
   it("warns that one team alone costs about as much as three", () => {
     render(<SimulatePlansModal isOpen onClose={vi.fn()} entries={entries} plans={plans()} initialSelection={[1]} />);
     expect(checkbox(1).checked).toBe(true);
