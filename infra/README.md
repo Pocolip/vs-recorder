@@ -210,9 +210,14 @@ the queue, and each job starts a GPU.
 ENGINE_JOBS_ENABLED=true
 REDIS_URL=<the value of the engine stack's queue_url_secret_arn secret>
 ENGINE_WORKER_INSTANCE_IDS=<the engine stack's worker_instance_ids output, comma-separated>
-ENGINE_ALLOWED_USERS=<comma-separated usernames allowed to run jobs>
-ENGINE_DAILY_CAP=3
+ENGINE_ALLOWED_USERS=<comma-separated usernames allowed to run jobs, or * for everyone>
+ENGINE_DAILY_CAP=3                # Simulated analytics runs per user per UTC day
+ENGINE_PLAN_DAILY_CAP=20          # Matchup Planner plans per user per UTC day
+ENGINE_GLOBAL_DAILY_CAP=0         # analytics runs per day across everyone (0: no limit)
+ENGINE_GLOBAL_PLAN_DAILY_CAP=0    # plans per day across everyone (0: no limit)
 ```
+
+**Opening simulations to everyone:** set `ENGINE_ALLOWED_USERS=*`. Any signed-in user can then run jobs on teams they own. Set both global caps first: the per-user caps alone don't bound a day's GPU spend, and the engine stack's AWS budget only alerts. The global count isn't locked across users, so simultaneous submits can overshoot it by a job or two. To go back, restore the list of usernames. Each change takes effect when the backend is recreated (`docker-compose -f docker-compose.prod.yml up -d backend`). A new setting only reaches the container once the server's copy of `docker-compose.prod.yml` passes it, so copy that file over after pulling a change to it.
 
 The backend reaches AWS with the instance role through IMDSv2. A container on Docker's
 bridge network needs a hop limit of 2 for that, which `metadata_options` in `ec2.tf`

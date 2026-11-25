@@ -149,7 +149,8 @@ public class PlanSimulationService {
             }
             Map<Long, GamePlanTeam> entries = entriesById(teamId);
             String currentModel = currentModel();
-            long left = properties.planDailyCap() - simulationService.jobsToday(userId, Kind.PLAN);
+            SimulationService.RunsLeft runs = simulationService.runsLeft(userId, Kind.PLAN);
+            long left = runs.left();
 
             List<Queued> jobs = new ArrayList<>();
             for (Map.Entry<Long, PreparedPaste> prepared : theirs.entrySet()) {
@@ -172,7 +173,7 @@ public class PlanSimulationService {
                     continue;
                 }
                 if (left <= 0) {
-                    outcomes.put(id, refused(id, DAILY_CAP, dailyCapMessage()));
+                    outcomes.put(id, refused(id, DAILY_CAP, runs.reason()));
                     continue;
                 }
                 left--;
@@ -347,13 +348,14 @@ public class PlanSimulationService {
         String blockedReason = null;
         Integer runsLeftToday = null;
         if (access.isOwner() && properties.isAllowed(username)) {
-            runsLeftToday = (int) Math.max(0, properties.planDailyCap() - simulationService.jobsToday(userId, Kind.PLAN));
+            SimulationService.RunsLeft runs = simulationService.runsLeft(userId, Kind.PLAN);
+            runsLeftToday = (int) runs.left();
             if (SimulationService.engineRegulation(team).isEmpty()) {
                 blockedReason = SimulationService.UNSUPPORTED_REGULATION;
             } else if (team.getPokepaste() == null || team.getPokepaste().isBlank()) {
                 blockedReason = NO_TEAM_PASTE;
             } else if (runsLeftToday == 0) {
-                blockedReason = dailyCapMessage();
+                blockedReason = runs.reason();
             } else {
                 canRun = true;
             }
@@ -490,7 +492,4 @@ public class PlanSimulationService {
                 .collect(Collectors.toMap(GamePlanTeam::getId, Function.identity(), (a, b) -> a, LinkedHashMap::new));
     }
 
-    private String dailyCapMessage() {
-        return "You've reached today's limit of " + properties.planDailyCap() + " simulated plans.";
-    }
 }

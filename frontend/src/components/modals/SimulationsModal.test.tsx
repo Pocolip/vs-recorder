@@ -109,6 +109,12 @@ describe("SimulationsModal", () => {
     planEntries = [];
   });
 
+  it("says when simulations are open to everyone", () => {
+    isOwner = true;
+    renderModal({ openToAll: true, runsLeftToday: 2 });
+    expect(screen.getByText("Open to everyone for a limited time. 2 runs left today.")).toBeTruthy();
+  });
+
   it("shows a collaborator the status without run buttons", () => {
     isOwner = false;
     renderModal({ canRun: false, runsLeftToday: null, job: simulationJob("COMPLETE", "job-1"), result: simulationResult() });

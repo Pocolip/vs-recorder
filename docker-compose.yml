@@ -65,6 +65,8 @@ services:
       - ENGINE_ALLOWED_USERS=${ENGINE_ALLOWED_USERS:-}
       - ENGINE_DAILY_CAP=${ENGINE_DAILY_CAP:-50}
       - ENGINE_PLAN_DAILY_CAP=${ENGINE_PLAN_DAILY_CAP:-200}
+      - ENGINE_GLOBAL_DAILY_CAP=${ENGINE_GLOBAL_DAILY_CAP:-0}
+      - ENGINE_GLOBAL_PLAN_DAILY_CAP=${ENGINE_GLOBAL_PLAN_DAILY_CAP:-0}
       - ENGINE_WORKER_INSTANCE_IDS=${ENGINE_WORKER_INSTANCE_IDS:-}
       - AWS_REGION=us-east-1
       # Prod polls once a minute; faster here so the fake worker's stages show up quickly.

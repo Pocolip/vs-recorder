@@ -4,7 +4,7 @@ import { Modal } from "../ui/modal";
 import { useSimulation } from "../../context/SimulationContext";
 import { usePlanSimulationContext } from "../../context/PlanSimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
-import { DEPTH_OPTIONS, depthName, describeProgress, planSummary } from "../../utils/simulationUtils";
+import { DEPTH_OPTIONS, accessNote, depthName, describeProgress, planSummary } from "../../utils/simulationUtils";
 import type { SimulationStatus, Team } from "../../types";
 
 const buttonBase =
@@ -337,7 +337,9 @@ function Footer({ status }: { status: SimulationStatus }) {
     text = "Simulations are limited to a few accounts while they're being tested.";
   } else {
     const runs = status.runsLeftToday === 1 ? "run" : "runs";
-    text = `Free while simulations are being tested. ${status.runsLeftToday} ${runs} left today.`;
+    text = `${accessNote(status.openToAll)} ${status.runsLeftToday} ${runs} left today.`;
   }
-  return <p className="text-xs text-gray-500 dark:text-gray-400">{text}</p>;
+  return (
+    <p className="text-xs text-gray-500 dark:text-gray-400">{text}</p>
+  );
 }

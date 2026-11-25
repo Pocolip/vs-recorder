@@ -160,8 +160,9 @@ public class SimulationService {
                                             : "This team already has a full simulation of its current paste.");
                         });
             }
-            if (jobsToday(userId) >= properties.dailyCap()) {
-                throw new RateLimitExceededException(dailyCapMessage());
+            RunsLeft runs = runsLeft(userId, Kind.SIMULATE);
+            if (runs.left() == 0) {
+                throw new RateLimitExceededException(runs.reason());
             }
 
             SimulationJob job = new SimulationJob();
@@ -600,13 +601,14 @@ public class SimulationService {
         String blockedReason = null;
         Integer runsLeftToday = null;
         if (access.isOwner() && properties.isAllowed(username)) {
-            runsLeftToday = (int) Math.max(0, properties.dailyCap() - jobsToday(userId));
+            RunsLeft runs = runsLeft(userId, Kind.SIMULATE);
+            runsLeftToday = (int) runs.left();
             if (engineRegulation(team).isEmpty()) {
                 blockedReason = UNSUPPORTED_REGULATION;
             } else if (latest.map(SimulationJob::isUnfinished).orElse(false)) {
                 blockedReason = null; // the UI shows the running job instead
             } else if (runsLeftToday == 0) {
-                blockedReason = dailyCapMessage();
+                blockedReason = runs.reason();
             } else {
                 canRun = true;
             }
@@ -617,6 +619,7 @@ public class SimulationService {
                 .canRun(canRun)
                 .runBlockedReason(blockedReason)
                 .runsLeftToday(runsLeftToday)
+                .openToAll(properties.openToAll())
                 .job(latest.map(SimulationService::toJobInfo).orElse(null))
                 .result(withResult.map(job -> toResultInfo(team, job)).orElse(null))
                 .build();
@@ -753,18 +756,49 @@ public class SimulationService {
         return Optional.ofNullable(team.getRegulation()).map(ENGINE_REGULATIONS::get);
     }
 
-    private long jobsToday(Long userId) {
-        return jobsToday(userId, Kind.SIMULATE);
+    /**
+     * Jobs of a kind the user may still submit today (UTC).
+     *
+     * @param reason why it's none, or will be once {@code left} runs out: the user's own
+     *               daily limit, or everyone's when that's the one that binds. A batch
+     *               reads it once and refuses the rest with it.
+     */
+    record RunsLeft(long left, String reason) {}
+
+    /**
+     * The user's own daily cap for the kind, and the global one when it's set: what a day
+     * can cost once jobs are open to everyone. The global count isn't locked across users,
+     * so simultaneous submits can overshoot it by a job or two.
+     */
+    RunsLeft runsLeft(Long userId, Kind kind) {
+        boolean plan = kind == Kind.PLAN;
+        String what = plan ? "simulated plans" : "simulations";
+        int personalCap = plan ? properties.planDailyCap() : properties.dailyCap();
+        long personal = Math.max(0, personalCap - jobsToday(userId, kind));
+        String personalReason = "You've reached today's limit of " + personalCap + " " + what + ".";
+        int globalCap = plan ? properties.globalPlanDailyCap() : properties.globalDailyCap();
+        if (personal == 0 || globalCap <= 0) {
+            return new RunsLeft(personal, personalReason);
+        }
+        long everyone = Math.max(0, globalCap - jobsTodayEveryone(kind));
+        if (everyone < personal) {
+            return new RunsLeft(everyone,
+                    "Today's " + what + " are used up for everyone. More are available after midnight UTC.");
+        }
+        return new RunsLeft(personal, personalReason);
     }
 
     /** Jobs of a kind the user submitted today (UTC): each kind has its own daily cap. */
     long jobsToday(Long userId, Kind kind) {
-        Instant startOfDay = LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant();
-        return jobRepository.countByRequestedByAndKindAndCreatedAtAfter(userId, kind, startOfDay);
+        return jobRepository.countByRequestedByAndKindAndCreatedAtAfter(userId, kind, startOfToday());
     }
 
-    private String dailyCapMessage() {
-        return "You've reached today's limit of " + properties.dailyCap() + " simulations.";
+    private long jobsTodayEveryone(Kind kind) {
+        return jobRepository.countByKindAndCreatedAtAfter(kind, startOfToday());
+    }
+
+    private static Instant startOfToday() {
+        return LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant();
     }
 
     void requireEnabled() {

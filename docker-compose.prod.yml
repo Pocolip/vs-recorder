@@ -47,6 +47,8 @@ services:
       - ENGINE_ALLOWED_USERS=${ENGINE_ALLOWED_USERS:-}
       - ENGINE_DAILY_CAP=${ENGINE_DAILY_CAP:-3}
       - ENGINE_PLAN_DAILY_CAP=${ENGINE_PLAN_DAILY_CAP:-20}
+      - ENGINE_GLOBAL_DAILY_CAP=${ENGINE_GLOBAL_DAILY_CAP:-0}
+      - ENGINE_GLOBAL_PLAN_DAILY_CAP=${ENGINE_GLOBAL_PLAN_DAILY_CAP:-0}
       - AWS_REGION=${AWS_REGION}
       # Non-heap (metaspace + code cache) runs ~145MB, plus ~50MB native/GC overhead,
       # so the container limit must stay well above Xmx + 200MB or the cgroup OOM-kills the JVM.
