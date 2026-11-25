@@ -153,19 +153,21 @@ public class ExportController {
      * Note: This endpoint is public to allow sharing export codes.
      * The actual import still requires authentication.
      *
-     * @param code the 6-character share code
+     * @param code the share code (8 characters, or 6 for older codes)
      * @return the export data
      */
     @GetMapping("/api/export/{code}")
-    public ResponseEntity<ExportDTO.ExportData> getExportByCode(@PathVariable String code) {
-        log.info("Fetching export by code: {}", code);
+    public ResponseEntity<ExportDTO.ExportData> getExportByCode(
+            @PathVariable String code,
+            Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
 
         // Basic validation
-        if (code == null || code.length() != 6) {
+        if (code == null || (code.length() != 6 && code.length() != 8)) {
             return ResponseEntity.badRequest().build();
         }
 
-        ExportDTO.ExportData exportData = teamExportService.getExportByCode(code);
+        ExportDTO.ExportData exportData = teamExportService.getExportByCode(code, userId);
         return ResponseEntity.ok(exportData);
     }
 
@@ -185,7 +187,7 @@ public class ExportController {
             @Valid @RequestBody ExportDTO.ImportCodeRequest request) {
 
         Long userId = getCurrentUserId(authentication);
-        log.info("Importing team from code {} for user {}", request.getCode(), userId);
+        log.info("Importing team from a share code for user {}", userId);
 
         ExportDTO.ImportResult result = teamImportService.importFromCode(request.getCode(), userId);
 

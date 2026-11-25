@@ -8,7 +8,6 @@ import com.yeskatronics.vs_recorder_backend.exceptions.RateLimitExceededExceptio
 import com.yeskatronics.vs_recorder_backend.security.CustomUserDetailsService;
 import com.yeskatronics.vs_recorder_backend.security.JwtUtil;
 import com.yeskatronics.vs_recorder_backend.services.PasswordResetService;
-import com.yeskatronics.vs_recorder_backend.services.TeamCollaboratorService;
 import com.yeskatronics.vs_recorder_backend.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +47,6 @@ public class AuthController {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordResetService passwordResetService;
-    private final TeamCollaboratorService collaboratorService;
 
     /**
      * Register a new user
@@ -86,14 +84,6 @@ public class AuthController {
 
             // Save user
             User savedUser = userService.createUser(user);
-
-            // If this user was invited to any teams (by email) before they registered, auto-accept now.
-            try {
-                collaboratorService.autoAcceptOnSignup(savedUser.getId(), savedUser.getEmail());
-            } catch (RuntimeException e) {
-                log.warn("Auto-accept of pending collaboration invites failed for user {}: {}",
-                        savedUser.getId(), e.getMessage());
-            }
 
             // Generate JWT tokens
             UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getUsername());
@@ -433,10 +423,15 @@ public class AuthController {
     /**
      * Helper method to extract client IP address
      */
-    private String getClientIp(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
+    /**
+     * The client's address, for rate limits. nginx sets X-Real-IP (from Cloudflare's
+     * CF-Connecting-IP) and overwrites whatever the client sent. X-Forwarded-For isn't used:
+     * its first entry is whatever the client put there.
+     */
+    static String getClientIp(HttpServletRequest request) {
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
         }
         return request.getRemoteAddr();
     }

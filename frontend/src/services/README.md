@@ -22,7 +22,7 @@ This directory contains the service layer for the VS Recorder frontend applicati
    - Wraps replayApi with batch operations
    - Match summary generation
    - Replay validation and deduplication
-   - Functions: `getById`, `createFromUrl`, `create`, `update`, `deleteReplay`, `getByTeamId`, `getByResult`, `existsByUrl`, `existsByUrlForTeam`, `getCountByTeamId`, `createManyFromUrls`, `getStandaloneReplays`, `search`, `getMatchSummary`, `getGameByGameResults`
+   - Functions: `getById`, `createFromUrl`, `create`, `update`, `deleteReplay`, `getByTeamId`, `getByResult`, `existsByUrlForTeam`, `getCountByTeamId`, `createManyFromUrls`, `getStandaloneReplays`, `search`, `getMatchSummary`, `getGameByGameResults`
 
 4. **matchService.ts** (218 lines)
    - Wraps matchApi with enhanced queries

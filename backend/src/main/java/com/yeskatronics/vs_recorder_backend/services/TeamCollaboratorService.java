@@ -149,10 +149,10 @@ public class TeamCollaboratorService {
         return collaboratorRepository.save(invite);
     }
 
-    public TeamCollaborator updatePermissions(Long collaboratorId,
+    /** The caller must have checked they own {@code teamId}; the collaborator must be on it. */
+    public TeamCollaborator updatePermissions(Long teamId, Long collaboratorId,
                                               TeamCollaboratorDTO.UpdatePermissionsRequest request) {
-        TeamCollaborator collaborator = collaboratorRepository.findById(collaboratorId)
-                .orElseThrow(() -> new IllegalArgumentException("Collaborator not found"));
+        TeamCollaborator collaborator = onTeam(teamId, collaboratorId);
         collaborator.setCanAddReplays(request.isCanAddReplays());
         collaborator.setCanDeleteReplays(request.isCanDeleteReplays());
         collaborator.setCanEditReplayNotes(request.isCanEditReplayNotes());
@@ -163,11 +163,14 @@ public class TeamCollaboratorService {
         return collaboratorRepository.save(collaborator);
     }
 
-    public void remove(Long collaboratorId) {
-        if (!collaboratorRepository.existsById(collaboratorId)) {
-            throw new IllegalArgumentException("Collaborator not found");
-        }
-        collaboratorRepository.deleteById(collaboratorId);
+    /** The caller must have checked they own {@code teamId}; the collaborator must be on it. */
+    public void remove(Long teamId, Long collaboratorId) {
+        collaboratorRepository.delete(onTeam(teamId, collaboratorId));
+    }
+
+    private TeamCollaborator onTeam(Long teamId, Long collaboratorId) {
+        return collaboratorRepository.findByIdAndTeamId(collaboratorId, teamId)
+                .orElseThrow(() -> new IllegalArgumentException("Collaborator not found"));
     }
 
     /**
@@ -195,51 +198,20 @@ public class TeamCollaboratorService {
         return collaboratorRepository.findTeamsOwnedByUserWithCollaborators(ownerUserId);
     }
 
+    /**
+     * Invites attached to this account: an owner invited the email of an existing account.
+     * An invite sent before the account existed isn't listed; its recipient accepts it from
+     * the emailed link, whose token shows they got the email (emails aren't verified at
+     * sign-up, so matching on the account's email alone would let anyone claim it).
+     */
     @Transactional(readOnly = true)
-    public List<TeamCollaborator> listPendingInvitesForUser(Long userId, String email) {
-        // Two ways pending invites can match the current user:
-        //   1. the row was pre-linked to user_id (a previous accept attempt or admin link)
-        //   2. invite_email matches the user's email (most common path)
-        List<TeamCollaborator> byUser = collaboratorRepository.findByUserIdAndStatus(userId, Status.PENDING);
-        List<TeamCollaborator> byEmail = collaboratorRepository
-                .findByInviteEmailIgnoreCaseAndStatus(email, Status.PENDING);
-        // Merge, deduping by id
-        return java.util.stream.Stream.concat(byUser.stream(), byEmail.stream())
-                .collect(java.util.stream.Collectors.toMap(TeamCollaborator::getId, c -> c, (a, b) -> a))
-                .values()
-                .stream()
-                .toList();
+    public List<TeamCollaborator> listPendingInvitesForUser(Long userId) {
+        return collaboratorRepository.findByUserIdAndStatus(userId, Status.PENDING);
     }
 
     @Transactional(readOnly = true)
     public Optional<TeamCollaborator> findByToken(String token) {
         return collaboratorRepository.findByInviteToken(token);
-    }
-
-    /**
-     * Called from AuthService.register so that anyone who was invited before they had an
-     * account is auto-added to the team when they sign up with the matching email.
-     */
-    public void autoAcceptOnSignup(Long userId, String email) {
-        if (email == null) return;
-        List<TeamCollaborator> pending = collaboratorRepository
-                .findByInviteEmailIgnoreCaseAndStatus(email, Status.PENDING);
-        if (pending.isEmpty()) return;
-
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) return;
-
-        LocalDateTime now = LocalDateTime.now();
-        for (TeamCollaborator invite : pending) {
-            if (invite.isExpired()) continue;
-            invite.setUser(user);
-            invite.setStatus(Status.ACCEPTED);
-            invite.setAcceptedAt(now);
-            invite.setInviteToken(null);
-            collaboratorRepository.save(invite);
-            log.info("Auto-accepted invite {} for new user {} on team {}",
-                    invite.getId(), userId, invite.getTeam().getId());
-        }
     }
 
     private void applyPermissions(TeamCollaborator c, TeamCollaboratorDTO.InviteRequest r) {

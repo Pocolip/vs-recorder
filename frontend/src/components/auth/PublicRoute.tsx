@@ -1,9 +1,11 @@
-import { Navigate } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import type { ReactNode } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { redirectTarget } from "../../utils/redirect";
 
 const PublicRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
+  const { search } = useLocation();
 
   if (loading) {
     return (
@@ -14,7 +16,7 @@ const PublicRoute = ({ children }: { children: ReactNode }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectTarget(search)} replace />;
   }
 
   return <>{children}</>;

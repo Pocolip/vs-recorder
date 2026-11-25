@@ -175,8 +175,8 @@ public class ExportDTO {
     @AllArgsConstructor
     public static class ImportCodeRequest {
         @NotBlank(message = "Export code is required")
-        @Size(min = 6, max = 6, message = "Export code must be exactly 6 characters")
-        @Pattern(regexp = "^[A-HJ-NP-Z2-9]{6}$", message = "Invalid export code format")
+        @Size(min = 6, max = 8, message = "Export code must be 6 or 8 characters")
+        @Pattern(regexp = "^[A-HJ-NP-Z2-9]{6}([A-HJ-NP-Z2-9]{2})?$", message = "Invalid export code format")
         private String code;
     }
 

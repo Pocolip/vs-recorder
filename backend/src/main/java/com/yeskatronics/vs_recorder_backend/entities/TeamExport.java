@@ -33,13 +33,13 @@ public class TeamExport {
     private Long id;
 
     /**
-     * 6-character alphanumeric share code (e.g., "ABC123")
-     * Uses A-Z (excluding I,O) and 2-9 to avoid ambiguous characters
+     * Alphanumeric share code: 8 characters (6 for codes made before 2026-11), from A-Z
+     * (excluding I,O) and 2-9 to avoid ambiguous characters
      */
     @NotBlank(message = "Export code is required")
-    @Size(min = 6, max = 6, message = "Export code must be exactly 6 characters")
-    @Pattern(regexp = "^[A-HJ-NP-Z2-9]{6}$", message = "Export code must contain only valid characters")
-    @Column(nullable = false, unique = true, length = 6)
+    @Size(min = 6, max = 8, message = "Export code must be 6 or 8 characters")
+    @Pattern(regexp = "^[A-HJ-NP-Z2-9]{6}([A-HJ-NP-Z2-9]{2})?$", message = "Export code must contain only valid characters")
+    @Column(nullable = false, unique = true, length = 8)
     private String code;
 
     /**
