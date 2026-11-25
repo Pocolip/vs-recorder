@@ -20,6 +20,25 @@ export interface SimulationJob {
   errorMessage: string | null;
   createdAt: string;
   updatedAt: string | null;
+  /** While it waits its turn: the jobs ahead of it in the engine's queue (everyone's). */
+  jobsAhead?: number | null;
+  /** While it waits its turn: estimated minutes before it starts. */
+  startsInMinutes?: number | null;
+}
+
+/**
+ * The engine's one worker, shared by everyone. asleep: nothing to do, powered off.
+ * awake: nothing to do, still up after its last job. starting: jobs are waiting while
+ * it powers on. busy: running a job.
+ */
+export type EngineQueueState = "asleep" | "awake" | "starting" | "busy";
+
+/** The engine's queue as a job submitted now would find it (backend SimulationDTO.QueueInfo). */
+export interface EngineQueue {
+  state: EngineQueueState;
+  jobsAhead: number;
+  /** Estimated minutes before a job submitted now starts, start-up included. */
+  waitMinutes: number;
 }
 
 export interface SimulationOpponentPokemon {
@@ -52,6 +71,7 @@ export interface SimulationStatus {
   openToAll?: boolean;
   job: SimulationJob | null;
   result: SimulationResultInfo | null;
+  queue?: EngineQueue | null;
 }
 
 /** Rates here are 0-1, unlike the analytics pages' whole percentages. */
@@ -143,6 +163,7 @@ export interface PlanStatus {
   /** Plans the viewer may still submit today; null unless they may run them on this team. */
   runsLeftToday: number | null;
   entries: PlanEntryStatus[];
+  queue?: EngineQueue | null;
 }
 
 export interface PlanSubmitOutcome {

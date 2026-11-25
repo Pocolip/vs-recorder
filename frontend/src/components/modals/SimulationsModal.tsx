@@ -4,7 +4,15 @@ import { Modal } from "../ui/modal";
 import { useSimulation } from "../../context/SimulationContext";
 import { usePlanSimulationContext } from "../../context/PlanSimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
-import { DEPTH_OPTIONS, accessNote, depthName, describeProgress, planSummary } from "../../utils/simulationUtils";
+import {
+  DEPTH_OPTIONS,
+  accessNote,
+  depthName,
+  describeProgress,
+  describeQueue,
+  describeQueuedJob,
+  planSummary,
+} from "../../utils/simulationUtils";
 import type { SimulationStatus, Team } from "../../types";
 
 const buttonBase =
@@ -99,7 +107,7 @@ function CurrentStatus({ status }: { status: SimulationStatus }) {
           : `${kind} running`;
     detail =
       job.status === "QUEUED" && !job.cancelRequested
-        ? `Started ${formatTime(job.createdAt)}. Starting the engine can take a few minutes.`
+        ? `Started ${formatTime(job.createdAt)}. ${describeQueuedJob(job) ?? "Starting the engine can take a few minutes."}`
         : [describeProgress(job.progress), `started ${formatTime(job.createdAt)}`].filter(Boolean).join(" · ");
     if (isOwner && !job.cancelRequested) {
       action = (
@@ -238,6 +246,9 @@ function SimulatedAnalytics({ status, teamId }: { status: SimulationStatus; team
         })}
       </div>
 
+      {canRun && status.queue && (
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{describeQueue(status.queue)}</p>
+      )}
       {running && <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">One run at a time per team.</p>}
       {!canRun && !running && runBlockedReason && (
         <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-400">{runBlockedReason}</p>

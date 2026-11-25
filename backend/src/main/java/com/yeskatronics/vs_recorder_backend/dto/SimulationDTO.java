@@ -37,6 +37,28 @@ public class SimulationDTO {
         private JobInfo job;
         /** The result the pages show (the latest job with one), or null. */
         private ResultInfo result;
+        /** The engine's queue as a job submitted now would find it; null when disabled. */
+        private QueueInfo queue;
+    }
+
+    /**
+     * The engine's queue, shared by everyone's jobs: one worker runs one job at a time,
+     * oldest first. Counts and estimates only, nothing about other users' jobs.
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QueueInfo {
+        /**
+         * "asleep" (nothing to do and powered off), "awake" (nothing to do, still up after
+         * its last job), "starting" (jobs waiting while it powers on) or "busy" (running one).
+         */
+        private String state;
+        /** Jobs a job submitted now would wait behind. */
+        private int jobsAhead;
+        /** Estimated minutes before a job submitted now starts, start-up included. */
+        private int waitMinutes;
     }
 
     @Data
@@ -60,6 +82,10 @@ public class SimulationDTO {
         private String errorMessage;
         private Instant createdAt;
         private Instant updatedAt;
+        /** While it waits its turn: the jobs ahead of it in the engine's queue. Null otherwise. */
+        private Integer jobsAhead;
+        /** While it waits its turn: estimated minutes before it starts. Null otherwise. */
+        private Integer startsInMinutes;
     }
 
     @Data

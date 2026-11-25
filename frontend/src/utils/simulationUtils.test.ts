@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { planJob, planResult } from "../test/planFixtures";
 import { simulationJob } from "../test/simulationFixtures";
-import { describePlanProgress, describeProgress, engineProgress, jobProgress, percent, percentRange, planErrorMessage, planJobProgress, planSummary, simulatedScopeLabel, staleLabel } from "./simulationUtils";
+import { describePlanProgress, describeProgress, describeQueue, describeQueuedJob, engineProgress, formatWait, jobProgress, percent, percentRange, planErrorMessage, planJobProgress, planSummary, simulatedScopeLabel, staleLabel } from "./simulationUtils";
 
 describe("describeProgress", () => {
   it("names each engine stage", () => {
@@ -15,6 +15,42 @@ describe("describeProgress", () => {
     expect(describeProgress("train 1/2")).toBe("train 1/2");
     expect(describeProgress(null)).toBeNull();
     expect(describeProgress("")).toBeNull();
+  });
+});
+
+describe("the engine's queue", () => {
+  it("rounds waits the way people say them", () => {
+    expect(formatWait(0)).toBe("about a minute");
+    expect(formatWait(1)).toBe("about a minute");
+    expect(formatWait(12)).toBe("about 12 minutes");
+    expect(formatWait(33)).toBe("about 35 minutes");
+    expect(formatWait(58)).toBe("about 1 hour");
+    expect(formatWait(71)).toBe("about 1 hour 10 minutes");
+    expect(formatWait(120)).toBe("about 2 hours");
+  });
+
+  it("describes the queue a run would join", () => {
+    expect(describeQueue(null)).toBeNull();
+    expect(describeQueue({ state: "awake", jobsAhead: 0, waitMinutes: 0 })).toBe(
+      "The engine is free: a run would start right away.",
+    );
+    expect(describeQueue({ state: "asleep", jobsAhead: 0, waitMinutes: 3 })).toBe(
+      "The engine is free. It's powered off when idle, so a run would start in about 3 minutes.",
+    );
+    expect(describeQueue({ state: "starting", jobsAhead: 1, waitMinutes: 7 })).toBe(
+      "The engine is starting up for 1 job. A run now would start in about 7 minutes.",
+    );
+    expect(describeQueue({ state: "busy", jobsAhead: 3, waitMinutes: 55 })).toBe(
+      "The engine is busy, with 3 jobs in line. A run now would start in about 55 minutes.",
+    );
+  });
+
+  it("gives a queued job its place in line", () => {
+    expect(describeQueuedJob({ jobsAhead: 0, startsInMinutes: 2 })).toBe("Next in line: starts in about 2 minutes.");
+    expect(describeQueuedJob({ jobsAhead: 2, startsInMinutes: 40 })).toBe(
+      "2 jobs ahead in the engine's queue: starts in about 40 minutes.",
+    );
+    expect(describeQueuedJob({ jobsAhead: null, startsInMinutes: null })).toBeNull();
   });
 });
 

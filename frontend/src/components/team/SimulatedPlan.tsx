@@ -5,6 +5,7 @@ import {
   CATEGORY_LABEL,
   PLAN_CAVEAT,
   describePlanProgress,
+  describeQueuedJob,
   percent,
   percentRange,
   planErrorMessage,
@@ -139,7 +140,7 @@ function JobState({
     const text = job.cancelRequested
       ? "Cancelling…"
       : job.status === "QUEUED"
-        ? "Queued. Starting the engine can take a few minutes."
+        ? `Queued. ${describeQueuedJob(job) ?? "Starting the engine can take a few minutes."}`
         : job.status === "PARTIAL"
           ? "What to bring is ready; playing the matchup for a win rate…"
           : `Simulating${progress ? `: ${progress}` : "…"}`;

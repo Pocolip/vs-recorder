@@ -175,6 +175,17 @@ public class SimulationJob {
     @Column(name = "last_changed_at", nullable = false)
     private Instant lastChangedAt;
 
+    /**
+     * When a poll first saw a worker on it (running or partial), so to within a poll.
+     * With {@link #finishedAt} it measures run times for queue wait estimates.
+     */
+    @Column(name = "started_at")
+    private Instant startedAt;
+
+    /** When a poll saw it finish (complete, failed or cancelled), or it was given up on. */
+    @Column(name = "finished_at")
+    private Instant finishedAt;
+
     public boolean isUnfinished() {
         return status != null && UNFINISHED.contains(status);
     }

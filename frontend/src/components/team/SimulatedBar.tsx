@@ -2,7 +2,7 @@ import { AlertTriangle, Cpu, Loader2 } from "lucide-react";
 import Switch from "../form/switch/Switch";
 import { useSimulation } from "../../context/SimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
-import { depthName, describeProgress, simulatedScopeLabel } from "../../utils/simulationUtils";
+import { depthName, describeProgress, describeQueuedJob, simulatedScopeLabel } from "../../utils/simulationUtils";
 
 const buttonClass =
   "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
@@ -56,7 +56,7 @@ export default function SimulatedBar({ showToggle = true }: { showToggle?: boole
     } else if (job.status === "RUNNING") {
       message = `${kind}${progress ? `: ${progress}` : " running…"}`;
     } else {
-      message = `${kind} queued. Starting the engine can take a few minutes.`;
+      message = `${kind} queued. ${describeQueuedJob(job) ?? "Starting the engine can take a few minutes."}`;
     }
     if (isOwner && !job.cancelRequested) action = button("Cancel", () => cancel(), false);
   } else if (job?.status === "FAILED") {

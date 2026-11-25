@@ -169,6 +169,12 @@ class PlanSimulationFlowTest {
         assertTrue(entry.getJob().isUnfinished());
         assertNull(entry.getJob().getDepth());
         assertNull(entry.getResult());
+        // In line in the order queued: the second waits for the first.
+        PlanDTO.EntryStatus second = entryStatus(response.getStatus(), inline);
+        assertEquals(0, entry.getJob().getJobsAhead());
+        assertEquals(1, second.getJob().getJobsAhead());
+        assertTrue(second.getJob().getStartsInMinutes() > entry.getJob().getStartsInMinutes());
+        assertEquals(2, response.getStatus().getQueue().getJobsAhead());
 
         SimulationJob saved = jobRepository.findById(entry.getJob().getId()).orElseThrow();
         assertEquals(Kind.PLAN, saved.getKind());

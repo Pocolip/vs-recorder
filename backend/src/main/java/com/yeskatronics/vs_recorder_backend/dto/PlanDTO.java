@@ -45,6 +45,8 @@ public class PlanDTO {
         private Integer runsLeftToday;
         /** One per entry of the team's planner, in the planner's order. */
         private List<EntryStatus> entries;
+        /** The engine's queue as a plan submitted now would find it; null when disabled. */
+        private SimulationDTO.QueueInfo queue;
     }
 
     @Data

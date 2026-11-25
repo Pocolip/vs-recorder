@@ -1,6 +1,7 @@
 package com.yeskatronics.vs_recorder_backend.repositories;
 
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob;
+import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Depth;
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Kind;
 import com.yeskatronics.vs_recorder_backend.entities.SimulationJob.Status;
 import jakarta.persistence.LockModeType;
@@ -65,6 +66,38 @@ public interface SimulationJobRepository extends JpaRepository<SimulationJob, UU
 
     /** The latest complete job that names its model: the model the engine runs now, as far as we know. */
     Optional<SimulationJob> findFirstByStatusAndModelIsNotNullOrderByLastChangedAtDesc(Status status);
+
+    // ==================== The queue (wait estimates) ====================
+
+    /** An unfinished job's place in the queue, without its result. */
+    interface QueuedJob {
+        UUID getId();
+        Kind getKind();
+        Depth getDepth();
+        Instant getCreatedAt();
+        Instant getStartedAt();
+        boolean isCancelRequested();
+    }
+
+    /** Every unfinished job, oldest first: the order the worker takes them in. */
+    List<QueuedJob> findByStatusInOrderByCreatedAtAsc(Collection<Status> statuses);
+
+    /** When a finished job ran, without its result. */
+    interface RunTime {
+        Instant getStartedAt();
+        Instant getFinishedAt();
+    }
+
+    /** Recent complete runs of a simulation depth that were seen start (page for how many). */
+    List<RunTime> findByKindAndDepthAndStatusAndStartedAtNotNullAndFinishedAtNotNullOrderByFinishedAtDesc(
+            Kind kind, Depth depth, Status status, Pageable pageable);
+
+    /** Recent complete runs of a kind that were seen start (page for how many). */
+    List<RunTime> findByKindAndStatusAndStartedAtNotNullAndFinishedAtNotNullOrderByFinishedAtDesc(
+            Kind kind, Status status, Pageable pageable);
+
+    /** A job a worker ran finished since then, so the worker may still be up. */
+    boolean existsByStartedAtNotNullAndFinishedAtAfter(Instant since);
 
     // ==================== The poller ====================
 
