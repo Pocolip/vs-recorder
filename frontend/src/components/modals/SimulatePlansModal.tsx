@@ -4,7 +4,7 @@ import { Modal } from "../ui/modal";
 import Checkbox from "../form/input/Checkbox";
 import PokemonTeam from "../pokemon/PokemonTeam";
 import { PlanBadge } from "../team/SimulatedPlan";
-import { SINGLE_PLAN_WARNING, accessNote, planErrorMessage } from "../../utils/simulationUtils";
+import { SINGLE_PLAN_WARNING, accessNote, describeQueue, planErrorMessage } from "../../utils/simulationUtils";
 import type { PlanSimulations } from "../../hooks/usePlanSimulations";
 import type { PlanEntryStatus, PlanSubmitOutcome } from "../../types";
 
@@ -196,6 +196,9 @@ export default function SimulatePlansModal({
       {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
       {status?.runBlockedReason && !status.canRun && (
         <p className="mt-3 text-sm text-yellow-700 dark:text-yellow-400">{status.runBlockedReason}</p>
+      )}
+      {status?.canRun && status.queue && (
+        <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">{describeQueue(status.queue)}</p>
       )}
 
       <div className="mt-6 flex flex-wrap items-center justify-end gap-3">

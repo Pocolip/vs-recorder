@@ -87,6 +87,7 @@ public class SimulationService {
     private final PokepasteService pokepasteService;
     private final PasteNormalizer pasteNormalizer;
     private final AnalyticsService analyticsService;
+    private final EngineQueueEstimator queueEstimator;
     private final EngineProperties properties;
     private final ObjectProvider<EngineQueue> queueProvider;
     private final ObjectProvider<WorkerStarter> workerStarterProvider;
@@ -206,6 +207,7 @@ public class SimulationService {
             job.setErrorCode(ERROR_QUEUE_UNAVAILABLE);
             job.setErrorMessage(QUEUE_UNAVAILABLE);
             job.setLastChangedAt(Instant.now());
+            job.setFinishedAt(Instant.now());
             job.setReconcilePending(true);
         }));
     }
@@ -398,6 +400,7 @@ public class SimulationService {
             job.setErrorCode(ERROR_TIMEOUT);
             job.setErrorMessage(GENERIC_FAILURE);
             job.setLastChangedAt(now);
+            job.setFinishedAt(now);
             // A worker may still claim it: keep it cancelled until it's safe to clean up.
             job.setReconcilePending(true);
         }
@@ -437,6 +440,9 @@ public class SimulationService {
         if (next != job.getStatus()) {
             job.setStatus(next);
             changed = true;
+        }
+        if (next != Status.QUEUED && job.getStartedAt() == null) {
+            job.setStartedAt(now);
         }
         String progress = state.get("progress");
         if (progress != null && !progress.equals(job.getProgress())) {
@@ -516,6 +522,7 @@ public class SimulationService {
         String id = job.getId().toString();
         job.setCleanupPending(true);
         job.setLastChangedAt(now);
+        job.setFinishedAt(now);
 
         SimulationResult result;
         try {
@@ -596,6 +603,7 @@ public class SimulationService {
         Team team = access.getTeam();
         Optional<SimulationJob> latest = jobRepository.findFirstByTeamIdAndKindOrderByCreatedAtDesc(team.getId(), Kind.SIMULATE);
         Optional<SimulationJob> withResult = shownResultJob(team.getId());
+        EngineQueueEstimator.Snapshot queue = queueEstimator.snapshot(Instant.now());
 
         boolean canRun = false;
         String blockedReason = null;
@@ -620,12 +628,14 @@ public class SimulationService {
                 .runBlockedReason(blockedReason)
                 .runsLeftToday(runsLeftToday)
                 .openToAll(properties.openToAll())
-                .job(latest.map(SimulationService::toJobInfo).orElse(null))
+                .job(latest.map(job -> toJobInfo(job, queue)).orElse(null))
                 .result(withResult.map(job -> toResultInfo(team, job)).orElse(null))
+                .queue(queue.forNewJob())
                 .build();
     }
 
-    private static SimulationDTO.JobInfo toJobInfo(SimulationJob job) {
+    private static SimulationDTO.JobInfo toJobInfo(SimulationJob job, EngineQueueEstimator.Snapshot queue) {
+        Optional<EngineQueueEstimator.Wait> wait = queue.forJob(job);
         return SimulationDTO.JobInfo.builder()
                 .id(job.getId())
                 .status(job.getStatus().name())
@@ -638,6 +648,8 @@ public class SimulationService {
                 .errorMessage(job.getErrorMessage())
                 .createdAt(job.getCreatedAt())
                 .updatedAt(job.getUpdatedAt())
+                .jobsAhead(wait.map(EngineQueueEstimator.Wait::jobsAhead).orElse(null))
+                .startsInMinutes(wait.map(EngineQueueEstimator.Wait::startsInMinutes).orElse(null))
                 .build();
     }
 

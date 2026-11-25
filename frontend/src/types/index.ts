@@ -31,6 +31,8 @@ export type {
   SimulationDiagnostics,
   SimulationMember,
   SimulationThreat,
+  EngineQueue,
+  EngineQueueState,
   PlanJob,
   PlanComposition,
   PlanCategory,
