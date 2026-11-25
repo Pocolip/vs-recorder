@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
+import { MarkdownInline } from "../../components/common/Markdown";
 import announcements from "../../data/announcements.json";
 
 function formatDate(dateStr: string): string {
@@ -38,7 +39,7 @@ export default function AnnouncementsSection() {
                 </span>
               </div>
               <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                {a.message}
+                <MarkdownInline text={a.message} />
               </p>
             </div>
           ))}

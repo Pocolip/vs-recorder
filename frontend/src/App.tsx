@@ -10,6 +10,7 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import HomePage from "./pages/Dashboard/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ResourcesPage from "./pages/ResourcesPage";
+import LegalPage from "./pages/Legal/LegalPage";
 import AnnouncementsPage from "./pages/Announcements/AnnouncementsPage";
 import ReplaysPage from "./pages/Team/ReplaysPage";
 import GameByGamePage from "./pages/Team/GameByGamePage";
@@ -78,6 +79,8 @@ export default function App() {
           <Route path="about" element={<AboutPage />} />
           <Route path="resources" element={<ResourcesPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
+          <Route path="terms" element={<LegalPage document="terms" />} />
+          <Route path="privacy" element={<LegalPage document="privacy" />} />
           <Route path="shared" element={<SharedHubPage />} />
           <Route path="invites/:token" element={<AcceptInvitePage />} />
           <Route path="team/:teamId" element={<TeamLayout />}>

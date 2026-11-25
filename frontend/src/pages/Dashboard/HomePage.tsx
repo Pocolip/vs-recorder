@@ -9,6 +9,7 @@ import RegulationFilter from "../../components/form/RegulationFilter";
 import NewTeamModal from "../../components/modals/NewTeamModal";
 import ImportTeamModal from "../../components/modals/ImportTeamModal";
 import Alert from "../../components/ui/alert/Alert";
+import { MarkdownInline } from "../../components/common/Markdown";
 import Toast from "../../components/ui/toast/Toast";
 import announcements from "../../data/announcements.json";
 import { useTeams } from "../../hooks/useTeams";
@@ -152,7 +153,7 @@ export default function HomePage() {
             <Alert
               variant="info"
               title={latestAnnouncement.title}
-              message={latestAnnouncement.message}
+              message={<MarkdownInline text={latestAnnouncement.message} />}
               onClose={dismissBanner}
             />
           </div>

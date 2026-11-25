@@ -1,5 +1,6 @@
 import { Megaphone } from "lucide-react";
 import PageMeta from "../../components/common/PageMeta";
+import { MarkdownInline } from "../../components/common/Markdown";
 import announcements from "../../data/announcements.json";
 
 function formatDate(dateStr: string): string {
@@ -42,7 +43,7 @@ export default function AnnouncementsPage() {
                 </span>
               </div>
               <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                {a.message}
+                <MarkdownInline text={a.message} />
               </p>
             </div>
           ))}
