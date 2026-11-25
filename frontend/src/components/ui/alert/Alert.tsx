@@ -1,10 +1,11 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { X } from "lucide-react";
 
 interface AlertProps {
   variant: "success" | "error" | "warning" | "info"; // Alert type
   title: string; // Title of the alert
-  message: string; // Message of the alert
+  message: ReactNode; // Message of the alert
   showLink?: boolean; // Whether to show the "Learn More" link
   linkHref?: string; // Link URL
   linkText?: string; // Link text

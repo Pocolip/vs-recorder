@@ -108,6 +108,10 @@ GitHub Actions handles CI and deployment:
 
 Issues and pull requests are welcome from anyone. See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit style, and the PR workflow.
 
+## Terms and privacy
+
+The [Terms of Service](frontend/src/content/legal/terms.md) and [Privacy Policy](frontend/src/content/legal/privacy.md) are Markdown files that the site renders at `/terms` and `/privacy`. Edit them there, and update the date at the top.
+
 ## License
 
 MIT
