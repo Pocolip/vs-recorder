@@ -634,6 +634,66 @@ class SimulationFlowTest {
     }
 
     @Test
+    void aCompleteResultRecordsItsModelAndPool() {
+        UUID id = submit(false).getJob().getId();
+        finishWith(id, completeJson);
+        assertEquals("run24-latest-70830fb1", job(id).getModel());
+        assertEquals("2026-10-23", job(id).getPoolSnapshot());
+
+        SimulationDTO.StatusResponse status = simulationService.getStatus(team.getId(), owner.getId(), "sim-owner");
+        assertFalse(status.getResult().isStale());
+        assertNull(status.getResult().getStaleReason());
+    }
+
+    @Test
+    void aNewPoolMakesTheResultOutOfDateAndWorthRunningAgain() {
+        finishWith(submit(false).getJob().getId(), completeJson);
+        engineNowRuns("run24-latest-70830fb1", "2026-11-24");
+
+        SimulationDTO.StatusResponse status = simulationService.getStatus(team.getId(), owner.getId(), "sim-owner");
+        assertTrue(status.getResult().isStale());
+        assertEquals(SimulationDTO.StaleReason.POOL, status.getResult().getStaleReason());
+        assertTrue(simulationService.getDiagnostics(team.getId(), owner.getId()).isStale());
+        // The same paste may run again without forcing it.
+        assertEquals("QUEUED", submit(false).getJob().getStatus());
+    }
+
+    @Test
+    void aNewModelMakesTheResultOutOfDate() {
+        finishWith(submit(false).getJob().getId(), completeJson);
+        engineNowRuns("run27-latest-00000000", "2026-10-23");
+
+        SimulationDTO.StatusResponse status = simulationService.getStatus(team.getId(), owner.getId(), "sim-owner");
+        assertEquals(SimulationDTO.StaleReason.MODEL, status.getResult().getStaleReason());
+    }
+
+    @Test
+    void aResultFromBeforePoolsWereRecordedIsOutOfDateOnceOneIs() {
+        UUID id = submit(false).getJob().getId();
+        finishWith(id, completeJson);
+        SimulationJob old = job(id);
+        old.setPoolSnapshot(null);
+        jobRepository.saveAndFlush(old);
+        assertFalse(simulationService.getStatus(team.getId(), owner.getId(), "sim-owner").getResult().isStale(),
+                "no pool known yet");
+
+        engineNowRuns("run24-latest-70830fb1", "2026-10-23");
+        assertEquals(SimulationDTO.StaleReason.POOL,
+                simulationService.getStatus(team.getId(), owner.getId(), "sim-owner").getResult().getStaleReason());
+    }
+
+    @Test
+    void aPasteChangeIsReportedBeforeAnEngineChange() {
+        finishWith(submit(false).getJob().getId(), completeJson);
+        engineNowRuns("run27-latest-00000000", "2026-11-24");
+        team.setPokepaste("https://pokepast.es/rain2");
+        teamRepository.saveAndFlush(team);
+
+        assertEquals(SimulationDTO.StaleReason.TEAM,
+                simulationService.getStatus(team.getId(), owner.getId(), "sim-owner").getResult().getStaleReason());
+    }
+
+    @Test
     void noResultMeansNotFound() {
         assertThrows(SimulationNotFoundException.class, () -> simulationService.getSimulatedUsageStats(team.getId()));
         assertThrows(SimulationNotFoundException.class, () -> simulationService.getDiagnostics(team.getId(), owner.getId()));
@@ -693,6 +753,21 @@ class SimulationFlowTest {
     private void finishWith(UUID id, String resultJson) {
         when(queue.result(id.toString())).thenReturn(Optional.of(resultJson));
         poller.poll();
+    }
+
+    /** Another team's job just completed on this model and pool. */
+    private void engineNowRuns(String model, String pool) {
+        SimulationJob other = new SimulationJob();
+        other.setId(UUID.randomUUID());
+        other.setTeam(saveTeam(collaborator, "VGC 2026 Regulation M-C"));
+        other.setRequestedBy(collaborator.getId());
+        other.setPasteUrl("https://pokepast.es/other");
+        other.setPasteSha256("0".repeat(64));
+        other.setStatus(Status.COMPLETE);
+        other.setModel(model);
+        other.setPoolSnapshot(pool);
+        other.setLastChangedAt(Instant.now().plusSeconds(60));
+        jobRepository.saveAndFlush(other);
     }
 
     private SimulationJob job(UUID id) {

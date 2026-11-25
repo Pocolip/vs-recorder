@@ -27,6 +27,7 @@ export type {
   SimulationJobStatus,
   SimulationDepth,
   SimulationResultInfo,
+  SimulationStaleReason,
   SimulationOpponentPokemon,
   SimulationDiagnostics,
   SimulationMember,

@@ -15,6 +15,12 @@ import java.util.UUID;
 public class SimulationDTO {
 
     /**
+     * Why a simulation is out of date: the team's paste changed, or the engine now plays
+     * other meta teams (POOL) or with another model (MODEL).
+     */
+    public enum StaleReason { TEAM, POOL, MODEL }
+
+    /**
      * {@code GET /api/teams/{id}/simulation}: everything the pages need to decide
      * what to show.
      */
@@ -98,8 +104,10 @@ public class SimulationDTO {
         private String status;
         /** "quick" or "full": the depth of the job that produced it. */
         private String depth;
-        /** The team's paste changed since this result. */
+        /** Something changed since this result: see {@code staleReason}. */
         private boolean stale;
+        /** What changed, when {@code stale}. */
+        private StaleReason staleReason;
         private int opponentsCount;
         private int totalGames;
         /**
