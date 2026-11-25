@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -91,17 +90,6 @@ public class UserService {
     }
 
     /**
-     * Get all users (admin function)
-     *
-     * @return list of all users
-     */
-    @Transactional(readOnly = true)
-    public List<User> getAllUsers() {
-        log.debug("Fetching all users");
-        return userRepository.findAll();
-    }
-
-    /**
      * Update user profile (email, password)
      *
      * @param id the user ID
@@ -149,45 +137,6 @@ public class UserService {
 
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
-    }
-
-    /**
-     * Delete a user (cascades to teams, replays, etc.)
-     *
-     * @param id the user ID
-     * @throws IllegalArgumentException if user not found
-     */
-    public void deleteUser(Long id) {
-        log.info("Deleting user with ID: {}", id);
-
-        if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("User not found with ID: " + id);
-        }
-
-        userRepository.deleteById(id);
-        log.info("User deleted successfully: {}", id);
-    }
-
-    /**
-     * Check if a username exists
-     *
-     * @param username the username to check
-     * @return true if exists, false otherwise
-     */
-    @Transactional(readOnly = true)
-    public boolean usernameExists(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    /**
-     * Check if an email exists
-     *
-     * @param email the email to check
-     * @return true if exists, false otherwise
-     */
-    @Transactional(readOnly = true)
-    public boolean emailExists(String email) {
-        return userRepository.existsByEmail(email);
     }
 
     /**

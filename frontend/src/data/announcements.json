@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-11-24-terms-privacy-simulations",
+    "date": "2026-11-24",
+    "title": "Terms, Privacy & Simulations Coming Soon",
+    "message": "VS Recorder now has a [Terms of Service](/terms) and a [Privacy Policy](/privacy), also linked at the bottom of the About page. The short version: your teams, pastes and replays stay yours, and none of your data is used to train the simulation engine. Engine simulations will also be turning on soon in a limited capacity. Keep an eye on socials for more info!"
+  },
+  {
     "id": "2026-10-02-login-with-email",
     "date": "2026-10-02",
     "title": "Sign In With Your Email",

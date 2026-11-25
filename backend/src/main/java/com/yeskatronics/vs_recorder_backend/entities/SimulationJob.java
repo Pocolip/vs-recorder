@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -75,9 +76,15 @@ public class SimulationJob {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Team team;
 
-    /** The column's default fills rows from before plans existed. */
+    /**
+     * The column's default fills rows from before plans existed. It's declared with
+     * {@code @ColumnDefault}, not in a {@code columnDefinition}: schema update compares a
+     * column definition with the database's type and, on every start, tries (and fails)
+     * to alter the column to the whole string, default included.
+     */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(16) default 'SIMULATE'")
+    @Column(nullable = false, length = 16)
+    @ColumnDefault("'SIMULATE'")
     private Kind kind = Kind.SIMULATE;
 
     /** PLAN only: the Matchup Planner entry the plan is for. */

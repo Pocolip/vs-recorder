@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import PageMeta from "../components/common/PageMeta";
 import {
   Users,
@@ -210,6 +211,18 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+
+        <p className="mt-8 text-center text-xs text-gray-400 dark:text-gray-500">
+          <Link to="/terms" className="hover:text-gray-600 hover:underline dark:hover:text-gray-300">
+            Terms of Service
+          </Link>
+          <span className="mx-2" aria-hidden>
+            ·
+          </span>
+          <Link to="/privacy" className="hover:text-gray-600 hover:underline dark:hover:text-gray-300">
+            Privacy Policy
+          </Link>
+        </p>
       </div>
     </>
   );
