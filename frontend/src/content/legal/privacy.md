@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: November 24, 2026_
+_Last updated: November 25, 2026_
 
 VS Recorder is a free, open-source hobby project run by a single maintainer. This policy explains what it collects, why, and who can see it. The short version: it keeps what it needs to run the site for you, doesn't sell or share your data, and doesn't use your data to train its simulation engine.
 
@@ -52,13 +52,14 @@ In the future, VS Recorder may ask users to volunteer data to help improve the e
 Your data is never sold, rented or shared for advertising. It's handled by only these services, to run the site:
 
 - **Amazon Web Services** hosts the site, its database and the simulation engine.
+- **Cloudflare** sits in front of the site, so your requests (including your IP address) pass through it.
 - **Resend** delivers the site's emails.
 - **Pokepaste, Pokebin and Pokémon Showdown**: the site fetches the pastes and replays you link from them.
 - **GitHub** serves Pokémon sprites, so your browser requests images from it. Ko-fi serves the donation button on the About page.
 
 Your data may also be disclosed if the law requires it.
 
-**People you share with:** collaborators you invite can see the teams you share with them, and anyone with a team's export code can view that export until it expires.
+**People you share with:** collaborators you invite can see the teams you share with them, and anyone signed in with a team's export code can view that export until you delete it.
 
 ## Keeping your data safe
 

@@ -49,10 +49,10 @@ public class TeamImportService {
      * Import a team from a share code
      */
     public ExportDTO.ImportResult importFromCode(String code, Long userId) {
-        log.info("Importing team from code: {} for user: {}", code, userId);
+        log.info("Importing team from a share code for user: {}", userId);
 
         // Fetch export data
-        ExportDTO.ExportData exportData = teamExportService.getExportByCode(code);
+        ExportDTO.ExportData exportData = teamExportService.getExportByCode(code, userId);
 
         // Import the data
         return importExportData(exportData, userId);

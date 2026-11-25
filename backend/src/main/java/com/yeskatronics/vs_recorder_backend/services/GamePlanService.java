@@ -35,24 +35,25 @@ public class GamePlanService {
     private final TeamAccessService teamAccessService;
 
     /**
-     * Resolve a game plan and verify the caller can access it.
-     *
-     * Access rules (a) the caller created the plan, OR (b) the plan is attached to a
-     * team and the caller is owner/accepted-collaborator of that team. For mutations
-     * (requireEdit=true) collaborators must additionally have {@link Permission#EDIT_GAME_PLANS}.
+     * Access rules: a plan linked to a team follows the team (owner, or accepted
+     * collaborator; for mutations, with {@link Permission#EDIT_GAME_PLANS}), whoever created
+     * it, so a collaborator who's removed loses the plan with the team. A plan with no team
+     * belongs to its creator alone.
      */
     private GamePlan requirePlanAccess(Long planId, Long userId, boolean requireEdit) {
         GamePlan plan = gamePlanRepository.findById(planId)
                 .orElseThrow(() -> new IllegalArgumentException("Game plan not found"));
+        checkAccess(plan, userId, requireEdit);
+        return plan;
+    }
 
-        boolean isCreator = plan.getUser() != null && userId.equals(plan.getUser().getId());
-        if (isCreator) {
-            return plan;
-        }
-
+    private void checkAccess(GamePlan plan, Long userId, boolean requireEdit) {
         Long teamId = plan.getTeamId();
         if (teamId == null) {
-            throw new TeamAccessDeniedException("Game plan not accessible to user " + userId);
+            if (plan.getUser() == null || !userId.equals(plan.getUser().getId())) {
+                throw new TeamAccessDeniedException("Game plan not accessible to user " + userId);
+            }
+            return;
         }
 
         if (requireEdit) {
@@ -60,7 +61,15 @@ public class GamePlanService {
         } else {
             teamAccessService.resolve(teamId, userId);
         }
-        return plan;
+    }
+
+    private boolean canRead(GamePlan plan, Long userId) {
+        try {
+            checkAccess(plan, userId, false);
+            return true;
+        } catch (IllegalArgumentException | TeamAccessDeniedException e) {
+            return false;
+        }
     }
 
     /**
@@ -135,7 +144,10 @@ public class GamePlanService {
     @Transactional(readOnly = true)
     public List<GamePlan> getGamePlansByUserId(Long userId) {
         log.debug("Fetching game plans for user ID: {}", userId);
-        return gamePlanRepository.findByUserId(userId);
+        // Plans they created, less those of teams they no longer have access to
+        return gamePlanRepository.findByUserId(userId).stream()
+                .filter(plan -> canRead(plan, userId))
+                .toList();
     }
 
     /**

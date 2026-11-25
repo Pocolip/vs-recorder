@@ -22,6 +22,8 @@ public interface TeamCollaboratorRepository extends JpaRepository<TeamCollaborat
 
     Optional<TeamCollaborator> findByInviteToken(String inviteToken);
 
+    Optional<TeamCollaborator> findByIdAndTeamId(Long id, Long teamId);
+
     List<TeamCollaborator> findByUserIdAndStatus(Long userId, Status status);
 
     @Query("SELECT c FROM TeamCollaborator c WHERE LOWER(c.inviteEmail) = LOWER(:email) AND c.status = :status")

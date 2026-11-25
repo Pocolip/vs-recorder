@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import { useAuth } from "../../context/AuthContext";
+import { redirectQuery, redirectTarget } from "../../utils/redirect";
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ export default function SignUpForm() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { search } = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ export default function SignUpForm() {
 
     try {
       await register({ username, email, password });
-      navigate("/");
+      navigate(redirectTarget(search), { replace: true });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Registration failed"
@@ -129,7 +131,7 @@ export default function SignUpForm() {
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Already have an account?{" "}
                 <Link
-                  to="/signin"
+                  to={`/signin${redirectQuery(search)}`}
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Sign In
