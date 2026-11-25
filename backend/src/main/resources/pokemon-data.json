@@ -1,5 +1,5 @@
 {
-  "version": "2026.05",
+  "version": "2026.11",
   "pokemon": {
     "bulbasaur": {
       "num": 1,
@@ -10367,6 +10367,7 @@
         "Flying"
       ],
       "aliases": [
+        "Vivillon-Meadow Pattern",
         "Vivillon-Pokeball",
         "vivillon-pokeball"
       ]
@@ -10381,7 +10382,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Icy Snow Pattern"
+      ]
     },
     "vivillon-polar": {
       "num": 666,
@@ -10393,7 +10396,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Polar Pattern"
+      ]
     },
     "vivillon-tundra": {
       "num": 666,
@@ -10405,7 +10410,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Tundra Pattern"
+      ]
     },
     "vivillon-continental": {
       "num": 666,
@@ -10417,7 +10424,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Continental Pattern"
+      ]
     },
     "vivillon-garden": {
       "num": 666,
@@ -10429,7 +10438,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Garden Pattern"
+      ]
     },
     "vivillon-elegant": {
       "num": 666,
@@ -10441,7 +10452,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Elegant Pattern"
+      ]
     },
     "vivillon-modern": {
       "num": 666,
@@ -10453,7 +10466,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Modern Pattern"
+      ]
     },
     "vivillon-marine": {
       "num": 666,
@@ -10465,7 +10480,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Marine Pattern"
+      ]
     },
     "vivillon-archipelago": {
       "num": 666,
@@ -10477,7 +10494,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Archipelago Pattern"
+      ]
     },
     "vivillon-high-plains": {
       "num": 666,
@@ -10489,7 +10508,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-High Plains Pattern"
+      ]
     },
     "vivillon-sandstorm": {
       "num": 666,
@@ -10501,7 +10522,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Sandstorm Pattern"
+      ]
     },
     "vivillon-river": {
       "num": 666,
@@ -10513,7 +10536,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-River Pattern"
+      ]
     },
     "vivillon-monsoon": {
       "num": 666,
@@ -10525,7 +10550,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Monsoon Pattern"
+      ]
     },
     "vivillon-savanna": {
       "num": 666,
@@ -10537,7 +10564,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Savanna Pattern"
+      ]
     },
     "vivillon-sun": {
       "num": 666,
@@ -10549,7 +10578,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Sun Pattern"
+      ]
     },
     "vivillon-ocean": {
       "num": 666,
@@ -10561,7 +10592,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Ocean Pattern"
+      ]
     },
     "vivillon-jungle": {
       "num": 666,
@@ -10573,7 +10606,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Jungle Pattern"
+      ]
     },
     "vivillon-fancy": {
       "num": 666,
@@ -10585,7 +10620,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Fancy Pattern"
+      ]
     },
     "vivillon-pokeball": {
       "num": 666,
@@ -10597,7 +10634,9 @@
         "Bug",
         "Flying"
       ],
-      "aliases": []
+      "aliases": [
+        "Vivillon-Poké Ball Pattern"
+      ]
     },
     "litleo": {
       "num": 667,
