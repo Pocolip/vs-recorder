@@ -69,6 +69,8 @@ const ImportTeamModal: React.FC<ImportTeamModalProps> = ({ isOpen, onClose, onIm
   const [code, setCode] = useState("");
   const [preview, setPreview] = useState<PreviewData | null>(null);
   const [previewing, setPreviewing] = useState(false);
+  // Share codes are 8 characters; codes made before 2026-11 are 6
+  const validCodeLength = code.length === 6 || code.length === 8;
 
   // JSON state
   const [jsonText, setJsonText] = useState("");
@@ -245,7 +247,7 @@ const ImportTeamModal: React.FC<ImportTeamModalProps> = ({ isOpen, onClose, onIm
             <button
               type="button"
               onClick={handlePreview}
-              disabled={(code.length !== 6 && code.length !== 8) || previewing}
+              disabled={!validCodeLength || previewing}
               className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               {previewing ? "Loading..." : "Preview"}
@@ -269,7 +271,7 @@ const ImportTeamModal: React.FC<ImportTeamModalProps> = ({ isOpen, onClose, onIm
             <button
               type="button"
               onClick={handleImportCode}
-              disabled={!code.trim() || importing}
+              disabled={!validCodeLength || importing}
               className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {importing ? "Importing..." : "Import"}
