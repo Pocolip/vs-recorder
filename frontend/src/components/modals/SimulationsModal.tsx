@@ -12,6 +12,7 @@ import {
   describeQueue,
   describeQueuedJob,
   planSummary,
+  simulationStaleLabel,
 } from "../../utils/simulationUtils";
 import type { SimulationStatus, Team } from "../../types";
 
@@ -170,7 +171,7 @@ function CurrentStatus({ status }: { status: SimulationStatus }) {
           {result.stale && (
             <p className="mt-1 flex items-center gap-1.5 text-yellow-700 dark:text-yellow-400">
               <AlertTriangle className="h-4 w-4 shrink-0" />
-              The team's paste changed since; run again to update it.
+              {simulationStaleLabel(result)} Run again to update it.
             </p>
           )}
         </div>

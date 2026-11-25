@@ -2,6 +2,7 @@ package com.yeskatronics.vs_recorder_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,8 +16,8 @@ import java.util.List;
  * pages render it as they render real replays. Rates in {@code opponents} and
  * {@code diagnostics} are 0-1, unlike the whole percentages in {@code metrics}.
  *
- * Unknown fields are ignored, and only {@code provenance.model} and
- * {@code provenance.created} are read.
+ * Unknown fields are ignored, and only {@code provenance.model},
+ * {@code provenance.pool_snapshot} and {@code provenance.created} are read.
  */
 @Data
 @NoArgsConstructor
@@ -134,6 +135,9 @@ public class SimulationResult {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Provenance {
         private String model;
+        /** The date of the meta teams it played against, e.g. "2026-11-16". */
+        @JsonProperty("pool_snapshot")
+        private String poolSnapshot;
         private String created;
     }
 }

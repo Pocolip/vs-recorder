@@ -133,8 +133,9 @@ class SimulationResultContractTest {
     }
 
     @Test
-    void provenanceReadsOnlyModelAndCreated() {
+    void provenanceReadsOnlyModelPoolAndCreated() {
         assertEquals("run24-latest-70830fb1", result.getProvenance().getModel());
+        assertEquals("2026-10-23", result.getProvenance().getPoolSnapshot());
         assertEquals("2026-11-06T01:37:55+00:00", result.getProvenance().getCreated());
     }
 

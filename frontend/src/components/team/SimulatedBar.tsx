@@ -2,7 +2,13 @@ import { AlertTriangle, Cpu, Loader2 } from "lucide-react";
 import Switch from "../form/switch/Switch";
 import { useSimulation } from "../../context/SimulationContext";
 import { useTeamPermissions } from "../../hooks/useTeamPermissions";
-import { depthName, describeProgress, describeQueuedJob, simulatedScopeLabel } from "../../utils/simulationUtils";
+import {
+  depthName,
+  describeProgress,
+  describeQueuedJob,
+  simulatedScopeLabel,
+  simulationStaleLabel,
+} from "../../utils/simulationUtils";
 
 const buttonClass =
   "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
@@ -86,7 +92,7 @@ export default function SimulatedBar({ showToggle = true }: { showToggle?: boole
       notes.push({ text: "Showing the results of an earlier simulation.", tone: "info" });
     }
     if (result.stale) {
-      notes.push({ text: "The team's paste changed since this simulation.", tone: "warning" });
+      notes.push({ text: simulationStaleLabel(result) ?? "", tone: "warning" });
     } else if (result.status === "partial") {
       notes.push({ text: "This simulation only has a partial result.", tone: "info" });
     }

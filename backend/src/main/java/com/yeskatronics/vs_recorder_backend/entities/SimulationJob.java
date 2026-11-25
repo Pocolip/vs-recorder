@@ -156,6 +156,13 @@ public class SimulationJob {
     @Column(length = 100)
     private String model;
 
+    /**
+     * The result's {@code provenance.pool_snapshot} (the date of the meta teams it played),
+     * once there's a complete result. Null for results from before it was recorded.
+     */
+    @Column(name = "pool_snapshot", length = 100)
+    private String poolSnapshot;
+
     @Column(name = "error_code", length = 50)
     private String errorCode;
 
