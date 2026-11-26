@@ -102,18 +102,6 @@ export async function getByResult(
 }
 
 /**
- * Check if a replay URL exists (any team)
- */
-export async function existsByUrl(url: string): Promise<boolean> {
-  try {
-    return await replayApi.checkExists(url);
-  } catch (error) {
-    console.error("Error checking replay existence:", error);
-    return false;
-  }
-}
-
-/**
  * Check if a replay URL exists for a specific team
  */
 export async function existsByUrlForTeam(

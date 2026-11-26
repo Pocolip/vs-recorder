@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeskatronics.vs_recorder_backend.dto.ExportDTO;
 import com.yeskatronics.vs_recorder_backend.entities.*;
+import com.yeskatronics.vs_recorder_backend.exceptions.RateLimitExceededException;
 import com.yeskatronics.vs_recorder_backend.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,16 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -43,10 +50,16 @@ public class TeamExportService {
 
     // Characters for code generation (excluding ambiguous: 0,1,I,O)
     private static final String CODE_CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    private static final int CODE_LENGTH = 6;
+    /** 32^8, about a trillion codes; codes made before were 6 characters and still work. */
+    private static final int CODE_LENGTH = 8;
+    /** Codes a user may look up and not find, per hour: enough for typos, not for guessing. */
+    static final int MAX_FAILED_LOOKUPS_PER_HOUR = 20;
+    private static final Duration FAILED_LOOKUP_WINDOW = Duration.ofHours(1);
     private static final int MAX_CODE_GENERATION_ATTEMPTS = 10;
 
     private final SecureRandom secureRandom = new SecureRandom();
+    /** Each user's recent failed lookups. In memory: there's one backend, and a restart only forgets an hour. */
+    private final Map<Long, Deque<Instant>> failedLookups = new ConcurrentHashMap<>();
 
     /**
      * Compile export data for a team
@@ -224,16 +237,20 @@ public class TeamExportService {
      * Get export data by share code
      */
     @Transactional(readOnly = true)
-    public ExportDTO.ExportData getExportByCode(String code) {
-        log.info("Fetching export by code: {}", code);
+    public ExportDTO.ExportData getExportByCode(String code, Long userId) {
+        checkLookupLimit(userId);
 
         String normalizedCode = code.toUpperCase().trim();
 
-        TeamExport export = teamExportRepository.findByCode(normalizedCode)
-                .orElseThrow(() -> new IllegalArgumentException("Export not found with code: " + code));
+        TeamExport export = teamExportRepository.findByCode(normalizedCode).orElse(null);
+        if (export == null) {
+            recordFailedLookup(userId);
+            throw new IllegalArgumentException("Export not found with that code");
+        }
 
         // Check expiration
         if (export.getExpiresAt() != null && export.getExpiresAt().isBefore(LocalDateTime.now())) {
+            recordFailedLookup(userId);
             throw new IllegalArgumentException("Export code has expired");
         }
 
@@ -302,6 +319,30 @@ public class TeamExportService {
             throw new IllegalStateException(
                     String.format("Rate limit exceeded. You can create up to %d export codes per day. Try again tomorrow.",
                             DAILY_CODE_LIMIT));
+        }
+    }
+
+    private void checkLookupLimit(Long userId) {
+        Deque<Instant> failures = failedLookups.get(userId);
+        if (failures == null) {
+            return;
+        }
+        synchronized (failures) {
+            Instant cutoff = Instant.now().minus(FAILED_LOOKUP_WINDOW);
+            while (!failures.isEmpty() && failures.peekFirst().isBefore(cutoff)) {
+                failures.pollFirst();
+            }
+            if (failures.size() >= MAX_FAILED_LOOKUPS_PER_HOUR) {
+                throw new RateLimitExceededException(
+                        "Too many share codes not found. Check the code and try again in an hour.");
+            }
+        }
+    }
+
+    private void recordFailedLookup(Long userId) {
+        Deque<Instant> failures = failedLookups.computeIfAbsent(userId, id -> new ArrayDeque<>());
+        synchronized (failures) {
+            failures.addLast(Instant.now());
         }
     }
 

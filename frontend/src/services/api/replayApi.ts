@@ -50,9 +50,6 @@ export const replayApi = {
 
   dissociateFromMatch: (replayId: number) =>
     apiClient.delete(`/api/replays/${replayId}/match`) as Promise<Replay>,
-
-  checkExists: (url: string) =>
-    apiClient.get(`/api/replays/check/url?url=${encodeURIComponent(url)}`) as Promise<boolean>,
 };
 
 export default replayApi;

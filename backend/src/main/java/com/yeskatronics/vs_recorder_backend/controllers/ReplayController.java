@@ -459,21 +459,6 @@ public class ReplayController {
     }
 
     /**
-     * Check if a replay URL exists
-     * GET /api/replays/check/url?url={url}
-     *
-     * @param url the replay URL to check
-     * @return boolean indicating if URL exists
-     */
-    @GetMapping("/check/url")
-    public ResponseEntity<Boolean> checkReplayUrlExists(@RequestParam String url) {
-        log.debug("Checking if replay URL exists: {}", url);
-
-        boolean exists = replayService.replayUrlExists(url);
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * Get win rate for a team
      * GET /api/replays/stats/win-rate?teamId={teamId}
      *

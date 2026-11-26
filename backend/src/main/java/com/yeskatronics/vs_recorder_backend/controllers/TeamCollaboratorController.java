@@ -78,7 +78,7 @@ public class TeamCollaboratorController {
             @Valid @RequestBody TeamCollaboratorDTO.UpdatePermissionsRequest request) {
         Long userId = getCurrentUserId(authentication);
         teamAccessService.requireOwner(teamId, userId);
-        TeamCollaborator updated = collaboratorService.updatePermissions(collaboratorId, request);
+        TeamCollaborator updated = collaboratorService.updatePermissions(teamId, collaboratorId, request);
         return ResponseEntity.ok(collaboratorMapper.toResponse(updated));
     }
 
@@ -89,7 +89,7 @@ public class TeamCollaboratorController {
             Authentication authentication) {
         Long userId = getCurrentUserId(authentication);
         teamAccessService.requireOwner(teamId, userId);
-        collaboratorService.remove(collaboratorId);
+        collaboratorService.remove(teamId, collaboratorId);
         return ResponseEntity.noContent().build();
     }
 
@@ -123,9 +123,8 @@ public class TeamCollaboratorController {
     @GetMapping("/api/collaborations/pending-invites")
     public ResponseEntity<List<TeamCollaboratorDTO.Response>> myPendingInvites(Authentication authentication) {
         Long userId = getCurrentUserId(authentication);
-        String email = userDetailsService.getUserEmailById(userId);
         List<TeamCollaboratorDTO.Response> response = collaboratorService
-                .listPendingInvitesForUser(userId, email).stream()
+                .listPendingInvitesForUser(userId).stream()
                 .map(collaboratorMapper::toResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);

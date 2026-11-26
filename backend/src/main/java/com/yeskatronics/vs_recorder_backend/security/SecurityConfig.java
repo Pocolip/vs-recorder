@@ -49,11 +49,10 @@ public class SecurityConfig {
                                 "/swagger-ui/**",         // Swagger UI
                                 "/v3/api-docs/**",        // OpenAPI docs
                                 "/swagger-ui.html",       // Swagger UI HTML
-                                "/actuator/**"            // Health checks and metrics
+                                "/actuator/health",       // Health checks
+                                "/actuator/health/**",
+                                "/actuator/info"
                         ).permitAll()
-                        // Public export code lookup (read-only, import still requires auth)
-                        .requestMatchers(HttpMethod.GET, "/api/export/{code}").permitAll()
-
                         // Public invite preview — the accept page calls this before login
                         // so it can show team/owner details. The accept POST still needs auth.
                         .requestMatchers(HttpMethod.GET, "/api/collaborations/invites/{token}").permitAll()

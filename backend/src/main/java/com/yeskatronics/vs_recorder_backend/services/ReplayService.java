@@ -447,17 +447,6 @@ public class ReplayService {
         return (double) wins / totalGames * 100;
     }
 
-    /**
-     * Check if a replay URL exists
-     *
-     * @param url the replay URL
-     * @return true if exists, false otherwise
-     */
-    @Transactional(readOnly = true)
-    public boolean replayUrlExists(String url) {
-        return replayRepository.existsByUrl(url);
-    }
-
     // ==================== Team activity timestamp ====================
 
     /**

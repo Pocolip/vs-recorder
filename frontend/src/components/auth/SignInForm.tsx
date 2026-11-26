@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useAuth } from "../../context/AuthContext";
+import { redirectQuery, redirectTarget } from "../../utils/redirect";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +18,7 @@ export default function SignInForm() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { search } = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ export default function SignInForm() {
 
     try {
       await login({ username, password });
-      navigate("/");
+      navigate(redirectTarget(search), { replace: true });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Invalid username/email or password"
@@ -128,7 +130,7 @@ export default function SignInForm() {
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Don&apos;t have an account?{" "}
                 <Link
-                  to="/signup"
+                  to={`/signup${redirectQuery(search)}`}
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Sign Up
