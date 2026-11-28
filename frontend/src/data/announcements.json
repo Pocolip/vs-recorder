@@ -1,5 +1,11 @@
 [
   {
+    "id": "2026-11-27-simulations-open",
+    "date": "2026-11-27",
+    "title": "Simulations Are Open",
+    "message": "For a limited time, any signed-in user can have the matchup engine play their team against the meta, no replays needed. Open **Simulations** in your team's sidebar and run a **Quick** (about 15 minutes) or **Full** (about 50 minutes) simulation against the top teams from recent events, then turn on the **Simulated** toggle to see the results on Usage Stats, Matchup Stats and Move Usage. The new **Diagnostics** page shows what's helping and hurting your win rate. In the **Matchup Planner**, pick teams and hit **Simulate** (about 5 minutes each) for suggested leads and backs, what they're likely to bring, and a win rate. Your own plans stay untouched, and \"Add to my plans\" copies a suggestion in. Simulations support Regulation M-C for now, and a team's owner can run a few a day. There's one shared engine, so you may wait in line: the modal shows how long before your run starts. Results are simulated games, not predictions against particular players. The engine will keep improving, and when it does, or the meta teams update, your results are marked out of date so you know to re-run. Feedback and odd results are welcome!"
+  },
+  {
     "id": "2026-11-24-terms-privacy-simulations",
     "date": "2026-11-24",
     "title": "Terms, Privacy & Simulations Coming Soon",
